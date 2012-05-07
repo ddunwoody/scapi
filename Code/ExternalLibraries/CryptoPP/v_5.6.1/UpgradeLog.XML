@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type='text/xsl' href='_UpgradeReport_Files/UpgradeReport.xslt'?><UpgradeLog>
+<Properties><Property Name="Solution" Value="cryptest">
+</Property><Property Name="Solution File" Value="C:\Users\user\Downloads\cryptopp561\cryptest.sln">
+</Property><Property Name="Date" Value="יום רביעי 11 מאי 2011">
+</Property><Property Name="Time" Value="11:34">
+</Property></Properties><Event ErrorLevel="0" Project="" Source="cryptest.sln" Description="File successfully backed up as C:\Users\user\Downloads\cryptopp561\cryptest.sln.old">
+</Event><Event ErrorLevel="0" Project="cryptdll" Source="cryptdll.vcproj" Description="Converting project file 'C:\Users\user\Downloads\cryptopp561\cryptdll.vcproj'.">
+</Event><Event ErrorLevel="1" Project="cryptdll" Source="cryptdll.vcproj" Description="This application has been updated to include settings related to the User Account Control (UAC) feature of Windows Vista. By default, when run on Windows Vista with UAC enabled, this application is marked to run with the same privileges as the process that launched it. This marking also disables the application from running with virtualization. You can change UAC related settings from the Property Pages of the project.">
+</Event><Event ErrorLevel="0" Project="cryptdll" Source="cryptdll.vcproj" Description="Done converting to new project file 'C:\Users\user\Downloads\cryptopp561\cryptdll.vcxproj'.">
+</Event><Event ErrorLevel="3" Project="cryptdll" Source="cryptdll.vcproj" Description="Converted">
+</Event><Event ErrorLevel="0" Project="cryptest" Source="cryptest.vcproj" Description="Converting project file 'C:\Users\user\Downloads\cryptopp561\cryptest.vcproj'.">
+</Event><Event ErrorLevel="1" Project="cryptest" Source="cryptest.vcproj" Description="This application has been updated to include settings related to the User Account Control (UAC) feature of Windows Vista. By default, when run on Windows Vista with UAC enabled, this application is marked to run with the same privileges as the process that launched it. This marking also disables the application from running with virtualization. You can change UAC related settings from the Property Pages of the project.">
+</Event><Event ErrorLevel="0" Project="cryptest" Source="cryptest.vcproj" Description="Done converting to new project file 'C:\Users\user\Downloads\cryptopp561\cryptest.vcxproj'.">
+</Event><Event ErrorLevel="3" Project="cryptest" Source="cryptest.vcproj" Description="Converted">
+</Event><Event ErrorLevel="0" Project="cryptlib" Source="cryptlib.vcproj" Description="Converting project file 'C:\Users\user\Downloads\cryptopp561\cryptlib.vcproj'.">
+</Event><Event ErrorLevel="1" Project="cryptlib" Source="cryptlib.vcproj" Description="This application has been updated to include settings related to the User Account Control (UAC) feature of Windows Vista. By default, when run on Windows Vista with UAC enabled, this application is marked to run with the same privileges as the process that launched it. This marking also disables the application from running with virtualization. You can change UAC related settings from the Property Pages of the project.">
+</Event><Event ErrorLevel="0" Project="cryptlib" Source="cryptlib.vcproj" Description="Done converting to new project file 'C:\Users\user\Downloads\cryptopp561\cryptlib.vcxproj'.">
+</Event><Event ErrorLevel="3" Project="cryptlib" Source="cryptlib.vcproj" Description="Converted">
+</Event><Event ErrorLevel="0" Project="dlltest" Source="dlltest.vcproj" Description="Converting project file 'C:\Users\user\Downloads\cryptopp561\dlltest.vcproj'.">
+</Event><Event ErrorLevel="1" Project="dlltest" Source="dlltest.vcproj" Description="This application has been updated to include settings related to the User Account Control (UAC) feature of Windows Vista. By default, when run on Windows Vista with UAC enabled, this application is marked to run with the same privileges as the process that launched it. This marking also disables the application from running with virtualization. You can change UAC related settings from the Property Pages of the project.">
+</Event><Event ErrorLevel="0" Project="dlltest" Source="dlltest.vcproj" Description="Done converting to new project file 'C:\Users\user\Downloads\cryptopp561\dlltest.vcxproj'.">
+</Event><Event ErrorLevel="3" Project="dlltest" Source="dlltest.vcproj" Description="Converted">
+</Event><Event ErrorLevel="0" Project="" Source="cryptest.sln" Description="Solution converted successfully">
+</Event><Event ErrorLevel="3" Project="" Source="cryptest.sln" Description="Converted">
+</Event></UpgradeLog>
