@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="JavaSrc"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry kind="lib" path="C:/Java/Workspace/bc/crypto-145/jars/bcprov-jdk16-145.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/aphache/commons-exec-1.1-bin/commons-exec-1.1/commons-exec-1.1.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
