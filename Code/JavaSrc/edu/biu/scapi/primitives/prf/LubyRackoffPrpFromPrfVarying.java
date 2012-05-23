@@ -1,13 +1,6 @@
 package edu.biu.scapi.primitives.prf;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.spec.AlgorithmParameterSpec;
-import java.security.spec.InvalidParameterSpecException;
-
 import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 
 import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.tools.Factories.PrfFactory;
@@ -23,61 +16,37 @@ import edu.biu.scapi.tools.Factories.PrfFactory;
  */
 public final class LubyRackoffPrpFromPrfVarying extends PrpFromPrfVarying {
 	
-	private SecureRandom random;
 	
 	public LubyRackoffPrpFromPrfVarying() throws FactoriesException {
 
-		//gets the requested prpVarying from the factory, creates random and call the extended constructor 
-		this(new IteratedPrfVarying(), new SecureRandom());
+		//default underlying PRF 
+		this(new IteratedPrfVarying());
 	}
 	
+		
 	/**
 	 * Constructor that accepts a name of a prfVaryingIOLength to be the underlying PRF.
-	 * @param prfVaryingIOLengthName the underlying PRF name
+	 * @param prfVaryingIOLengthName the underlying PRF name 
 	 * @throws FactoriesException
 	 */
 	public LubyRackoffPrpFromPrfVarying(String prfVaryingIOLengthName) throws FactoriesException {
 
-		//gets the requested prpVarying from the factory, creates random and call the extended constructor 
-		this((PrfVaryingIOLength) PrfFactory.getInstance().getObject(prfVaryingIOLengthName), new SecureRandom());
-	}
-	
-	/**
-	 * Constructor that accepts a name of a prfVaryingIOLength to be the underlying PRF.
-	 * @param prfVaryingIOLengthName the underlying PRF name
-	 * @param randNumGenAlg algorithm of randomness to use 
-	 * @throws FactoriesException
-	 * @throws NoSuchAlgorithmException 
-	 */
-	public LubyRackoffPrpFromPrfVarying(String prfVaryingIOLengthName, String randNumGenAlg) throws FactoriesException, NoSuchAlgorithmException {
-
 		//gets the requested prpVarying and random from the factories. 
 		//then call the extended constructor
-		this((PrfVaryingIOLength) PrfFactory.getInstance().getObject(prfVaryingIOLengthName), SecureRandom.getInstance(randNumGenAlg));
+		this((PrfVaryingIOLength) PrfFactory.getInstance().getObject(prfVaryingIOLengthName));
 	}
+	
 	
 	/**
 	 * Constructor that accepts a prfVaryingIOLength to be the underlying PRF.
 	 * @param prfVaryingIOLength the underlying PRF varying.
 	 */
 	public LubyRackoffPrpFromPrfVarying(PrfVaryingIOLength prfVaryingIOLength){
-		//creates random and call the extended constructor
-		this(prfVaryingIOLength, new SecureRandom());
-		
-	}
-	
-	/**
-	 * Constructor that accepts a prfVaryingIOLength to be the underlying PRF and a secureRandom object to use.
-	 * @param prfVaryingIOLength the underlying PRF varying.
-	 * @param random secureRandom object to use
-	 */
-	public LubyRackoffPrpFromPrfVarying(PrfVaryingIOLength prfVaryingIOLength, SecureRandom random){
 		
 		if(prfVaryingIOLength instanceof LubyRackoffPrpFromPrfVarying){
 			throw new IllegalArgumentException("Cannot create a LubyRackoffPrpFromPrfVarying from a LubyRackoffPrpFromPrfVarying object!");
 		}
 		this.prfVaryingIOLength = prfVaryingIOLength;
-		this.random = random;
 		
 	}
 	
