@@ -1,6 +1,8 @@
 package edu.biu.scapi.primitives.prf;
 
 import java.security.InvalidKeyException;
+import java.security.spec.AlgorithmParameterSpec;
+import java.security.spec.InvalidParameterSpecException;
 
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.SecretKey;
@@ -33,45 +35,57 @@ public abstract class PrfVaryingFromPrfVaryingInput implements PrfVaryingIOLengt
 		
 	}
 
+	/**
+	 * Check that the Secret Key for this instance has been set
+	 * @return true if key had been set<p>
+	 * 			false, otherwise.
+	 */
 	public boolean isKeySet(){
 		return prfVaryingInputLength.isKeySet();
 	}
 	
 
 	/** 
-	 * Since both input and output variables are varying this function should not be call. Throws an exception.
-	 * 
-	 * @throws IllegalBlockSizeException 
-	 * @throws UnInitializedException 
+	 * Since both input and output variables are varying this function should not be called.
+	 * @throws UnsupportedOperationException 
 	 */
-
 	public void computeBlock(byte[] inBytes, int inOff, byte[] outBytes,
 			int outOff) throws IllegalBlockSizeException{
-		if (!isKeySet()){
-			throw new IllegalStateException("secret key isn't set");
-		}
-		
-		throw new IllegalBlockSizeException("Input and output sizes are not specified");
-		
+		throw new UnsupportedOperationException("Only compute that gets lengths of I/O should be called for Varying Prf");
 	}
 
 
 
 	/** 
-	 * Since both input and output variables are varying this function should not be call. Throws an exception.
-	 * 
-	 * @throws IllegalBlockSizeException 
-	 * @throws UnInitializedException 
+	 * Since both input and output variables are varying this function should not be call.
+	 * @throws UnsupportedOperationException
 	 */
 	public void computeBlock(byte[] inBytes, int inOff, int inLen,
 			byte[] outBytes, int outOff) throws IllegalBlockSizeException{
-		
-		if (!isKeySet()){
-			throw new IllegalStateException("secret key isn't set");
-		}
-		
-		throw new IllegalBlockSizeException("Output size is not specified");
-		
+		throw new UnsupportedOperationException("Only compute that gets lengths of I/O should be called for Varying Prf");
+	}
+	
+	/**
+	 * Generate a SecretKey suitable for a Pseudo random permutation obtained from a Varying Prf.
+	 * @param keyParams an instance of a class implementing the AlgorithmParameterSpec interface 
+	 * 					that holds the necessary parameters to generate the key.
+	 * @return the generated secret key
+	 * @throws InvalidParameterSpecException if keyParams is not an instance of relevant Parameter Spec.
+	 */
+	@Override
+	public SecretKey generateKey(AlgorithmParameterSpec keyParams)
+			throws InvalidParameterSpecException {
+		return prfVaryingInputLength.generateKey(keyParams);
+	}
+
+	/**
+	 * Generate a SecretKey suitable for a Pseudo random permutation obtained from a Varying Prf.
+	 * @param keySize bit-length of required Secret Key
+	 * @return the generated secret key
+	 */
+	@Override
+	public SecretKey generateKey(int keySize) {
+		return prfVaryingInputLength.generateKey(keySize);
 	}
 
 }
