@@ -3,6 +3,8 @@ package edu.biu.scapi.primitives.prf.bc;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.security.spec.AlgorithmParameterSpec;
+import java.security.spec.InvalidParameterSpecException;
 
 import javax.crypto.SecretKey;
 
@@ -59,4 +61,13 @@ public final class BcTripleDES extends BcPRP implements TripleDES{
 		super.setKey(secretKey);
 	}
 
+	/**
+	 * This function should not be used to generate a key for TripleDes and it throws UnsupportedOperationException
+	 * @param keySize algorithmParameterSpec contains the required secret key size in bits 
+	 * @return the generated secret key
+	 * @throws UnsupportedOperationException 
+	 */
+	public SecretKey generateKey(AlgorithmParameterSpec keyParams) throws InvalidParameterSpecException{
+		throw new UnsupportedOperationException("To generate a key for this prf object use the generateKey(int keySize) function");
+	}
 }
