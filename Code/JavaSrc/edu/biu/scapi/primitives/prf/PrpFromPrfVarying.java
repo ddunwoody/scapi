@@ -1,6 +1,8 @@
 package edu.biu.scapi.primitives.prf;
 
 import java.security.InvalidKeyException;
+import java.security.spec.AlgorithmParameterSpec;
+import java.security.spec.InvalidParameterSpecException;
 
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.SecretKey;
@@ -37,13 +39,12 @@ public abstract class PrpFromPrfVarying implements PrpVaryingIOLength {
 	 * 
 	 * @throws IllegalBlockSizeException 
 	 */
-	public void computeBlock(byte[] inBytes, int inOff, byte[] outBytes,
-			int outOff) throws IllegalBlockSizeException {
+	public void computeBlock(byte[] inBytes, int inOff, byte[] outBytes, int outOff) throws IllegalBlockSizeException {
 		if (!isKeySet()){
 			throw new IllegalStateException("secret key isn't set");
 		}
 		
-		throw new IllegalBlockSizeException("to use this prp, call the computeBlock function which specify the block size length");
+		throw new IllegalBlockSizeException("to use this prp, call the computeBlock function that specifies the block size length");
 	}
 
 	/** 
@@ -61,9 +62,7 @@ public abstract class PrpFromPrfVarying implements PrpVaryingIOLength {
 	 * @param outLen the length of the output array
 	 * @throws IllegalBlockSizeException 
 	 */
-	public void computeBlock(byte[] inBytes, int inOff, int inLen,
-			byte[] outBytes, int outOff, int outLen)
-			throws IllegalBlockSizeException {
+	public void computeBlock(byte[] inBytes, int inOff, int inLen, byte[] outBytes, int outOff, int outLen)	throws IllegalBlockSizeException {
 		if (!isKeySet()){
 			throw new IllegalStateException("secret key isn't set");
 		}
@@ -89,13 +88,34 @@ public abstract class PrpFromPrfVarying implements PrpVaryingIOLength {
 	 * 
 	 * @throws IllegalBlockSizeException 
 	 */
-	public void invertBlock(byte[] inBytes, int inOff, byte[] outBytes,
-			int outOff) throws IllegalBlockSizeException{
+	public void invertBlock(byte[] inBytes, int inOff, byte[] outBytes,	int outOff) throws IllegalBlockSizeException{
 		if (!isKeySet()){
 			throw new IllegalStateException("secret key isn't set");
 		}
 		throw new IllegalBlockSizeException("to use this prp, call the invertBlock function which specify the block size length");
 		
+	}
+
+	/**
+	 * Generate a SecretKey suitable for a Pseudo random permutation obtained from a Varying Prf.
+	 * @param keyParams an instance of a class implementing the AlgorithmParameterSpec interface 
+	 * 					that holds the necessary parameters to generate the key.
+	 * @return the generated secret key
+	 * @throws InvalidParameterSpecException if keyParams is not an instance of relevant Parameter Spec.
+	 */
+	@Override
+	public SecretKey generateKey(AlgorithmParameterSpec keyParams) throws InvalidParameterSpecException {
+		return prfVaryingIOLength.generateKey(keyParams);
+	}
+
+	/**
+	 * Generate a SecretKey suitable for a Pseudo random permutation obtained from a Varying Prf.
+	 * @param keySize bit-length of required Secret Key
+	 * @return the generated secret key
+	 */
+	@Override
+	public SecretKey generateKey(int keySize) {
+		return prfVaryingIOLength.generateKey(keySize);
 	}
 	
 	
