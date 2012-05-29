@@ -131,6 +131,20 @@ public interface TrapdoorPermutation {
 	 * creates a random TPElement that is valid for this trapdoor permutation
 	 * @return TPElement - the created random element 
 	 */
-	public TPElement getRandomTPElement();
+	public TPElement generateRandomTPElement();
+	
+	/** 
+	 * Creates a TPElement from a specific value x. It checks that the x value is valid for this trapdoor permutation.
+	 * @return TPElement - If the x value is valid for this permutation return the created random element
+	 * @throws  IllegalArgumentException if the given value x is invalid for this permutation
+	 */
+	public TPElement generateTPElement(BigInteger x) throws IllegalArgumentException;
+	
+	/** 
+	 * Creates a TPElement from a specific value x. This function does not guarantee that the the returned "TPElement" is valid.<p>
+	 * It is the caller's responsibility to pass a legal x value.
+	 * @return TPElement - Set the x value and return the created random element
+	 */
+	public TPElement generateUncheckedTPElement(BigInteger x);
 	
 }

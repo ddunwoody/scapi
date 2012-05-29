@@ -8,7 +8,7 @@ import java.math.BigInteger;
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  */
-public final class CryptoPpRSAElement extends CryptoPpTrapdoorElement{
+final class CryptoPpRSAElement extends CryptoPpTrapdoorElement{
 	//native function. This function is implemented in CryptoPpJavaInterface dll using the JNI tool.
 	//returns a pointer to a random native integer object
 	private native long getPointerToRandomRSAElement(byte[] modN);
@@ -26,13 +26,17 @@ public final class CryptoPpRSAElement extends CryptoPpTrapdoorElement{
 	}
 		
 	/**
-	 * Constructor that gets a modulus and a value. If the value is a valid RSA element according to the modulus, sets it as the element.
+	 * Constructor that gets a modulus and a value. It sets the x value as the element. If check is true, it checks that the x value is a valid RSA element according to the modulus.
 	 * @param modN - the modulus
 	 * @param x - the element value
-	 * @throws IllegalArgumentException if the element is not legal according the modulus
+	 * @param check if true, check if x is valid for modulus
+	 * 				else, do not check and set x as is
+	 * @throws IllegalArgumentException if the element is not legal according to the modulus and check was requested
 	 */
-	public CryptoPpRSAElement(BigInteger modN, BigInteger x) throws IllegalArgumentException{
-		
+	public CryptoPpRSAElement(BigInteger modN, BigInteger x, boolean check) throws IllegalArgumentException{
+		if( !check){
+			pointerToInteger = getPointerToElement(x.toByteArray());
+		}else {
 		/*checks if the value is valid (between 1 to (modN) - 1 ).
 		  if valid - calls a native function that returns pointer and sets it to be the element pointer
 		  if not valid - throws exception */
@@ -41,7 +45,9 @@ public final class CryptoPpRSAElement extends CryptoPpTrapdoorElement{
 		} else {
 			throw new IllegalArgumentException("element out of range");
 		}
+		}
 	}
+	
 	
 	/**
 	 * Constructor that gets a pointer to a native element and sets it as the native element pointer.

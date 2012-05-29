@@ -5,6 +5,8 @@ import java.security.InvalidKeyException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
+import edu.biu.scapi.exceptions.ScapiRuntimeException;
+
 /** 
  * This class implements some common functionality of trapdoor permutation.
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
@@ -16,7 +18,7 @@ public abstract class TrapdoorPermutationAbs implements TrapdoorPermutation {
 	protected BigInteger modN = null;			//modulus
 	protected boolean isKeySet = false;		    // indicates if this object is initialized or not. Set to false until init is called
 
-
+	
 	public void setKey(PublicKey publicKey, PrivateKey privateKey) throws InvalidKeyException {
 		//sets the class members with the keys
 		pubKey = publicKey;

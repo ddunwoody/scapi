@@ -70,6 +70,7 @@ public final class CryptoPpRSAPermutation extends TrapdoorPermutationAbs impleme
 		this(SecureRandom.getInstance(randNumGenAlg));
 	}
 	
+	
 	/** 
 	 * Initializes this RSA with public and private keys
 	 * @param publicKey - public key
@@ -281,13 +282,30 @@ public final class CryptoPpRSAPermutation extends TrapdoorPermutationAbs impleme
 	 * creates a random CryptoPpRSAElement
 	 * @return TPElement - the created random element 
 	 */
-	public TPElement getRandomTPElement() {
+	public TPElement generateRandomTPElement() {
 
 		if (!isKeySet()){
 			throw new IllegalStateException("keys aren't set");
 		}
 		
 		return new CryptoPpRSAElement(modN);
+	}
+	
+	@Override
+	public TPElement generateTPElement(BigInteger x) throws IllegalArgumentException {
+		if (!isKeySet()){
+			throw new IllegalStateException("keys aren't set");
+		}
+		
+		return new CryptoPpRSAElement(modN, x, true);
+	}
+	
+	public TPElement generateUncheckedTPElement(BigInteger x) throws IllegalArgumentException {
+		/*if (!isKeySet()){
+			throw new IllegalStateException("keys aren't set");
+		}
+		*/
+		return new CryptoPpRSAElement(modN, x, false);
 	}
 	
 	/**
@@ -305,6 +323,8 @@ public final class CryptoPpRSAPermutation extends TrapdoorPermutationAbs impleme
 	 static {
 	        System.loadLibrary("CryptoPPJavaInterface");
 	 }
+
+	
 	
 	
 	

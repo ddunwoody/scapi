@@ -8,6 +8,7 @@ import java.security.PublicKey;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.InvalidParameterSpecException;
 
+import edu.biu.scapi.exceptions.ScapiRuntimeException;
 import edu.biu.scapi.primitives.trapdoorPermutation.RabinKeyGenParameterSpec;
 import edu.biu.scapi.primitives.trapdoorPermutation.RabinPermutation;
 import edu.biu.scapi.primitives.trapdoorPermutation.RabinPrivateKey;
@@ -63,6 +64,7 @@ public final class CryptoPpRabinPermutation extends TrapdoorPermutationAbs imple
 	private native void deleteRabin(long ptr);
 	
 	
+
 	/** 
 	 * Initializes this Rabin permutation with public and private keys
 	 * @param publicKey - public key
@@ -231,7 +233,7 @@ public final class CryptoPpRabinPermutation extends TrapdoorPermutationAbs imple
 
 	
 	/** 
-	 * Checks if the given element is valid to this Rabin permutation
+	 * Checks if the given element is valid for this Rabin permutation
 	 * @param tpEl - the element to check
 	 * @return TPElValidity - enum number that indicate the validation of the element 
 	 * There are three possible validity values: 
@@ -270,16 +272,60 @@ public final class CryptoPpRabinPermutation extends TrapdoorPermutationAbs imple
 	}
 
 	/** 
-	 * creates a random CryptoPpRabinElement.
+	 * Creates a random CryptoPpRabinElement.
 	 * @return TPElement - the created element
 	 */
-	public TPElement getRandomTPElement(){
+	public TPElement generateRandomTPElement(){
 		if (!isKeySet()){
 			throw new IllegalStateException("keys aren't set");
 		}
 		return new CryptoPpRabinElement(modN);
 	}
 
+	/**
+	 * Creates a Rabin Element based on the x value if the x value is valid for this permutation.<p>
+	 * If is succeeds, it is guaranteed that the element returned is a valid Rabin Element for this Rabin permutation instance.
+	 * @params x an integer value to set as the value of the Rabin element
+	 * @returns a Rabin Element based on the cryptoPP library suitable to use with this permutation.  
+	 * @throws IllegalStateException if keys aren't set
+	 * @throws IllegalArgumentException if the x value is not a valid value for this trapdoor permution
+	 * @throws ScapiRuntimeException if there is not enough information (trapdoor) to create this element
+	 */
+	public TPElement generateTPElement(BigInteger x) throws IllegalArgumentException {
+		//This function creates the corresponding CryptoPpRabinElement by calling the CryptoPpRabinElement constructor that gets the modulus and a value x (BigInteger) as arguments. 
+		//It then checks that the x value is legal for the trapdoor permutation it belongs to, that is, it is in the range and it has a square root in Zn. 
+		//If so, it creates the object. Else, it throws IllegalArgumentException.
+		if (!isKeySet()){
+			throw new IllegalStateException("keys aren't set");
+		}
+		CryptoPpRabinElement tpElement = new CryptoPpRabinElement(modN,x);
+		TPElValidity validity = isElement(tpElement);
+		
+		if(validity == TPElValidity.NOT_VALID)
+			throw new IllegalArgumentException("The x value is not a valid value for this trapdoor permution");
+		if( validity == TPElValidity.DONT_KNOW)
+			throw new ScapiRuntimeException("There is not enough information (trapdoor) to create this element");
+		
+		//If we got here then the element is valid, return it!
+		return tpElement;
+	}
+	
+	/**
+	 * This function returns a "possible" RabinElement based on the x value.<p>
+	 * No validity checks are performed on the x value so it is the caller's responsibility to make sure that the x value passed is a valid one.<p>
+	 * It is possible to call the isElement(TpElement) function on the object returned by this function if eventually validity checks are needed.
+	 * @param x an integer value to set as the value of the Rabin element
+	 * @return a possible Rabin Element
+	 * @throws IllegalStateException if keys aren't set.
+	 */
+	public TPElement generateUncheckedTPElement(BigInteger x) {
+		/*if (!isKeySet()){
+			throw new IllegalStateException("keys aren't set");
+		}*/
+		return new CryptoPpRabinElement(null,x);
+		
+	}
+	
 	/**
 	 * deletes the native Rabin object
 	 */
@@ -295,5 +341,6 @@ public final class CryptoPpRabinPermutation extends TrapdoorPermutationAbs imple
 	 static {
 	        System.loadLibrary("CryptoPPJavaInterface");
 	 }
+
 	
 }

@@ -9,7 +9,7 @@ import java.math.BigInteger;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public final class CryptoPpRabinElement extends CryptoPpTrapdoorElement{
+final class CryptoPpRabinElement extends CryptoPpTrapdoorElement{
 	//native function. This function is implemented in CryptoPpJavaInterface dll using the JNI tool.
 	//returns a pointer to a random native integer object
 	private native long getPointerToRandomRabinElement(byte[] modN); 
@@ -26,10 +26,10 @@ public final class CryptoPpRabinElement extends CryptoPpTrapdoorElement{
 	}
 		
 	/**
-	 * Constructor that gets the mod n and a value to be the element. 
-	 * Because the element doesn't contains p and q, we can't check if the value has a square root modN. 
-	 * So we can't know if the element is valid Rabin element. Therefore, we don't do any checks and save 
-	 * the value as is. Any trapdoor permutation that use this element will check validity before using.
+	 * Constructor that gets the mod n and a value x to be the element. 
+	 * Because the element doesn't contain p and q, we can't check if the value has a square root modN. 
+	 * So we can't know if the element is a valid Rabin element. Therefore, we don't do any checks and save 
+	 * the value as is. Any trapdoor permutation that uses this element will check validity before using.
 	 * @param modN - modulus
 	 * @param x - the element value
 	 */

@@ -40,6 +40,7 @@ public final class ScRSAPermutation extends TrapdoorPermutationAbs implements RS
 		this(SecureRandom.getInstance(randNumGenAlg));
 	}
 
+	
 	/** 
 	 * Initializes this RSA permutation with keys
 	 * @param publicKey - public key
@@ -142,7 +143,7 @@ public final class ScRSAPermutation extends TrapdoorPermutationAbs implements RS
 		BigInteger result = element.modPow(
 				((RSAPublicKey)pubKey).getPublicExponent(), ((RSAPublicKey)pubKey).getModulus());
 		// builds the return element
-		RSAElement returnEl = new RSAElement(modN, result);			
+		RSAElement returnEl = new RSAElement(modN, result, false);	//create an RSAElement without checking since "result" is the result of the computation and it should be valid.		
 		//returns the result of the computation
 		return returnEl;
 	}
@@ -170,7 +171,7 @@ public final class ScRSAPermutation extends TrapdoorPermutationAbs implements RS
 		//invert the permutation
 		BigInteger result = doInvert(element);
 		//builds the return element
-		RSAElement returnEl = new RSAElement(modN, result);
+		RSAElement returnEl = new RSAElement(modN, result, false); //create an RSAElement without checking since "result" is the result of the computation and it should be valid.
 		//returns the result
 		return returnEl;
 	}
@@ -261,25 +262,54 @@ public final class ScRSAPermutation extends TrapdoorPermutationAbs implements RS
 	}
 
 	/** 
-	 * creates a random RSAElement 
+	 * Creates a random RSAElement 
 	 * @return TPElement - the created RSA element
 	 */
-	public TPElement getRandomTPElement(){
+	public TPElement generateRandomTPElement(){
 		if (!isKeySet()){
 			throw new IllegalStateException("keys aren't set");
 		}
 		return new RSAElement(modN);
 	}
+	
+	/** 
+	 * Creates an RSA Element from a specific value x. It checks that the x value is valid for this trapdoor permutation.
+	 * @return TPElement - If the x value is valid for this permutation return the created random element
+	 * @throws  IllegalArgumentException if the given value x is invalid for this permutation
+	 * @throws IllegalStateException if the keys aren't set
+	 */
+	public TPElement generateTPElement(BigInteger x) throws IllegalArgumentException {
+		if (!isKeySet()){
+			throw new IllegalStateException("keys aren't set");
+		}
+		return new RSAElement(modN, x, true);
+	}
 
+	/** 
+	 * Creates an RSA Element from a specific value x. It checks that the x value is valid for this trapdoor permutation.
+	 * @return TPElement - If the x value is valid for this permutation return the created random element
+	 * @throws  IllegalArgumentException if the given value x is invalid for this permutation
+	 * @throws IllegalStateException if the keys aren't set
+	 */
+	public TPElement generateUncheckedTPElement(BigInteger x) throws IllegalArgumentException {
+	
+		return new RSAElement(modN, x, false);
+	}
 
-	public static RSAModulus generateRSAModulus(int strength, int certainty, SecureRandom random){
+	/**
+	 * This function generates an RSA modulus N with "length" bits of length, such that N = p*q, and p and q
+	 * @param length the length in bits of the RSA modulus
+	 * @param certainty the certainty required regarding the primeness of p and q
+	 * @param random a source of randomness
+	 * @return an RSAModulus structure that holds N, p and q.
+	 */
+	public static RSAModulus generateRSAModulus(int length, int certainty, SecureRandom random){
 
 		BigInteger p, q, n;
-		int pbitlength = (strength + 1) / 2;
-		int qbitlength = strength - pbitlength;
-		int mindiffbits = strength / 3;
-		final BigInteger ONE = BigInteger.valueOf(1);
-
+		int pbitlength = (length + 1) / 2;
+		int qbitlength = length - pbitlength;
+		int mindiffbits = length / 3;
+	
 
 		// generate p prime
 		for (;;) {
@@ -303,7 +333,7 @@ public final class ScRSAPermutation extends TrapdoorPermutationAbs implements RS
 			// calculate the modulus
 			n = p.multiply(q);
 
-			if (n.bitLength() == strength) 
+			if (n.bitLength() == length) 
 			{
 				break;
 			} 
