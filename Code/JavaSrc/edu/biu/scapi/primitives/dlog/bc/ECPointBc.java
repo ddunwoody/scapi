@@ -5,7 +5,6 @@ import java.math.BigInteger;
 import org.bouncycastle.math.ec.ECPoint;
 
 import edu.biu.scapi.primitives.dlog.ECElement;
-import edu.biu.scapi.primitives.dlog.groupParams.ECGroupParams;
 
 /**
  * This class is an adapter for BC point.
@@ -39,12 +38,19 @@ public abstract class ECPointBc implements ECElement{
 		return point.getY().toBigInteger();
 	}
 	
-	abstract boolean checkValidity(BigInteger x, BigInteger y,
-			ECGroupParams groupParams);
+	/**
+	 * checks if the element is the identity of this Dlog group.
+	 * @return <code>true<code> if this element is the identity of the group; <code>false<code> otherwise.
+	 */
+	public boolean isIdentity(){
+
+		return isInfinity();
+	}
 	
 	public boolean isInfinity(){
 		return point.isInfinity();
 	}
+	
 	public boolean equals(Object elementToCompare){
 		if (elementToCompare == null || elementToCompare.getClass() != this.getClass()) 
 			return false;
