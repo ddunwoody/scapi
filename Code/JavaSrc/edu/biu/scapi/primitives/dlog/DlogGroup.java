@@ -54,18 +54,14 @@ public interface DlogGroup {
 	
 	/**
 	 * Checks if the given element is a member of this Dlog group
-	 * 
 	 * @param element possible group element for which to check that it is a member of this group
-	 * 
 	 * @return <code>true<code> if the given element is a member of this group; <code>false<code> otherwise.
-	 * 
 	 * @throws IllegalArgumentException
 	 */
 	public boolean isMember(GroupElement element) throws IllegalArgumentException;
 	
 	/**
 	 * Checks if the order is a prime number
-	 * 
 	 * @return <code>true<code> if the order is a prime number; <code>false<code> otherwise.
 	 * 
 	 */
@@ -80,8 +76,6 @@ public interface DlogGroup {
 	
 	/**
 	 * Checks if the element set as the generator is indeed the generator of this group.
-	 * The generator is set upon calling the init function of this group. <p>
-	 * Therefore, if init hasn't been called this function throws an UnInitializedException.
 	 * @return <code>true<code> if the generator is valid; <code>false<code> otherwise.
 	 */
 	public boolean isGenerator();
@@ -123,6 +117,13 @@ public interface DlogGroup {
 	 * @return the random element 
 	 */
 	public GroupElement getRandomElement();
+	
+	/**
+	 * Creates a random generator of this Dlog group
+	 * @return the random generator 
+	 */
+	public GroupElement getRandomGenerator();
+	
 	
 	/**
 	 * Computes the product of several exponentiations with distinct bases 
