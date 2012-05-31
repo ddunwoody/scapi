@@ -17,7 +17,8 @@ public:
 	Integer* getPointerToInteger (Integer integerToPointer);
 	jbyteArray CryptoPPIntegerTojbyteArray (JNIEnv *env, Integer integerToConvert);
 	void extendedEuclideanAlg(Integer a, Integer b, Integer & gcd, Integer & x, Integer&  y);
-	Integer SquareRoot(Integer value, Integer mod, Integer p, Integer q);
+	Integer SquareRoot(Integer value, Integer mod, Integer p, Integer q, bool check);
+	bool HasSquareRoot(Integer value, Integer p, Integer q);
 };
 
 
