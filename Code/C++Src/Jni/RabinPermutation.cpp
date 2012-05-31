@@ -225,19 +225,14 @@ JNIEXPORT jboolean JNICALL Java_edu_biu_scapi_primitives_trapdoorPermutation_cry
 	  mod = ((RabinFunction *) tpPtr) -> GetModulus();
 	  p = ((InvertibleRabinFunction *) tpPtr) -> GetPrime1();
 	  q = ((InvertibleRabinFunction *) tpPtr) -> GetPrime2();
-
+	 
 	  bool valid = false;
 
 	  //check if the element is in the right range
 	  if ((value < mod) && (value > 0)) {
 		  //get a square root
-		  square = utils.SquareRoot(value, mod, p, q);
-
-		  //check if the return value of SquareRoot is indeed the square root of the element
-		  if (((square*square).Modulo(mod)) == value)
-			  valid = true;
+		  valid = utils.HasSquareRoot(value, p, q);
 	  }
-
 	  return valid;
 }
 
