@@ -4,24 +4,23 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.math.BigInteger;
-import java.security.SecureRandom;
-import java.util.logging.Level;
 
-import edu.biu.scapi.generals.Logging;
 import edu.biu.scapi.primitives.dlog.ECElement;
+import edu.biu.scapi.primitives.dlog.ECF2mPoint;
+import edu.biu.scapi.primitives.dlog.ECF2mUtility;
 import edu.biu.scapi.primitives.dlog.groupParams.ECF2mGroupParams;
 /**
  * This class is an adapter for F2m points of miracl
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class ECF2mPointMiracl implements ECElement{
+public class ECF2mPointMiracl implements ECElement, ECF2mPoint{
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 5263481969362114289L;
 
-	private native long createF2mPoint(long mip, byte[] x, byte[] y, boolean[] validity);
+	private native long createF2mPoint(long mip, byte[] x, byte[] y);
 	private native long createF2mPointFromX(long mip, byte[] x, boolean[] validity);
 	private native long createRandomF2mPoint(long mip, int m, int seed, boolean[] validity);
 	private native boolean checkInfinityF2m(long point);
@@ -34,6 +33,7 @@ public class ECF2mPointMiracl implements ECElement{
 	private String curveName;
 	private String fileName;
 	
+	private ECF2mUtility util = new ECF2mUtility();
 	/**
 	 * Constructor that accepts x,y values of a point. 
 	 * if the values are valid - set the point.
@@ -44,43 +44,17 @@ public class ECF2mPointMiracl implements ECElement{
 	public ECF2mPointMiracl(BigInteger x, BigInteger y, MiraclDlogECF2m curve){
 		
 		mip = curve.getMip();
-		boolean validity[] = new boolean[1];
 		curveName = curve.getCurveName();
 		fileName = curve.getFileName();
 
-		//creates a point in the field with the given parameters
-		point = createF2mPoint(mip, x.toByteArray(), y.toByteArray(), validity);
-		
-		//if the creation failed - throws exception
-		if (validity[0]==false){
-			point = 0;
+		boolean valid = util.checkCurveMembership((ECF2mGroupParams) curve.getGroupParams(), x, y);
+		// checks validity
+		if (valid == false) // if not valid, throws exception
 			throw new IllegalArgumentException("x, y values are not a point on this curve");
-		}
-	}
+		
+		//creates a point in the field with the given parameters
+		point = createF2mPoint(mip, x.toByteArray(), y.toByteArray());
 	
-	/**
-	 *  Constructor that gets DlogGroup and chooses a random point in the group
-	 * @param curve
-	 */
-	public ECF2mPointMiracl(MiraclDlogECF2m curve){
-	
-		mip = curve.getMip();
-		curveName = curve.getCurveName();
-		fileName = curve.getFileName();
-		
-		boolean validity[] = new boolean[1];
-		
-		//generates a seed to initiate the random number generator of miracl
-		int seed = new BigInteger(new SecureRandom().generateSeed(20)).intValue();
-		
-		//call for native function that creates random point in the field.
-		point = createRandomF2mPoint(mip, ((ECF2mGroupParams)curve.getGroupParams()).getM(), seed, validity);
-		
-		//if the algorithm for random element failed - throws exception
-		if(validity[0]==false){
-			point = 0;
-			Logging.getLogger().log(Level.WARNING, "couldn't find random element");
-		}
 	}
 	
 	/**
@@ -89,6 +63,10 @@ public class ECF2mPointMiracl implements ECElement{
 	 * @param curve
 	 */
 	ECF2mPointMiracl(BigInteger x, MiraclDlogECF2m curve){
+		// This constructor is NOT guarantee that the created point is in the group. 
+		// It creates a point on the curve, but this point is not necessarily a point in the dlog group, 
+		// which is a sub-group of the elliptic curve.
+				
 		mip = curve.getMip();
 		curveName = curve.getCurveName();
 		fileName = curve.getFileName();
@@ -139,9 +117,14 @@ public class ECF2mPointMiracl implements ECElement{
 			e.printStackTrace();
 		}
 		MiraclDlogECF2m dlog = new MiraclDlogECF2m(fileName, curveName);
+		
+		boolean valid = util.checkCurveMembership((ECF2mGroupParams) dlog.getGroupParams(), new BigInteger(x), new BigInteger(y));
+		// checks validity
+		if (valid == false) // if not valid, throws exception
+			throw new IllegalArgumentException("x, y values are not a point on this curve");
+		
 		mip = dlog.getMip();
-		boolean validity[] = new boolean[1];
-		point = createF2mPoint(mip, x, y, validity);
+		point = createF2mPoint(mip, x, y);
 	}
 	
 	/**
@@ -150,6 +133,10 @@ public class ECF2mPointMiracl implements ECElement{
 	 */
 	long getPoint(){
 		return point;
+	}
+	
+	public boolean isIdentity(){
+		return isInfinity();
 	}
 	
 	public boolean isInfinity(){
@@ -183,11 +170,6 @@ public class ECF2mPointMiracl implements ECElement{
 			return true;
 		}
 		return false;
-	}
-	
-	public void release(){
-		//delete from the dll the dynamic allocation of the point.
-		deletePointF2m(point);
 	}
 	
 	/**

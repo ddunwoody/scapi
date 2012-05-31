@@ -1,11 +1,10 @@
 package edu.biu.scapi.primitives.dlog.miracl;
 
 import java.math.BigInteger;
-import java.security.SecureRandom;
-import java.util.logging.Level;
 
-import edu.biu.scapi.generals.Logging;
 import edu.biu.scapi.primitives.dlog.ECElement;
+import edu.biu.scapi.primitives.dlog.ECFpPoint;
+import edu.biu.scapi.primitives.dlog.ECFpUtility;
 import edu.biu.scapi.primitives.dlog.groupParams.ECFpGroupParams;
 
 /**
@@ -13,9 +12,9 @@ import edu.biu.scapi.primitives.dlog.groupParams.ECFpGroupParams;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class ECFpPointMiracl implements ECElement{
+public class ECFpPointMiracl implements ECElement, ECFpPoint{
 
-	private native long createFpPoint(long mip, byte[] x, byte[] y, boolean[] validity);
+	private native long createFpPoint(long mip, byte[] x, byte[] y);
 	private native long createFpPointFromX(long mip, byte[] x, boolean[] validity);
 	private native long createRandomFpPoint(long mip, byte[] p, int seed, boolean[] validity);
 	private native boolean checkInfinityFp(long point);
@@ -26,6 +25,7 @@ public class ECFpPointMiracl implements ECElement{
 	private long point = 0;
 	private long mip = 0;
 	
+	private ECFpUtility util = new ECFpUtility();
 	/**
 	 * Constructor that accepts x,y values of a point. 
 	 * if the values are valid - set the point.
@@ -33,42 +33,17 @@ public class ECFpPointMiracl implements ECElement{
 	 * @param y
 	 * @param curve - DlogGroup
 	 */
-	public ECFpPointMiracl(BigInteger x, BigInteger y, MiraclDlogECFp curve){
+	public ECFpPointMiracl(BigInteger x, BigInteger y, MiraclDlogECFp curve) throws IllegalArgumentException{
 		mip = curve.getMip();
 		
-		boolean validity[] = new boolean[1];
+		boolean valid = util.checkCurveMembership((ECFpGroupParams) curve.getGroupParams(), x, y);
+		// checks validity
+		if (valid == false) // if not valid, throws exception
+			throw new IllegalArgumentException("x, y values are not a point on this curve");
 		
 		//call for a native function that creates an element in the field
-		point = createFpPoint(mip, x.toByteArray(), y.toByteArray(), validity);
-		
-		//if the creation failed - throws exception
-		if (validity[0]==false){
-			point = 0;
-			throw new IllegalArgumentException("x, y values are not a point on this curve");
-		}	
-	}
-	
-	/**
-	 *  Constructor that gets DlogGroup and chooses a random point in the group
-	 * @param curve
-	 */
-	public ECFpPointMiracl(MiraclDlogECFp curve){
-		mip = curve.getMip();
-		
-		boolean validity[] = new boolean[1];
-		
-		//generates a seed to initiate the random number generator of miracl
-		int seed = new BigInteger(new SecureRandom().generateSeed(20)).intValue();
-		
-		//call for native function that creates random point in the field.
-		point = createRandomFpPoint(mip, 
-							((ECFpGroupParams)curve.getGroupParams()).getP().toByteArray(), seed, validity);
-		
-		//if the algorithm for random element failed - throws exception
-		if(validity[0]==false){
-			point = 0;
-			Logging.getLogger().log(Level.WARNING, "couldn't find random element");
-		}
+		point = createFpPoint(mip, x.toByteArray(), y.toByteArray());
+			
 	}
 	
 	/**
@@ -77,6 +52,10 @@ public class ECFpPointMiracl implements ECElement{
 	 * @param curve 
 	 */
 	ECFpPointMiracl(BigInteger x, MiraclDlogECFp curve){
+		// This constructor is NOT guarantee that the created point is in the group. 
+		// It creates a point on the curve, but this point is not necessarily a point in the dlog group, 
+		// which is a sub-group of the elliptic curve.
+		
 		mip = curve.getMip();
 		
 		boolean validity[] = new boolean[1];
@@ -100,6 +79,10 @@ public class ECFpPointMiracl implements ECElement{
 	ECFpPointMiracl(long ptr, MiraclDlogECFp curve){
 		this.point = ptr;
 		mip = curve.getMip();
+	}
+	
+	public boolean isIdentity(){
+		return isInfinity();
 	}
 	
 	public boolean isInfinity(){
@@ -143,11 +126,6 @@ public class ECFpPointMiracl implements ECElement{
 			return true;
 		}
 		return false;
-	}
-	
-	public void release(){
-		//delete from the dll the dynamic allocation of the point.
-		deletePointFp(point);
 	}
 	
 	/**
