@@ -8,9 +8,10 @@ package edu.biu.scapi.primitives.dlog;
  *
  */
 public interface GroupElement {
+
 	/**
-	 * Release the memory allocated for this element.
-	 * This function should be called when the element need to be deleted.
+	 * checks if this element is the identity of the group.
+	 * @return <code>true<code> if this element is the identity of the group; <code>false<code> otherwise.
 	 */
-	public void release();
+	public boolean isIdentity();
 }
