@@ -10,6 +10,7 @@ import org.bouncycastle.util.encoders.Hex;
 
 import edu.biu.scapi.primitives.dlog.DlogECF2m;
 import edu.biu.scapi.primitives.dlog.ECElement;
+import edu.biu.scapi.primitives.dlog.ECF2mUtility;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.dlog.groupParams.ECF2mGroupParams;
 import edu.biu.scapi.primitives.dlog.groupParams.ECF2mKoblitz;
@@ -24,6 +25,8 @@ import edu.biu.scapi.securityLevel.DDH;
  */
 public class BcDlogECF2m extends BcAdapterDlogEC implements DlogECF2m, DDH{
 
+	private ECF2mUtility util = new ECF2mUtility();
+	
 	/**
 	 * Default constructor. Initializes this object with K-163 NIST curve.
 	 */
@@ -79,29 +82,25 @@ public class BcDlogECF2m extends BcAdapterDlogEC implements DlogECF2m, DDH{
 		BigInteger x = new BigInteger(1,Hex.decode(ecProperties.getProperty(curveName+"x")));
 		BigInteger y = new BigInteger(1,Hex.decode(ecProperties.getProperty(curveName+"y")));
 		BigInteger q = new BigInteger(ecProperties.getProperty(curveName+"r"));
+		BigInteger h = new BigInteger(ecProperties.getProperty(curveName+"h"));
 		int k2=0;
 		int k3=0;
 		boolean trinomial; //sign which basis the curve use
 		
 		if (k2Property==null && k3Property==null){ //for trinomial basis
-			groupParams = new ECF2mTrinomialBasis(q, x, y, m, k, a, b);
+			groupParams = new ECF2mTrinomialBasis(q, x, y, m, k, a, b, h);
 			trinomial = true;
 		
 		} else { //pentanomial basis
 			k2 = Integer.parseInt(k2Property);
 			k3 = Integer.parseInt(k3Property);
-			groupParams = new ECF2mPentanomialBasis(q, x, y, m, k, k2, k3, a, b);
+			groupParams = new ECF2mPentanomialBasis(q, x, y, m, k, k2, k3, a, b, h);
 			trinomial = false;
 		} 
-		BigInteger h = null;
+		
 		//koblitz curve
 		if (curveName.contains("K-")){
 			
-			if (a.equals(BigInteger.ONE)){
-				h = new BigInteger("2");
-			} else {
-				h = new BigInteger("4");
-			}
 			groupParams = new ECF2mKoblitz((ECF2mGroupParams) groupParams, q, h);
 		}
 		
@@ -124,21 +123,57 @@ public class BcDlogECF2m extends BcAdapterDlogEC implements DlogECF2m, DDH{
 		return "elliptic curve over F2m";
 	}
 	
-	/**
-	 * Creates a random member of this Dlog group
-	 * @return the random element
+	/*
+	 * Checks if the given element is a member of this Dlog group
+	 * @param element 
+	 * @return true if the given element is member of this group; false, otherwise.
+	 * @throws IllegalArgumentException
 	 */
-	public GroupElement getRandomElement(){
+	public boolean isMember(GroupElement element) throws IllegalArgumentException{
 		
-		return new ECF2mPointBc(this);
+		if (!(element instanceof ECF2mPointBc)){
+			throw new IllegalArgumentException("element type doesn't match the group type");
+		}
+		
+		ECF2mPointBc point = (ECF2mPointBc) element;
+		
+		//infinity point is a valid member
+		if (point.isInfinity()){
+			return true;
+		}
+		
+		// A point (x, y) is a member of a Dlog group with prime order q over an Elliptic Curve if it meets the following two conditions:
+		// 1)	P = (x,y) is a point in the Elliptic curve, i.e (x,y) is a solution of the curve’s equation.
+		// 2)	P = (x,y) is a point in the q-order group which is a sub-group of the Elliptic Curve.
+		// those two checks is done in two steps:
+		// 1.	Checking that the point is on the curve, performed by checkCurveMembership
+		// 2.	Checking that the point is in the Dlog group,performed by checkSubGroupMembership
+
+		boolean valid = util.checkCurveMembership((ECF2mGroupParams) groupParams, point.getX(), point.getY());
+		valid = valid && util.checkSubGroupMembership(this, point);
+		
+		return valid;
+			
 	}
 	
 	/**
 	 * Creates a point over F2m field with the given parameters
 	 * @return the created point
 	 */
-	public ECElement getElement(BigInteger x, BigInteger y){
-		return new ECF2mPointBc(x, y, this);
+	public ECElement generateElement(BigInteger x, BigInteger y) throws IllegalArgumentException{
+		//Creates element with the given values.
+		ECF2mPointBc point =  new ECF2mPointBc(x, y, this);
+		
+		//if the element was created, it is a point on the curve.
+		//checks if the point is in the sub-group, too.
+		boolean valid = util.checkSubGroupMembership(this, point);
+		
+		//if the point is not in the sub-group, throw exception.
+		if (valid == false){
+			throw new IllegalArgumentException("Could not generate the element. The given (x, y) is not a point in this Dlog group");
+		}
+		
+		return point;
 	}
 	
 	/**
@@ -146,6 +181,17 @@ public class BcDlogECF2m extends BcAdapterDlogEC implements DlogECF2m, DDH{
 	 */
 	protected GroupElement createPoint(ECPoint result) {
 		return new ECF2mPointBc(result);
+	}
+	
+	/**
+	 * Check if the element is valid to this elliptic curve group
+	 */
+	protected boolean checkInstance(GroupElement element){
+		if (element instanceof ECF2mPointBc){
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	/**
@@ -162,17 +208,9 @@ public class BcDlogECF2m extends BcAdapterDlogEC implements DlogECF2m, DDH{
 	 * @return the created group Element
 	 */
 	public GroupElement convertByteArrayToGroupElement(byte[] binaryString){
-		if (binaryString.length >= ((ECF2mGroupParams) groupParams).getM()){
-			throw new IllegalArgumentException("String is too long. It has to be of length less than log p");
-		}
-		BigInteger  x = new BigInteger(binaryString);
-		GroupElement point = null;
-		try {
-			point = new ECF2mPointBc(x, this);
-		} catch (IllegalArgumentException e) {
-			throw new IllegalArgumentException("The given string is not a valid point to this curve");
-		} 
-		return point;
+		//currently we don't support this conversion. 
+		//will be implemented in the future.
+		return null;
 	}
 	
 	/**
@@ -184,7 +222,9 @@ public class BcDlogECF2m extends BcAdapterDlogEC implements DlogECF2m, DDH{
 		if (!(groupElement instanceof ECF2mPointBc)){
 			throw new IllegalArgumentException("element type doesn't match the group type");
 		}
-		return ((ECElement) groupElement).getX().toByteArray();
+		//currently we don't support this conversion. 
+		//will be implemented in the future.
+		return null;
 	}
 	
 
