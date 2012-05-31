@@ -13,7 +13,7 @@ extern "C" {
  * Signature: (J[B[B[Z)J
  */
 JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_miracl_ECFpPointMiracl_createFpPoint
-  (JNIEnv *, jobject, jlong, jbyteArray, jbyteArray, jbooleanArray);
+  (JNIEnv *, jobject, jlong, jbyteArray, jbyteArray);
 
 /*
  * Class:     edu_biu_scapi_primitives_dlog_miracl_ECFpPointMiracl

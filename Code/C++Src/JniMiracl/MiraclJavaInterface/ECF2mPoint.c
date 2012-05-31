@@ -13,20 +13,16 @@
  * return			      : A pointer to the created point.
  */
 JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_miracl_ECF2mPointMiracl_createF2mPoint
-  (JNIEnv *env, jobject obj, jlong m, jbyteArray xVal, jbyteArray yVal,  jbooleanArray validity){
+  (JNIEnv *env, jobject obj, jlong m, jbyteArray xVal, jbyteArray yVal){
 	  /* convert the accepted parameters to MIRACL parameters*/
 	  miracl* mip = (miracl*)m;
-	  jboolean* valid = env->GetBooleanArrayElements(validity, 0);
 	  
-	   /* create the point with x,y values */
+	  /* create the point with x,y values */
 	  epoint* p = epoint_init(mip);
 	  big x = byteArrayToMiraclBig(env, mip, xVal);
 	  big y = byteArrayToMiraclBig(env, mip, yVal);
 
-	  valid[0] = epoint2_set(mip, x, y, 0, p);
-
-	  /* release the array */
-	  env->ReleaseBooleanArrayElements(validity, valid, 0);
+	  epoint2_set(mip, x, y, 0, p);
 	  
 	  mirkill(x);
 	  mirkill(y);
