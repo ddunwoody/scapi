@@ -13,7 +13,7 @@ public abstract class ECGroupParams extends GroupParams{
 	protected BigInteger b; //coefficient b of the elliptic curve equation
 	protected BigInteger xG; //x coordinate of the generator point
 	protected BigInteger yG; //y coordinate of the generator point
-	
+	protected BigInteger h;
 	/*
 	 * Returns coefficient a of the elliptic curves equation
 	 * @return coefficient a
@@ -44,5 +44,13 @@ public abstract class ECGroupParams extends GroupParams{
 	 */
 	public BigInteger getYg(){
 		return yG;
+	}
+	
+	/*
+	 * Returns the cofactor of the group
+	 * @return the cofactor of the group
+	 */
+	public BigInteger getCofactor(){
+		return h;
 	}
 }

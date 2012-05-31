@@ -33,8 +33,9 @@ public class ECF2mPentanomialBasis extends ECF2mGroupParams{
      * represents the reduction polynomial <code>f(z)</code>.
 	 * @param a the a coefficient of the elliptic curve equation
 	 * @param b the b coefficient of the elliptic curve equation
+	 * @param h the group cofactor
 	 */
-	public ECF2mPentanomialBasis(BigInteger q, BigInteger xG, BigInteger yG, int m, int k1, int k2, int k3, BigInteger a, BigInteger b){
+	public ECF2mPentanomialBasis(BigInteger q, BigInteger xG, BigInteger yG, int m, int k1, int k2, int k3, BigInteger a, BigInteger b, BigInteger h){
 		this.q = q;
 		this.xG = xG;
 		this.yG = yG;
@@ -44,6 +45,7 @@ public class ECF2mPentanomialBasis extends ECF2mGroupParams{
 		this.k1 = k1;
 		this.k2 = k2;
 		this.k3 = k3;
+		this.h = h;
 	}
 	
 	/*

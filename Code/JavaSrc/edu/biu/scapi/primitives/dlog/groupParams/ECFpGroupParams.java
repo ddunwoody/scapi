@@ -19,14 +19,16 @@ public class ECFpGroupParams extends ECGroupParams{
 	 * @param p group modulus
 	 * @param a the a coefficient of the elliptic curve equation
 	 * @param b the b coefficient of the elliptic curve equation
+	 * @param h the group cofactor
 	 */
-	public ECFpGroupParams(BigInteger q, BigInteger xG, BigInteger yG, BigInteger p, BigInteger a, BigInteger b) {
+	public ECFpGroupParams(BigInteger q, BigInteger xG, BigInteger yG, BigInteger p, BigInteger a, BigInteger b, BigInteger h) {
 		this.q = q;
 		this.xG = xG;
 		this.yG = yG;
 		this.a = a;
 		this.b = b;
 		this.p = p;
+		this.h = h;
 	}
 	
 	/*

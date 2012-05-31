@@ -11,7 +11,6 @@ import java.math.BigInteger;
 public class ECF2mKoblitz extends ECF2mGroupParams{
 	
 	private BigInteger n; 	//order of the main subgroup
-	private BigInteger h; 	//cofactor
 	ECF2mGroupParams curve; //underline curve
 	
 	/*
@@ -131,14 +130,6 @@ public class ECF2mKoblitz extends ECF2mGroupParams{
 	 */
 	public BigInteger getSubGroupOrder(){
 		return n;
-	}
-	
-	/*
-	 * Returns the cofactor of this curve
-	 * @return h the cofactor
-	 */
-	public BigInteger getCofactor(){
-		return h;
 	}
 	
 	/*

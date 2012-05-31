@@ -22,8 +22,9 @@ public class ECF2mTrinomialBasis extends ECF2mGroupParams{
 	 * represents the reduction polynomial <code>f(z)</code>.
 	 * @param a the a coefficient of the elliptic curve equation
 	 * @param b the b coefficient of the elliptic curve equation
+	 * @param h the group cofactor
 	 */
-	public ECF2mTrinomialBasis(BigInteger q, BigInteger xG, BigInteger yG, int m, int k, BigInteger a, BigInteger b){
+	public ECF2mTrinomialBasis(BigInteger q, BigInteger xG, BigInteger yG, int m, int k, BigInteger a, BigInteger b, BigInteger h){
 		this.q = q;
 		this.xG = xG;
 		this.yG = yG;
@@ -31,6 +32,7 @@ public class ECF2mTrinomialBasis extends ECF2mGroupParams{
 		this.b = b;
 		this.m = m;
 		this.k = k;
+		this.h = h;
 	}
 	
 	/*
