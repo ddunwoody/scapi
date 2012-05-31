@@ -104,26 +104,48 @@ void Utils::extendedEuclideanAlg(Integer a, Integer b, Integer & gcd, Integer & 
     gcd = a;
 	//loop that return the right x,y
     while (b!=0) {
-            q=gcd/b; r=gcd%b;
-            m=x-u*q; n=y-v*q;
-            gcd=b; b=r; x=u; y=v; u=m; v=n;
+        q=gcd/b;
+		r=gcd%b;
+        m=x-u*q; 
+		n=y-v*q;
+        gcd=b; 
+		b=r; 
+		x=u; 
+		y=v; 
+		u=m; 
+		v=n;
     }
 }
 
 
-/* function SquareRoot : This function return the square root of a value mod(N)
+/* function SquareRoot : This function return the square root of a value modulus mod
  * param value		   : the number to calculate its square root
- * param mod		   : mod(N)
- * param p			   : prime 1
- * param q			   : prime 2
+ * param mod		   : modulus, such that mod = p*q
+ * param p			   : prime 1, such that p=3mod4 and p*q = mod
+ * param q			   : prime 2, such that q=3mod4 and p*q = mod
  */
-Integer Utils::SquareRoot(Integer value, Integer mod, Integer p, Integer q) {
+Integer Utils::SquareRoot(Integer value, Integer mod, Integer p, Integer q, bool check=false) {
+	Integer pMod4, qMod4;
 	Integer vModP, vModQ;
 	Integer srModP, srModQ;
 	Integer xP, yQ, gcd;
 	Integer pUnit, qUnit;
 	Integer square;
+	if (check){
 
+		pMod4 = p.Modulo(4);
+		qMod4 = q.Modulo(4);
+
+		//if p or q is not 3mod4 return false (-1)
+		if ((pMod4 != 3) || (qMod4 != 3)){
+			return -1;
+		}
+
+		if (p*q != mod){
+			return false;
+		}
+
+	}
 	vModP = value.Modulo(p); //value mod(p)
 	vModQ = value.Modulo(q); //value mod(q)
 	
@@ -135,7 +157,7 @@ Integer Utils::SquareRoot(Integer value, Integer mod, Integer p, Integer q) {
 		extendedEuclideanAlg(p, q, gcd, yQ, xP);
 	else
 		extendedEuclideanAlg(q, p, gcd, xP, yQ);
-
+	
 	//calculate 1p, 1q
 	pUnit = (yQ*q).Modulo(mod);
 	qUnit = (xP*p).Modulo(mod);
@@ -143,4 +165,23 @@ Integer Utils::SquareRoot(Integer value, Integer mod, Integer p, Integer q) {
 	//calculate the square root
 	square = ((srModP * pUnit) + (srModQ * qUnit)).Modulo(mod);
 	return square; 
+}
+
+bool Utils::HasSquareRoot(Integer x, Integer p, Integer q){
+
+	Integer xModP, xModQ;
+	Integer srModP, srModQ;
+
+	xModP = x.Modulo(p); //value mod(p)
+	xModQ = x.Modulo(q); //value mod(q)
+	
+	srModP = a_exp_b_mod_c(xModP, ((p-1)/2), p); //square root of xModP
+	srModQ = a_exp_b_mod_c(xModQ, ((q-1)/2), q); //square root of xModQ
+
+	if ((srModP == 1) && (srModQ == 1)){
+		return true;
+	}else{
+		return false;
+	}
+
 }
