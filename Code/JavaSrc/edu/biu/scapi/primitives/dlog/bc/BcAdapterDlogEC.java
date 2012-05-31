@@ -9,7 +9,6 @@ import org.bouncycastle.math.ec.ECPoint;
 import edu.biu.scapi.primitives.dlog.DlogEllipticCurve;
 import edu.biu.scapi.primitives.dlog.DlogGroupEC;
 import edu.biu.scapi.primitives.dlog.GroupElement;
-import edu.biu.scapi.primitives.dlog.groupParams.ECGroupParams;
 
 /*
  * This class is the adapter to Bouncy Castle implementation of elliptic curves.
@@ -39,30 +38,6 @@ public abstract class BcAdapterDlogEC extends DlogGroupEC
 	}
 	
 	/*
-	 * Checks if the given element is a member of this Dlog group
-	 * @param element - 
-	 * @return true if the given element is member of this group; false, otherwise.
-	 * @throws IllegalArgumentException
-	 */
-	public boolean isMember(GroupElement element) throws IllegalArgumentException{
-		
-		if (!(element instanceof ECPointBc)){
-			throw new IllegalArgumentException("element type doesn't match the group type");
-		}
-		
-		//infinity point is a valid member
-		if (((ECPointBc) element).isInfinity()){
-			return true;
-		}
-		
-		ECPointBc point = (ECPointBc)element;
-		//checks the validity of the point
-		return point.checkValidity(point.getPoint().getX().toBigInteger(), point.getPoint().getY().toBigInteger(), (ECGroupParams)groupParams);
-		
-		
-	}
-	
-	/*
 	 * Calculates the inverse of the given GroupElement
 	 * @param groupElement to inverse
 	 * @return the inverse element of the given GroupElement
@@ -71,7 +46,7 @@ public abstract class BcAdapterDlogEC extends DlogGroupEC
 	public GroupElement getInverse(GroupElement groupElement) throws IllegalArgumentException{
 		
 		//if the GroupElement doesn't match the DlogGroup, throws exception
-		if (!(groupElement instanceof ECPointBc)){
+		if (!(checkInstance(groupElement))){
 			throw new IllegalArgumentException("groupElement doesn't match the DlogGroup");
 		}
 		
@@ -105,7 +80,7 @@ public abstract class BcAdapterDlogEC extends DlogGroupEC
 									 throws IllegalArgumentException{
 		
 		//if the GroupElements don't match the DlogGroup, throws exception
-		if (!(base instanceof ECPointBc)){
+		if (!(checkInstance(base))){
 			throw new IllegalArgumentException("groupElement doesn't match the DlogGroup");
 		}
 		
@@ -134,16 +109,15 @@ public abstract class BcAdapterDlogEC extends DlogGroupEC
 	 * @param groupElement2
 	 * @return the multiplication result
 	 * @throws IllegalArgumentException
-	 * @throws UnInitializedException 
 	 */
 	public GroupElement multiplyGroupElements(GroupElement groupElement1, 
 						GroupElement groupElement2) throws IllegalArgumentException{
 		
 		//if the GroupElements don't match the DlogGroup, throws exception
-		if (!(groupElement1 instanceof ECPointBc)){
+		if (!(checkInstance(groupElement1))){
 			throw new IllegalArgumentException("groupElement doesn't match the DlogGroup");
 		}
-		if (!(groupElement2 instanceof ECPointBc)){
+		if (!(checkInstance(groupElement2))){
 			throw new IllegalArgumentException("groupElement doesn't match the DlogGroup");
 		}
 			
@@ -182,7 +156,11 @@ public abstract class BcAdapterDlogEC extends DlogGroupEC
 	@Override
 	public GroupElement simultaneousMultipleExponentiations
 					(GroupElement[] groupElements, BigInteger[] exponentiations){
-		
+		for (int i=0; i < groupElements.length; i++){
+			if (!checkInstance(groupElements[i])){
+				throw new IllegalArgumentException("groupElement doesn't match the DlogGroup");
+			}
+		}
 		//Our test results show that for BC elliptic curve the LL algorithm always gives the best performances
 		return computeLL(groupElements, exponentiations);
 	}
@@ -193,5 +171,10 @@ public abstract class BcAdapterDlogEC extends DlogGroupEC
 	 * BcDlogECF2m creates an ECPoint.F2m
 	 */
 	protected abstract GroupElement createPoint(ECPoint result);
+	
+	/**
+	 * Checks if the element is valid to this elliptic curve group.
+	 */
+	protected abstract boolean checkInstance(GroupElement element);
 
 }
