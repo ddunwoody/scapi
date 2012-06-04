@@ -88,6 +88,9 @@ public class CryptoPPRSAOaep extends RSAOaepAbs {
 			//init the native object with the RSA parameters - n, e, d
 			initRSADecryptor(decryptor, modN.toByteArray(), pubExponent.toByteArray(), privExponent.toByteArray());
 		}
+		
+		initRSAEncryptor(encryptor, modN.toByteArray(), pubExponent.toByteArray());
+		isKeySet = true;
 	}
 
 	/* (non-Javadoc)
@@ -127,4 +130,8 @@ public class CryptoPPRSAOaep extends RSAOaepAbs {
 		byte[] plaintext =  doDecrypt(decryptor, ((BasicAsymCiphertext)cipher).getBytes());
 		return new BasicPlaintext(plaintext);
 	}
+	
+	 static {
+	        System.loadLibrary("CryptoPPJavaInterface");
+	 }
 }
