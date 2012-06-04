@@ -185,5 +185,9 @@ public class CryptoPPRSAPss extends RSAPssAbs{
 		return doVerify(verifier, sigBytes, newMsg, length);
 		
 	}
+	
+	 static {
+	        System.loadLibrary("CryptoPPJavaInterface");
+	 }
 
 }
