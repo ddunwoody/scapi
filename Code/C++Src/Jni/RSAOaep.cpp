@@ -5,6 +5,7 @@
 #include <osrng.h>
 #include <rsa.h>
 #include <assert.h>
+#include <iostream>
 
 using namespace std;
 using namespace CryptoPP;
@@ -136,6 +137,7 @@ JNIEXPORT jbyteArray JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_encryp
 		return NULL;
 
 	size_t msgLength = env->GetArrayLength(msg);
+	
 	if(msgLength > encryptorLocal->FixedMaxPlaintextLength() )
 		return NULL;
 	
@@ -152,8 +154,11 @@ JNIEXPORT jbyteArray JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_encryp
 	// Actually perform encryption
 	AutoSeededRandomPool randPool;
 	encryptorLocal->Encrypt( randPool, plaintext, msgLength, ciphertext );
-
-	return (jbyteArray)ciphertext;
+	
+	//create a JNI byte array from the ciphertext
+	jbyteArray retCipher= env->NewByteArray(cipherSize);
+	env->SetByteArrayRegion(retCipher, 0, cipherSize, (jbyte*)ciphertext);
+	return retCipher;
 }
 
 /*
@@ -190,7 +195,10 @@ JNIEXPORT jbyteArray JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_encryp
     if(result.messageLength >  decryptorLocal->MaxPlaintextLength( cipherLength ) )
 		return NULL;
    
-	return (jbyteArray)recovered;
+	//create a JNI byte array from the ciphertext
+	jbyteArray retRecovered= env->NewByteArray(result.messageLength);
+	env->SetByteArrayRegion(retRecovered, 0, result.messageLength, (jbyte*)recovered);
+	return retRecovered;
 
 }
 
