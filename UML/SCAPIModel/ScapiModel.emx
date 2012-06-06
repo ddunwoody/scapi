@@ -6969,12 +6969,6 @@
       </eAnnotations>
       <appliedProfile href="pathmap://UML2_MSL_PROFILES/Deployment.epx#_vjbuwOvHEdiDX5bji0iVSA?Deployment?"/>
     </profileApplication>
-    <profileApplication xmi:id="_sAesEBPrEeC20cbJ9z5wpw">
-      <eAnnotations xmi:id="_sA7YABPrEeC20cbJ9z5wpw" source="http://www.eclipse.org/uml2/2.0.0/UML">
-        <references xmi:type="ecore:EPackage" href="pathmap://XSD_PROFILES/XSDProfile.epx#_vvGR0PDPEdq5wKwOrH0SmA?XSDProfile/XSDProfile?"/>
-      </eAnnotations>
-      <appliedProfile href="pathmap://XSD_PROFILES/XSDProfile.epx#_w1-ykSkOEdmj4ajjgbmSxQ?XSDProfile?"/>
-    </profileApplication>
   </uml:Package>
   <Default:Documentation xmi:id="_xnQF8Oz1EeC8av2_mh-J3A" base_Comment="_xm1PMuz1EeC8av2_mh-J3A"/>
   <Default:Documentation xmi:id="_xnQtAOz1EeC8av2_mh-J3A" base_Comment="_xm1PO-z1EeC8av2_mh-J3A"/>
