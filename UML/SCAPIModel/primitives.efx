@@ -4327,7 +4327,7 @@
             <children xmi:id="_OiS5ee2VEeC8av2_mh-J3A" type="Description">
               <element xsi:nil="true"/>
             </children>
-            <styles xmi:type="notation:ShapeStyle" xmi:id="_OiS5eu2VEeC8av2_mh-J3A" description="&lt;p>&#xD;&#xA;    This class gets the name of the prfVaringInputLength algorithm and creates the relevant object using the factories.&#xD;&#xA;&lt;/p>" fillColor="13369343" lineColor="6737151" lineWidth="1"/>
+            <styles xmi:type="notation:ShapeStyle" xmi:id="_OiS5eu2VEeC8av2_mh-J3A" description="&lt;p>&#xD;&#xA;    This class gets the name of the prfVaryingInputLength algorithm and creates the relevant object using the factories.&#xD;&#xA;&lt;/p>" fillColor="13369343" lineColor="6737151" lineWidth="1"/>
             <styles xmi:type="notation:TextStyle" xmi:id="_OiS5e-2VEeC8av2_mh-J3A"/>
             <styles xmi:type="notation:LineTypeStyle" xmi:id="_OiS5fO2VEeC8av2_mh-J3A"/>
             <element xsi:nil="true"/>
@@ -4658,7 +4658,7 @@
             <children xmi:id="_OiS6Z-2VEeC8av2_mh-J3A" type="Description">
               <element xsi:nil="true"/>
             </children>
-            <styles xmi:type="notation:ShapeStyle" xmi:id="_OiS6aO2VEeC8av2_mh-J3A" description="Gets&amp;nbsp;the&amp;nbsp;name&amp;nbsp;of&amp;nbsp;the&amp;nbsp;PrfVaringIOLength&amp;nbsp;as&amp;nbsp;input&amp;nbsp;and&amp;nbsp;creates&amp;nbsp;the&amp;nbsp;relevant&amp;nbsp;object&amp;nbsp;usinf&amp;nbsp;the&amp;nbsp;factories." fillColor="13369343" lineColor="6737151" lineWidth="1"/>
+            <styles xmi:type="notation:ShapeStyle" xmi:id="_OiS6aO2VEeC8av2_mh-J3A" description="Gets&amp;nbsp;the&amp;nbsp;name&amp;nbsp;of&amp;nbsp;the&amp;nbsp;PrfVaryingIOLength&amp;nbsp;as&amp;nbsp;input&amp;nbsp;and&amp;nbsp;creates&amp;nbsp;the&amp;nbsp;relevant&amp;nbsp;object&amp;nbsp;usinf&amp;nbsp;the&amp;nbsp;factories." fillColor="13369343" lineColor="6737151" lineWidth="1"/>
             <styles xmi:type="notation:TextStyle" xmi:id="_OiS6ae2VEeC8av2_mh-J3A"/>
             <styles xmi:type="notation:LineTypeStyle" xmi:id="_OiS6au2VEeC8av2_mh-J3A"/>
             <element xsi:nil="true"/>
@@ -9177,15 +9177,15 @@
         <ownedAttribute xmi:id="_Ov_LsJNzEeGcStgsGPQ8tA" name="random" visibility="private"/>
         <ownedOperation xmi:id="_2no2MJNzEeGcStgsGPQ8tA" name="IteratedPrfVarying"/>
         <ownedOperation xmi:id="_OiXLOe2VEeC8av2_mh-J3A" name="IteratedPrfVarying">
-          <ownedParameter xmi:id="_OiXLOu2VEeC8av2_mh-J3A" name="prfVaringInput">
+          <ownedParameter xmi:id="_OiXLOu2VEeC8av2_mh-J3A" name="prfVaryingInput">
             <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
           </ownedParameter>
         </ownedOperation>
         <ownedOperation xmi:id="_OiXLO-2VEeC8av2_mh-J3A" name="IteratedPrfVarying">
-          <ownedParameter xmi:id="_OiXLPO2VEeC8av2_mh-J3A" name="prfVaringInput" type="_OiY_hu2VEeC8av2_mh-J3A"/>
+          <ownedParameter xmi:id="_OiXLPO2VEeC8av2_mh-J3A" name="prfVaryingInput" type="_OiY_hu2VEeC8av2_mh-J3A"/>
         </ownedOperation>
         <ownedOperation xmi:id="_5qfjMJNzEeGcStgsGPQ8tA" name="IteratedPrfVarying">
-          <ownedParameter xmi:id="_7LMg8JNzEeGcStgsGPQ8tA" name="prfVaringInput">
+          <ownedParameter xmi:id="_7LMg8JNzEeGcStgsGPQ8tA" name="prfVaryingInput">
             <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
           </ownedParameter>
           <ownedParameter xmi:id="_7LNIAJNzEeGcStgsGPQ8tA" name="randNumAlg">
@@ -9193,7 +9193,7 @@
           </ownedParameter>
         </ownedOperation>
         <ownedOperation xmi:id="_81gtsJNzEeGcStgsGPQ8tA" name="IteratedPrfVarying">
-          <ownedParameter xmi:id="_-wnIcJNzEeGcStgsGPQ8tA" name="prfVaringInput" type="_OiY_hu2VEeC8av2_mh-J3A"/>
+          <ownedParameter xmi:id="_-wnIcJNzEeGcStgsGPQ8tA" name="prfVaryingInput" type="_OiY_hu2VEeC8av2_mh-J3A"/>
           <ownedParameter xmi:id="_-wnvgJNzEeGcStgsGPQ8tA" name="random">
             <type xmi:type="uml:PrimitiveType" href="ScapiModel.emx#_THdWsCC-EeGgp9a0aLX5Ug?SCAPI%20Model/PrimitiveTypes/SecureRandom?"/>
           </ownedParameter>
@@ -9328,15 +9328,15 @@
         <ownedAttribute xmi:id="_4Z23MJNyEeGcStgsGPQ8tA" name="random" visibility="private"/>
         <ownedOperation xmi:id="_8a98MJNyEeGcStgsGPQ8tA" name="LubyRackoffPrpFromPrfVarying"/>
         <ownedOperation xmi:id="_OiXxmO2VEeC8av2_mh-J3A" name="LubyRackoffPrpFromPrfVarying">
-          <ownedParameter xmi:id="_OiXxme2VEeC8av2_mh-J3A" name="prfVaringIOLengthName">
+          <ownedParameter xmi:id="_OiXxme2VEeC8av2_mh-J3A" name="prfVaryingIOLengthName">
             <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
           </ownedParameter>
         </ownedOperation>
         <ownedOperation xmi:id="_OiXxmu2VEeC8av2_mh-J3A" name="LubyRackoffPrpFromPrfVarying">
-          <ownedParameter xmi:id="_OiXxm-2VEeC8av2_mh-J3A" name="prfVaringIOLength" type="_OiY_iO2VEeC8av2_mh-J3A"/>
+          <ownedParameter xmi:id="_OiXxm-2VEeC8av2_mh-J3A" name="prfVaryingIOLength" type="_OiY_iO2VEeC8av2_mh-J3A"/>
         </ownedOperation>
         <ownedOperation xmi:id="_-6M-wJNyEeGcStgsGPQ8tA" name="LubyRackoffPrpFromPrfVarying">
-          <ownedParameter xmi:id="_BmgM8JNzEeGcStgsGPQ8tA" name="prfVaringIOLengthName">
+          <ownedParameter xmi:id="_BmgM8JNzEeGcStgsGPQ8tA" name="prfVaryingIOLengthName">
             <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
           </ownedParameter>
           <ownedParameter xmi:id="_EbPlcJNzEeGcStgsGPQ8tA" name="randNumGenAlg">
@@ -9344,7 +9344,7 @@
           </ownedParameter>
         </ownedOperation>
         <ownedOperation xmi:id="_Fhs3MJNzEeGcStgsGPQ8tA" name="LubyRackoffPrpFromPrfVarying">
-          <ownedParameter xmi:id="_JQKtAJNzEeGcStgsGPQ8tA" name="prfVaringIOLength" type="_OiY_iO2VEeC8av2_mh-J3A"/>
+          <ownedParameter xmi:id="_JQKtAJNzEeGcStgsGPQ8tA" name="prfVaryingIOLength" type="_OiY_iO2VEeC8av2_mh-J3A"/>
           <ownedParameter xmi:id="_JQLUEJNzEeGcStgsGPQ8tA" name="random">
             <type xmi:type="uml:PrimitiveType" href="ScapiModel.emx#_THdWsCC-EeGgp9a0aLX5Ug?SCAPI%20Model/PrimitiveTypes/SecureRandom?"/>
           </ownedParameter>
