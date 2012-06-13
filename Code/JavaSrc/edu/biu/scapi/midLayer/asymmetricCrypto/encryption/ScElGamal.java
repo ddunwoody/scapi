@@ -2,6 +2,7 @@ package edu.biu.scapi.midLayer.asymmetricCrypto.encryption;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.InvalidKeyException;
 import java.security.KeyException;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
@@ -14,64 +15,65 @@ import java.security.spec.InvalidParameterSpecException;
 import org.bouncycastle.util.BigIntegers;
 
 import edu.biu.scapi.exceptions.FactoriesException;
-import edu.biu.scapi.exceptions.UnInitializedException;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScElGamalPrivateKey;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScElGamalPublicKey;
 import edu.biu.scapi.midLayer.ciphertext.Ciphertext;
 import edu.biu.scapi.midLayer.ciphertext.ElGamalCiphertext;
-import edu.biu.scapi.midLayer.plaintext.BasicPlaintext;
+import edu.biu.scapi.midLayer.plaintext.GroupElementPlaintext;
 import edu.biu.scapi.midLayer.plaintext.Plaintext;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
-import edu.biu.scapi.primitives.dlog.bc.BcDlogECFp;
+import edu.biu.scapi.primitives.dlog.miracl.MiraclDlogECFp;
 import edu.biu.scapi.securityLevel.DDH;
 import edu.biu.scapi.tools.Factories.DlogGroupFactory;
 
 /**
- * This class performs the El Gamal encryption and decryption scheme.
- * By definition, this encryption scheme is CPA-secure.
+ * This class performs the El Gamal encryption scheme.
+ * By definition, this encryption scheme is CPA-secure and Indistinguishable.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
 public class ScElGamal implements ElGamalEnc{
 	
-	private DlogGroup dlog;					//the underlying DlogGroup
-	private ScElGamalPrivateKey privateKey;	//ElGamal private key (contains x)
+	private DlogGroup dlog;						//The underlying DlogGroup
+	private ScElGamalPrivateKey privateKey;		//ElGamal private key (contains x)
 	private ScElGamalPublicKey publicKey;		//ElGamal public key (contains h)
-	private SecureRandom random;			//source of randomness
-	private boolean isKeySet = false;
-	
-	private BigInteger qMinusOne;	//We keep this value to save unnecessary calculations.
+	private SecureRandom random;				//Source of randomness
+	private boolean isKeySet;
+	private BigInteger qMinusOne;				//We keep this value to save unnecessary calculations.
 	
 	
 	/**
-	 * Default constructor. The default DlogGroup is BcDlogECFp and is initialized with P-192 NIST's curve.
-	 * @throws IOException 
-	 * @throws IllegalArgumentException 
+	 * Default constructor. Uses the default implementations of DlogGroup, CryptographicHash and SecureRandom.
 	 */
-	public ScElGamal() throws IllegalArgumentException, IOException {
-		this(new BcDlogECFp("P-192"));
+	public ScElGamal(){
+		try {
+			dlog = new MiraclDlogECFp("P-192");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		qMinusOne = dlog.getOrder().subtract(BigInteger.ONE);
+		this.random = new SecureRandom();
 	}
 
 	/**
-	 * Constructor that gets a DlogGroup and set it to the underlying group
-	 * It lets SCAPI choose the source of randomness.
-	 * @param dlogGroup must be DDH secure
-	 * @throws UnInitializedException if the given dlog group is not initialized
+	 * Constructor that gets a DlogGroup and sets it to the underlying group.
+	 * It lets SCAPI choose and source of randomness.
+	 * @param dlogGroup must be DDH secure.
+	 * @throws IllegalArgumentException if the given dlog group does not have DDH security level.
 	 */
 	public ScElGamal(DlogGroup dlogGroup) {
 		this(dlogGroup, new SecureRandom());
 	}
 	/**
-	 * Constructor that gets a DlogGroup and set it to the underlying group
-	 * and gets a source of randomness.
-	 * @param dlogGroup must be DDH secure
-	 * @param random source of randomness
-	 * @throws IllegalArgumentException if the given dlog group does not have DDH security level 
+	 * Constructor that gets a DlogGroup and source of randomness.
+	 * @param dlogGroup must be DDH secure.
+	 * @param random source of randomness.
+	 * @throws IllegalArgumentException if the given dlog group does not have DDH security level.
 	 */
 	public ScElGamal(DlogGroup dlogGroup, SecureRandom random) {
-		//the underlying dlog group must be DDH secure
+		//The underlying dlog group must be DDH secure.
 		if (!(dlogGroup instanceof DDH)){
 			throw new IllegalArgumentException("DlogGroup should have DDH security level");
 		}
@@ -81,10 +83,11 @@ public class ScElGamal implements ElGamalEnc{
 	}
 	
 	/**
-	 * Constructor that gets a DlogGroup name to create and set it to the underlying group
-	 * @param dlogGroup must be DDH secure
-	 * @throws FactoriesException if the creation of the dlog failed
-	 * @throws IllegalArgumentException if the given dlog group does not have DDH security level 
+	 * Constructor that gets a DlogGroup name to create and sets it to the underlying group.
+	 * Uses default implementation of SecureRandom.
+	 * @param dlogGroup must be DDH secure.
+	 * @throws FactoriesException if the creation of the dlog failed.
+	 * @throws IllegalArgumentException if the given dlog group does not have DDH security level. 
 	 */
 	public ScElGamal(String dlogName) throws FactoriesException{
 		//Create a dlog group object with relevant factory, and then use regular constructor.
@@ -93,101 +96,73 @@ public class ScElGamal implements ElGamalEnc{
 	
 	
 	/**
-	 * Constructor that gets a DlogGroup name to create and set it to the underlying group
-	 * @param dlogGroup must be DDH secure
-	 * @throws FactoriesException if the creation of the dlog failed
-	 * @throws NoSuchAlgorithmException 
-	 * @throws IllegalArgumentException if the given dlog group does not have DDH security level 
+	 * Constructor that gets a DlogGroup name to create and random number generator to use.
+	 * @param dlogGroup must be DDH secure.
+	 * @throws FactoriesException if the creation of the dlog failed.
+	 * @throws NoSuchAlgorithmException if the given random number generator is not supported.
+	 * @throws IllegalArgumentException if the given dlog group does not have DDH security level.
 	 */
 	public ScElGamal(String dlogName, String randNumGenAlg) throws FactoriesException, NoSuchAlgorithmException{
-		//Create a dlog group object with relevant factory. and then use regular constructor.
+		//Creates a dlog group object with relevant factory.
 		//Creates a SecureRandom object that implements the specified Random Number Generator (RNG) algorithm.
 		//Then use regular constructor.
 		this(DlogGroupFactory.getInstance().getObject(dlogName), SecureRandom.getInstance(randNumGenAlg));
 	}
 	
-		/**
-	 * Initialize this ElGamal encryption scheme with keys, AlgorithmParameterSpec and source of randomness.
+	/**
+	 * Initializes this ElGamal encryption scheme with (public, private) key pair.
 	 * After this initialization the user can encrypt and decrypt messages.
-	 * @param publicKey should be ElGamalPublicKey
-	 * @param privateKey should be ElGamalPrivateKey
-	 * @param params can be GroupParams to initialize the DlogGroup
-	 * @param random source of secure randomness
+	 * @param publicKey should be ElGamalPublicKey.
+	 * @param privateKey should be ElGamalPrivateKey.
+	 * @throws InvalidKeyException if the given keys are not instances of ElGamal keys.
 	 */
-	public void setKey(PublicKey publicKey, PrivateKey privateKey) {
-		//key should be ElGamal keys
-		if(!(publicKey instanceof ScElGamalPublicKey) || !(privateKey instanceof ScElGamalPrivateKey)){
-			throw new IllegalArgumentException("keys should be instances of ElGamal keys");
+	public void setKey(PublicKey publicKey, PrivateKey privateKey) throws InvalidKeyException{
+		//Key should be ElGamalPublicKey.
+		if(!(publicKey instanceof ScElGamalPublicKey)){
+			throw new InvalidKeyException("keys should be instances of ElGamal keys");
 		}
-	
-		//set the key
+		
+		//Key should be ElGamalPrivateKey.
+		if(privateKey!= null && !(privateKey instanceof ScElGamalPrivateKey)){
+			throw new InvalidKeyException("keys should be instances of ElGamal keys");
+		}
+		
+		//Sets the keys.
 		this.publicKey = (ScElGamalPublicKey) publicKey;
-			
-		//operates an optimization of the private key
-		initPrivateKey(privateKey);
+		
+		if (privateKey != null){
+			//Computes an optimization of the private key.
+			initPrivateKey(privateKey);
+		}
+		
 		isKeySet = true;
 	}
-
-
-
+	
 	/**
-	 * Initialize this ElGamal encryption scheme with public key.
+	 * Initializes this ElGamal encryption scheme with public key.
 	 * Setting only the public key the user can encrypt messages but can not decrypt messages.
 	 * @param publicKey should be ElGamalPublicKey
-	 * @param random source of secure randomness
+	 * @throws InvalidKeyException if the given key is not instances of ElGamalPuclicKey.
 	 */
-	public void setKey(PublicKey publicKey) {
-		//public key should be ElGamal public key
-		if(!(publicKey instanceof ScElGamalPublicKey)){
-			throw new IllegalArgumentException("key should be instances of ElGamal key");
-		}
-		//set the parameters
-		this.publicKey = (ScElGamalPublicKey) publicKey;
-		this.privateKey = null;
-		isKeySet = true;
+	public void setKey(PublicKey publicKey) throws InvalidKeyException {
+		setKey(publicKey, null);
 	}
 
 	/**
 	 * ElGamal decrypt function can be optimized if, instead of using the x value in the private key as is, 
 	 * we change it to be q-x, while q is the dlog group order.
-	 * This function operates this changing and save the new private value as the private key memeber
-	 * @param privateKey to change
+	 * This function computes this changing and saves the new private value as the private key member.
+	 * @param privateKey to change.
 	 */
 	private void initPrivateKey(PrivateKey privateKey){
-		//get the a value from the private key
+		//Gets the a value from the private key.
 		BigInteger x = ((ScElGamalPrivateKey) privateKey).getX();
-		//get the q-x value
+		//Gets the q-x value.
 		BigInteger xInv = dlog.getOrder().subtract(x);
-		//set the q-x value as the private key
+		//Sets the q-x value as the private key.
 		this.privateKey = new ScElGamalPrivateKey(xInv);
 	}
 	
-	/**
-	 * In case that the dlog is not initialized and the init function didn't get a GroupParams to initialize it,
-	 * this function initialize it with default values.
-	 */
-	/*private void initDlogDefault(){
-		
-		if (dlog instanceof DlogECF2m){
-			((DlogECF2m)dlog).init("B-163");
-		}
-		if (dlog instanceof DlogECFp){
-			((DlogECFp)dlog).init("P-192");
-		}
-		if (dlog instanceof DlogZp){
-			BigInteger q = null;
-			BigInteger xG = null;
-			BigInteger p = null;
-			ZpGroupParams params = new ZpGroupParams(q, xG, p);
-			try {
-				((DlogZp)dlog).init(params);
-			} catch (IOException e) {
-				// shouldn't occur since that can occur in EC cases
-				e.printStackTrace();
-			}
-		}
-	}
-	*/
 	@Override
 	public boolean isKeySet(){
 		return isKeySet;
@@ -202,159 +177,152 @@ public class ScElGamal implements ElGamalEnc{
 	
 	/**
 	 * Encrypts the given message using ElGamal encryption scheme.
-	 * Pseudo-code:
-	 * 		•	Choose a random  y <- Zq
-	 *		•	Calculate c1 = g^y mod p //mod p operation are performed automatically by the group.
-	 *		•	Calculate c2 = h^y * plaintext.getText() mod p
-	 * @param plaintext contains message to encrypt
-	 * @return CipherText of type ElGamalCiphertext contains the encrypted message
+	 * 
+	 * @param plaintext contains message to encrypt. MUST be an instance of GroupElementPlaintext.
+	 * @return Ciphertext of type ElGamalCiphertext containing the encrypted message.
+	 * @throws IllegalStateException if no public key was set.
+	 * @throws IllegalArgumentException if the given Plaintext is not instance of GroupElementPlaintext.
 	 */
 	public Ciphertext encrypt(Plaintext plaintext) {
-		//convert the message to a group element. 
-		//if the message is not a group element, the function convertByteArrayToGroupElement will throw IllegalArgumentException, which we catch.
-		try {
-			GroupElement msgElement = dlog.convertByteArrayToGroupElement(((BasicPlaintext)plaintext).getText());
+		/* 
+		 * Pseudo-code:
+		 * 	•	Choose a random  y <- Zq.
+		 *	•	Calculate c1 = g^y mod p //Mod p operation are performed automatically by the group.
+		 *	•	Calculate c2 = h^y * plaintext.getText() mod p.
+		 */
 		
-			//choose a random value y<-Zq
-			BigInteger y = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
-			
-			//calculate c1 = g^y and c2 = msg * h^y
-			GroupElement generator = dlog.getGenerator();
-			GroupElement c1 = dlog.exponentiate(generator, y);
-			GroupElement hy = dlog.exponentiate(publicKey.getH(), y);
-			GroupElement c2 = dlog.multiplyGroupElements(hy, msgElement);
-			
-			//return an ElGamalCiphertext with c1, c2
-			ElGamalCiphertext cipher = new ElGamalCiphertext(c1, c2);
-			return cipher;
-			
-		} catch (IllegalArgumentException e) {
-			throw new IllegalArgumentException("the given message is not a valid member in this underlying DlogGroup");
+		// If there is no public key can not encrypt, throws exception.
+		if (!isKeySet()){
+			throw new IllegalStateException("in order to encrypt a message this object must be initialized with public key");
 		}
+		
+		if (!(plaintext instanceof GroupElementPlaintext)){
+			throw new IllegalArgumentException("plaintext should be instance of GroupElementPlaintext");
+		}
+	
+		//Gets the element.
+		GroupElement msgElement = ((GroupElementPlaintext) plaintext).getElement();
+	
+		//Chooses a random value y<-Zq.
+		BigInteger y = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
+		
+		//Calculates c1 = g^y and c2 = msg * h^y.
+		GroupElement generator = dlog.getGenerator();
+		GroupElement c1 = dlog.exponentiate(generator, y);
+		GroupElement hy = dlog.exponentiate(publicKey.getH(), y);
+		GroupElement c2 = dlog.multiplyGroupElements(hy, msgElement);
+		
+		//Returns an ElGamalCiphertext with c1, c2.
+		ElGamalCiphertext cipher = new ElGamalCiphertext(c1, c2);
+		return cipher;
+		
 	}
 
 	/**
 	 * Decrypts the given ciphertext using ElGamal encryption scheme.
-	 * Pseudo-code:
-	 * 		•	Calculate s = ciphertext.getC1() ^ privateKey
-	 *		•	Calculate the inverse of s: invS =  s ^ -1
-	 *		•	Calculate m = ciphertext.getC2() * invS
-	 * @param cipherText of type ElGamalCiphertext contains the cipher to decrypt
-	 * @return Plaintext contains the decrypted message
-	 * @throws KeyException 
+	 *
+	 * @param CipherText MUST be of type ElGamalCiphertext contains the cipher to decrypt.
+	 * @return Plaintext of type GroupElementPlaintext which containing the decrypted message.
+	 * @throws KeyException if no private key was set.
+	 * @throws IllegalArgumentException if the given cipher is not instance of ElGamalCiphertext.
 	 */
 	public Plaintext decrypt(Ciphertext cipher) throws KeyException {
-		//if there is no private key, throw exception
+		/*  
+		 * Pseudo-code:
+		 * 	•	Calculate s = ciphertext.getC1() ^ x^(-1) //x^(-1) is kept in the private key because of the optimization computed in the function initPrivateKey.
+		 *	•	Calculate m = ciphertext.getC2() * s
+		 */
+		
+		//If there is no private key, throws exception.
 		if (privateKey == null){
 			throw new KeyException("in order to decrypt a message, this object must be initialized with private key");
 		}
-		//ciphertext should be ElGamal ciphertext
+		//Ciphertext should be ElGamal ciphertext.
 		if (!(cipher instanceof ElGamalCiphertext)){
 			throw new IllegalArgumentException("ciphertext should be instance of ElGamalCiphertext");
 		}
-		Plaintext plaintext = null;
 
 		ElGamalCiphertext ciphertext = (ElGamalCiphertext) cipher;
-		//calculates s = ciphertext.getC1() ^ x
+		//Calculates s = ciphertext.getC1() ^ x.
 		GroupElement s = dlog.exponentiate(ciphertext.getC1(), privateKey.getX());
-		//calculate the plaintext element m = ciphertext.getC2() * s
+		//Calculates the plaintext element m = ciphertext.getC2() * s.
 		GroupElement m = dlog.multiplyGroupElements(ciphertext.getC2(), s);
 		
-		//convert the plaintext element to a byte[], create a plaintext object with the bytes and return it
-		byte[] text = dlog.convertGroupElementToByteArray(m);
-		plaintext = new BasicPlaintext(text);
-		
+		//Creates a plaintext object with the element and returns it.
+		Plaintext plaintext = new GroupElementPlaintext(m);
 		return plaintext;
 	}
 
 	/**
-	 * Generates a KeyPair contains set of ElGamalPublicKEy and ElGamalPrivateKey using default source of randomness and the dlog specified upon construction.
-	 * @return KeyPair contains keys for this El Gamal object
-	 * @throws InvalidParameterSpecException 
+	 * Generates a KeyPair containing a set of ElGamalPublicKEy and ElGamalPrivateKey using the source of randomness and the dlog specified upon construction.
+	 * @return KeyPair contains keys for this ElGamal object.
 	 */
 	public KeyPair generateKey() {
 		
-		KeyPair pair = null;
-		
-		//choose a random value in Zq
+		//Chooses a random value in Zq.
 		BigInteger x = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
 		GroupElement generator = dlog.getGenerator();
-		//calculates h = g^x
+		//Calculates h = g^x.
 		GroupElement h = dlog.exponentiate(generator, x);
-		//create an ElGamalPublicKey with h and ElGamalPrivateKey with x
+		//Creates an ElGamalPublicKey with h and ElGamalPrivateKey with x.
 		ScElGamalPublicKey publicKey = new ScElGamalPublicKey(h);
 		ScElGamalPrivateKey privateKey = new ScElGamalPrivateKey(x);
-		//create a KeyPair with the created keys
-		pair = new KeyPair(publicKey, privateKey);
-	
+		//Creates a KeyPair with the created keys.
+		KeyPair pair = new KeyPair(publicKey, privateKey);
 		return pair;
 	}
 	
 	/**
-	 * There is no need for parameters to generate an El Gamal key pair. Therefore this operation is not supported.
+	 * This function is not supported for this encryption scheme, since there is no need for parameters to generate an ElGamal key pair.
 	 * @throws UnsupportedOperationException
 	 */
 	@Override
 	public KeyPair generateKey(AlgorithmParameterSpec keyParams) throws InvalidParameterSpecException {
-		//No need for parameters to generate an El Gamal key pair. Therefore this operation is not supported
-		throw new UnsupportedOperationException();
+		//No need for parameters to generate an El Gamal key pair. 
+		throw new UnsupportedOperationException("To Generate ElGamal keys use the generateKey() function");
 	}
-	
-	/**
-	 * Creates DlogGroup using the ElGamalParameterSpec
-	 * @param keyParams ElGamalParameterSpec
-	 * @return initialized dlogGroup
-	 */
-	/*private static DlogGroup createDlogGroup(ElGamalParameterSpec keyParams) {
-		try {
-			DlogGroup dlog = null;
-			String provider = keyParams.getProviderName();
-			if (provider == null){
-				dlog = DlogGroupFactory.getInstance().getObject(keyParams.getDlogName());
-			} else {
-				dlog = DlogGroupFactory.getInstance().getObject(keyParams.getDlogName(), provider);
-			}
-			dlog.init(keyParams.getGroupParams());
-			return dlog;
-			
-		} catch(Exception e){
-			
-		}
-		return null;
-	}
-	*/
 	
 	/**
 	 * Calculates the ciphertext resulting of multiplying two given ciphertexts.
-	 * IF NOT VALID_PARAMS(G,q,g), AND the same h value appears in c1,c2, 
-	 * 	REPORT ERROR and HALT
-	 * c1 = (u1, v1); c2 = (u2, v2) 
-	 * SAMPLE a random value w in Zq
-	 * COMPUTE u = g^w*u1*u2
-	 * COMPUTE v = h^w*v1*v2
-	 * OUTPUT c = (u,v)
+	 * Both ciphertexts have to have been generated with the same public key and DlogGroup as the underlying objects of this ElGamal object.
+	 * @throws IllegalArgumentException in the following cases:
+	 * 		1. If one or more of the given ciphertexts is not instance of ElGamalCiphertext.
+	 * 		2. If one or more of the GroupElements in the given ciphertexts is not a member of the underlying DlogGroup of this ElGamal encryption scheme.
 	 */
 	public Ciphertext multiply(Ciphertext cipher1, Ciphertext cipher2) {
-		//TODO Need to decide if the  H element of the public key has to be part of the ciphertext or not.
-		//Without that we can't check that both ciphertexts have the same H.
-		//TODO Need to decide if the dlog group has to be part of the ciphertext.
-		
-		//cipher1 and cipher2 should be ElGamal ciphertexts
+		/* 
+		 * Pseudo-Code:
+		 * 	c1 = (u1, v1); c2 = (u2, v2) 
+		 * 	SAMPLE a random value w in Zq
+		 * 	COMPUTE u = g^w*u1*u2
+		 * 	COMPUTE v = h^w*v1*v2
+		 * 	OUTPUT c = (u,v)
+		 */
+		// Cipher1 and cipher2 should be ElGamal ciphertexts.
 		if (!(cipher1 instanceof ElGamalCiphertext) || !(cipher2 instanceof ElGamalCiphertext)){
 			throw new IllegalArgumentException("ciphertexts should be instance of ElGamalCiphertext");
 		}
 		ElGamalCiphertext c1 = (ElGamalCiphertext)cipher1;
 		ElGamalCiphertext c2 = (ElGamalCiphertext)cipher2;
 		
-		//choose a random value in Zq
+		//Gets the groupElements of the ciphers.
+		GroupElement u1 = c1.getC1();
+		GroupElement v1 = c1.getC2();
+		GroupElement u2 = c2.getC1();
+		GroupElement v2 = c2.getC2();
+		
+		if (!(dlog.isMember(u1)) || !(dlog.isMember(v1)) || !(dlog.isMember(u2)) || !(dlog.isMember(v2))){
+			throw new IllegalArgumentException("GroupElements in the given ciphertexts must be a members in the DlogGroup of type " + dlog.getGroupType());
+		}
+		//Chooses a random value in Zq.
 		BigInteger w = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
 		
-		//calculate u = g^w*u1*u2
+		//Calculates u = g^w*u1*u2.
 		GroupElement gExpW = dlog.exponentiate(dlog.getGenerator(), w);
 		GroupElement gExpWmultU1 = dlog.multiplyGroupElements(gExpW, c1.getC1());
 		GroupElement u = dlog.multiplyGroupElements(gExpWmultU1, c2.getC1());
 		
-		//calculate v = h^w*v1*v2
+		//Calculates v = h^w*v1*v2.
 		GroupElement hExpW = dlog.exponentiate(publicKey.getH(), w);
 		GroupElement hExpWmultV1 = dlog.multiplyGroupElements(hExpW, c1.getC2());
 		GroupElement v = dlog.multiplyGroupElements(hExpWmultV1, c2.getC2());
