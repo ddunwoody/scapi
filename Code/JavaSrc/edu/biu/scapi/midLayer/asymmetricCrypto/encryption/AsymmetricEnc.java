@@ -30,6 +30,7 @@ public interface AsymmetricEnc extends Cpa, Indistinguishable{
 	 * Sets this asymmetric encryption with public key and private key.
 	 * @param publicKey
 	 * @param privateKey
+	 * @throws InvalidKeyException if the given keys don't match this encryption scheme.
 	 */
 	public void setKey(PublicKey publicKey, PrivateKey privateKey)throws InvalidKeyException;
 	
@@ -37,6 +38,7 @@ public interface AsymmetricEnc extends Cpa, Indistinguishable{
 	 * Sets this asymmetric encryption with a public key<p> 
 	 * In this case the encryption object can be used only for encryption.
 	 * @param publicKey
+	 * @throws InvalidKeyException if the given key doesn't match this encryption scheme.
 	 */
 	public void setKey(PublicKey publicKey)throws InvalidKeyException;
 	
@@ -52,10 +54,12 @@ public interface AsymmetricEnc extends Cpa, Indistinguishable{
 	 * @return the name of this AsymmetricEnc
 	 */
 	public String getAlgorithmName();
+	
 	/**
 	 * Encrypts the given plaintext using this asymmetric encryption scheme.
 	 * @param plaintext message to encrypt
 	 * @return Ciphertext the encrypted plaintext
+	 * @throws IllegalArgumentException if the given Plaintext doesn't match this encryption type.
 	 */
 	public Ciphertext encrypt(Plaintext plainText);
 	
@@ -63,7 +67,8 @@ public interface AsymmetricEnc extends Cpa, Indistinguishable{
 	 * Decrypts the given ciphertext using this asymmetric encryption scheme.
 	 * @param cipher ciphertext to decrypt
 	 * @return Plaintext the decrypted cipher
-	 * @throws KeyException 
+	 * @throws KeyException if there is no private key
+	 * @throws IllegalArgumentException if the given Ciphertext doesn't march this encryption type.
 	 */
 	public Plaintext decrypt(Ciphertext cipher) throws KeyException;
 	
@@ -71,14 +76,13 @@ public interface AsymmetricEnc extends Cpa, Indistinguishable{
 	 * Generates public and private keys for this asymmetric encryption.
 	 * @param keyParams hold the required parameters to generate the encryption scheme's keys
 	 * @return KeyPair holding the public and private keys relevant to the encryption scheme
-	 * @throws InvalidParameterSpecException 
+	 * @throws InvalidParameterSpecException if the given parameters don't match this encryption scheme.
 	 */
 	public KeyPair generateKey(AlgorithmParameterSpec keyParams) throws InvalidParameterSpecException;
 	
 	/**
 	 * Generates public and private keys for this asymmetric encryption.
 	 * @return KeyPair holding the public and private keys
-	 * @throws InvalidParameterSpecException 
 	 */
 	public KeyPair generateKey();
 		

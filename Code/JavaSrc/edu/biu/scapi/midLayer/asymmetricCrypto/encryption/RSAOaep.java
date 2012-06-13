@@ -5,7 +5,7 @@ import edu.biu.scapi.securityLevel.NonMalleable;
 
 /**
  * General interface for RSA OAEP encryption scheme. Every concrete implementation of RSA OAEP encryption should implement this interface.
- * By definition, this encryption scheme is CCA-secure.
+ * By definition, this encryption scheme is CCA-secure and NonMalleable.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *

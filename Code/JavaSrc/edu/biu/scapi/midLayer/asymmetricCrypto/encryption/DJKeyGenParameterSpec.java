@@ -1,11 +1,10 @@
-/**
- * 
- */
 package edu.biu.scapi.midLayer.asymmetricCrypto.encryption;
 
 import java.security.spec.AlgorithmParameterSpec;
 
 /**
+ * Parameters for DamgardJurik key generation.
+ * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
