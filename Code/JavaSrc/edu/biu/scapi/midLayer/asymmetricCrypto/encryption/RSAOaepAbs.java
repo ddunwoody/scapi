@@ -9,19 +9,25 @@ import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.InvalidParameterSpecException;
 import java.security.spec.RSAKeyGenParameterSpec;
 
+/**
+ * Abstract class of RSA OAEP encryption scheme. This class has some common functionality of the encryption scheme, such as key generation.
+ * 
+ * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
+ *
+ */
 public abstract class RSAOaepAbs implements RSAOaep {
 
-	protected SecureRandom random;					//source of randomness
+	protected SecureRandom random;		//Source of randomness.
 	protected boolean isKeySet;
 	
 	
 	@Override
 	public boolean isKeySet() {
-		return isKeySet();
+		return isKeySet;
 	}
 
 	/**
-	 * @return the name of this Asymmetric encryption - "RSAOAEP"
+	 * @return the name of this Asymmetric encryption - "RSA/OAEP".
 	 */
 	@Override
 	public String getAlgorithmName() {
@@ -31,38 +37,35 @@ public abstract class RSAOaepAbs implements RSAOaep {
 
 
 	/**
-	 * Generates a KeyPair contains set of RSAPublicKEy and RSAPrivateKey using default source of randomness.
-	 * @param keyParams RSAPssParameterSpec
-	 * @return KeyPair contains keys for this RSAPss object
-	 * @throws InvalidParameterSpecException if keyParams is not instance of RSAPssParameterSpec
+	 * This function is not supported. 
 	 */
 	@Override
 	public KeyPair generateKey() {
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException("To generate RSA keys call generateKey with RSAKeyGenParameterSpec");
 	}
 
 	
 	/**
-	 * Generate an RSA key pair using the given source of randomness.
-	 * @param keyParams RSAPssParameterSpec
-	 * @return KeyPair contains keys for this RSAPss object
-	 * @throws InvalidParameterSpecException if keyParams is not instance of RSAPssParameterSpec
+	 * Generate an RSA key pair using the given parameters.
+	 * @param keyParams RSAKeyGenParameterSpec
+	 * @return KeyPair contains keys for this RSAOaep object
+	 * @throws InvalidParameterSpecException if keyParams is not instance of RSAKeyGenParameterSpec
 	 */
 	public KeyPair generateKey(AlgorithmParameterSpec keyParams) throws InvalidParameterSpecException {
-		//if keyParams is not the expected, throw exception
+		//If keyParams is not the expected, throw exception.
 		if (!(keyParams instanceof RSAKeyGenParameterSpec)){
 			throw new InvalidParameterSpecException("keyParams should be instance of RSAKeyGenParameterSpec");
 		}
 		
 		try {
-			//generates keys using the KeyPairGenerator
+			//Generates keys using the KeyPairGenerator
 			KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
 			generator.initialize(keyParams, random);
 			return generator.generateKeyPair(); 
 		} catch(InvalidAlgorithmParameterException e){
-			//shouldn't occur since the parameterSpec is valid for RSA
+			//Shouldn't occur since the parameterSpec is valid for RSA
 		} catch (NoSuchAlgorithmException e) {
-			//shouldn't occur since RSA is a valid algorithm
+			//Shouldn't occur since RSA is a valid algorithm
 			e.printStackTrace();
 		}
 		return null;
