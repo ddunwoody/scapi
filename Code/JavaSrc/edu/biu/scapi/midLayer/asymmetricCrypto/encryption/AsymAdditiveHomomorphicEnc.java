@@ -17,6 +17,7 @@ public interface AsymAdditiveHomomorphicEnc extends AsymmetricEnc {
 	 * @param cipher1
 	 * @param cipher2
 	 * @return the addition result
+	 * @throws IllegalStateException if no public key was set.
 	 * @throws IllegalArgumentException if the given ciphertexts do not match this asymmetric encryption.
 	 */
 	public Ciphertext add(Ciphertext cipher1, Ciphertext cipher2);
@@ -26,6 +27,7 @@ public interface AsymAdditiveHomomorphicEnc extends AsymmetricEnc {
 	 * @param cipher
 	 * @param constNumber
 	 * @return the multiplication result.
+	 * @throws IllegalStateException if no public key was set.
 	 * @throws IllegalArgumentException if the given ciphertext does not match this asymmetric encryption.
 	 */
 	public Ciphertext multByConst(Ciphertext cipher, BigInteger constNumber);

@@ -16,6 +16,7 @@ public interface AsymMultiplicativeHomomorphicEnc extends AsymmetricEnc{
 	 * @param cipher1
 	 * @param cipher2
 	 * @return the multiplication result
+	 * @throws IllegalStateException if no public key was set.
 	 * @throws IllegalArgumentException if the given ciphertexts do not match this asymmetric encryption.
 	 */
 	public Ciphertext multiply(Ciphertext cipher1, Ciphertext cipher2);
