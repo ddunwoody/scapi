@@ -15,6 +15,7 @@ public interface DamgardJurikEnc extends AsymAdditiveHomomorphicEnc {
 	 * This function takes an encryption of some plaintext (let's call it originalPlaintext) and returns a cipher that "looks" different but
 	 * it is also an encryption of originalPlaintext.<p>
 	 * @param cipher
+	 * @throws IllegalStateException if no public key was set.
 	 * @throws IllegalArgumentException if the given ciphertext does not match this asymmetric encryption.
 	 */
 	public Ciphertext reRandomize(Ciphertext cipher);
