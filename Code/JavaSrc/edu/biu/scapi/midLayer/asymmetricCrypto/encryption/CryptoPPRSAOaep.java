@@ -75,6 +75,9 @@ public class CryptoPPRSAOaep extends RSAOaepAbs {
 				throw new InvalidKeyException("keys should be instances of RSA keys");
 		}
 		
+		//Notice! We set the public key twice - in the PublicKey member and in the native encryptor object.
+		//This can lead to many synchronization problems, so we need to be very careful not to change just one of them.
+		this.publicKey = (RSAPublicKey) publicKey;
 		//Creates the native encryptor object.
 		this.encryptor = createRSAEncryptor();
 		// Gets the values of modulus (N), pubExponent (e), 

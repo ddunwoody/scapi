@@ -70,6 +70,10 @@ public class BcRSAOaep extends RSAOaepAbs {
 				throw new InvalidKeyException("keys should be instances of RSA keys");
 		}
 				
+		//Notice! We set the public key twice - in the PublicKey member and in the publicParameters object.
+		//This can lead to many synchronization problems, so we need to be very careful not to change just one of them.
+		this.publicKey = (RSAPublicKey) publicKey;
+		
 		//Creates BC objects and initializes them.
 		initBCCipher((RSAPublicKey) publicKey, (RSAPrivateKey)privateKey);
 		isKeySet = true;
