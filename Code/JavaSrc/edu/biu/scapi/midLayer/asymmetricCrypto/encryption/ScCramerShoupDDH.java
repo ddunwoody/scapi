@@ -214,6 +214,19 @@ public class ScCramerShoupDDH implements CramerShoupDDHEnc {
 	public boolean isKeySet() {
 		return isKeySet;
 	}
+	
+	/**
+	 * Returns the PublicKey of this CramerShoup encryption scheme.
+	 * @return the CramerShoupPublicKey
+	 * @throws IllegalStateException if no public key was set.
+	 */
+	public PublicKey getPublicKey(){
+		if (!isKeySet()){
+			throw new IllegalStateException("no PublicKey was set");
+		}
+		
+		return publicKey;
+	}
 
 	/**
 	 * @return the name of this AsymmetricEnc - CramerShoup and the underlying DlogGroup it uses.

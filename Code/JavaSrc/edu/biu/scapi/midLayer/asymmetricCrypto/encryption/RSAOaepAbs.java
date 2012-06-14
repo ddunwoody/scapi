@@ -4,7 +4,9 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.security.SecureRandom;
+import java.security.interfaces.RSAPublicKey;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.InvalidParameterSpecException;
 import java.security.spec.RSAKeyGenParameterSpec;
@@ -19,11 +21,24 @@ public abstract class RSAOaepAbs implements RSAOaep {
 
 	protected SecureRandom random;		//Source of randomness.
 	protected boolean isKeySet;
-	
+	protected RSAPublicKey publicKey;
 	
 	@Override
 	public boolean isKeySet() {
 		return isKeySet;
+	}
+	
+	/**
+	 * Returns the PublicKey of this RSA encryption scheme.
+	 * @return the RSAPublicKey
+	 * @throws IllegalStateException if no public key was set.
+	 */
+	public PublicKey getPublicKey(){
+		if (!isKeySet()){
+			throw new IllegalStateException("no PublicKey was set");
+		}
+		
+		return publicKey;
 	}
 
 	/**

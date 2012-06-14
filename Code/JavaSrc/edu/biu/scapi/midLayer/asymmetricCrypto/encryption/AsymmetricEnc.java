@@ -49,6 +49,13 @@ public interface AsymmetricEnc extends Cpa, Indistinguishable{
 	 */
 	public boolean isKeySet();
 	
+	/**
+	 * Returns the PublicKey of this encryption scheme.
+	 * @return the PublicKey
+	 * @throws IllegalStateException if no public key was set.
+	 */
+	public PublicKey getPublicKey();
+	
 		
 	/**
 	 * @return the name of this AsymmetricEnc
@@ -60,6 +67,7 @@ public interface AsymmetricEnc extends Cpa, Indistinguishable{
 	 * @param plaintext message to encrypt
 	 * @return Ciphertext the encrypted plaintext
 	 * @throws IllegalArgumentException if the given Plaintext doesn't match this encryption type.
+	 * @throws IllegalStateException if no public key was set.
 	 */
 	public Ciphertext encrypt(Plaintext plainText);
 	

@@ -169,6 +169,19 @@ public class ScElGamal implements ElGamalEnc{
 	}
 	
 	/**
+	 * Returns the PublicKey of this ElGamal encryption scheme.
+	 * @return the ElGamalPublicKey
+	 * @throws IllegalStateException if no public key was set.
+	 */
+	public PublicKey getPublicKey(){
+		if (!isKeySet()){
+			throw new IllegalStateException("no PublicKey was set");
+		}
+		
+		return publicKey;
+	}
+	
+	/**
 	 * @return the name of this AsymmetricEnc - ElGamal and the underlying dlog group type
 	 */
 	public String getAlgorithmName(){
@@ -285,6 +298,7 @@ public class ScElGamal implements ElGamalEnc{
 	/**
 	 * Calculates the ciphertext resulting of multiplying two given ciphertexts.
 	 * Both ciphertexts have to have been generated with the same public key and DlogGroup as the underlying objects of this ElGamal object.
+	 * @throws IllegalStateException if no public key was set.
 	 * @throws IllegalArgumentException in the following cases:
 	 * 		1. If one or more of the given ciphertexts is not instance of ElGamalCiphertext.
 	 * 		2. If one or more of the GroupElements in the given ciphertexts is not a member of the underlying DlogGroup of this ElGamal encryption scheme.
@@ -298,6 +312,12 @@ public class ScElGamal implements ElGamalEnc{
 		 * 	COMPUTE v = h^w*v1*v2
 		 * 	OUTPUT c = (u,v)
 		 */
+		
+		// If there is no public key can not encrypt, throws exception.
+		if (!isKeySet()){
+			throw new IllegalStateException("in order to encrypt a message this object must be initialized with public key");
+		}
+		
 		// Cipher1 and cipher2 should be ElGamal ciphertexts.
 		if (!(cipher1 instanceof ElGamalCiphertext) || !(cipher2 instanceof ElGamalCiphertext)){
 			throw new IllegalArgumentException("ciphertexts should be instance of ElGamalCiphertext");

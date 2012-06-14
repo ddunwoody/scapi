@@ -99,6 +99,19 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 	public boolean isKeySet() {
 		return isKeySet;
 	}
+	
+	/**
+	 * Returns the PublicKey of this DamgardJurik encryption scheme.
+	 * @return the DamgardJurikPublicKey
+	 * @throws IllegalStateException if no public key was set.
+	 */
+	public PublicKey getPublicKey(){
+		if (!isKeySet()){
+			throw new IllegalStateException("no PublicKey was set");
+		}
+		
+		return publicKey;
+	}
 
 	/**
 	 * @return the name of this AsymmetricEnc - DamgardJurik.
