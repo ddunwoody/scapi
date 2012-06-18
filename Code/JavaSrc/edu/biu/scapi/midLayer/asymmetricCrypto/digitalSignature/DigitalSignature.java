@@ -27,47 +27,60 @@ public interface DigitalSignature {
 	 * Sets this digital signature with public key and private key.
 	 * @param publicKey
 	 * @param privateKey
+	 * @throws InvalidKeyException if the given keys do not match this signature scheme.
 	 */
 	public void setKey(PublicKey publicKey, PrivateKey privateKey)throws InvalidKeyException;
 	
 	/**
-	 * Sets this digital signature with a public key<p> 
+	 * Sets this digital signature with a public key.<p> 
 	 * In this case the signature object can be used only for verification.
 	 * @param publicKey
+	 * @throws InvalidKeyException if the given key does not match his signature scheme.
 	 */
 	public void setKey(PublicKey publicKey)throws InvalidKeyException;
 	
 	/**
-	 * Checks if this digital signature object has been previously initialized.<p> 
-	 * To initialize the object the setKey function has to be called with corresponding parameters after construction.
-	 * 
-	 * @return <code>true<code> if the object was initialized;
+	 * Checks if this digital signature object has been given a key already.<p> 
+	 * @return <code>true<code> if the object has been given a key;
 	 * 		   <code>false</code> otherwise.
 	 */
 	public boolean isKeySet();
 	
 	/**
-	 * @return the name of this digital signature
+	 * Returns the PublicKey of this signature scheme. <p>
+	 * This function should not be use to check if the key has been set. 
+	 * To check if the key has been set use isKeySet function.
+	 * @return the PublicKey
+	 * @throws IllegalStateException if no public key was set.
+	 */
+	public PublicKey getPublicKey();
+	
+	/**
+	 * @return the name of this digital signature scheme.
 	 */
 	public String getAlgorithmName();
 	
 	/**
 	 * Signs the given message
-	 * @param msg the byte array to verify the signature with
-	 * @param offset the place in the msg to take the bytes from
-	 * @param length the length of the msg
-	 * @return the signatures from the msg signing
-	 * @throws KeyException if PrivateKey is not set 
+	 * @param msg the byte array to sign.
+	 * @param offset the place in the msg to take the bytes from.
+	 * @param length the length of the msg.
+	 * @return the signatures from the msg signing.
+	 * @throws KeyException if PrivateKey is not set.
+	 * @throws ArrayIndexOutOfBoundsException if the given offset and length are wrong for the given message.
 	 */
 	public Signature sign(byte[] msg, int offset, int length) throws KeyException;
 	
 	/**
-	 * Verifies the given signatures.
+	 * Verifies the given signature.
 	 * @param signature to verify
 	 * @param msg the byte array to verify the signature with
 	 * @param offset the place in the msg to take the bytes from
 	 * @param length the length of the msg
 	 * @return true if the signature is valid. false, otherwise.
+	 * @throws IllegalStateException if no public key was set.
+	 * @throws IllegalArgumentException if the given Signature does not match this signature scheme.
+	 * @throws ArrayIndexOutOfBoundsException if the given offset and length are wrong for the given message.
 	 */
 	public boolean verify(Signature signature, byte[] msg, int offset, int length);
 
@@ -75,7 +88,7 @@ public interface DigitalSignature {
 	 * Generates public and private keys for this digital signature.
 	 * @param keyParams hold the required key parameters
 	 * @return KeyPair holding the public and private keys
-	 * @throws InvalidParameterSpecException 
+	 * @throws InvalidParameterSpecException if the given keyParams does not match this signature scheme.
 	 */
 	public KeyPair generateKey(AlgorithmParameterSpec keyParams) throws InvalidParameterSpecException;
 	
