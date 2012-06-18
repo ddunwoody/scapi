@@ -14,19 +14,23 @@ import java.security.interfaces.RSAPublicKey;
 
 import edu.biu.scapi.midLayer.signature.RSASignature;
 import edu.biu.scapi.midLayer.signature.Signature;
+import edu.biu.scapi.securityLevel.ACMA;
+import edu.biu.scapi.securityLevel.UnlimitedTimes;
 
 /**
- * This class is a wrapper for the RSA pss signature scheme of crypto++.
+ * This class implements the RSA PSS signature scheme, using Crypto++ RSAPss implementation.
+ * The RSA PSS (Probabilistic Signature Scheme) is a provably secure way of creating signatures with RSA.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class CryptoPPRSAPss extends RSAPssAbs{
+public class CryptoPPRSAPss extends RSAPssAbs implements UnlimitedTimes, ACMA{
 
-	private long signer = 0;
-	private long verifier = 0;
-
-	// JNI native functions. The functions of this class call the necessary native function which perform the signature scheme
+	private long signer;		//Pointer to the native Crypto++ signer object.
+	private long verifier;		//Pointer to the native Crypto++ verifier object.
+	private boolean isPrivateKeySet;
+	
+	// JNI native functions. The functions of this class call the necessary native functions to perform the signature operations.
 	private native long createRSASigner();
 	private native long createRSAVerifier();
 	private native void initRSAVerifier(long verifier, byte[] modulus, byte[] exponent);
@@ -38,10 +42,10 @@ public class CryptoPPRSAPss extends RSAPssAbs{
 	
 	
 	/**
-	 * Default constructor. uses SecureRandom object.
+	 * Default constructor. uses default implementation of SecureRandom.
 	 */
-	public CryptoPPRSAPss() throws NoSuchAlgorithmException{
-		//call the other constructor with default parameter
+	public CryptoPPRSAPss(){
+		//Calls the other constructor with default parameter.
 		this(new SecureRandom());
 	}
 	
@@ -51,7 +55,7 @@ public class CryptoPPRSAPss extends RSAPssAbs{
 	 * @throws NoSuchAlgorithmException if there is no random number generation algorithm
 	 */
 	public CryptoPPRSAPss(String randNumGenAlg) throws NoSuchAlgorithmException {
-		//call the other constructor with SecureRandom object
+		//Calls the other constructor with SecureRandom object.
 		this(SecureRandom.getInstance(randNumGenAlg));
 	}
 	
@@ -62,94 +66,114 @@ public class CryptoPPRSAPss extends RSAPssAbs{
 	public CryptoPPRSAPss(SecureRandom random) {
 		this.random = random;
 		
-		//create the signer and verifier that operates the sign and verify algorithms.
+		//Creates the signer and verifier objects that perform the sign and verify operations.
 		this.signer = createRSASigner();
 		this.verifier = createRSAVerifier();
 		
 	}
 	
+	/**
+	 * Sets this RSA PSS scheme with public key and private key.
+	 * @param publicKey should be an instance of RSAPublicKey.
+	 * @param privateKey hould be an instance of RSAPrivateKey.
+	 * @throws InvalidKeyException if the given keys are not instances of RSA keys.
+	 */
 	@Override
 	public void setKey(PublicKey publicKey, PrivateKey privateKey)
 			throws InvalidKeyException {
-		if (!(publicKey instanceof RSAPublicKey) || !(privateKey instanceof RSAPrivateKey)) {
+		if (!(publicKey instanceof RSAPublicKey)) {
+			throw new InvalidKeyException("Key type doesn't match the RSA signature scheme type");
+		}
+		
+		if ((privateKey!=null) && !(privateKey instanceof RSAPrivateKey)){
 			throw new InvalidKeyException("Key type doesn't match the RSA signature scheme type");
 		}
 			
-		/* gets the values of modulus (N), pubExponent (e), privExponent (d)*/
+		//Notice! We set the public key twice - in the PublicKey member and in the native verifier object.
+		//This can lead to many synchronization problems, so we need to be very careful not to change just one of them.
+		this.publicKey = (RSAPublicKey) publicKey;
+		
+		/* Gets the values of modulus (N), pubExponent (e), privExponent (d)*/
 		BigInteger pubExponent = ((RSAPublicKey) publicKey).getPublicExponent();
-		BigInteger privExponent = ((RSAPrivateKey) privateKey).getPrivateExponent();
 		BigInteger modN = ((RSAKey) publicKey).getModulus();
 		
-		//if private key is CRT private key
-		if (privateKey instanceof RSAPrivateCrtKey)
-		{
-			//gets all the crt parameters
-			RSAPrivateCrtKey key = (RSAPrivateCrtKey) privateKey;
-			BigInteger p = key.getPrimeP();
-			BigInteger q = key.getPrimeQ();
-			BigInteger dp = key.getPrimeExponentP();
-			BigInteger dq = key.getPrimeExponentQ();
-			BigInteger crt = key.getCrtCoefficient();
-			
-			//initializes the native signer
-			initRSACrtSigner(signer, modN.toByteArray(), pubExponent.toByteArray(), privExponent.toByteArray(), 
-					p.toByteArray(), q.toByteArray(), dp.toByteArray(), dq.toByteArray(), crt.toByteArray());
-			
-		//if private key is key with N, e, d
-		} else {
-			
-			//init the native signer with the RSA parameters - n, e, d
-			initRSASigner(signer, modN.toByteArray(), pubExponent.toByteArray(), privExponent.toByteArray());
-		}
-		
-		//init the native verifier with the RSA parameters - n, e
+		//Initializes the native verifier with the RSA parameters - n, e.
 		initRSAVerifier(verifier, modN.toByteArray(), pubExponent.toByteArray());
 		
-		isKeySet = true;
-		
-	}
-
-	@Override
-	public void setKey(PublicKey publicKey) throws InvalidKeyException {
-		if(!(publicKey instanceof RSAPublicKey)){
-			throw new InvalidKeyException("Key type doesn't match the RSA encryption scheme type");
+		if (privateKey != null){
+			
+			BigInteger privExponent = ((RSAPrivateKey) privateKey).getPrivateExponent();
+			//If private key is CRT private key.
+			if (privateKey instanceof RSAPrivateCrtKey)
+			{
+				//Gets all the crt parameters
+				RSAPrivateCrtKey key = (RSAPrivateCrtKey) privateKey;
+				BigInteger p = key.getPrimeP();
+				BigInteger q = key.getPrimeQ();
+				BigInteger dp = key.getPrimeExponentP();
+				BigInteger dq = key.getPrimeExponentQ();
+				BigInteger crt = key.getCrtCoefficient();
+				
+				//Initializes the native signer.
+				initRSACrtSigner(signer, modN.toByteArray(), pubExponent.toByteArray(), privExponent.toByteArray(), 
+						p.toByteArray(), q.toByteArray(), dp.toByteArray(), dq.toByteArray(), crt.toByteArray());
+				
+			//If private key is key with N, e, d.
+			} else {
+				
+				//Initializes the native signer with the RSA parameters - n, e, d.
+				initRSASigner(signer, modN.toByteArray(), pubExponent.toByteArray(), privExponent.toByteArray());
+			}
+			isPrivateKeySet = true;
 		}
-	
-		RSAPublicKey pub = (RSAPublicKey) publicKey;
-		BigInteger pubExponent = pub.getPublicExponent();
-		BigInteger modN = pub.getModulus();
 		
-		//init the native verifier with the RSA parameters - n, e
-		initRSAVerifier(verifier, modN.toByteArray(), pubExponent.toByteArray());
 		isKeySet = true;
 		
 	}
 
 	/**
-	 * Signs the given message using the native signer object
-	 * @param msg the byte array to verify the signature with
-	 * @param offset the place in the msg to take the bytes from
-	 * @param length the length of the msg
-	 * @return the signature from the msg signing
-	 * @throws KeyException if PrivateKey is not set 
+	 * Sets this RSA PSS with a public key.<p> 
+	 * In this case the signature object can be used only for verification.
+	 * @param publicKey should be an instance of RSAPublicKey.
+	 * @throws InvalidKeyException if the given key is not an instance of RSAPublicKey.
+	 */
+	@Override
+	public void setKey(PublicKey publicKey) throws InvalidKeyException {
+		setKey(publicKey, null);
+		
+	}
+
+	/**
+	 * Signs the given message using the native signer object.
+	 * @param msg the byte array to verify the signature with.
+	 * @param offset the place in the msg to take the bytes from.
+	 * @param length the length of the msg.
+	 * @return the signature from the msg signing.
+	 * @throws KeyException if PrivateKey is not set.
+	 * @throws ArrayIndexOutOfBoundsException if the given offset and length are wrong for the given message.
 	 */
 	@Override
 	public Signature sign(byte[] msg, int offset, int length)
 			throws KeyException {
-		//if there is no private key can not sign, throw exception
-		if (signer == 0){
+		//If there is no private key can not sign, throws exception.
+		if (!isPrivateKeySet){
 			throw new KeyException("in order to sign a message, this object must be initialized with private key");
 		}
 		
-		// the native function that perform the sign needs the message to begin at offset 0.
-		// so, if the given offset is not 0 copy the msg to a new array. 
+		// Checks that the offset and length are correct.
+		if ((offset > msg.length) || (offset+length > msg.length)){
+			throw new ArrayIndexOutOfBoundsException("wrong offset for the given input buffer");
+		}
+		
+		// The native function that perform the sign needs the message to begin at offset 0.
+		// If the given offset is not 0 copy the msg to a new array. 
 		byte[] newMsg = msg;
 		if (offset > 0){
 			newMsg = new byte[msg.length];
 			System.arraycopy(msg, offset, newMsg, 0, length);
 		}
 		
-		//call native function that operates sign
+		//Calls native function that performs the signing.
 		byte[] signature = doSign(signer, newMsg, length);
 		
 		return new RSASignature(signature);
@@ -157,37 +181,50 @@ public class CryptoPPRSAPss extends RSAPssAbs{
 
 	/**
 	 * Verifies the given signature using the native verifier object.
-	 * @param signature to verify
+	 * @param signature to verify should be an instance of RSASignature.
 	 * @param msg the byte array to verify the signature with
 	 * @param offset the place in the msg to take the bytes from
 	 * @param length the length of the msg
 	 * @return true if the signature is valid. false, otherwise.
+	 * @throws IllegalStateException if no public key was set.
+	 * @throws IllegalArgumentException if the given Signature is not an instance of RSASignature.
+	 * @throws ArrayIndexOutOfBoundsException if the given offset and length are wrong for the given message.
 	 */
 	@Override
-	public boolean verify(Signature signature, byte[] msg, int offset,
-			int length) {
+	public boolean verify(Signature signature, byte[] msg, int offset, int length) {
+		//If there is no public key can not encrypt, throws exception.
+		if (!isKeySet()){
+			throw new IllegalStateException("in order to encrypt a message this object must be initialized with public key");
+		}
+		
 		if (!(signature instanceof RSASignature)){
 			throw new IllegalArgumentException("Signature must be instance of RSASignature");
 		}
 		
-		//get the signature bytes
+		// Checks that the offset and length are correct.
+		if ((offset > msg.length) || (offset+length > msg.length)){
+			throw new ArrayIndexOutOfBoundsException("wrong offset for the given input buffer");
+		}
+		
+		//Gets the signature bytes
 		byte[] sigBytes = ((RSASignature) signature).getSignatureBytes();
 		
-		// the native function that perform the sign needs the message to begin at offset 0.
-		// so, if the given offset is not 0 copy the msg to a new array. 
+		// The native function that perform the sign needs the message to begin at offset 0.
+		// If the given offset is not 0 copy the msg to a new array. 
 		byte[] newMsg = msg;
 		if (offset > 0){
 			newMsg = new byte[msg.length];
 			System.arraycopy(msg, offset, newMsg, 0, length);
 		}
 		
-		//call native function that operates verification
+		//Calls native function that perform the verification.
 		return doVerify(verifier, sigBytes, newMsg, length);
 		
 	}
 	
-	 static {
-	        System.loadLibrary("CryptoPPJavaInterface");
-	 }
+	//Loads the Crypto++ library.
+	static {
+	      System.loadLibrary("CryptoPPJavaInterface");
+	}
 
 }
