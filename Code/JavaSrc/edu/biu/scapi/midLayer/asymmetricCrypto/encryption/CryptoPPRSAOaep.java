@@ -27,6 +27,7 @@ public class CryptoPPRSAOaep extends RSAOaepAbs {
 	
 	private long encryptor; //Pointer to encryptor object (RSAES_OAEP_SHA_Encryptor) in Crypto++.
 	private long decryptor; //Pointer to decryptor object (RSAES_OAEP_SHA_Decryptor) in Crypto++.
+	private boolean isPrivateKeySet;
 	
 	//Native functions that compute the encryption scheme functionality.
 	private native long createRSAEncryptor();
@@ -55,6 +56,11 @@ public class CryptoPPRSAOaep extends RSAOaepAbs {
 	 */
 	public CryptoPPRSAOaep(SecureRandom secureRandom){
 		this.random = secureRandom;
+		
+		//Creates the native encryptor object.
+		this.encryptor = createRSAEncryptor();
+		//Creates the native decryptor object.
+		this.decryptor = createRSADecryptor();
 	}
 		
 	/**
@@ -78,8 +84,7 @@ public class CryptoPPRSAOaep extends RSAOaepAbs {
 		//Notice! We set the public key twice - in the PublicKey member and in the native encryptor object.
 		//This can lead to many synchronization problems, so we need to be very careful not to change just one of them.
 		this.publicKey = (RSAPublicKey) publicKey;
-		//Creates the native encryptor object.
-		this.encryptor = createRSAEncryptor();
+		
 		// Gets the values of modulus (N), pubExponent (e), 
 		BigInteger pubExponent = ((RSAPublicKey) publicKey).getPublicExponent();
 		BigInteger modN = ((RSAKey) publicKey).getModulus();
@@ -88,8 +93,7 @@ public class CryptoPPRSAOaep extends RSAOaepAbs {
 		initRSAEncryptor(encryptor, modN.toByteArray(), pubExponent.toByteArray());
 		
 		if (privateKey != null){
-			//Creates the native decryptor object.
-			this.decryptor = createRSADecryptor();
+			
 			//Gets the value of privExponent(d)
 			BigInteger privExponent = ((RSAPrivateKey) privateKey).getPrivateExponent();
 			//If private key is CRT private key.
@@ -113,6 +117,8 @@ public class CryptoPPRSAOaep extends RSAOaepAbs {
 				//Initializes the native decryptor object with the RSA parameters - n, e, d.
 				initRSADecryptor(decryptor, modN.toByteArray(), pubExponent.toByteArray(), privExponent.toByteArray());
 			}
+			
+			isPrivateKeySet = true;
 		}
 		
 		isKeySet = true;
@@ -165,7 +171,7 @@ public class CryptoPPRSAOaep extends RSAOaepAbs {
 	public Plaintext decrypt(Ciphertext cipher) throws KeyException{
 		
 		// If there is no private key can not decrypt, throws exception.
-		if (decryptor == 0){
+		if (!isPrivateKeySet){
 			throw new KeyException("in order to decrypt a message, this object must be initialized with private key");
 		}
 		// Cipher must be of type BasicAsymCiphertext.
