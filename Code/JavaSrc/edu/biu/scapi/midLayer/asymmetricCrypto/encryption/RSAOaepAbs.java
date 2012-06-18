@@ -30,6 +30,8 @@ public abstract class RSAOaepAbs implements RSAOaep {
 	
 	/**
 	 * Returns the PublicKey of this RSA encryption scheme.
+	 * This function should not be use to check if the key has been set. 
+	 * To check if the key has been set use isKeySet function.
 	 * @return the RSAPublicKey
 	 * @throws IllegalStateException if no public key was set.
 	 */

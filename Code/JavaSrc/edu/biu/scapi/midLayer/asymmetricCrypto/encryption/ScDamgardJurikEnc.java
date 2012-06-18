@@ -102,6 +102,8 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 	
 	/**
 	 * Returns the PublicKey of this DamgardJurik encryption scheme.
+	 * This function should not be use to check if the key has been set. 
+	 * To check if the key has been set use isKeySet function.
 	 * @return the DamgardJurikPublicKey
 	 * @throws IllegalStateException if no public key was set.
 	 */

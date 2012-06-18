@@ -50,7 +50,9 @@ public interface AsymmetricEnc extends Cpa, Indistinguishable{
 	public boolean isKeySet();
 	
 	/**
-	 * Returns the PublicKey of this encryption scheme.
+	 * Returns the PublicKey of this encryption scheme. <p>
+	 * This function should not be use to check if the key has been set. 
+	 * To check if the key has been set use isKeySet function.
 	 * @return the PublicKey
 	 * @throws IllegalStateException if no public key was set.
 	 */

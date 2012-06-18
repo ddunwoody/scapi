@@ -170,6 +170,8 @@ public class ScElGamal implements ElGamalEnc{
 	
 	/**
 	 * Returns the PublicKey of this ElGamal encryption scheme.
+	 * This function should not be use to check if the key has been set. 
+	 * To check if the key has been set use isKeySet function.
 	 * @return the ElGamalPublicKey
 	 * @throws IllegalStateException if no public key was set.
 	 */
