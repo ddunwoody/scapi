@@ -21,142 +21,174 @@ import edu.biu.scapi.exceptions.ScapiRuntimeException;
 import edu.biu.scapi.midLayer.signature.RSASignature;
 import edu.biu.scapi.midLayer.signature.Signature;
 import edu.biu.scapi.primitives.hash.CryptographicHash;
+import edu.biu.scapi.securityLevel.ACMA;
+import edu.biu.scapi.securityLevel.UnlimitedTimes;
 import edu.biu.scapi.tools.Factories.BCFactory;
 import edu.biu.scapi.tools.Translation.BCParametersTranslator;
 
 /**
- * This class performs the RSA pss signature scheme.
+ * This class implements the RSA PSS signature scheme, using BC RSAPss implementation.
+ * The RSA PSS (Probabilistic Signature Scheme) is a provably secure way of creating signatures with RSA.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class BcRSAPss extends RSAPssAbs{
+public class BcRSAPss extends RSAPssAbs implements UnlimitedTimes, ACMA{
 
-	private RSAPublicKey publicKey;
-	private RSAPrivateKey privateKey;				//set to false until setKey is called
-	private CipherParameters privateParameters;		//parameters contains the private key and the random
-	private CipherParameters publicParameters;		//parameters contains the public key and the random
+	private CipherParameters privateParameters;		//parameters that contain the private key and the random
+	private CipherParameters publicParameters;		//parameters that contain the public key and the random
 	private Digest digest;							//the underlying hash to use
 	private PSSSigner signer;						//BC signature object
 	private SecureRandom random;
-	private int saltLen = 20;
-	private boolean forSigning = true;
+	private boolean forSigning;
 	
 	/**
-	 * Default constructor. uses SHA1 and SHA1PRNG random number generator algorithm.
-	 * @throws FactoriesException
-	 * @throws NoSuchAlgorithmException 
+	 * Default constructor. uses default implementations of CryptographicHash and SecureRandom.
 	 */
-	public BcRSAPss() throws FactoriesException, NoSuchAlgorithmException{
-		//call the other constructor with default parameters
-		this("SHA-1", "SHA1PRNG");
+	public BcRSAPss() {
+		//Creates BC digest with SHA1.
+		try {
+			digest = BCFactory.getInstance().getDigest("SHA-1");
+		} catch (FactoriesException e) {
+			// Shouldn't occur since SHA1 is a valid hash name.
+			e.printStackTrace();
+		}
+		
+		//Creates random with the given algorithm.
+		this.random = new SecureRandom();
+		
+		RSABlindedEngine rsa = new RSABlindedEngine();
+		signer = new PSSSigner(rsa, digest, digest.getDigestSize());
 	}
 	
 	/**
 	 * Constructor that receives hash name and random number generation algorithm to use.
-	 * @param hashName underlying hash to use
-	 * @param randNumGenAlg random number generation algorithm to use
-	 * @throws FactoriesException if there is no hash with the given name
-	 * @throws NoSuchAlgorithmException if there is no random number generation algorithm
+	 * @param hashName underlying hash to use.
+	 * @param randNumGenAlg random number generation algorithm to use.
+	 * @throws FactoriesException if there is no hash with the given name.
+	 * @throws NoSuchAlgorithmException if there is no random number generation algorithm.
 	 */
 	public BcRSAPss(String hashName, String randNumGenAlg) throws FactoriesException, NoSuchAlgorithmException{
-		//creates BC digest with the given name
-		digest = BCFactory.getInstance().getDigest(hashName);
-		
-		//create random with the given algorithm
-		this.random = SecureRandom.getInstance(randNumGenAlg);
+		//Creates SecureRandom object and calls the general constructor.
+		this (hashName, SecureRandom.getInstance(randNumGenAlg));
 	}
 	
 	/**
-	 * Constructor that receives hash to use.
-	 * @param hash underlying hash to use
-	 * @throws FactoriesException if there is no hash with the given name
+	 * Constructor that receives hash to use. Uses default implementation of SecureRandom.
+	 * @param hash underlying hash to use.
+	 * @throws FactoriesException if there is no hash with the given name in BC hash functions.
 	 */
 	public BcRSAPss(CryptographicHash hash) throws FactoriesException {
-		//create SecureRandom object and call the pther constructor
-		this(hash, new SecureRandom());
+		//Creates SecureRandom object and calls the general constructor
+		this(hash.getAlgorithmName(), new SecureRandom());
 	}
 	
 	/**
 	 * Constructor that receives hash and secure random to use.
-	 * @param hash underlying hash to use
-	 * @param random secure random to use
-	 * @throws FactoriesException if there is no hash with the given name
+	 * @param hash underlying hash to use.
+	 * @param random secure random to use.
+	 * @throws FactoriesException if there is no hash with the given name.
 	 */
 	public BcRSAPss(CryptographicHash hash, SecureRandom random) throws FactoriesException{
-		//creates BC digest with the given name
-		digest = BCFactory.getInstance().getDigest(hash.getAlgorithmName());
-		
-		//create random with the given algorithm
-		this.random = random;
+		//Calls the general constructor with hash name and secure random object.
+		this(hash.getAlgorithmName(), random);
 	}
 	
+	/**
+	 * Constructor that receives hash name and secure random object to use.
+	 * @param hashName underlying hash to use.
+	 * @param random secure random to use.
+	 * @throws FactoriesException if there is no hash with the given name in BC hash functions.
+	 */
+	public BcRSAPss(String hashName, SecureRandom random) throws FactoriesException{
+		//Creates BC digest with the given name.
+		digest = BCFactory.getInstance().getDigest(hashName);
+		
+		this.random = random;
+		
+		RSABlindedEngine rsa = new RSABlindedEngine();
+		signer = new PSSSigner(rsa, digest, digest.getDigestSize());
+	}
+	
+	/**
+	 * Sets this RSA PSS scheme with public key and private key.
+	 * @param publicKey should be an instance of RSAPublicKey.
+	 * @param privateKey hould be an instance of RSAPrivateKey.
+	 * @throws InvalidKeyException if the given keys are not instances of RSA keys.
+	 */
 	@Override
-	public void setKey(PublicKey publicKey, PrivateKey privateKey)
-			throws InvalidKeyException {
-		//key should be RSA keys
+	public void setKey(PublicKey publicKey, PrivateKey privateKey) throws InvalidKeyException {
+		//Keys should be RSA keys.
 		if(!(publicKey instanceof RSAPublicKey)){
-			throw new IllegalArgumentException("keys should be instances of RSA keys");
+			throw new InvalidKeyException("keys should be instances of RSA keys");
 		}
-		if(privateKey!= null && !(privateKey instanceof RSAPrivateKey)){
-				throw new IllegalArgumentException("keys should be instances of RSA keys");
+		if((privateKey!= null) && !(privateKey instanceof RSAPrivateKey)){
+				throw new InvalidKeyException("keys should be instances of RSA keys");
 		}
-		//set the parameters
+		//Sets the parameters.
 		this.publicKey = (RSAPublicKey) publicKey;
 		publicParameters = BCParametersTranslator.getInstance().translateParameter(this.publicKey, random);
 				
 		//translate the keys and random to BC parameters
 		if (privateKey != null){
-			this.privateKey = (RSAPrivateKey) privateKey;
-			privateParameters = BCParametersTranslator.getInstance().translateParameter(this.privateKey, random);
+			privateParameters = BCParametersTranslator.getInstance().translateParameter(privateKey, random);
 		}
 		
-		
-		RSABlindedEngine rsa = new RSABlindedEngine();
-		signer = new PSSSigner(rsa, digest, saltLen);
-		signer.init(forSigning, privateParameters);
+		signer.init(forSigning, publicParameters);
 		
 		isKeySet = true;
 		
 	}
 
+	/**
+	 * Sets this RSA PSS with a public key.<p> 
+	 * In this case the signature object can be used only for verification.
+	 * @param publicKey should be an instance of RSAPublicKey.
+	 * @throws InvalidKeyException if the given key is not an instance of RSAPublicKey.
+	 */
 	@Override
 	public void setKey(PublicKey publicKey) throws InvalidKeyException {
-		//call the other setKey function with null private key
-		setKey(publicKey, null);
-		
+		//Calls the other setKey function with null private key
+		setKey(publicKey, null);		
 	}
 
-	
-
 	/**
-	 * Signs the given message
-	 * @param msg the byte array to verify the signature with
-	 * @param offset the place in the msg to take the bytes from
-	 * @param length the length of the msg
-	 * @return the signature from the msg signing
-	 * @throws KeyException if PrivateKey is not set 
+	 * Signs the given message.
+	 * @param msg the byte array to sign.
+	 * @param offset the place in the msg to take the bytes from.
+	 * @param length the length of the msg.
+	 * @return the signature from the msg signing.
+	 * @throws KeyException if PrivateKey is not set.
+	 * @throws ArrayIndexOutOfBoundsException if the given offset and length are wrong for the given message.
+	 * @throws ScapiRuntimeException in case that BC throws an exception of type DataLengthException or CryptoException.
 	 */
 	@Override
 	public Signature sign(byte[] msg, int offset, int length) throws KeyException {
-		//if there is no private key can not decrypt, throw exception
-		if (privateKey == null){
+		//If there is no private key can not sign, throws exception.
+		if (privateParameters == null){
 			throw new KeyException("in order to sign a message, this object must be initialized with private key");
 		}
 		
-		//if the underlying BC object used to the signing is in verify mode - change it
+		// Checks that the offset and length are correct.
+		if ((offset > msg.length) || (offset+length > msg.length)){
+			throw new ArrayIndexOutOfBoundsException("wrong offset for the given input buffer");
+		}
+		
+		//If the underlying BC object used to the signing is in verify mode - changes it.
 		if (!forSigning){
 			forSigning = true;
 			signer.init(forSigning, privateParameters);
 		}
 		
-		//update the msg in the digest
+		//Updates the msg in the digest.
 		signer.update(msg, offset, length);
 		byte[] signature = null;
 		
-		//generate the signature
+		//Generates the signature.
 		try {
 			signature = signer.generateSignature();
+			
+		//We wrap this exceptions instead of throwing them because we can't declare them in the interface.
 		} catch (DataLengthException e) {
 			throw new ScapiRuntimeException(e.getMessage());
 		} catch (CryptoException e) {
@@ -167,17 +199,30 @@ public class BcRSAPss extends RSAPssAbs{
 
 	/**
 	 * Verifies the given signatures.
-	 * @param signature to verify
-	 * @param msg the byte array to verify the signature with
-	 * @param offset the place in the msg to take the bytes from
-	 * @param length the length of the msg
+	 * @param signature to verify. Should be an instance of RSA signature.
+	 * @param msg the byte array to verify the signature with.
+	 * @param offset the place in the msg to take the bytes from.
+	 * @param length the length of the msg.
 	 * @return true if the signature is valid. false, otherwise.
+	 * @throws IllegalStateException if no public key was set.
+	 * @throws IllegalArgumentException if the given Signature is not an instance of RSA signature.
+	 * @throws ArrayIndexOutOfBoundsException if the given offset and length are wrong for the given message.
 	 */
 	@Override
 	public boolean verify(Signature signature, byte[] msg, int offset, int length) {
 		
+		//If there is no public key can not encrypt, throws exception.
+		if (!isKeySet()){
+			throw new IllegalStateException("in order to encrypt a message this object must be initialized with public key");
+		}
+				
 		if (!(signature instanceof RSASignature)){
 			throw new IllegalArgumentException("Signature must be instance of RSASignature");
+		}
+		
+		// Checks that the offset and length are correct.
+		if ((offset > msg.length) || (offset+length > msg.length)){
+			throw new ArrayIndexOutOfBoundsException("wrong offset for the given input buffer");
 		}
 		
 		byte[] sigBytes = ((RSASignature) signature).getSignatureBytes();
