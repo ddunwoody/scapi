@@ -4,6 +4,7 @@ import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.KeyException;
 import java.security.KeyPair;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
@@ -44,7 +45,7 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 	 * Default constructor. Uses the default implementations of SecureRandom.
 	 */
 	public ScDamgardJurikEnc(){
-		random = new SecureRandom();
+		this(new SecureRandom());
 	}
 	
 	/**
@@ -53,6 +54,15 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 	 */
 	public ScDamgardJurikEnc(SecureRandom rnd){
 		random = rnd;
+	}
+	
+	/**
+	 * Constructor that lets the user choose the random number generation algorithm.
+	 * @param randNumGenAlg random number generation algorithm.
+	 * @throws NoSuchAlgorithmException if the given name is not a valid random number generation algorithm name.
+	 */
+	public ScDamgardJurikEnc(String randNumGenAlg) throws NoSuchAlgorithmException{
+		this(SecureRandom.getInstance(randNumGenAlg));
 	}
 	
 	/**
