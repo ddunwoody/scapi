@@ -41,7 +41,7 @@ public class ECF2mPointMiracl implements ECElement, ECF2mPoint{
 	 * @param y
 	 * @param curve - DlogGroup
 	 */
-	public ECF2mPointMiracl(BigInteger x, BigInteger y, MiraclDlogECF2m curve){
+	ECF2mPointMiracl(BigInteger x, BigInteger y, MiraclDlogECF2m curve){
 		
 		mip = curve.getMip();
 		curveName = curve.getCurveName();
@@ -84,7 +84,7 @@ public class ECF2mPointMiracl implements ECElement, ECF2mPoint{
 	}
 	
 	/**
-	 * Constructor that gets pointer to element and sets it.
+	 * Constructor that gets a pointer to an existing element and sets it.
 	 * Only our inner functions use this constructor to set an element. 
 	 * The ptr is a result of our DlogGroup functions, such as multiply.
 	 * @param ptr - pointer to native point
@@ -172,6 +172,10 @@ public class ECF2mPointMiracl implements ECElement, ECF2mPoint{
 		return false;
 	}
 	
+	@Override
+	public String toString() {
+		return "ECF2mPointMiracl [point= " + getX() + ", " + getY() + "]";
+	}
 	/**
 	 * delete the related point
 	 */
