@@ -1,5 +1,8 @@
 package edu.biu.scapi.primitives.dlog.miracl;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.math.BigInteger;
 
 import edu.biu.scapi.primitives.dlog.ECElement;
@@ -22,10 +25,11 @@ public class ECFpPointMiracl implements ECElement, ECFpPoint{
 	private native byte[] getXValueFpPoint(long mip, long point);
 	private native byte[] getYValueFpPoint(long mip, long point);
 	
-	private long point = 0;
-	private long mip = 0;
+	private long point;
+	private long mip;
 	
-	private ECFpUtility util = new ECFpUtility();
+	private ECFpUtility util;
+	 
 	/**
 	 * Constructor that accepts x,y values of a point. 
 	 * if the values are valid - set the point.
@@ -33,14 +37,15 @@ public class ECFpPointMiracl implements ECElement, ECFpPoint{
 	 * @param y
 	 * @param curve - DlogGroup
 	 */
-	public ECFpPointMiracl(BigInteger x, BigInteger y, MiraclDlogECFp curve) throws IllegalArgumentException{
+	ECFpPointMiracl(BigInteger x, BigInteger y, MiraclDlogECFp curve) throws IllegalArgumentException{
 		mip = curve.getMip();
-		
+		util = new ECFpUtility();
 		boolean valid = util.checkCurveMembership((ECFpGroupParams) curve.getGroupParams(), x, y);
 		// checks validity
 		if (valid == false) // if not valid, throws exception
 			throw new IllegalArgumentException("x, y values are not a point on this curve");
-		
+
+
 		//call for a native function that creates an element in the field
 		point = createFpPoint(mip, x.toByteArray(), y.toByteArray());
 			
@@ -52,7 +57,7 @@ public class ECFpPointMiracl implements ECElement, ECFpPoint{
 	 * @param curve 
 	 */
 	ECFpPointMiracl(BigInteger x, MiraclDlogECFp curve){
-		// This constructor is NOT guarantee that the created point is in the group. 
+		// This constructor does NOT guarantee that the created point is in the group. 
 		// It creates a point on the curve, but this point is not necessarily a point in the dlog group, 
 		// which is a sub-group of the elliptic curve.
 		
@@ -128,6 +133,11 @@ public class ECFpPointMiracl implements ECElement, ECFpPoint{
 		return false;
 	}
 	
+	@Override
+	public String toString() {
+		return "ECFpPointMiracl [point= " + getX() + ", " + getY() + "]";
+	}
+	
 	/**
 	 * delete the related point
 	 */
@@ -136,6 +146,7 @@ public class ECFpPointMiracl implements ECElement, ECFpPoint{
 		//delete from the dll the dynamic allocation of the point.
 		deletePointFp(point);
 	}
+	
 	
 	static {
         System.loadLibrary("MiraclJavaInterface");
