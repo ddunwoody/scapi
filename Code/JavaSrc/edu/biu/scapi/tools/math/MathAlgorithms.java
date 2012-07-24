@@ -71,4 +71,49 @@ public class MathAlgorithms {
         } 
         return fact; 
     } 
+    
+    /*-------------------------------------------------------------*/
+    /**
+     * This class holds the result of calculating the square root of a BigInteger.
+     * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
+     *
+     */
+    public static class SquareRootResults{
+    	BigInteger root1;
+    	BigInteger root2;
+		public SquareRootResults(BigInteger root1, BigInteger root2) {
+			super();
+			this.root1 = root1;
+			this.root2 = root2;
+		}
+		public BigInteger getRoot1() {
+			return root1;
+		}
+		public BigInteger getRoot2() {
+			return root2;
+		}
+    	
+    }		
+		
+    /**
+     * This function calculates the square root of z mod p if and only if p is a prime such that p = 3 mod 4.
+     * This function assumes that p is a prime and does not perform the primality check for efficiency reasons. 
+     * @param z the number for which we calculate the square root
+     * @param p the mod
+     * @throws IllegalArgumentException if p != 3 mod 4
+     * @return SquareRootResults which is a pair of BigIntegers x and -x such that z = x^2  and z = -x^2 
+     */
+	public  static SquareRootResults sqrtModP_3_4(BigInteger z, BigInteger p){
+		//We assume here (and we do not check for efficiency reasons) that p is a prime
+		//We do check that the prime p = 3 mod 4, if not throw exception 
+		BigInteger four = BigInteger.valueOf(4); 
+		if(!p.mod(four).equals(BigInteger.valueOf(3)))
+			throw new IllegalArgumentException("p has to be a prime such that p = 3 mod 4");
+		
+		BigInteger exponent = p.add(BigInteger.ONE).divide(four);
+		BigInteger x =  z.modPow(exponent, p);
+		return new SquareRootResults(x, x.negate().mod(p));
+    }
+	
+	/*-------------------------------------------------------------*/
 }
