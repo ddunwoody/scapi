@@ -20,6 +20,9 @@ public abstract class DlogGroupAbs implements primeOrderSubGroup{
 	protected GroupElement generator;			//generator of the group
 	//map for multExponentiationsWithSameBase calculations
 	private HashMap<GroupElement, GroupElementsExponentiations> exponentiationsMap = new HashMap<GroupElement, GroupElementsExponentiations>();
+
+	//k is the maximum length of a string to be converted to a Group Element of this group. If a string exceeds the k length it cannot be converted.
+ 	protected int k;
 	
 	/**
 	 * If this group has been initialized then it returns the group's generator. Otherwise throws exception.
@@ -49,17 +52,19 @@ public abstract class DlogGroupAbs implements primeOrderSubGroup{
 	}
 	
 	/**
-	 * Checks if the order is a prime number
+	 * Checks if the order is a prime number.<p>
+	 * Primality checking can be an expensive operation and it should be performed only when absolutely necessary.
 	 * @return true if the order is a prime number. false, otherwise.
 	 */
 	public boolean isPrimeOrder(){
 		
-		/* isProbablePrime is BigInteger function, which gets a certainty parameter.
-		 * We will test some values to decide which is appropriate to our demands.
+		/* isProbablePrime is a BigInteger function, that gets a "certainty" parameter. 
+		 * 				   It returns true if this BigInteger is probably prime, false if it's definitely composite
+		 * certainty - a measure of the uncertainty that the caller is willing to tolerate: 
+		 * 			   if the call returns true the probability that this BigInteger is prime exceeds (1 - 1/2^certainty). 
+		 * 			   The execution time of this method is proportional to the value of this parameter. 
 		 */
-		if (getOrder().isProbablePrime(40))
-			return true;
-		else return false;
+		return (getOrder().isProbablePrime(40));
 	}
 
 	/**
@@ -78,7 +83,7 @@ public abstract class DlogGroupAbs implements primeOrderSubGroup{
 	 * 
 	 * @return the random element
 	 */
-	public GroupElement getRandomElement() {
+	public GroupElement createRandomElement() {
 		BigInteger one = BigInteger.ONE;
 		BigInteger qMinusOne = groupParams.getQ().subtract(one);
 
@@ -96,14 +101,14 @@ public abstract class DlogGroupAbs implements primeOrderSubGroup{
 	 * 
 	 * @return the random generator
 	 */
-	public GroupElement getRandomGenerator() {
+	public GroupElement createRandomGenerator() {
 		// in prime order groups every element except the identity is a generator.
 		// get a random element in the group
-		GroupElement randGen = getRandomElement();
+		GroupElement randGen = createRandomElement();
 
 		// if the given element is the identity, get a new random element
 		while (randGen.isIdentity() == true) {
-			randGen = getRandomElement();
+			randGen = createRandomElement();
 		}
 
 		return randGen;
@@ -111,23 +116,23 @@ public abstract class DlogGroupAbs implements primeOrderSubGroup{
 	}
 
 	/*
-	 * Computes the simultanouesMultiplyExponentiate by the native algorithm
+	 * Computes the simultaneousMultiplyExponentiate using a naive algorithm
 	 */
 	protected GroupElement computeNaive(GroupElement[] groupElements, BigInteger[] exponentiations){
 		int n = groupElements.length; //number of bases and exponents
-		GroupElement[] exponentsRasult = new GroupElement[n]; //holds the exponentiations result
+		GroupElement[] exponentsResult = new GroupElement[n]; //holds the exponentiations result
 		
 		// raises each element to the corresponding power
 		for (int i = 0; i < n; i++) {
-			exponentsRasult[i] = exponentiate(groupElements[i], exponentiations[i]);
+			exponentsResult[i] = exponentiate(groupElements[i], exponentiations[i]);
 		}
 		
-		GroupElement result = null; //holds the multiplication of all the exponentations
+		GroupElement result = null; //holds the multiplication of all the exponentiations
 		result = getIdentity(); //initialized to the identity element
 		
 		//multiplies every exponentiate
 		for (int i = 0; i<n; i++){
-			result = multiplyGroupElements(exponentsRasult[i], result);
+			result = multiplyGroupElements(exponentsResult[i], result);
 		}
 		
 		//return the final result
@@ -135,7 +140,7 @@ public abstract class DlogGroupAbs implements primeOrderSubGroup{
 	}
 	
 	/*
-	 * Compute the simultanouesMultiplyExponentiate by LL algorithm.
+	 * Compute the simultaneousMultiplyExponentiate by LL algorithm.
 	 * The code is taken from the pseudo code of LL algorithm in http://dasan.sejong.ac.kr/~chlim/pub/multi_exp.ps.
 	 */
 	protected GroupElement computeLL(GroupElement[] groupElements, BigInteger[] exponentiations){
@@ -293,7 +298,7 @@ public abstract class DlogGroupAbs implements primeOrderSubGroup{
 		//extracts from the map the GroupElementsExponentiations object corresponding to the accepted base
 		GroupElementsExponentiations exponentiations = exponentiationsMap.get(groupElement);
 	
-		// if there is no object matches this base - creates it and add it to the map
+		// if there is no object that matches this base - create it and add it to the map
 		if (exponentiations == null) {
 			exponentiations = new GroupElementsExponentiations(groupElement);
 			exponentiationsMap.put(groupElement, exponentiations);
@@ -304,8 +309,8 @@ public abstract class DlogGroupAbs implements primeOrderSubGroup{
 	}
 	
 	/**
-	 * The class GroupElementExponentiations is a nested class of DlogGroupAbs.
-	 * It performs the actual work of exponentially multiple exponentiations for one base.
+	 * The class GroupElementExponentiations is a nested class of DlogGroupAbs.<p>
+	 * It performs the actual work of pre-computation of the exponentiations for one base.
 	 * It is composed of two main elements. The group element for which the optimized computations 
 	 * are built for, called the base and a vector of group elements that are the result of 
 	 * exponentiations of order 1,2,4,8,… 
@@ -322,12 +327,14 @@ public abstract class DlogGroupAbs implements primeOrderSubGroup{
 		 */
 		public GroupElementsExponentiations(GroupElement base) {
 			this.base = base;
-			// build new vactor of exponentiations
+			// build new vector of exponentiations
 			exponentiations = new Vector<GroupElement>();
 			exponentiations.add(0, this.base); // add the base - base^1
+			
+			BigInteger two = new BigInteger("2");
 			for (int i=1; i<4; i++) {
 				GroupElement multI;
-				multI = exponentiate(exponentiations.get(i-1), new BigInteger("2"));
+				multI = exponentiate(exponentiations.get(i-1), two);
 					
 				exponentiations.add(i, multI);
 			}
@@ -385,5 +392,13 @@ public abstract class DlogGroupAbs implements primeOrderSubGroup{
 		}
 	}
 	
+	
+	/**
+	 * @return the maximum length of a string to be converted to a Group Element of this group. If a string exceeds this length it cannot be converted.
+	 */
+	public int getMaxLengthOfByteArrayForEncoding() {
+		//Return member variable k, which was calculated upon construction of this Dlog group, once the group got the p value. 
+		return k;
+	}
 	
 }
