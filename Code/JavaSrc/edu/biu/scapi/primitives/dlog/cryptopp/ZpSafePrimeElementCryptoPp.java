@@ -120,6 +120,12 @@ public class ZpSafePrimeElementCryptoPp implements ZpSafePrimeElement {
 		return false;
 	}
 
+
+	@Override
+	public String toString() {
+		return "ZpSafePrimeElementCryptoPp [element value="	+  getElementValue() + "]";
+	}
+	
 	/*
 	 * delete the related Dlog element object
 	 */
