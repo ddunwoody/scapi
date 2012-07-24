@@ -2,12 +2,15 @@ package edu.biu.scapi.primitives.dlog.cryptopp;
 
 import java.math.BigInteger;
 
+import org.bouncycastle.util.Strings;
+
 import edu.biu.scapi.primitives.dlog.DlogGroupAbs;
 import edu.biu.scapi.primitives.dlog.DlogZpSafePrime;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.dlog.ZpElement;
 import edu.biu.scapi.primitives.dlog.groupParams.ZpGroupParams;
 import edu.biu.scapi.securityLevel.DDH;
+import edu.biu.scapi.tools.math.MathAlgorithms;
 
 /**
  * This class implements a Dlog group over Zp* utilizing Crypto++'s implementation.<p>
@@ -33,6 +36,8 @@ public class CryptoPpDlogZpSafePrime extends DlogGroupAbs implements DlogZpSafeP
 	private native boolean validateZpGenerator(long group);
 	private native boolean validateZpElement(long group, long element);
 
+	
+	
 	/**
 	 * Initializes the CryptoPP implementation of Dlog over Zp* with the given groupParams
 	 * @param groupParams - contains the group parameters
@@ -58,18 +63,20 @@ public class CryptoPpDlogZpSafePrime extends DlogGroupAbs implements DlogZpSafeP
 		// set the inner parameters
 		this.groupParams = groupParams;
 
-		/* create CryptoPP Dlog group with p, ,q , g.
-		 * The validity of g will be checked after the creation of the group because the check need the pointer to the group
-		 */
+		//Create CryptoPP Dlog group with p, ,q , g.
+		//The validity of g will be checked after the creation of the group because the check need the pointer to the group
 		pointerToGroup = createDlogZp(p.toByteArray(), q.toByteArray(), g.toByteArray());
 		
-		/* if the generator is not valid, delete the allocated memory and throw exception */
+		//If the generator is not valid, delete the allocated memory and throw exception 
 		if (!validateZpGenerator(pointerToGroup)) {
 			deleteDlogZp(pointerToGroup);
 			throw new IllegalArgumentException("generator value is not valid");
 		}
-		//create the GroupElement - generator with the pointer that return from the native function
+		//Create the GroupElement - generator with the pointer that return from the native function
 		generator = new ZpSafePrimeElementCryptoPp(g, p, false);
+		
+		//Now that we have p, we can calculate k which is the maximum length of a string to be converted to a Group Element of this group.
+		k = calcK(p);
 	}
 
 	/**
@@ -99,7 +106,7 @@ public class CryptoPpDlogZpSafePrime extends DlogGroupAbs implements DlogZpSafeP
 
 		// get the generator value
 		long pGenerator = getGenerator(pointerToGroup);
-		//create the GroupElement - generator with the pointer that return from the native function
+		//create the GroupElement - generator with the pointer that returned from the native function
 		generator = new ZpSafePrimeElementCryptoPp(pGenerator);
 
 		BigInteger p = new BigInteger(getP(pointerToGroup));
@@ -108,13 +115,27 @@ public class CryptoPpDlogZpSafePrime extends DlogGroupAbs implements DlogZpSafeP
 
 		groupParams = new ZpGroupParams(q, xG, p);
 
+		//Now that we have p, we can calculate k which is the maximum length in bytes of a string to be converted to a Group Element of this group. 
+		k = calcK(p);
+
 	}
 
 	public CryptoPpDlogZpSafePrime(String numBits) {
-		//creates an int from the given string and call the appropriate constructor
+		//creates an int from the given string and calls the appropriate constructor
 		this(new Integer(numBits));
 	}
-
+	
+	private int calcK(BigInteger p){
+		int bitsInp = p.bitLength();
+		//any string of length k has a numeric value that is less than (p-1)/2 - 1
+		int k = (bitsInp - 3)/8; 
+		//The actual k that we allow is one byte less. This will give us an extra byte pad the binary string passed to encode to a group element with a 01 byte
+		//and at decoding we will remove that extra byte. This way, even if the original string translates to a negative BigInteger the encode and decode functions
+		//always work with positive numbers. The encoding will be responsible for padding and the decoding will be responsible for removing the pad.
+		k--; 
+		return k;
+	}
+	
 	/**
 	 * @return the type of the group - Zp*
 	 */
@@ -135,7 +156,7 @@ public class CryptoPpDlogZpSafePrime extends DlogGroupAbs implements DlogZpSafeP
 	 * 
 	 * @return the random element
 	 */
-	public GroupElement getRandomElement() {
+	public GroupElement createRandomElement() {
 		
 		return new ZpSafePrimeElementCryptoPp(((ZpGroupParams) groupParams).getP());
 
@@ -275,36 +296,6 @@ public class CryptoPpDlogZpSafePrime extends DlogGroupAbs implements DlogZpSafeP
 		return new ZpSafePrimeElementCryptoPp(x, ((ZpGroupParams) groupParams).getP(), bCheckMembership);
 	}
 
-	/**
-	 * Converts a byte array to a ZpSafePrimeElementCryptoPp element.
-	 * @param binaryString the byte array to convert
-	 * @return the created group Element
-	 */
-	public GroupElement convertByteArrayToGroupElement(byte[] binaryString) {
-
-		if (binaryString.length >= ((ZpGroupParams) groupParams).getP().bitLength()){
-			throw new IllegalArgumentException("String is too long. It has to be of length less than p");
-		}
-		try {
-			BigInteger elValue = new BigInteger(binaryString);
-			GroupElement element= new ZpSafePrimeElementCryptoPp(elValue, ((ZpGroupParams) groupParams).getP(), true);
-			return element;
-		} catch(IllegalArgumentException e){
-			throw new IllegalArgumentException("The given string is not a valid Zp safe prime element");
-		}
-	}
-
-	/**
-	 * Convert a ZpSafePrimeElementCryptoPp to a byte array.
-	 * @param groupElement the element to convert
-	 * @return the created byte array
-	 */
-	public byte[] convertGroupElementToByteArray(GroupElement groupElement){
-		if (!(groupElement instanceof ZpSafePrimeElementCryptoPp)){
-			throw new IllegalArgumentException("element type doesn't match the group type");
-		}
-		return ((ZpElement) groupElement).getElementValue().toByteArray();
-	}
 
 	/**
 	 * deletes the related Dlog group object
@@ -317,9 +308,83 @@ public class CryptoPpDlogZpSafePrime extends DlogGroupAbs implements DlogZpSafeP
 		super.finalize();
 	}
 
+
+	/**
+	 * This function takes any string of length up to k bytes and encodes it to a Group Element.<p>
+	 * k is calculated upon construction of this group and it depends on the length in bits of p.<p>
+	 * The encoding-decoding functionality is not a bijection, that is, it is a 1-1 function but is not onto.<p>
+	 * Therefore, any string of length in bytes up to k can be encoded to a group element but not<p>
+	 * every group element can be decoded to a binary string in the group of binary strings of length up to 2^k.<p>
+	 * Thus, the right way to use this functionality is first to encode a byte array and the to decode it, and not the opposite.
+	 * @throws IndexOutOfBoundsException if the length of the binary array to encode is longer than k
+	 */
+	public GroupElement encodeByteArrayToGroupElement(byte[] binaryString) {
+		//Any string of length up to k has numeric value that is less than (p-1)/2 - 1.
+		//If longer than k then throw exception.
+		if (binaryString.length > k){
+			throw new IndexOutOfBoundsException("The binary array to encode is too long.");
+		}
+	
+		//Denote the string of length k by s.
+		//Set the group element to be y=(s+1)^2 (this ensures that the result is not 0 and is a square)
+		byte[] newString = new byte[binaryString.length + 1];
+		newString[0] = 1;
+		System.arraycopy(binaryString, 0, newString, 1, binaryString.length);
+	
+		BigInteger s = new BigInteger(newString);
+		BigInteger y = (s.add(BigInteger.ONE)).pow(2).mod(((ZpGroupParams) groupParams).getP());
+		//There is no need to check membership since the "element" was generated so that it is always an element.
+		Boolean bCheckMembership = true;
+		ZpSafePrimeElementCryptoPp element = new ZpSafePrimeElementCryptoPp(y, ((ZpGroupParams) groupParams).getP(), bCheckMembership);
+		return element;
+	}
+	
+	/**
+	 * This function decodes a group element to a byte array.<p> 
+	 * This function is guaranteed to work properly ONLY if the group element was obtained as a result
+	 * of encoding a binary string of length in bytes up to k. This is because the encoding-decoding functionality is not a bijection, that is, it is a 1-1 function but is not onto.<p>
+	 * Therefore, any string of length in bytes up to k can be encoded to a group element but not<p>
+	 * any group element can be decoded to a binary sting in the group of binary strings of length up to 2^k.
+	 * @param groupElement the GroupElement to decode
+	 * @return a byte[] decoding of the group element
+	 */
+	public byte[] decodeGroupElementToByteArray(GroupElement groupElement) {
+		//Given a group element y, find the two inverses z,-z. Take z to be the value between 1 and (p-1)/2. Return s=z-1
+		BigInteger y = ((ZpElement) groupElement).getElementValue();
+		BigInteger p = ((ZpGroupParams) groupParams).getP();
+		MathAlgorithms.SquareRootResults roots = MathAlgorithms.sqrtModP_3_4(y, p);
+	
+		BigInteger goodRoot;
+		BigInteger halfP = (p.subtract(BigInteger.ONE)).divide(BigInteger.valueOf(2));
+		if(roots.getRoot1().compareTo(BigInteger.ONE)>= 0 && roots.getRoot1().compareTo(halfP) < 0)
+			goodRoot = roots.getRoot1();
+		else 
+			goodRoot = roots.getRoot2();
+		
+		goodRoot = goodRoot.subtract(BigInteger.ONE);
+	
+		//Remove the padding byte at the most significant position (that was added while encoding)
+		byte[] rootByteArray = goodRoot.toByteArray();
+		byte[] oneByteLess = new byte[rootByteArray.length -1];
+		System.arraycopy(rootByteArray, 1, oneByteLess, 0,oneByteLess.length );
+		return oneByteLess;
+	}
+
+	
+	/**
+	 * This function maps a group element of this dlog group to a byte array.<p>
+	 * This function does not have an inverse function, that is, it is not possible to re-construct the original group element from the resulting byte array. 
+	 * @return a byte array representation of the given group element
+	 */
+	public byte[] mapAnyGroupElementToByteArray(GroupElement groupElement){
+		if (!(groupElement instanceof ZpSafePrimeElementCryptoPp)){
+			throw new IllegalArgumentException("element type doesn't match the group type");
+		}
+		return ((ZpElement) groupElement).getElementValue().toByteArray();		
+	}
+
 	// upload CryptoPP library
 	static {
 		System.loadLibrary("CryptoPPJavaInterface");
 	}
-
 }
