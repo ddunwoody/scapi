@@ -126,25 +126,24 @@ public class ECFpUtility {
 	 */
 	public FpPoint findPointRepresentedByByteArray(ECFpGroupParams params, byte[] binaryString, int k ){
 	
-		/*
-		 * If the length of binaryString exceeds k then throw IndexOutOfBoundsException.
+		//Pseudo-code:
+		/*If the length of binaryString exceeds k then throw IndexOutOfBoundsException.
 
- ·         Let L be the length in bytes of p
+          Let L be the length in bytes of p
 
- ·         Choose a random byte array r of length L – k – 2 bytes 
+          Choose a random byte array r of length L – k – 2 bytes 
 
-·         Prepare a byte array beginning with r, followed by 01x, followed by the input binaryString
+          Prepare a byte array beginning with r, followed by 01x, followed by the input binaryString
 
- ·         Convert the result to a BigInteger (bIString)
+          Convert the result to a BigInteger (bIString)
 
- ·         Compute the elliptic curve equation for this x and see if there exists a y such that (x,y) satisfies the equation.
+          Compute the elliptic curve equation for this x and see if there exists a y such that (x,y) satisfies the equation.
 
- ·         If yes, return (x,y)
+          If yes, return (x,y)
 
- ·         Else, go back to step 3 (choose a random r etc.) up to 80 times (This is an arbitrary hard-coded number).
+          Else, go back to step 3 (choose a random r etc.) up to 80 times (This is an arbitrary hard-coded number).
 
- ·         If did not find y such that (x,y) satisfies the equation after 80 trials then return null.
-
+          If did not find y such that (x,y) satisfies the equation after 80 trials then return null.
 		 */
 
 
@@ -167,13 +166,6 @@ public class ECFpUtility {
 			System.arraycopy(randomArray, 0, newString, 0, randomArray.length);
 			newString[randomArray.length] = 1;
 			System.arraycopy(binaryString, 0, newString, randomArray.length + 1, binaryString.length);
-			/*
-			System.out.println("In util, new string with prepended random bytes + x01 byte is:");
-			for(int i = 0; i < newString.length; i ++){
-				System.out.print(newString[i] + " ");
-			}
-			System.out.println();
-			*/
 			//Convert the result to a BigInteger (bIString)
 			x = new BigInteger(newString);
 			if(x.compareTo(BigInteger.ZERO) < 0){
@@ -181,17 +173,8 @@ public class ECFpUtility {
 				byte[] temp = x.toByteArray();
 				byte t0 = temp[0];
 				temp[0] = (byte) -t0;
-				/*
-				for(int i = 0; i < temp.length; i ++){
-					System.out.print(temp[i] + " ");
-				}
-				System.out.println();
-				*/
 				x = new BigInteger(temp);
-				//System.out.println("The new x after changing t0 is: " + x);
 			}
-			//System.out.println("The big integer obtained from prepended string is:");
-			//System.out.println(x);
 
 			//Compute the elliptic curve equation for this x and see if there exists a y such that (x,y) satisfies the equation.
 			//If yes, return (x,y)
@@ -199,7 +182,7 @@ public class ECFpUtility {
 			y = findYInCurveEquationForX(params, x);
 			counter++;
 		} while((y == null) && (counter <= 80)); //we limit the amount of times we try to 80 which is an arbitrary number.
-		//System.out.println("counter = " + counter);
+
 		//If found the correct y in reasonable time then return the (x,y) FpPoint
 		if (y != null)
 			return new FpPoint(x,y);
