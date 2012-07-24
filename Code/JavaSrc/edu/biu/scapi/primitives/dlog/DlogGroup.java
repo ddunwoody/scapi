@@ -116,13 +116,13 @@ public interface DlogGroup {
 	 * Creates a random member of this Dlog group
 	 * @return the random element 
 	 */
-	public GroupElement getRandomElement();
+	public GroupElement createRandomElement();
 	
 	/**
 	 * Creates a random generator of this Dlog group
 	 * @return the random generator 
 	 */
-	public GroupElement getRandomGenerator();
+	public GroupElement createRandomGenerator();
 	
 	
 	/**
@@ -152,15 +152,29 @@ public interface DlogGroup {
 	/**
 	 * Converts a byte array to a GroupElement.
 	 * @param binaryString the byte array to convert
-	 * @return the created group Element
+	 * @return the created group Element or null if element could not be created
 	 */
-	public GroupElement convertByteArrayToGroupElement(byte[] binaryString);
+	public GroupElement encodeByteArrayToGroupElement(byte[] binaryString);
 	
 	/**
 	 * Convert a GroupElement to a byte array.
 	 * @param groupElement the element to convert
 	 * @return the created byte array
 	 */
-	public byte[] convertGroupElementToByteArray(GroupElement groupElement);
+	public byte[] decodeGroupElementToByteArray(GroupElement groupElement);
 	
+	
+	/**
+	 * This function returns the value k which is the maximum length of a string to be converted to a Group Element of this group.<p>
+	 * If a string exceeds the k length it cannot be converted
+	 * @return k the maximum length of a string to be converted to a Group Element of this group. k can be zero if there is no maximum.
+	 */
+	public int getMaxLengthOfByteArrayForEncoding();
+	
+	/**
+	 * This function maps a group element of this dlog group to a byte array.<p>
+	 * This function does not have an inverse function, that is, it is not possible to re-construct the original group element from the resulting byte array. 
+	 * @return a byte array representation of the given group element
+	 */
+	public byte[] mapAnyGroupElementToByteArray(GroupElement groupElement);
 }
