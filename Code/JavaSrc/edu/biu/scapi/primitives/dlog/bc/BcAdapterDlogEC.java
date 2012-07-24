@@ -32,7 +32,7 @@ public abstract class BcAdapterDlogEC extends DlogGroupEC
 	 * @param y
 	 * @return ECPoint - the created point
 	 */
-	public ECPoint createPoint(BigInteger x, BigInteger y){
+	ECPoint createPoint(BigInteger x, BigInteger y){
 		
 		return curve.createPoint(x, y, false);
 	}
