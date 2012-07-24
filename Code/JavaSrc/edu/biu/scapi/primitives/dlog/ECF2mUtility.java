@@ -209,6 +209,11 @@ public class ECF2mUtility {
 		return groupParams;
 	}
 	
-	
+	/**
+	 * @return the type of the group - ECF2m
+	 */
+	public String getGroupType(){
+		return "ECF2m";
+	}
 	
 }
