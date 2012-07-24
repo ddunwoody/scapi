@@ -1,9 +1,11 @@
 package edu.biu.scapi.primitives.dlog;
 
 import java.math.BigInteger;
+import java.util.Properties;
 
 import org.bouncycastle.math.ec.ECFieldElement;
 import org.bouncycastle.math.ec.ECFieldElement.F2m;
+import org.bouncycastle.util.encoders.Hex;
 
 import edu.biu.scapi.primitives.dlog.groupParams.ECF2mGroupParams;
 import edu.biu.scapi.primitives.dlog.groupParams.ECF2mKoblitz;
@@ -20,7 +22,7 @@ import edu.biu.scapi.primitives.dlog.groupParams.GroupParams;
 public class ECF2mUtility {
 
 	/**
-	 * Checks if the given x and y represented a valid point on the given curve, 
+	 * Checks if the given x and y represent a valid point on the given curve, 
 	 * i.e. if the point (x, y) is a solution of the curve’s equation.
 	 * @param params elliptic curve over F2m parameters
 	 * @param x coefficient of the point
@@ -91,7 +93,7 @@ public class ECF2mUtility {
 	/**
 	 * checks if the given point is in the given dlog group with the q prime order. 
 	 * A point is in the group if it in the q-order group which is a sub-group of the Elliptic Curve.
-	 * Base assumption of this function is that checkCurveMembership function is already been called and returned true.
+	 * Tha basic assumption of this function is that checkCurveMembership function has already been called and returned true.
 	 * @param curve
 	 * @param point
 	 * @return true if the given point is in the given dlog group.
@@ -158,4 +160,50 @@ public class ECF2mUtility {
 			return false;
 		}
 	}
+	
+	
+	public GroupParams checkAndCreateInitParams(Properties ecProperties, String curveName) {
+		// check that the given curve is in the field that matches the group
+		if (!curveName.startsWith("B-") && !curveName.startsWith("K-")) {
+			throw new IllegalArgumentException("curveName is not a curve over F2m field and doesn't match the DlogGroup type"); 
+		}
+
+		// get the curve parameters
+		int m = Integer.parseInt(ecProperties.getProperty(curveName));
+		int k = Integer.parseInt(ecProperties.getProperty(curveName + "k"));
+		String k2Property = ecProperties.getProperty(curveName + "k2");
+		String k3Property = ecProperties.getProperty(curveName + "k3");
+		BigInteger a = new BigInteger(ecProperties.getProperty(curveName + "a"));
+		BigInteger b = new BigInteger(1,Hex.decode(ecProperties.getProperty(curveName+"b")));
+		BigInteger x = new BigInteger(1,Hex.decode(ecProperties.getProperty(curveName+"x")));
+		BigInteger y = new BigInteger(1,Hex.decode(ecProperties.getProperty(curveName+"y")));
+		BigInteger q = new BigInteger(ecProperties.getProperty(curveName + "r"));
+		BigInteger h = new BigInteger(ecProperties.getProperty(curveName + "h"));
+		
+		int k2 = 0;
+		int k3 = 0;
+		boolean trinomial;
+		
+		GroupParams groupParams;
+		if (k2Property == null && k3Property == null) { // for trinomial basis
+			groupParams = new ECF2mTrinomialBasis(q, x, y, m, k, a, b, h);
+			trinomial = true;
+		} else { // pentanomial basis
+			k2 = Integer.parseInt(k2Property);
+			k3 = Integer.parseInt(k3Property);
+			trinomial = false;
+			groupParams = new ECF2mPentanomialBasis(q, x, y, m, k, k2, k3, a, b, h);
+		}
+		// koblitz curve
+		if (curveName.contains("K-")) {
+
+			
+			groupParams = new ECF2mKoblitz((ECF2mGroupParams) groupParams, q, h);
+		}
+
+		return groupParams;
+	}
+	
+	
+	
 }
