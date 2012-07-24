@@ -16,6 +16,7 @@ import edu.biu.scapi.primitives.dlog.groupParams.ECF2mGroupParams;
 import edu.biu.scapi.primitives.dlog.groupParams.ECF2mKoblitz;
 import edu.biu.scapi.primitives.dlog.groupParams.ECF2mPentanomialBasis;
 import edu.biu.scapi.primitives.dlog.groupParams.ECF2mTrinomialBasis;
+import edu.biu.scapi.primitives.dlog.groupParams.GroupParams;
 import edu.biu.scapi.securityLevel.DDH;
 
 /**
@@ -25,13 +26,13 @@ import edu.biu.scapi.securityLevel.DDH;
  */
 public class BcDlogECF2m extends BcAdapterDlogEC implements DlogECF2m, DDH{
 
-	private ECF2mUtility util = new ECF2mUtility();
+	private ECF2mUtility util;
 	
 	/**
-	 * Default constructor. Initializes this object with K-163 NIST curve.
+	 * Default constructor. Initializes this object with B-163 NIST curve.
 	 */
 	public BcDlogECF2m() throws IOException{
-		this("K-163");
+		this("B-163");
 	}
 	
 	public BcDlogECF2m(String fileName, String curveName) throws IOException{
@@ -45,85 +46,54 @@ public class BcDlogECF2m extends BcAdapterDlogEC implements DlogECF2m, DDH{
 	 * @throws IllegalAccessException
 	 */
 	public BcDlogECF2m(String curveName) throws IllegalArgumentException, IOException{
-		
-		Properties ecProperties;
-	
-		ecProperties = getProperties(PROPERTIES_FILES_PATH); //get properties object containing the curve data
-	
-		//checks that the curveName is in the file 
-		if(!ecProperties.containsKey(curveName)) { 
-			throw new IllegalArgumentException("no such NIST elliptic curve"); 
-		} 
-			this.curveName = curveName;
-		//check that the given curve is in the field that matches the group
-		if (!curveName.startsWith("B-") && !curveName.startsWith("K-")){
-			throw new IllegalArgumentException("curveName is not a curve over F2m field and doesn't match this DlogGroup type"); 
-		}
-		
-		doInit(ecProperties, curveName);  // set the data and initialize the curve
-		
+		this(PROPERTIES_FILES_PATH, curveName);
 	}
 	
 	
 	/*
 	 * Extracts the parameters of the curve from the properties object and initialize the groupParams, 
-	 * generator and the underlying curve
+	 * generator and the underlying curve. 
 	 * @param ecProperties - properties object contains the curve file data
-	 * @param curveName - the curve name as it called in the file
+	 * @param curveName - the curve name as it is called in the file
 	 */
 	protected void doInit(Properties ecProperties, String curveName) {
-		//get the curve parameters
-		int m = Integer.parseInt(ecProperties.getProperty(curveName));
-		int k = Integer.parseInt(ecProperties.getProperty(curveName+"k"));
-		String k2Property = ecProperties.getProperty(curveName+"k2");
-		String k3Property = ecProperties.getProperty(curveName+"k3");
-		BigInteger a = new BigInteger(ecProperties.getProperty(curveName+"a"));
-		BigInteger b = new BigInteger(1,Hex.decode(ecProperties.getProperty(curveName+"b")));
-		BigInteger x = new BigInteger(1,Hex.decode(ecProperties.getProperty(curveName+"x")));
-		BigInteger y = new BigInteger(1,Hex.decode(ecProperties.getProperty(curveName+"y")));
-		BigInteger q = new BigInteger(ecProperties.getProperty(curveName+"r"));
-		BigInteger h = new BigInteger(ecProperties.getProperty(curveName+"h"));
-		int k2=0;
-		int k3=0;
-		boolean trinomial; //sign which basis the curve use
-		
-		if (k2Property==null && k3Property==null){ //for trinomial basis
-			groupParams = new ECF2mTrinomialBasis(q, x, y, m, k, a, b, h);
-			trinomial = true;
-		
-		} else { //pentanomial basis
-			k2 = Integer.parseInt(k2Property);
-			k3 = Integer.parseInt(k3Property);
-			groupParams = new ECF2mPentanomialBasis(q, x, y, m, k, k2, k3, a, b, h);
-			trinomial = false;
-		} 
-		
-		//koblitz curve
-		if (curveName.contains("K-")){
-			
-			groupParams = new ECF2mKoblitz((ECF2mGroupParams) groupParams, q, h);
+		//Delegate the work on the params to the ECF2mUtility since this work does not depend on BC library. 
+		util = new ECF2mUtility();
+		groupParams = util.checkAndCreateInitParams(ecProperties, curveName);
+		//Create a BC underlying curve:
+		createUnderlyingCurveAndGenerator();
+	}
+	
+	private void createUnderlyingCurveAndGenerator(){
+		BigInteger x;
+		BigInteger y;
+		if(groupParams instanceof ECF2mTrinomialBasis){
+			ECF2mTrinomialBasis triParams = (ECF2mTrinomialBasis)groupParams;		
+			curve = new ECCurve.F2m(triParams.getM(), triParams.getK1(), triParams.getA(), triParams.getB(), triParams.getQ(), triParams.getCofactor());
+			x = triParams.getXg();
+			y = triParams.getYg();
+		}else{
+			//we assume that if it's not trinomial then it's pentanomial. We do not check.
+			ECF2mPentanomialBasis pentaParams = (ECF2mPentanomialBasis) groupParams;
+			curve = new ECCurve.F2m(pentaParams.getM(), pentaParams.getK1(), pentaParams.getK2(), pentaParams.getK3(),  pentaParams.getA(), pentaParams.getB(), pentaParams.getQ(), pentaParams.getCofactor());		
+			x = pentaParams.getXg();
+			y = pentaParams.getYg();
 		}
 		
-		//create the curve of BC
-		if (trinomial == true){
-			curve = new ECCurve.F2m(m, k, a, b, q, h);
-		} else {
-			curve = new ECCurve.F2m(m, k, k2, k3, a, b, q, h);
-		}
-		
-		//create the generator
-		generator = new ECF2mPointBc(x,y, this);
-			
+		// create the generator
+		// here we assume that (x,y) are the coordinates of a point that is indeed a generator
+		generator = new ECF2mPointBc(x, y, this);
 	}
 	
 	/**
+	 * 
 	 * @return the type of the group - ECF2m
 	 */
 	public String getGroupType(){
-		return "elliptic curve over F2m";
+		return util.getGroupType();
 	}
 	
-	/*
+	/**
 	 * Checks if the given element is a member of this Dlog group
 	 * @param element 
 	 * @return true if the given element is member of this group; false, otherwise.
@@ -203,22 +173,24 @@ public class BcDlogECF2m extends BcAdapterDlogEC implements DlogECF2m, DDH{
 	}
 	
 	/**
-	 * Converts a byte array to an ECF2mPointBc.
+	 * Encode a byte array to an ECF2mPointBc. Some constraints on the byte array are necessary so that it maps into an element of this group.
+	 * Currently we don't support this conversion. It will be implemented in the future.Meanwhile we return null
 	 * @param binaryString the byte array to convert
 	 * @return the created group Element
 	 */
-	public GroupElement convertByteArrayToGroupElement(byte[] binaryString){
+	public GroupElement encodeByteArrayToGroupElement(byte[] binaryString){
 		//currently we don't support this conversion. 
 		//will be implemented in the future.
 		return null;
 	}
 	
 	/**
-	 * Convert a ECF2mPointBc to a byte array.
+	 * Decode an ECF2mPointBc that was obtained through the encodeByteArrayToGroupElement function to the original byte array.
+	 * Currently we don't support this conversion. It will be implemented in the future.Meanwhile we return null.
 	 * @param groupElement the element to convert
 	 * @return the created byte array
 	 */
-	public byte[] convertGroupElementToByteArray(GroupElement groupElement){
+	public byte[] decodeGroupElementToByteArray(GroupElement groupElement){
 		if (!(groupElement instanceof ECF2mPointBc)){
 			throw new IllegalArgumentException("element type doesn't match the group type");
 		}
@@ -226,6 +198,32 @@ public class BcDlogECF2m extends BcAdapterDlogEC implements DlogECF2m, DDH{
 		//will be implemented in the future.
 		return null;
 	}
+
+	/**
+	 * This function returns the value k which is the maximum length of a string to be converted to a Group Element of this group.<p>
+	 * If a string exceeds the k length it cannot be converted
+	 * Currently we do not have a proper algorithm for this therefore we return 0.
+	 * @return k the maximum length of a string to be converted to a Group Element of this group
+	 */
+	public int getMaxLengthOfByteArrayForEncoding() {
+		//Currently we do not have a proper algorithm for this.
+		//Return 0
+		return 0;
+	}
+
+	/**
+	 * This is 1-1 mapping of any element of this group to a byte array representation.
+	 * Currently we don't support this conversion. It will be implemented in the future.Meanwhile we return null.
+	 * @param groupElement the element to convert
+	 * @return the byte array representation
+	 */
+	public byte[] mapAnyGroupElementToByteArray(GroupElement groupElement) {
+		//Currently we do not have a proper algorithm for this.
+		//return null
+		return null;
+	}
+
+
 	
 
 }
