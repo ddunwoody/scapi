@@ -19,7 +19,7 @@ public abstract class MiraclAdapterDlogEC extends DlogGroupEC
 
 	private native long createMip();
 
-	protected long mip = 0; ///MIRACL pointer
+	protected long mip; ///MIRACL pointer
 
 	/*
 	 * 
