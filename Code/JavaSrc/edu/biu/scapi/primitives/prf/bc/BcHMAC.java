@@ -38,9 +38,14 @@ public final class BcHMAC implements Hmac {
 	 * Default constructor that uses SHA1.
 	 * @throws FactoriesException if BC has no hash function corresponding to the given hash.
 	 */
-	public BcHMAC() throws FactoriesException {
-		//creates SHA1 and secure random end than use the extended constructor
-		this(new CryptoPpSHA1(), new SecureRandom());
+	public BcHMAC() {
+		//creates SHA1 and secure random end than uses the extended constructor
+		try{
+			construct("SHA1", new SecureRandom());
+		}
+		catch(FactoriesException e){
+			//No need to do anything here since this exception cannot happen because we provide an BCSha1 class which the class the Factory needs to call.
+		}
 	}
 	
 	/** 
@@ -49,24 +54,22 @@ public final class BcHMAC implements Hmac {
 	 * @throws FactoriesException if there is no hash function with given name.
 	 */
 	public BcHMAC(String hashName) throws FactoriesException{
-		//passes a digest to the hmac.
-		hMac = new HMac(BCFactory.getInstance().getDigest(hashName));
-		//creates SecureRandom object from the given algorithm
-		this.random = new SecureRandom();
+			construct(hashName, new SecureRandom());
 	}
 	
 	/** 
-	 * This constructor receives an hashName and build the underlying hmac accoring to it. It can be called from the factory.
+	 * This constructor receives an hashName and build the underlying hmac according to it. It can be called from the factory.
 	 * @param hashName - the hash function to translate into digest of bc hmac.
 	 * @param randNumGenAlg - the random number generator algorithm to use.
 	 * @throws FactoriesException if there is no hash function with given name.
 	 * @throws NoSuchAlgorithmException 
 	 */
 	public BcHMAC(String hashName, String randNumGenAlg) throws FactoriesException, NoSuchAlgorithmException {
-		//passes a digest to the hmac.
-		hMac = new HMac(BCFactory.getInstance().getDigest(hashName));
-		//creates SecureRandom object from the given algorithm
-		this.random = SecureRandom.getInstance(randNumGenAlg);
+		construct(hashName, SecureRandom.getInstance(randNumGenAlg));
+	}
+
+	public BcHMAC(String hashName, SecureRandom random) throws FactoriesException, NoSuchAlgorithmException {
+		construct(hashName, random);
 	}
 
 	/**
@@ -88,13 +91,20 @@ public final class BcHMAC implements Hmac {
 	 * @throws FactoriesException if BC has no hash function corresponding to the given hash.
 	 */
 	public BcHMAC(CryptographicHash hash, SecureRandom random) throws FactoriesException{
-		
-		//passes a digest to the hmac.
-		hMac = new HMac(BCFactory.getInstance().getDigest(hash.getAlgorithmName()));
-		//sets the random
-		this.random = random;
+		construct(hash.getAlgorithmName(), random);
 	}
 	
+	private void construct(String hashName, SecureRandom random) throws FactoriesException{
+		//passes a digest to the hmac.
+		hMac = new HMac(BCFactory.getInstance().getDigest(hashName));
+		//sets the random
+		this.random = random;
+		// Get 1024 random bits, this causes the random object to seed itself. Since the seeding might be a time-consuming operation 
+		//it makes sense to do it once at the beginning, and then use the seeded object.
+		byte[] bytes = new byte[1024/8];
+	    random.nextBytes(bytes);
+
+	}
 	/** 
 	 * Initializes this hmac with a secret key.
 	 * @param secretKey the secret key 
