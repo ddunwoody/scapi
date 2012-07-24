@@ -14,6 +14,8 @@ import edu.biu.scapi.primitives.dlog.groupParams.ECF2mGroupParams;
 import edu.biu.scapi.primitives.dlog.groupParams.ECF2mKoblitz;
 import edu.biu.scapi.primitives.dlog.groupParams.ECF2mPentanomialBasis;
 import edu.biu.scapi.primitives.dlog.groupParams.ECF2mTrinomialBasis;
+import edu.biu.scapi.primitives.dlog.groupParams.ECFpGroupParams;
+import edu.biu.scapi.primitives.dlog.groupParams.GroupParams;
 import edu.biu.scapi.securityLevel.DDH;
 
 /**
@@ -35,7 +37,7 @@ public class MiraclDlogECF2m extends MiraclAdapterDlogEC implements DlogECF2m, D
 	private native long exponentiateF2mWithPreComputed(long mip, long dlogGroup, long base, byte[] size, int window, int maxBits);
 	
 	private long nativeDlog = 0;
-	private ECF2mUtility util = new ECF2mUtility();
+	private ECF2mUtility util;
 	
 	/**
 	 * Default constructor. Initializes this object with K-163 NIST curve.
@@ -54,22 +56,7 @@ public class MiraclDlogECF2m extends MiraclAdapterDlogEC implements DlogECF2m, D
 	 * @throws IllegalAccessException
 	 */
 	public MiraclDlogECF2m(String curveName) throws IllegalArgumentException, IOException{
-
-		Properties ecProperties;
-
-		ecProperties = getProperties(PROPERTIES_FILES_PATH); //get properties object containing the curve data
-
-		// checks that the curveName is in the file
-		if (!ecProperties.containsKey(curveName)) {
-			throw new IllegalArgumentException("no such NIST elliptic curve");
-		}
-		this.curveName = curveName;
-		// check that the given curve is in the field that matches the group
-		if (!curveName.startsWith("B-") && !curveName.startsWith("K-")) {
-			throw new IllegalArgumentException("curveName is not a curve over F2m field and doesn't match the DlogGroup type"); 
-		}
-
-		doInit(ecProperties, curveName); // set the data and initialize the curv
+		this(PROPERTIES_FILES_PATH, curveName);
 	}
 
 	/**
@@ -79,46 +66,34 @@ public class MiraclDlogECF2m extends MiraclAdapterDlogEC implements DlogECF2m, D
 	 * @param curveName - the curve name as it called in the file
 	 */
 	protected void doInit(Properties ecProperties, String curveName) {
-		// get the curve parameters
-		int m = Integer.parseInt(ecProperties.getProperty(curveName));
-		int k = Integer.parseInt(ecProperties.getProperty(curveName + "k"));
-		String k2Property = ecProperties.getProperty(curveName + "k2");
-		String k3Property = ecProperties.getProperty(curveName + "k3");
-		BigInteger a = new BigInteger(ecProperties.getProperty(curveName + "a"));
-		BigInteger b = new BigInteger(1,Hex.decode(ecProperties.getProperty(curveName+"b")));
-		BigInteger x = new BigInteger(1,Hex.decode(ecProperties.getProperty(curveName+"x")));
-		BigInteger y = new BigInteger(1,Hex.decode(ecProperties.getProperty(curveName+"y")));
-		BigInteger q = new BigInteger(ecProperties.getProperty(curveName + "r"));
-		BigInteger h = new BigInteger(ecProperties.getProperty(curveName + "h"));
+		util = new ECF2mUtility();
+		groupParams = util.checkAndCreateInitParams(ecProperties, curveName);
 		
-		int k2 = 0;
-		int k3 = 0;
-		boolean trinomial;
-
-		if (k2Property == null && k3Property == null) { // for trinomial basis
-			groupParams = new ECF2mTrinomialBasis(q, x, y, m, k, a, b, h);
-			trinomial = true;
-		} else { // pentanomial basis
-			k2 = Integer.parseInt(k2Property);
-			k3 = Integer.parseInt(k3Property);
-			trinomial = false;
-			groupParams = new ECF2mPentanomialBasis(q, x, y, m, k, k2, k3, a, b, h);
-		}
-		// koblitz curve
-		if (curveName.contains("K-")) {
-
+		createUnderlyingCurveAndGenerator();
+		
+	}
+	
+	private void createUnderlyingCurveAndGenerator(){
+		BigInteger x;
+		BigInteger y;
+		if(groupParams instanceof ECF2mTrinomialBasis){
+			ECF2mTrinomialBasis triParams = (ECF2mTrinomialBasis)groupParams;
+			int k2 = 0;
+			int k3 = 0;
+			initF2mCurve(getMip(), triParams.getM(), triParams.getK1(), k2, k3, triParams.getA().toByteArray(), triParams.getB().toByteArray());
+			x = triParams.getXg();
+			y = triParams.getYg();
+		}else{
+			//we assume that if it's not trinomial then it's pentanomial. We do not check.
+			ECF2mPentanomialBasis pentaParams = (ECF2mPentanomialBasis) groupParams;
 			
-			groupParams = new ECF2mKoblitz((ECF2mGroupParams) groupParams, q, h);
+			initF2mCurve(getMip(), pentaParams.getM(), pentaParams.getK3(), pentaParams.getK2(), pentaParams.getK1(), pentaParams.getA().toByteArray(), pentaParams.getB().toByteArray());
+			x = pentaParams.getXg();
+			y = pentaParams.getYg();
 		}
-
-		// create the curve
-		if (trinomial == true) {
-			initF2mCurve(getMip(), m, k, k2, k3, a.toByteArray(), b.toByteArray());
-		} else {
-			initF2mCurve(getMip(), m, k3, k2, k, a.toByteArray(), b.toByteArray());
-		}
-
+			
 		// create the generator
+		// here we assume that (x,y) are the coordinates of a point that is indeed a generator
 		generator = new ECF2mPointMiracl(x, y, this);
 	}
 
@@ -126,7 +101,7 @@ public class MiraclDlogECF2m extends MiraclAdapterDlogEC implements DlogECF2m, D
 	 * @return the type of the group - ECF2m
 	 */
 	public String getGroupType() {
-		return "elliptic curve over F2m";
+		return util.getGroupType();
 	}
 
 	/**
@@ -232,8 +207,8 @@ public class MiraclDlogECF2m extends MiraclAdapterDlogEC implements DlogECF2m, D
 	public GroupElement simultaneousMultipleExponentiations(GroupElement[] groupElements, 
 			BigInteger[] exponentiations) {
 		
-		//Koblitz curve has an optimization that cause the naive algorithm to be faster than the following optimized algorithm.
-		//so currently we operate the naive algorithm instead of the optimized algorithm.
+		//Koblitz curve has an optimization that causes the naive algorithm to be faster than the following optimized algorithm.
+		//so currently we use the naive algorithm instead of the optimized algorithm.
 		// may be in the future this will be change.
 		if (groupParams instanceof ECF2mKoblitz) {
 			return computeNaive(groupElements, exponentiations);
@@ -377,22 +352,24 @@ public class MiraclDlogECF2m extends MiraclAdapterDlogEC implements DlogECF2m, D
 	}
 
 	/**
-	 * Converts a byte array to a ECF2mPointMiracl.
+	 * Encode a byte array to an ECF2mPointBc. Some constraints on the byte array are necessary so that it maps into an element of this group.
+	 * Currently we don't support this conversion. It will be implemented in the future.Meanwhile we return null.
 	 * @param binaryString the byte array to convert
 	 * @return the created group Element
 	 */
-	public GroupElement convertByteArrayToGroupElement(byte[] binaryString) {
+	public GroupElement encodeByteArrayToGroupElement(byte[] binaryString) {
 		//currently we don't support this conversion. 
 		//will be implemented in the future.
 		return null;
 	}
 
 	/**
-	 * Convert a ECF2mPointMiracl to a byte array.
+	 * Decode an ECF2mPointBc that was obtained through the encodeByteArrayToGroupElement function to the original byte array.
+	 * Currently we don't support this conversion. It will be implemented in the future.Meanwhile we return null.
 	 * @param groupElement the element to convert
 	 * @return the created byte array
 	 */
-	public byte[] convertGroupElementToByteArray(GroupElement groupElement) {
+	public byte[] decodeGroupElementToByteArray(GroupElement groupElement) {
 		if (!(groupElement instanceof ECF2mPointMiracl)) {
 			throw new IllegalArgumentException("element type doesn't match the group type");
 		}
@@ -401,9 +378,19 @@ public class MiraclDlogECF2m extends MiraclAdapterDlogEC implements DlogECF2m, D
 		return null;
 	}
 
-	// upload MIRACL library
-	static {
-		System.loadLibrary("MiraclJavaInterface");
+	
+	/**
+	 * This is 1-1 mapping of any element of this group to a byte array representation.
+	 * Currently we don't support this conversion. It will be implemented in the future.Meanwhile we return null.
+	 * @param groupElement the element to convert
+	 * @return the byte array representation
+	 */
+	public byte[] mapAnyGroupElementToByteArray(GroupElement groupElement) {
+		// TODO Auto-generated method stub
+		return null;
 	}
-
+	// upload MIRACL library
+		static {
+			System.loadLibrary("MiraclJavaInterface");
+		}
 }
