@@ -21,6 +21,11 @@ import edu.biu.scapi.primitives.dlog.groupParams.GroupParams;
  */
 public class ECF2mUtility {
 
+	//Default constructor.
+	public ECF2mUtility() {
+		super();
+	}
+
 	/**
 	 * Checks if the given x and y represent a valid point on the given curve, 
 	 * i.e. if the point (x, y) is a solution of the curve’s equation.
