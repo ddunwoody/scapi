@@ -10,7 +10,9 @@ import edu.biu.scapi.primitives.dlog.DlogECFp;
 import edu.biu.scapi.primitives.dlog.ECElement;
 import edu.biu.scapi.primitives.dlog.ECFpUtility;
 import edu.biu.scapi.primitives.dlog.GroupElement;
+import edu.biu.scapi.primitives.dlog.bc.ECFpPointBc;
 import edu.biu.scapi.primitives.dlog.groupParams.ECFpGroupParams;
+import edu.biu.scapi.primitives.dlog.groupParams.GroupParams;
 import edu.biu.scapi.securityLevel.DDH;
 
 /**
@@ -32,7 +34,7 @@ public class MiraclDlogECFp extends MiraclAdapterDlogEC implements DlogECFp, DDH
 	private native long exponentiateFpWithPreComputed(long mip, long dlogGroup, long base, byte[] size, int window, int maxBits);
 
 	private long nativeDlog = 0;
-	private ECFpUtility util = new ECFpUtility();
+	private ECFpUtility util;
 	/**
 	 * Default constructor. Initializes this object with P-192 NIST curve.
 	 */
@@ -45,24 +47,7 @@ public class MiraclDlogECFp extends MiraclAdapterDlogEC implements DlogECFp, DDH
 	}
 
 	public MiraclDlogECFp(String curveName) throws IllegalArgumentException, IOException{
-		
-
-		Properties ecProperties;
-
-		ecProperties = getProperties(PROPERTIES_FILES_PATH); //get properties object containing the curve data
-
-		// checks that the curveName is in the file
-		if (!ecProperties.containsKey(curveName)) {
-			throw new IllegalArgumentException("no such NIST elliptic curve");
-		}
-		this.curveName = curveName;
-		// check that the given curve is in the field that matches the group
-		if (!curveName.startsWith("P-")) {
-			throw new IllegalArgumentException("curveName is not a curve over Fp field and doesn't match the DlogGroup type"); 
-		}
-		doInit(ecProperties, curveName);  // set the data and initialize the curve
-		
-			
+		this(PROPERTIES_FILES_PATH, curveName);
 	}
 
 	/**
@@ -72,30 +57,30 @@ public class MiraclDlogECFp extends MiraclAdapterDlogEC implements DlogECFp, DDH
 	 * @param curveName - the curve name as it called in the file
 	 */
 	protected void doInit(Properties ecProperties, String curveName) {
-		// get the nist parameters
-		BigInteger p = new BigInteger(ecProperties.getProperty(curveName));
-		BigInteger a = new BigInteger(ecProperties.getProperty(curveName + "a"));
-		BigInteger b = new BigInteger(1,Hex.decode(ecProperties.getProperty(curveName+"b")));
-		BigInteger x = new BigInteger(1,Hex.decode(ecProperties.getProperty(curveName+"x")));
-		BigInteger y = new BigInteger(1,Hex.decode(ecProperties.getProperty(curveName+"y")));
-		BigInteger q = new BigInteger(ecProperties.getProperty(curveName + "r"));
-		BigInteger h = new BigInteger(ecProperties.getProperty(curveName + "h"));
-
-		// create the GroupParams
-		groupParams = new ECFpGroupParams(q, x, y, p, a, b, h);
-
-		// create the curve
-		initFpCurve(getMip(), p.toByteArray(), a.mod(p).toByteArray(), b.toByteArray());
-
-		// create the generator
-		generator = new ECFpPointMiracl(x, y, this);
+		util = new ECFpUtility();
+		groupParams = util.checkAndCreateInitParams(ecProperties, curveName);
+		//Now that we have p, we can calculate k which is the maximum length in bytes of a string to be converted to a Group Element of this group. 
+		BigInteger p = ((ECFpGroupParams)groupParams).getP();
+		k = util.calcK(p);	
+		createUnderlyingCurveAndGenerator(groupParams);
 	}
-
+	
+	private void createUnderlyingCurveAndGenerator(GroupParams params){
+		//There is no need to check that the params passed are an instance of ECFpGroupParams since this function is only used by SCAPI.
+		ECFpGroupParams fpParams = (ECFpGroupParams)params;
+		// create the ECCurve
+		BigInteger p = fpParams.getP();
+		initFpCurve(getMip(), p.toByteArray(), fpParams.getA().mod(p).toByteArray(), fpParams.getB().toByteArray());
+		// create the generator
+		generator = new ECFpPointMiracl(fpParams.getXg(), fpParams.getYg(), this);
+	}
+	
+	
 	/**
 	 * @return the type of the group - ECFp
 	 */
 	public String getGroupType() {
-		return "elliptic curve over Fp";
+		return util.getGroupType();
 	}
 
 	/**
@@ -117,7 +102,7 @@ public class MiraclDlogECFp extends MiraclAdapterDlogEC implements DlogECFp, DDH
 		}
 
 		long point = ((ECFpPointMiracl) groupElement).getPoint();
-		// call to native inverse function
+		// call the native inverse function
 		long result = invertFpPoint(mip, point);
 		// build a ECFpPointMiracl element from the result value
 		return new ECFpPointMiracl(result, this);
@@ -153,7 +138,7 @@ public class MiraclDlogECFp extends MiraclAdapterDlogEC implements DlogECFp, DDH
 		long point1 = ((ECFpPointMiracl) groupElement1).getPoint();
 		long point2 = ((ECFpPointMiracl) groupElement2).getPoint();
 
-		// call to native multiply function
+		// call the native multiply function
 		long result = multiplyFpPoints(mip, point1, point2);
 		// build a ECFpPointMiracl element from the result value
 		return new ECFpPointMiracl(result, this);
@@ -181,7 +166,7 @@ public class MiraclDlogECFp extends MiraclAdapterDlogEC implements DlogECFp, DDH
 		}
 
 		long point = ((ECFpPointMiracl) base).getPoint();
-		// call to native exponentiate function
+		// call the native exponentiate function
 		long result = exponentiateFpPoint(mip, point, exponent.toByteArray());
 		// build a ECFpPointMiracl element from the result value
 		return new ECFpPointMiracl(result, this);
@@ -219,7 +204,7 @@ public class MiraclDlogECFp extends MiraclAdapterDlogEC implements DlogECFp, DDH
 			exponents[i] = exponentiations[i].toByteArray();
 		}
 
-		// call to native exponentiate function
+		// call the native simultaneousMultiplyFp function
 		long result = simultaneousMultiplyFp(mip, nativePoints, exponents);
 		// build a ECF2mPointMiracl element from the result value
 		return new ECFpPointMiracl(result, this);
@@ -229,8 +214,7 @@ public class MiraclDlogECFp extends MiraclAdapterDlogEC implements DlogECFp, DDH
 	public GroupElement exponentiateWithPreComputedValues
 			(GroupElement groupElement, BigInteger exponent){
 
-		//override of the function exponentiateWithPreComputedValues that uses the same algorithm as the ABS but in native.
-		//Results showed that the naive algorithm is faster so we dicide not to use this algorithm but the naive
+		//Results showed that the naive algorithm is faster so we decided not to use this algorithm but the naive
 
 		// if the GroupElements don't match the DlogGroup, throw exception
 		if (!(groupElement instanceof ECFpPointMiracl)) {
@@ -249,7 +233,7 @@ public class MiraclDlogECFp extends MiraclAdapterDlogEC implements DlogECFp, DDH
 			nativeDlog = createECFpObject(mip, params.getP().toByteArray(), params.getA().mod(params.getP()).toByteArray(), params.getB().toByteArray());
 		}
 		
-		//call to native exponentiate function
+		//call the native exponentiate function
 		long result = exponentiateFpWithPreComputed(mip, nativeDlog, base.getPoint(), exponent.toByteArray(), getWindow(), getOrder().bitLength());
 
 		// build a ECFpPointMiracl element from the result value
@@ -257,7 +241,7 @@ public class MiraclDlogECFp extends MiraclAdapterDlogEC implements DlogECFp, DDH
 	}
 
 	/**
-	 * Create a point in the Fp field with the given parameters
+	 * Creates a point in the Fp field with the given parameters
 	 * 
 	 * @return the created point
 	 */
@@ -278,7 +262,7 @@ public class MiraclDlogECFp extends MiraclAdapterDlogEC implements DlogECFp, DDH
 	}
 
 	/**
-	 * Check if the given element is member of that Dlog group
+	 * Checks if the given element is member of that Dlog group
 	 * @param element - 
 	 * @return true if the given element is member of that group. false, otherwise.
 	 * @throws IllegalArgumentException
@@ -299,10 +283,13 @@ public class MiraclDlogECFp extends MiraclAdapterDlogEC implements DlogECFp, DDH
 		// A point (x, y) is a member of a Dlog group with prime order q over an Elliptic Curve if it meets the following two conditions:
 		// 1)	P = (x,y) is a point in the Elliptic curve, i.e (x,y) is a solution of the curve’s equation.
 		// 2)	P = (x,y) is a point in the q-order group which is a sub-group of the Elliptic Curve.
-		// those two checks is done in two steps:
+		// those two checks are done in two steps:
 		// 1.	Checking that the point is on the curve, performed by checkCurveMembership
 		// 2.	Checking that the point is in the Dlog group,performed by checkSubGroupMembership
 
+		
+		//The actual work is implemented in ECFpUtility since it is independent of the underlying library (BC, Miracl, or other)
+		//If we ever decide to change the implementation there will only be one place to change it.
 		boolean valid = util.checkCurveMembership((ECFpGroupParams) groupParams, point.getX(), point.getY());
 		valid = valid && util.checkSubGroupMembership(this, point);
 		
@@ -314,38 +301,69 @@ public class MiraclDlogECFp extends MiraclAdapterDlogEC implements DlogECFp, DDH
 		return new ECFpPointMiracl(infinity, this);
 	}
 
-	// upload MIRACL library
-	static {
-		System.loadLibrary("MiraclJavaInterface");
-	}
 
 	/**
-	 * Converts a byte array to a ECFpPointMiracl.
+	 * Converts a byte array to an ECFpPointMiracl.
 	 * @param binaryString the byte array to convert
+	 * @throws IndexOutOfBoundsException if the length of the binary array to encode is longer than k
 	 * @return the created group Element
 	 */
-	public GroupElement convertByteArrayToGroupElement(byte[] binaryString) {
-		//currently we don't support this conversion. 
-		//will be implemented in the future.
-		return null;
+	public GroupElement encodeByteArrayToGroupElement(byte[] binaryString) {
+		//The actual work is implemented in ECFpUtility since it is independent of the underlying library (BC, Miracl, or other)
+		//If we ever decide to change the implementation there will only be one place to change it.
+		ECFpUtility.FpPoint fpPoint = util.findPointRepresentedByByteArray((ECFpGroupParams) groupParams, binaryString, k); 
+		ECElement element = generateElement(fpPoint.getX(), fpPoint.getY());
+		return element;
 	}
-
+	
 	/**
 	 * Convert a ECFpPointMiracl to a byte array.
 	 * @param groupElement the element to convert
 	 * @return the created byte array
 	 */
-	public byte[] convertGroupElementToByteArray(GroupElement groupElement) {
+	public byte[] decodeGroupElementToByteArray(GroupElement groupElement) {
 		if (!(groupElement instanceof ECFpPointMiracl)) {
 			throw new IllegalArgumentException("element type doesn't match the group type");
 		}
-		//currently we don't support this conversion. 
-		//will be implemented in the future.
-		return null;
+		ECFpPointMiracl point = (ECFpPointMiracl) groupElement;
+		//The actual work is implemented in ECFpUtility since it is independent of the underlying library (BC, Miracl, or other)
+		//If we ever decide to change the implementation there will only be one place to change it.
+//		return util.getKLeastSignBytes(point.getX(), k);
+		
+		byte[] b1 = util.getKLeastSignBytes(point.getX(), k +1);
+		byte[] b2 = new byte[b1.length -1];
+		System.arraycopy(b1, 1, b2, 0, b2.length);
+		return b2;
+	}
+	
+	/**
+	 * This function maps a group element of this dlog group to a byte array.<p>
+	 * This function does not have an inverse function, that is, it is not possible to re-construct the original group element from the resulting byte array. 
+	 * @return a byte array representation of the given group element
+	 */
+	public byte[] mapAnyGroupElementToByteArray(GroupElement groupElement) {
+		//This function simply returns an array which is the result of concatenating 
+		//the byte array representation of x with the byte array representation of y.
+		if (!(groupElement instanceof ECFpPointMiracl)) {
+			throw new IllegalArgumentException("element type doesn't match the group type");
+		}
+		ECFpPointMiracl point = (ECFpPointMiracl) groupElement;
+		//The actual work is implemented in ECFpUtility since it is independent of the underlying library (BC, Miracl, or other)
+		//If we ever decide to change the implementation there will only be one place to change it.
+		return util.mapAnyGroupElementToByteArray(point.getX(), point.getY());
 	}
 
+	
+	
+	
+	
+	
 	// upload MIRACL library
 	static {
 		System.loadLibrary("MiraclJavaInterface");
 	}
+
+
 }
+
+
