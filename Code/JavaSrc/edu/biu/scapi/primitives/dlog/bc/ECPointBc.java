@@ -62,4 +62,9 @@ public abstract class ECPointBc implements ECElement{
 		
 		return false;
 	}
+
+	@Override
+	public String toString() {
+		return "ECPointBc [point=" + getX()+", " + getY() + "]";
+	}
 }
