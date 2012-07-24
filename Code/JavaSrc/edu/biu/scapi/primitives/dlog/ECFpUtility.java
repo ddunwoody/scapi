@@ -334,4 +334,11 @@ public class ECFpUtility {
 		GroupParams groupParams = new ECFpGroupParams(q, x, y, p, a, b, h);
 		return groupParams;
 	}
+	
+	/**
+	 * @return the type of the group - ECFp
+	 */
+	public String getGroupType(){
+		return "ECFp";
+	}
 }
