@@ -41,7 +41,7 @@ public final class BcHMAC implements Hmac {
 	public BcHMAC() {
 		//creates SHA1 and secure random end than uses the extended constructor
 		try{
-			construct("SHA1", new SecureRandom());
+			construct("SHA-1", new SecureRandom());
 		}
 		catch(FactoriesException e){
 			//No need to do anything here since this exception cannot happen because we provide an BCSha1 class which the class the Factory needs to call.
