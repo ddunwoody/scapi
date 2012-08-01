@@ -1,6 +1,6 @@
 package edu.biu.scapi.midLayer.ciphertext;
 
-public class BasicAsymCiphertext implements Ciphertext {
+public class ByteArrayAsymCiphertext implements AsymmetricCiphertext {
 
 	byte[] data = null;
 	
@@ -9,7 +9,7 @@ public class BasicAsymCiphertext implements Ciphertext {
 	 * The encrypted bytes need to be passed to construct this holder.
 	 * @param data
 	 */
-	public BasicAsymCiphertext(byte[] data) {
+	public ByteArrayAsymCiphertext(byte[] data) {
 		this.data = data;
 	}
 

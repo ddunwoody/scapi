@@ -1,6 +1,3 @@
-/**
- * 
- */
 package edu.biu.scapi.midLayer.ciphertext;
 
 /**
@@ -10,7 +7,7 @@ package edu.biu.scapi.midLayer.ciphertext;
  *  
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  */
-public class BasicSymCiphertext implements SymmetricCiphertext {
+public class ByteArraySymCiphertext implements SymmetricCiphertext {
 
 	byte[] data = null;
 	
@@ -19,7 +16,7 @@ public class BasicSymCiphertext implements SymmetricCiphertext {
 	 * The encrypted bytes need to be passed to construct this holder.
 	 * @param data
 	 */
-	public BasicSymCiphertext(byte[] data) {
+	public ByteArraySymCiphertext(byte[] data) {
 		this.data = data;
 	}
 
