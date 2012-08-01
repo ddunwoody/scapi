@@ -11,13 +11,16 @@ import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.InvalidParameterSpecException;
 import java.security.spec.RSAKeyGenParameterSpec;
 
+import edu.biu.scapi.midLayer.plaintext.ByteArrayPlaintext;
+import edu.biu.scapi.midLayer.plaintext.Plaintext;
+
 /**
  * Abstract class of RSA OAEP encryption scheme. This class has some common functionality of the encryption scheme, such as key generation.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public abstract class RSAOaepAbs implements RSAOaep {
+public abstract class RSAOaepAbs implements RSAOaepEnc {
 
 	protected SecureRandom random;		//Source of randomness.
 	protected boolean isKeySet;
@@ -51,7 +54,42 @@ public abstract class RSAOaepAbs implements RSAOaep {
 		return "RSA/OAEP";
 	}
 
-
+	/**
+	 * RSA OAEP has a limit of the byte array length to generate a plaintext from.
+	 * @return true. 
+	 */
+	public boolean hasMaxByteArrayLengthForPlaintext(){
+		return true;
+	}
+	
+	/**
+	 * Generates a Plaintext suitable to ElGamal encryption scheme from the given message.
+	 * @param msg byte array to convert to a Plaintext object.
+	 * @throws IllegalArgumentException if the given message's length is greater than the maximum. 
+	 */
+	public Plaintext generatePlaintext(byte[] text){
+		if (text.length > getMaxLengthOfByteArrayForPlaintext()){
+			throw new IllegalArgumentException("the given text is too big for plaintext");
+		}
+		
+		return new ByteArrayPlaintext(text);
+	}
+	
+	/**
+	 * Generates a byte array from the given plaintext. 
+	 * This function should be used when the user does not know the specific type of the Asymmetric encryption he has, 
+	 * and therefore he is working on byte array.
+	 * @param plaintext to generates byte array from. MUST be an instance of ByteArrayPlaintext.
+	 * @return the byte array generated from the given plaintext.
+	 * @throws IllegalArgumentException if the given plaintext is not an instance of ByteArrayPlaintext.
+	 */
+	public byte[] generateBytesFromPlaintext(Plaintext plaintext){
+		if (!(plaintext instanceof ByteArrayPlaintext)){
+			throw new IllegalArgumentException("plaintext should be an instance of ByteArrayPlaintext");
+		}
+		
+		return ((ByteArrayPlaintext) plaintext).getText();
+	}
 
 	/**
 	 * This function is not supported. 
