@@ -12,42 +12,23 @@ import javax.crypto.SecretKey;
 public interface KeyDerivationFunction {
 	
 	/** 
-	 * Generates a new secret key from the given seed and IV.
-	 * @param seedForGeneration the secret key that is the seed for the key generation
-	 * @param len the required output key length
-	 * @param iv info for the key generation
-	 * @return secret key the generated key
-	 */
-	public SecretKey generateKey(SecretKey seedForGeneration, int outLen,  byte[] iv) ;
-	
-	/** 
 	 * Generates a new secret key from the given seed.
-	 * @param seedForGeneration the secret key that is the seed for the key generation
-	 * @param len the required output key length
-	 * @return secret key the generated key
-	 */
-	public SecretKey generateKey(SecretKey seedForGeneration, int outLen) ;
-	
-	/** 
-	 * Generates a new secret key from the given seed.
-	 * @param seedForGeneration the secret key that is the seed for the key generation
-	 * @param inOff the offset within the seedForGeneration to take the bytes from
+	 * @param entropySource the secret key that is the seed for the key generation
+	 * @param inOff the offset within the entropySource to take the bytes from
 	 * @param inLen the length of the seed
-	 * @param outKey the array to put the generated key bytes
-	 * @param outoff the offset within the output array to put the generated key bytes from
-	 * @param outlen the required output key length
+	 * @param outLen the required output key length
+	 * @return SecretKey the derivated key.
 	 */
-	public void generateKey(byte[] seedForGeneration, int inOff, int inLen, byte[] outKey, int outOff, int outLen) ;
+	public SecretKey derivateKey(byte[] entropySource, int inOff, int inLen, int outLen);
 	
 	/** 
 	 * Generates a new secret key from the given seed and iv.
-	 * @param seedForGeneration the secret key that is the seed for the key generation
-	 * @param inOff the offset within the seedForGeneration to take the bytes from
+	 * @param entropySource the secret key that is the seed for the key generation
+	 * @param inOff the offset within the entropySource to take the bytes from
 	 * @param inLen the length of the seed
-	 * @param outKey the array to put the generated key bytes
-	 * @param outoff the offset within the output array to put the generated key bytes from
-	 * @param outlen the required output key length
+	 * @param outLen the required output key length
 	 * @param iv info for the key generation
+	 * @return SecretKey the derivated key.
 	 */
-	public void generateKey(byte[] seedForGeneration, int inOff, int inLen, byte[] outKey, int outOff, int outLen, byte[] iv) ;
+	public SecretKey derivateKey(byte[] entropySource, int inOff, int inLen, int outLen, byte[] iv);
 }
