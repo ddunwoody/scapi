@@ -44,52 +44,31 @@ public class BcKdfISO18033 implements KeyDerivationFunction {
 		//creates a digest of the given hash type through the factory and passes it to the KDF
 		bcKdfGenerator = new KDF1BytesGenerator(BCFactory.getInstance().getDigest(hash.getAlgorithmName()));
 	}
-	
-	public SecretKey generateKey(SecretKey seedForGeneration, int len){
+
+	public SecretKey derivateKey(byte[] entropySource, int inOff, int inLen, int outLen){
 		//calls the generateKey with iv=null
-		return generateKey(seedForGeneration, len, null);
-	}
-
-	public SecretKey generateKey(SecretKey seedForGeneration, int outLen, byte[] iv){
-		
-		byte[] generatedKey = new byte[outLen];//generated key bytes
-		
-		//generates the related derivation parameter for bc with the seed and iv
-		bcKdfGenerator.init(generateParameters(seedForGeneration.getEncoded(), iv));
-		
-		//generates the actual key bytes
-		bcKdfGenerator.generateBytes(generatedKey, 0, outLen);
-		
-		//converts to secret key
-		return new SecretKeySpec(generatedKey, "KDF");
-	}
-
-
-	public void generateKey(byte[] seedForGeneration, int inOff, int inLen, byte[] outKey,
-			 int outOff,int outLen){
-		//calls the generateKey with iv=null
-		generateKey(seedForGeneration, inOff, inLen, outKey, outOff, outLen, null);
+		return derivateKey(entropySource, inOff, inLen, outLen, null);
 		
 	}
 	
-	public void generateKey(byte[] seedForGeneration, int inOff, int inLen, byte[] outKey,
-			 int outOff,int outLen, byte[] iv){
+	public SecretKey derivateKey(byte[] entropySource, int inOff, int inLen, int outLen, byte[] iv){
 		
 		//checks that the offset and length are correct
-		if ((inOff > seedForGeneration.length) || (inOff+inLen > seedForGeneration.length)){
+		if ((inOff > entropySource.length) || (inOff+inLen > entropySource.length)){
 			throw new ArrayIndexOutOfBoundsException("wrong offset for the given input buffer");
 		}
-		if ((outOff > outKey.length) || (outOff+outLen > outKey.length)){
-			throw new ArrayIndexOutOfBoundsException("wrong offset for the given output buffer");
-		}
-		
+	
 		//generates the related derivation parameter for bc with the seed and iv
-		bcKdfGenerator.init(generateParameters(seedForGeneration,iv));
+		bcKdfGenerator.init(generateParameters(entropySource,iv));
 		
+		byte[] derivatedKey = new byte[outLen];
 		//generates the actual key bytes and puts it in the output array
-		bcKdfGenerator.generateBytes(outKey, outOff, outLen);
+		bcKdfGenerator.generateBytes(derivatedKey, 0, outLen);
+		
+		return new SecretKeySpec(derivatedKey, "KDF");
 		
 	}
+		
 	
 	/**
 	 * Generates the bc related parameters of type DerivationParameters
