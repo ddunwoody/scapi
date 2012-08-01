@@ -14,12 +14,13 @@ import java.util.Vector;
 
 import org.bouncycastle.util.BigIntegers;
 
+import edu.biu.scapi.exceptions.NoMaxException;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.DamgardJurikPrivateKey;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.DamgardJurikPublicKey;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScDamgardJurikPrivateKey;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScDamgardJurikPublicKey;
-import edu.biu.scapi.midLayer.ciphertext.Ciphertext;
-import edu.biu.scapi.midLayer.ciphertext.DJCiphertext;
+import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertext;
+import edu.biu.scapi.midLayer.ciphertext.BigIntegerCiphertext;
 import edu.biu.scapi.midLayer.plaintext.BigIntegerPlainText;
 import edu.biu.scapi.midLayer.plaintext.Plaintext;
 import edu.biu.scapi.primitives.trapdoorPermutation.RSAModulus;
@@ -133,6 +134,30 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 		
 		return "DamgardJurik";
 	}
+	
+	/**
+	 * DamgardJurik encryption scheme has no limit of the byte array length to generate a plaintext from.
+	 * @return false. 
+	 */
+	public boolean hasMaxByteArrayLengthForPlaintext(){
+		return false;
+	}
+	
+	/**
+	 * DamgardJurik encryption can get any plaintext length.
+	 * @throws NoMaxException 
+	 */
+	public int getMaxLengthOfByteArrayForPlaintext() throws NoMaxException{
+		throw new NoMaxException("DamgardJurik encryption can get any plaintext length");
+	}
+	
+	/**
+	 * Generates a Plaintext suitable to DamgardJurik encryption scheme from the given message.
+	 * @param msg byte array to convert to a Plaintext object.
+	 */
+	public Plaintext generatePlaintext(byte[] msg){
+		return new BigIntegerPlainText(new BigInteger(msg));
+	}
 
 	/**
 	 * Generate an DamgardJurik key pair using the given parameters.
@@ -180,7 +205,7 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 	 * 		1. If the given plaintext is not instance of BigIntegerPlainText.
 	 * 		2. If the BigInteger value in the given plaintext is not in ZN.
 	 */
-	public Ciphertext encrypt(Plaintext plainText) {
+	public AsymmetricCiphertext encrypt(Plaintext plainText) {
 		/*
 		 * We use the notation N=n^s, and N’ = n^(s+1).
 		 * Pseudo-Code:
@@ -222,7 +247,7 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 		BigInteger c = (mult1.multiply(mult2)).mod(Ntag);
 
 		//Wraps the BigInteger c with DJCiphertext and returns it.
-		return new DJCiphertext(c);
+		return new BigIntegerCiphertext(c);
 	}
 
 	/**
@@ -232,7 +257,7 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 	 * @throws IllegalArgumentException if cipher is not an instance of DJCiphertext.
 	 */
 	@Override
-	public Plaintext decrypt(Ciphertext cipher) throws KeyException{
+	public Plaintext decrypt(AsymmetricCiphertext cipher) throws KeyException{
 		/*
 		 * We use the notation N=n^s, and N’ = n^(s+1).
 		 * Pseudo-Code:
@@ -263,11 +288,11 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 			throw new KeyException("in order to decrypt a message, this object must be initialized with private key");
 		}
 		//Ciphertext should be Damgard-Jurik ciphertext.
-		if (!(cipher instanceof DJCiphertext)){
+		if (!(cipher instanceof BigIntegerCiphertext)){
 			throw new IllegalArgumentException("cipher should be instance of DJCiphertext");
 		}
 		
-		DJCiphertext djCipher = (DJCiphertext) cipher;
+		BigIntegerCiphertext djCipher = (BigIntegerCiphertext) cipher;
 		//n is the modulus in the public key.
 		//Calculates s = (|cipher| -1) / |n|
 		int s = ((djCipher).getCipher().bitLength() - 1) / publicKey.getModulus().bitLength();
@@ -315,7 +340,22 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 		return new BigIntegerPlainText(x);
 	}
 
-
+	/**
+	 * Generates a byte array from the given plaintext. 
+	 * This function should be used when the user does not know the specific type of the Asymmetric encryption he has, 
+	 * and therefore he is working on byte array.
+	 * @param plaintext to generates byte array from. MUST be an instance of BigIntegerPlainText.
+	 * @return the byte array generated from the given plaintext.
+	 * @throws IllegalArgumentException if the given plaintext is not an instance of BigIntegerPlainText.
+	 */
+	public byte[] generateBytesFromPlaintext(Plaintext plaintext){
+		if (!(plaintext instanceof BigIntegerPlainText)){
+			throw new IllegalArgumentException("the given plaintext should be an instance of BigIntegerPlainText");
+		}
+		
+		return ((BigIntegerPlainText) plaintext).getX().toByteArray();
+	}
+	
 	/**
 	 * This function takes an encryption of some plaintext (let's call it originalPlaintext) and returns a cipher that "looks" different but
 	 * it is also an encryption of originalPlaintext.<p>
@@ -326,18 +366,18 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 	 * 		2. If the BigInteger number in the given cipher is not in ZN'.
 	 */
 	@Override
-	public Ciphertext reRandomize(Ciphertext cipher) {
+	public AsymmetricCiphertext reRandomize(AsymmetricCiphertext cipher) {
 		// If there is no public key can not operate the function, throws exception.
 		if (!isKeySet()){
 			throw new IllegalStateException("in order to encrypt a message this object must be initialized with public key");
 		}
 		
 		//Ciphertext should be Damgard-Jurik ciphertext.
-		if (!(cipher instanceof DJCiphertext)){
+		if (!(cipher instanceof BigIntegerCiphertext)){
 			throw new IllegalArgumentException("cipher should be instance of DJCiphertext");
 		}
 		
-		DJCiphertext djCipher = (DJCiphertext) cipher;
+		BigIntegerCiphertext djCipher = (BigIntegerCiphertext) cipher;
 		//n is the modulus in the public key.
 		//Calculates s = (|cipher| -1) / |n|.
 		int s = ((djCipher).getCipher().bitLength() - 1) / publicKey.getModulus().bitLength();
@@ -357,7 +397,7 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 		BigInteger r = BigIntegers.createRandomInRange(BigInteger.ONE, NtagMinus1, random);
 		BigInteger c = djCipher.getCipher().multiply(r.modPow(N, Ntag));
 		
-		return new DJCiphertext(c);
+		return new BigIntegerCiphertext(c);
 	}
 
 	/**
@@ -370,23 +410,26 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 	 * 		3. If one or more of the BigInteger numbers in the given ciphertexts is not in ZN'.
 	 */
 	@Override
-	public Ciphertext add(Ciphertext cipher1, Ciphertext cipher2) {
+	public AsymmetricCiphertext add(AsymmetricCiphertext cipher1, AsymmetricCiphertext cipher2) {
 		// If there is no public key can not operate the function, throws exception.
 		if (!isKeySet()){
 			throw new IllegalStateException("in order to encrypt a message this object must be initialized with public key");
 		}
 		
 		//Ciphertexts should be Damgard-Jurik ciphertexts.
-		if (!(cipher1 instanceof DJCiphertext) || !(cipher1 instanceof DJCiphertext)){
+		if (!(cipher1 instanceof BigIntegerCiphertext) || !(cipher1 instanceof BigIntegerCiphertext)){
 			throw new IllegalArgumentException("cipher should be instance of DJCiphertext");
 		}
-		DJCiphertext djCipher1 = (DJCiphertext) cipher1;
-		DJCiphertext djCipher2 = (DJCiphertext) cipher2;
+		BigIntegerCiphertext djCipher1 = (BigIntegerCiphertext) cipher1;
+		BigIntegerCiphertext djCipher2 = (BigIntegerCiphertext) cipher2;
+		
+		BigInteger c1 = djCipher1.getCipher();
+		BigInteger c2 = djCipher2.getCipher();
 		
 		//n is the modulus in the public key.
 		//Calculates s = (|cipher| -1) / |n|.
-		int s1 = ((djCipher1).getCipher().bitLength() - 1) / publicKey.getModulus().bitLength();
-		int s2 = ((djCipher2).getCipher().bitLength() - 1) / publicKey.getModulus().bitLength();
+		int s1 = (c1.bitLength() - 1) / publicKey.getModulus().bitLength();
+		int s2 = (c2.bitLength() - 1) / publicKey.getModulus().bitLength();
 		if(s1 != s2){
 			throw new IllegalArgumentException("Sizes of ciphertexts do not match");
 		}
@@ -397,13 +440,11 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 		BigInteger Ntag = n.pow(s1+1);
 		
 		//Checks that cipher1 and cipher2 belong to ZN'
-		if(djCipher1.getCipher().compareTo(BigInteger.ZERO) < 0 || djCipher1.getCipher().compareTo(Ntag) >= 0)
+		if(c1.compareTo(BigInteger.ZERO) < 0 || c1.compareTo(Ntag) >= 0)
 			throw new IllegalArgumentException("cipher1 is not in ZN'");
-		if(djCipher2.getCipher().compareTo(BigInteger.ZERO) < 0 || djCipher2.getCipher().compareTo(Ntag) >= 0)
+		if(c2.compareTo(BigInteger.ZERO) < 0 || c2.compareTo(Ntag) >= 0)
 			throw new IllegalArgumentException("cipher2 is not in ZN'");
 		
-		BigInteger c1 = djCipher1.getCipher();
-		BigInteger c2 = djCipher2.getCipher();
 		BigInteger c = c1.multiply(c2).mod(Ntag);
 		
 		BigInteger NtagMinus1 = Ntag.subtract(BigInteger.ONE);
@@ -412,7 +453,7 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 		BigInteger r = BigIntegers.createRandomInRange(BigInteger.ONE, NtagMinus1, random);
 		c = c.multiply(r.modPow(N, Ntag));
 		
-		return new DJCiphertext(c);
+		return new BigIntegerCiphertext(c);
 	}
 
 	/**
@@ -427,18 +468,18 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 	 * 		3. If the constant number is not in ZN.
 	 */
 	@Override
-	public Ciphertext multByConst(Ciphertext cipher, BigInteger constNumber) {
+	public AsymmetricCiphertext multByConst(AsymmetricCiphertext cipher, BigInteger constNumber) {
 		// If there is no public key can not operate the function, throws exception.
 		if (!isKeySet()){
 			throw new IllegalStateException("in order to encrypt a message this object must be initialized with public key");
 		}
 		
 		//Ciphertext should be Damgard-Jurik ciphertext.
-		if (!(cipher instanceof DJCiphertext)){
+		if (!(cipher instanceof BigIntegerCiphertext)){
 			throw new IllegalArgumentException("cipher should be instance of DJCiphertext");
 		}
 		
-		DJCiphertext djCipher = (DJCiphertext) cipher;
+		BigIntegerCiphertext djCipher = (BigIntegerCiphertext) cipher;
 		//n is the modulus in the public key.
 		//Calculates s = (|cipher| -1) / |n|.
 		int s = ((djCipher).getCipher().bitLength() - 1) / publicKey.getModulus().bitLength();
@@ -464,7 +505,7 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 		BigInteger r = BigIntegers.createRandomInRange(BigInteger.ONE, NtagMinus1, random);
 		c = c.multiply(r.modPow(N, Ntag));
 		
-		return new DJCiphertext(c);
+		return new BigIntegerCiphertext(c);
 	}
 	
 	/**
