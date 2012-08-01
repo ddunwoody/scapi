@@ -2,6 +2,7 @@ package edu.biu.scapi.midLayer.asymmetricCrypto.encryption;
 
 import java.security.InvalidKeyException;
 import java.security.KeyException;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
@@ -14,8 +15,8 @@ import org.bouncycastle.crypto.encodings.OAEPEncoding;
 import org.bouncycastle.crypto.engines.RSABlindedEngine;
 
 import edu.biu.scapi.exceptions.ScapiRuntimeException;
-import edu.biu.scapi.midLayer.ciphertext.BasicAsymCiphertext;
-import edu.biu.scapi.midLayer.ciphertext.Ciphertext;
+import edu.biu.scapi.midLayer.ciphertext.ByteArrayAsymCiphertext;
+import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertext;
 import edu.biu.scapi.midLayer.plaintext.ByteArrayPlaintext;
 import edu.biu.scapi.midLayer.plaintext.Plaintext;
 import edu.biu.scapi.tools.Translation.BCParametersTranslator;
@@ -53,6 +54,17 @@ public class BcRSAOaep extends RSAOaepAbs {
 		this.bcBlockCipher = new OAEPEncoding(new RSABlindedEngine());
 
 	}
+	
+	/**
+	 * Constructor that lets the user choose the random number generator algorithm.
+	 * @param randNumGenAlg random number generator algorithm.
+	 * @throws NoSuchAlgorithmException 
+	 */
+	public BcRSAOaep(String randNumGenAlg) throws NoSuchAlgorithmException{
+		this(SecureRandom.getInstance(randNumGenAlg));
+
+	}
+	
 	/**
 	 * Sets this RSAOAEP encryption scheme with a (Public,Private) key pair.
 	 * In this case the user can encrypt and decrypt messages.
@@ -93,8 +105,7 @@ public class BcRSAOaep extends RSAOaepAbs {
 	}
 	
 	/**
-	 * Creates BC OAEPEncoding with BC RSABlindedEngine, translates the keys and random to BC CipherParameters
-	 * and initializes BC object in encrypt mode.
+	 * Translates the keys and random to BC CipherParameters and initializes BC object in encrypt mode.
 	 * In order to decrypt, the decrypt function initializes them again to decrypt mode.
 	 * @param privateKey 
 	 * @param publicKey 
@@ -110,6 +121,14 @@ public class BcRSAOaep extends RSAOaepAbs {
 		bcBlockCipher.init(forEncryption, publicParameters);
 	}
 	
+	/**
+	 * Returns the maximum size of the byte array that can be passed to generatePlaintext function. 
+	 * This is the maximum size of a byte array that can be converted to a Plaintext object suitable to this encryption scheme.
+	 * @return the maximum size of the byte array that can be passed to generatePlaintext function. 
+	 */
+	public int getMaxLengthOfByteArrayForPlaintext(){
+		return bcBlockCipher.getInputBlockSize();
+	}
 	
 	/**
 	 * Encrypts the given plaintext according to the RSAOAEP algorithm using BC OAEPEncoding.
@@ -120,7 +139,7 @@ public class BcRSAOaep extends RSAOaepAbs {
 	 * @throws ScapiRuntimeException if the exception InvalidCipherTextException of BC is thrown. This exception is thrown when there is something unexpected in a message.
 	 */
 	@Override
-	public Ciphertext encrypt(Plaintext plaintext){	
+	public AsymmetricCiphertext encrypt(Plaintext plaintext){	
 		//If there is no public key can not encrypt, throws exception.
 		if (!isKeySet()){
 			throw new IllegalStateException("in order to encrypt a message this object must be initialized with public key");
@@ -146,7 +165,7 @@ public class BcRSAOaep extends RSAOaepAbs {
 		}
 
 		//Returns a ciphertext with the encrypted plaintext.
-		return new BasicAsymCiphertext(ciphertext);
+		return new ByteArrayAsymCiphertext(ciphertext);
 	}
 
 	/**
@@ -158,13 +177,13 @@ public class BcRSAOaep extends RSAOaepAbs {
 	 * @throws ScapiRuntimeException if the exception InvalidCipherTextException of BC is thrown. This exception is thrown when there is something unexpected in a message.
 	 */
 	@Override
-	public Plaintext decrypt(Ciphertext cipher) throws KeyException{
+	public Plaintext decrypt(AsymmetricCiphertext cipher) throws KeyException{
 		//If there is no private key can not decrypt, throws exception.
 		if (privateParameters == null){
 			throw new KeyException("in order to decrypt a message, this object must be initialized with private key");
 		}
 		//Cipher must be of type BasicAsymCiphertext.
-		if (!(cipher instanceof BasicAsymCiphertext)){
+		if (!(cipher instanceof ByteArrayAsymCiphertext)){
 			throw new IllegalArgumentException("The ciphertext has to be of type BasicAsymCiphertext");
 		}
 		//If the underlying BC object used to the decryption is in encrypt mode - changes it.
@@ -173,7 +192,7 @@ public class BcRSAOaep extends RSAOaepAbs {
 			bcBlockCipher.init(forEncryption, privateParameters);
 		}
 		
-		byte[] ciphertext = ((BasicAsymCiphertext) cipher).getBytes();
+		byte[] ciphertext = ((ByteArrayAsymCiphertext) cipher).getBytes();
 
 		byte[] plaintext;
 		try {
