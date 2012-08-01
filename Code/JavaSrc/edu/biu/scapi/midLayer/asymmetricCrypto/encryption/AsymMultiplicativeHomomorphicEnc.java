@@ -1,6 +1,6 @@
 package edu.biu.scapi.midLayer.asymmetricCrypto.encryption;
 
-import edu.biu.scapi.midLayer.ciphertext.Ciphertext;
+import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertext;
 
 /**
  * Interface for asymmetric multiplicative homomorphic encryption.
@@ -19,5 +19,5 @@ public interface AsymMultiplicativeHomomorphicEnc extends AsymmetricEnc{
 	 * @throws IllegalStateException if no public key was set.
 	 * @throws IllegalArgumentException if the given ciphertexts do not match this asymmetric encryption.
 	 */
-	public Ciphertext multiply(Ciphertext cipher1, Ciphertext cipher2);
+	public AsymmetricCiphertext multiply(AsymmetricCiphertext cipher1, AsymmetricCiphertext cipher2);
 }

@@ -2,7 +2,7 @@ package edu.biu.scapi.midLayer.asymmetricCrypto.encryption;
 
 import java.math.BigInteger;
 
-import edu.biu.scapi.midLayer.ciphertext.Ciphertext;
+import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertext;
 
 /**
  * General interface for asymmetric additive homomorphic encryption.
@@ -20,7 +20,7 @@ public interface AsymAdditiveHomomorphicEnc extends AsymmetricEnc {
 	 * @throws IllegalStateException if no public key was set.
 	 * @throws IllegalArgumentException if the given ciphertexts do not match this asymmetric encryption.
 	 */
-	public Ciphertext add(Ciphertext cipher1, Ciphertext cipher2);
+	public AsymmetricCiphertext add(AsymmetricCiphertext cipher1, AsymmetricCiphertext cipher2);
 	
 	/**
 	 * Receives a cipher and a constant number and returns their multiplication.
@@ -30,5 +30,5 @@ public interface AsymAdditiveHomomorphicEnc extends AsymmetricEnc {
 	 * @throws IllegalStateException if no public key was set.
 	 * @throws IllegalArgumentException if the given ciphertext does not match this asymmetric encryption.
 	 */
-	public Ciphertext multByConst(Ciphertext cipher, BigInteger constNumber);
+	public AsymmetricCiphertext multByConst(AsymmetricCiphertext cipher, BigInteger constNumber);
 }
