@@ -1,6 +1,3 @@
-/**
- * 
- */
 package edu.biu.scapi.midLayer.symmetricCrypto.encryption;
 
 import edu.biu.scapi.securityLevel.Cpa;
