@@ -7,6 +7,6 @@ package edu.biu.scapi.midLayer.asymmetricCrypto.encryption;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public interface ElGamalEnc extends AsymMultiplicativeHomomorphicEnc{
+public interface ElGamalEnc extends AsymmetricEnc{
 
 }
