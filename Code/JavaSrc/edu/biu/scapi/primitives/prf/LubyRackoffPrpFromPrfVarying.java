@@ -3,6 +3,7 @@ package edu.biu.scapi.primitives.prf;
 import javax.crypto.IllegalBlockSizeException;
 
 import edu.biu.scapi.exceptions.FactoriesException;
+import edu.biu.scapi.exceptions.NoMaxException;
 import edu.biu.scapi.tools.Factories.PrfFactory;
 
 /** 
@@ -245,10 +246,10 @@ public final class LubyRackoffPrpFromPrfVarying extends PrpFromPrfVarying {
 
 	/**
 	 * This object has varying input/output lengths, so this function shouldn't be called.
-	 * @throws UnsupportedOperationException
+	 * @throws NoMaxException
 	 */
-	public int getBlockSize() {
-		throw new UnsupportedOperationException("prp varying has no fixed block size");
+	public int getBlockSize() throws NoMaxException {
+		throw new NoMaxException("prp varying has no fixed block size");
 	}
 
 

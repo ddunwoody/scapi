@@ -5,6 +5,7 @@ import java.util.logging.Level;
 import javax.crypto.IllegalBlockSizeException;
 
 import edu.biu.scapi.exceptions.FactoriesException;
+import edu.biu.scapi.exceptions.NoMaxException;
 import edu.biu.scapi.generals.Logging;
 import edu.biu.scapi.primitives.prf.bc.BcHMAC;
 import edu.biu.scapi.tools.Factories.PrfFactory;
@@ -54,11 +55,11 @@ public class IteratedPrfVarying extends PrfVaryingFromPrfVaryingInput {
 
 	/** 
 	 * Not relevant - the input and the output do not have a fixed size.
-	 * @throws UnsupportedOperationException
+	 * @throws NoMaxException
 	 */
-	public int getBlockSize() {
+	public int getBlockSize() throws NoMaxException {
 		
-		throw new UnsupportedOperationException("prp varying has no fixed block size");
+		throw new NoMaxException("prp varying has no fixed block size");
 	}
 
 
