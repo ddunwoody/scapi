@@ -1,15 +1,15 @@
 package edu.biu.scapi.midLayer.symmetricCrypto.encryption;
 
-
-import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 
 import javax.crypto.IllegalBlockSizeException;
 
 import edu.biu.scapi.exceptions.FactoriesException;
-import edu.biu.scapi.midLayer.ciphertext.BasicSymCiphertext;
-import edu.biu.scapi.midLayer.ciphertext.Ciphertext;
+import edu.biu.scapi.midLayer.ciphertext.ByteArraySymCiphertext;
 import edu.biu.scapi.midLayer.ciphertext.IVCiphertext;
-import edu.biu.scapi.midLayer.plaintext.BasicPlaintext;
+import edu.biu.scapi.midLayer.ciphertext.SymmetricCiphertext;
+import edu.biu.scapi.midLayer.plaintext.ByteArrayPlaintext;
 import edu.biu.scapi.midLayer.plaintext.Plaintext;
 import edu.biu.scapi.primitives.prf.PseudorandomPermutation;
 
@@ -22,51 +22,86 @@ import edu.biu.scapi.primitives.prf.PseudorandomPermutation;
 public class ScCTREncRandomIV extends EncWithIVAbs implements CTREnc {
 
 	/**
+	 * Default constructor. Uses default implementation of prp and SecureRandom.
+	 */
+	public ScCTREncRandomIV(){
+		//Calls the corresponding constructor in the super class.
+		super();
+	}
+	
+	/**
 	 * By passing a specific Pseudorandom permutation we are setting the type of encryption scheme.<p>
 	 * This constructor gets the name of a Pseudorandom permutation and is responsible for creating a corresponding instance.<p>
-	 * The init function must be called subsequently in order to work properly with this encryption object.
-	 * @param prp the name of a specific Pseudorandom permutation, for example "AES".
+	 * @param prpName the name of a specific Pseudorandom permutation, for example "AES".
 	 */
 	public ScCTREncRandomIV(String prpName) throws FactoriesException {
+		//Calls the corresponding constructor in the super class.
 		super(prpName);
+	}
+	
+	/**
+	 * By passing a specific Pseudorandom permutation we are setting the type of encryption scheme.<p>
+	 * This constructor gets the name of a Pseudorandom permutation and is responsible for creating a corresponding instance.<p>
+	 * It also gets the name of a Random Number Generator Algorithm to use to generate the source of randomness
+	 * @param prpName the name of a specific Pseudorandom permutation, for example "AES".
+	 * @param randNumGenAlg  the name of the RNG algorithm, for example "SHA1PRNG".
+	 * @throws FactoriesException if the given prpName is not a valid prp name.
+	 * @throws NoSuchAlgorithmException if the given randNumGenAlg is not a valid random number generator algorithm.
+	 */
+	public ScCTREncRandomIV(String prpName, String randNumGenAlg) throws FactoriesException, NoSuchAlgorithmException {
+		//Calls the corresponding constructor in the super class.
+		super(prpName, randNumGenAlg);
 	}
 
 	/**
 	 * The Pseudorandom Permutation passed to the constructor of this class determines the type of encryption that will be performed.
 	 * For ex: if the PRP is TripleDes, the after constructing this object we hole a CTR-TripleDes encryption scheme.
-	 * @param prp
+	 * @param prp the specific Pseudorandom permutation.
 	 */
 	public ScCTREncRandomIV(PseudorandomPermutation prp){
+		//Calls the corresponding constructor in the super class.
 		super(prp);
+	}
+	
+	/**
+	 * By passing a specific Pseudorandom permutation we are setting the type of encryption scheme.<p>
+	 * Random object sets the source of randomness.
+	 * @param prp the specific Pseudorandom permutation.
+	 * @param random SecureRandom object to set the random member
+	 */
+	public ScCTREncRandomIV(PseudorandomPermutation prp, SecureRandom random) {
+		//Calls the corresponding constructor in the super class.
+		super(prp, random);
 	}
 	
 	/** This function returns a string that is the result of concatenating "CTRwith" with the name of the underlying PRP. 
 	 *  For example: "CTRwithAES"
-	 * @see edu.biu.scapi.midLayer.symmetricCrypto.encryption.SymmetricEnc#getAlgorithmName()
 	 */
 	@Override
 	public String getAlgorithmName() {
 		return "CTRwith" + prp.getAlgorithmName();
 	}
 
-	/**This function performs the decryption of a ciphertext returning the corresponding decrypted plaintext.
-	 * It requires the ciphertext to be of type IVCiphertext, if not, an IllegalArgumentException is thrown.<p>
+	/**
+	 * This function performs the decryption of a ciphertext returning the corresponding decrypted plaintext.
 	 * It assumes that the IV passed as part of the IVCiphertext is also the one that was used to encrypt the corresponding plaintext.
-	 * Pseudo-code:
-	 *    •	ctr = ciphertext.getIV
-	 *	  •	For every block in ciphertext (i = 0 to n-1) do:
-	 *		o	Plaintext[i] : = ciphertext[i] XOR prp.computeBlock(ctr)
-	 *		o	ctr  = ctr + 1 mod 2n
-	 *	  •	Return the plaintext.
-	 *
-	 * @see edu.biu.scapi.midLayer.symmetricCrypto.encryption.SymmetricEnc#decrypt(edu.biu.scapi.midLayer.ciphertext.Ciphertext)
-	 * 
-	 * @param ciphertext The Ciphertext to decrypt
-	 * @return the decrypted plaintext
-	 * @throws IllegalArgumentException if the argument ciphertext is not specifically of type IVCiphertext
+	 * @param ciphertext The Ciphertext to decrypt. Must be of type IVCiphertext.
+	 * @return the decrypted plaintext.
+	 * @throws IllegalArgumentException if the argument ciphertext is not specifically of type IVCiphertext.
+	 * @throws IllegalStateException if no secret key was set.
 	 */
 	@Override
-	public Plaintext decrypt(Ciphertext ciphertext){
+	public Plaintext decrypt(SymmetricCiphertext ciphertext){
+		/* Pseudo-code:
+		 *    •	ctr = ciphertext.getIV
+		 *	  •	For every block in ciphertext (i = 0 to n-1) do:
+		 *		o	Plaintext[i] : = ciphertext[i] XOR prp.computeBlock(ctr)
+		 *		o	ctr  = ctr + 1 mod 2n
+		 *	  •	Return the plaintext.
+		 */
+		if (!isKeySet()){
+			throw new IllegalStateException("no SecretKey was set");
+		}
 		if (! (ciphertext instanceof IVCiphertext))
 			throw new IllegalArgumentException("The ciphertext has to be of type IVCiphertext");
 
@@ -75,25 +110,20 @@ public class ScCTREncRandomIV extends EncWithIVAbs implements CTREnc {
 		
 		int cipherLengthInBytes = ivCipher.getLength();
 		
-		//Prepare a buffer where to store the plaintext. It has to be of the same length as the cipher.
+		//Prepares a buffer where to store the plaintext. It has to be of the same length as the cipher.
 		byte[] plaintext = new byte[cipherLengthInBytes];
 
-		//Calculate the number of blocks in the cipher, so that we can loop over them.
+		//Calculates the number of blocks in the cipher, so that we can loop over them.
 		int numOfBlocksInCipher = cipherLengthInBytes / prp.getBlockSize();
 
 		int cipherOffset = 0;
 		int plaintextOffset = 0;
 		int blockSize = prp.getBlockSize();
-		//View the IV passed as the counter.
+		//Views the IV passed as the counter.
 		byte[] ctr = ivCipher.getIv();
 		
-		System.out.println("In decrypt, the iv = " + new BigInteger(ctr));
-		for(int i = 0; i < 16; i++){
-			System.out.print(ctr[i] + " ");
-		}
-		
 		//First, process all full blocks. 
-		//If the length of the input is not a multiple of block size, we will take care of the last part of it not here, but in the next step
+		//If the length of the input is not a multiple of block size, we will take care of the last part of it not here, but in the next step.
 		boolean isFullBlock = true;
 		for(int i = 0; i < numOfBlocksInCipher; i++){
 			ctr = processBlock(ivCipher.getBytes(), cipherOffset, ctr, plaintext, plaintextOffset, isFullBlock);
@@ -110,42 +140,37 @@ public class ScCTREncRandomIV extends EncWithIVAbs implements CTREnc {
 			ctr = processBlock(ivCipher.getBytes(), cipherOffset, ctr, plaintext, plaintextOffset, isFullBlock);
 		}
 
-		return new BasicPlaintext(plaintext);
+		return new ByteArrayPlaintext(plaintext);
 	}
 
-	/**This function performs the encryption of a plaintext returning the corresponding encrypted ciphertext.
+	/**
+	 * This function performs the encryption of a plaintext returning the corresponding encrypted ciphertext.
 	 * It works on plaintexts of any length.<p>
 	 * It returns an object of type IVCiphertext which contains the IV used for encryption and the actual encrypted data. 
-	 * Pseudo-code:
-	 * 		•	ctr = iv
-	 *		•	For each block in plaintext do: //i = 0
-	 *			o	cipher[i] = prp.computeBlock(ctr) XOR plaintext[i]
-	 *			o	ctr = ctr +1 mod 2n
-	 *
-	 * @see edu.biu.scapi.midLayer.symmetricCrypto.encryption.EncWithIVAbs#encAlg(byte[], byte[])
-	 * 
 	 * @param plaintext a byte array containing the bytes to encrypt
-	 * @param iv 		a byte array containing a (random) IV used by CTR- mode to encrypt.
+	 * @param iv a byte array containing a (random) IV used by CTR- mode to encrypt.
 	 * 
 	 */
 	@Override
 	protected IVCiphertext encAlg(byte[] plaintext, byte[] iv) {
-		
+		/* Pseudo-code:
+		 * 		•	ctr = iv
+		 *		•	For each block in plaintext do: //i = 0
+		 *			o	cipher[i] = prp.computeBlock(ctr) XOR plaintext[i]
+		 *			o	ctr = ctr +1 mod 2n
+		 */
 		int plaintextLengthInBytes = plaintext.length;
 		byte[] cipher = new byte[plaintextLengthInBytes];
 		byte[] ctr = new byte[iv.length];
 		System.arraycopy(iv,0, ctr, 0, iv.length);
 
-		//System.out.println("In encrypt, the iv = " + new BigInteger(ctr));
-
-		
 		int numOfBlocksInPlaintext = plaintextLengthInBytes / prp.getBlockSize();
 
 		int cipherOffset = 0;
 		int plaintextOffset = 0;
 		int blockSize = prp.getBlockSize();
 
-		//for each block in ciphertext do:
+		//For each block in ciphertext do:
 		boolean isFullBlock = true;
 		for(int i = 0; i < numOfBlocksInPlaintext; i++){
 			ctr = processBlock(plaintext, plaintextOffset, ctr, cipher, cipherOffset, isFullBlock);
@@ -160,7 +185,7 @@ public class ScCTREncRandomIV extends EncWithIVAbs implements CTREnc {
 			ctr = processBlock(plaintext, plaintextOffset, ctr, cipher, cipherOffset, isFullBlock);
 		}
 
-		return new IVCiphertext(new BasicSymCiphertext(cipher), iv);
+		return new IVCiphertext(new ByteArraySymCiphertext(cipher), iv);
 	}
 
 
@@ -184,7 +209,8 @@ public class ScCTREncRandomIV extends EncWithIVAbs implements CTREnc {
 	 */
 	private byte[] processBlock(byte[] in, int inOffset, byte[] ctr, byte[] out, int outOffset, boolean isFullBlock){
 		int blockSize = prp.getBlockSize();
-		byte[] prpBytes = new byte[blockSize];
+		//Here we have to create a new array because we can't override in and ctr arrays and out array may not be long enough.
+		byte[] prpBytes = new byte[blockSize]; 
 		try {
 			prp.computeBlock(ctr, 0, blockSize, prpBytes, 0, blockSize);
 		} catch (IllegalBlockSizeException e) {
@@ -204,8 +230,7 @@ public class ScCTREncRandomIV extends EncWithIVAbs implements CTREnc {
 			}
 		}
 
-
-		//increase the counter by one.
+		//Increases the counter by one.
 		int    carry = 1;
 
 		for (int i = blockSize - 1; i >= 0; i--)
