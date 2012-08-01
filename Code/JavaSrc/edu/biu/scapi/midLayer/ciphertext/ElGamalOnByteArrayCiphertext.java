@@ -2,23 +2,19 @@ package edu.biu.scapi.midLayer.ciphertext;
 
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
-/**
- * This class is a container that encapsulates the cipher data resulting from applying the El Gamal encryption.
- * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
- *
- */
-public class ElGamalOnGroupElementCiphertext implements AsymmetricCiphertext {
+public class ElGamalOnByteArrayCiphertext implements AsymmetricCiphertext{
+
 	//First part of the ciphertext.
 	private GroupElement cipher1;
 	//Second part of the ciphertext.
-	private GroupElement cipher2;
+	private byte[] cipher2;
 	
 	/**
 	 * Create an instance of this container class 
 	 * @param c1 the first part of the cihertext
 	 * @param c2 the second part of the ciphertext
 	 */
-	public ElGamalOnGroupElementCiphertext(GroupElement c1, GroupElement c2){
+	public ElGamalOnByteArrayCiphertext(GroupElement c1, byte[] c2){
 		this.cipher1 = c1;
 		this.cipher2 = c2;
 	}
@@ -35,7 +31,7 @@ public class ElGamalOnGroupElementCiphertext implements AsymmetricCiphertext {
 	 * 
 	 * @return the second part of the ciphertext
 	 */
-	public GroupElement getC2(){
+	public byte[] getC2(){
 		return cipher2;
 	}
 }
