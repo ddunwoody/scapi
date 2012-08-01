@@ -46,19 +46,22 @@ public class BcRSAPss extends RSAPssAbs implements UnlimitedTimes, ACMA{
 	 * Default constructor. uses default implementations of CryptographicHash and SecureRandom.
 	 */
 	public BcRSAPss() {
-		//Creates BC digest with SHA1.
 		try {
-			digest = BCFactory.getInstance().getDigest("SHA-1");
+			createBCSigner("SHA-1", new SecureRandom());
 		} catch (FactoriesException e) {
 			// Shouldn't occur since SHA1 is a valid hash name.
 			e.printStackTrace();
 		}
-		
-		//Creates random with the given algorithm.
-		this.random = new SecureRandom();
-		
-		RSABlindedEngine rsa = new RSABlindedEngine();
-		signer = new PSSSigner(rsa, digest, digest.getDigestSize());
+	}
+	
+	/**
+	 * Constructor that receives hash name to use.
+	 * @param hashName underlying hash to use.
+	 * @throws FactoriesException if there is no hash with the given name.
+	 */
+	public BcRSAPss(String hashName) throws FactoriesException{
+		//Creates SecureRandom object and calls the general constructor.
+		this (hashName, new SecureRandom());
 	}
 	
 	/**
@@ -101,6 +104,10 @@ public class BcRSAPss extends RSAPssAbs implements UnlimitedTimes, ACMA{
 	 * @throws FactoriesException if there is no hash with the given name in BC hash functions.
 	 */
 	public BcRSAPss(String hashName, SecureRandom random) throws FactoriesException{
+		createBCSigner(hashName, random);
+	}
+	
+	private void createBCSigner(String hashName, SecureRandom random) throws FactoriesException{
 		//Creates BC digest with the given name.
 		digest = BCFactory.getInstance().getDigest(hashName);
 		
