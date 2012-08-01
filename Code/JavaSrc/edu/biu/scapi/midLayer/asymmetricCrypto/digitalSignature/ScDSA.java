@@ -56,15 +56,13 @@ public class ScDSA implements DSABasedSignature, UnlimitedTimes, ACMA{
 	 */
 	public ScDSA(){
 		//Sets the parameters with default values.
-		this.hash = new CryptoPpSHA1();
 		try {
-			this.dlog = new MiraclDlogECFp();
-		} catch (IOException e) {
+			construct(new CryptoPpSHA1(), new MiraclDlogECFp(), new SecureRandom());
+		} catch (IOException e1) {
 			// If there was a problem to create the properties file of elliptic curve, creates Dlog over Zp*.
-			this.dlog = new CryptoPpDlogZpSafePrime();
+			construct(new CryptoPpSHA1(), new CryptoPpDlogZpSafePrime(), new SecureRandom());
 		}
-		qMinusOne = dlog.getOrder().subtract(BigInteger.ONE);
-		this.random = new SecureRandom();
+		
 	}
 	
 	/**
@@ -108,6 +106,10 @@ public class ScDSA implements DSABasedSignature, UnlimitedTimes, ACMA{
 	 * @param random secure random to use.
 	 */
 	public ScDSA(CryptographicHash hash, DlogGroup dlog, SecureRandom random){
+		construct(hash, dlog, random);
+	}
+	
+	private void construct(CryptographicHash hash, DlogGroup dlog, SecureRandom random){
 		//Sets the parameters.
 		this.hash = hash;
 		this.dlog = dlog;
