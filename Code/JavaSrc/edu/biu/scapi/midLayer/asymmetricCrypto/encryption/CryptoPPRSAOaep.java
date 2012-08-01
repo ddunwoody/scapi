@@ -3,6 +3,7 @@ package edu.biu.scapi.midLayer.asymmetricCrypto.encryption;
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.KeyException;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
@@ -11,8 +12,8 @@ import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 
-import edu.biu.scapi.midLayer.ciphertext.BasicAsymCiphertext;
-import edu.biu.scapi.midLayer.ciphertext.Ciphertext;
+import edu.biu.scapi.midLayer.ciphertext.ByteArrayAsymCiphertext;
+import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertext;
 import edu.biu.scapi.midLayer.plaintext.ByteArrayPlaintext;
 import edu.biu.scapi.midLayer.plaintext.Plaintext;
 
@@ -41,6 +42,8 @@ public class CryptoPPRSAOaep extends RSAOaepAbs {
 	private native byte[] doEncrypt(long encryptor, byte[] plaintext);
 	private native byte[] doDecrypt(long decryptor, byte[] ciphertext);
 	
+	private native int getPlaintextLength(long encryptor); 
+	
 	
 	/**
 	 * Default constructor. Uses default implementation of SecureRandom as source of randomness.
@@ -48,6 +51,16 @@ public class CryptoPPRSAOaep extends RSAOaepAbs {
 	public CryptoPPRSAOaep(){
 		//Calls the constructor with default SecureRandom implementation.
 		this(new SecureRandom());
+	}
+	
+	/**
+	 * Constructor that lets the user choose the random number generator algorithm.
+	 * @param randNumGenAlg random number generator algorithm.
+	 * @throws NoSuchAlgorithmException 
+	 */
+	public CryptoPPRSAOaep(String randNumGenAlg) throws NoSuchAlgorithmException{
+		this(SecureRandom.getInstance(randNumGenAlg));
+
 	}
 	
 	/**
@@ -136,6 +149,15 @@ public class CryptoPPRSAOaep extends RSAOaepAbs {
 	}
 
 	/**
+	 * Returns the maximum size of the byte array that can be passed to generatePlaintext function. 
+	 * This is the maximum size of a byte array that can be converted to a Plaintext object suitable to this encryption scheme.
+	 * @return the maximum size of the byte array that can be passed to generatePlaintext function. 
+	 */
+	public int getMaxLengthOfByteArrayForPlaintext(){
+		return getPlaintextLength(encryptor);
+	}
+	
+	/**
 	 * Encrypts the given plaintext according to the RSAOAEP algorithm using Crypto++ implementation.
 	 * @param plaintext the plaintext to encrypt. MUST be an instance of ByteArrayPlaintext.
 	 * @return Ciphertext contains the encrypted plaintext.
@@ -144,7 +166,7 @@ public class CryptoPPRSAOaep extends RSAOaepAbs {
 	 * 
 	 */
 	@Override
-	public Ciphertext encrypt(Plaintext plaintext){
+	public AsymmetricCiphertext encrypt(Plaintext plaintext){
 		// If there is no public key can not encrypt, throws exception.
 		if (!isKeySet()){
 			throw new IllegalStateException("in order to encrypt a message this object must be initialized with public key");
@@ -157,7 +179,7 @@ public class CryptoPPRSAOaep extends RSAOaepAbs {
 		// Calls native function that computes the encryption.
 		byte[] ciphertext = doEncrypt(encryptor, ((ByteArrayPlaintext)plaintext).getText());
 		// Returns a ciphertext with the encrypted plaintext.
-		return new BasicAsymCiphertext(ciphertext);
+		return new ByteArrayAsymCiphertext(ciphertext);
 	}
 
 	/**
@@ -168,19 +190,19 @@ public class CryptoPPRSAOaep extends RSAOaepAbs {
 	 * @throws IllegalArgumentException if the given cipher is not instance of BasicAsymCiphertext.
 	 */
 	@Override
-	public Plaintext decrypt(Ciphertext cipher) throws KeyException{
+	public Plaintext decrypt(AsymmetricCiphertext cipher) throws KeyException{
 		
 		// If there is no private key can not decrypt, throws exception.
 		if (!isPrivateKeySet){
 			throw new KeyException("in order to decrypt a message, this object must be initialized with private key");
 		}
 		// Cipher must be of type BasicAsymCiphertext.
-		if (!(cipher instanceof BasicAsymCiphertext)){
+		if (!(cipher instanceof ByteArrayAsymCiphertext)){
 			throw new IllegalArgumentException("The ciphertext has to be of type BasicAsymCiphertext");
 		}
 		
 		// Calls native function that computes the decryption.
-		byte[] plaintext =  doDecrypt(decryptor, ((BasicAsymCiphertext)cipher).getBytes());
+		byte[] plaintext =  doDecrypt(decryptor, ((ByteArrayAsymCiphertext)cipher).getBytes());
 		return new ByteArrayPlaintext(plaintext);
 	}
 	
