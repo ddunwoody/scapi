@@ -8,7 +8,8 @@ import java.security.PublicKey;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.InvalidParameterSpecException;
 
-import edu.biu.scapi.midLayer.ciphertext.Ciphertext;
+import edu.biu.scapi.exceptions.NoMaxException;
+import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertext;
 import edu.biu.scapi.midLayer.plaintext.Plaintext;
 import edu.biu.scapi.securityLevel.Cpa;
 import edu.biu.scapi.securityLevel.Indistinguishable;
@@ -65,13 +66,36 @@ public interface AsymmetricEnc extends Cpa, Indistinguishable{
 	public String getAlgorithmName();
 	
 	/**
+	 * There are some encryption schemes that have a limit of the byte array that can be passes to the generatePlaintext.
+	 * This function indicates whether or not there is a limit. 
+	 * Its helps the user know if he needs to pass an array with specific length or not.
+	 * @return true if this encryption scheme has a maximum byte array length to generate a plaintext from; false, otherwise. 
+	 */
+	public boolean hasMaxByteArrayLengthForPlaintext();
+	
+	/**
+	 * Returns the maximum size of the byte array that can be passed to generatePlaintext function. 
+	 * This is the maximum size of a byte array that can be converted to a Plaintext object suitable to this encryption scheme.
+	 * @return the maximum size of the byte array that can be passed to generatePlaintext function. 
+	 * @throws NoMaxException if this encryption scheme has no limit on the plaintext input.
+	 */
+	public int getMaxLengthOfByteArrayForPlaintext() throws NoMaxException;
+	
+	/**
+	 * Generates a Plaintext suitable to this encryption scheme from the given message.
+	 * @param msg byte array to convert to a Plaintext object.
+	 * @throws IllegalArgumentException if the given message's length is greater than the maximum. 
+	 */
+	public Plaintext generatePlaintext(byte[] text);
+	
+	/**
 	 * Encrypts the given plaintext using this asymmetric encryption scheme.
 	 * @param plaintext message to encrypt
 	 * @return Ciphertext the encrypted plaintext
 	 * @throws IllegalArgumentException if the given Plaintext doesn't match this encryption type.
 	 * @throws IllegalStateException if no public key was set.
 	 */
-	public Ciphertext encrypt(Plaintext plainText);
+	public AsymmetricCiphertext encrypt(Plaintext plainText);
 	
 	/**
 	 * Decrypts the given ciphertext using this asymmetric encryption scheme.
@@ -80,7 +104,16 @@ public interface AsymmetricEnc extends Cpa, Indistinguishable{
 	 * @throws KeyException if there is no private key
 	 * @throws IllegalArgumentException if the given Ciphertext doesn't march this encryption type.
 	 */
-	public Plaintext decrypt(Ciphertext cipher) throws KeyException;
+	public Plaintext decrypt(AsymmetricCiphertext cipher) throws KeyException;
+	
+	/**
+	 * Generates a byte array from the given plaintext. 
+	 * This function should be used when the user does not know the specific type of the Asymmetric encryption he has, 
+	 * and therefore he is working on byte array.
+	 * @param plaintext to generates byte array from.
+	 * @return the byte array generated from the given plaintext.
+	 */
+	public byte[] generateBytesFromPlaintext(Plaintext plaintext);
 	
 	/**
 	 * Generates public and private keys for this asymmetric encryption.
