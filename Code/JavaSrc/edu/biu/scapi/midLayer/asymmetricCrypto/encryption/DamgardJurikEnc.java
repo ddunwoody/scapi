@@ -1,6 +1,6 @@
 package edu.biu.scapi.midLayer.asymmetricCrypto.encryption;
 
-import edu.biu.scapi.midLayer.ciphertext.Ciphertext;
+import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertext;
 
 /**
  * General interface for DamgardJurik encryption scheme. Every concrete implementation of DamgardJurik encryption should implement this interface.
@@ -18,5 +18,5 @@ public interface DamgardJurikEnc extends AsymAdditiveHomomorphicEnc {
 	 * @throws IllegalStateException if no public key was set.
 	 * @throws IllegalArgumentException if the given ciphertext does not match this asymmetric encryption.
 	 */
-	public Ciphertext reRandomize(Ciphertext cipher);
+	public AsymmetricCiphertext reRandomize(AsymmetricCiphertext cipher);
 }
