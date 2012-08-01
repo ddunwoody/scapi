@@ -1,6 +1,3 @@
-/**
- * 
- */
 package edu.biu.scapi.midLayer.ciphertext;
 
 /**
@@ -8,7 +5,7 @@ package edu.biu.scapi.midLayer.ciphertext;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-public interface SymmetricCiphertext extends Ciphertext {
+public interface SymmetricCiphertext{
 	/**
 	 * @return the byte array representation of the ciphertext.
 	 */
