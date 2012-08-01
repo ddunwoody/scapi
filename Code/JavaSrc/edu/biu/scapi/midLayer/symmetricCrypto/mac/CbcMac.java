@@ -13,7 +13,7 @@ public interface CbcMac extends UniqueTagMac, PrfVaryingInputLength{
 	/**
 	 * Pre-pends the length if the message to the message.
 	 * As a result, the mac will be calculated on [msgLength||msg].
-	 * @param msgLength the length of the message
+	 * @param msgLength the length of the message in bytes.
 	 */
 	public void startMac(int msgLength);
 }
