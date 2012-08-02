@@ -81,7 +81,9 @@ public class CryptoPpDlogZpSafePrime extends DlogGroupAbs implements DlogZpSafeP
 
 	/**
 	 * Initializes the CryptoPP implementation of Dlog over Zp* with the given groupParams
-	 * @param groupParams - contains the group parameters
+	 * @param q the order of the group
+	 * @param g the generator of the group
+	 * @param p the prime of the group
 	 */
 	public CryptoPpDlogZpSafePrime(String q, String g, String p) {
 		//creates ZpGroupParams from the given arguments and call the appropriate constructor
@@ -129,7 +131,7 @@ public class CryptoPpDlogZpSafePrime extends DlogGroupAbs implements DlogZpSafeP
 		int bitsInp = p.bitLength();
 		//any string of length k has a numeric value that is less than (p-1)/2 - 1
 		int k = (bitsInp - 3)/8; 
-		//The actual k that we allow is one byte less. This will give us an extra byte pad the binary string passed to encode to a group element with a 01 byte
+		//The actual k that we allow is one byte less. This will give us an extra byte to pad the binary string passed to encode to a group element with a 01 byte
 		//and at decoding we will remove that extra byte. This way, even if the original string translates to a negative BigInteger the encode and decode functions
 		//always work with positive numbers. The encoding will be responsible for padding and the decoding will be responsible for removing the pad.
 		k--; 
@@ -325,12 +327,14 @@ public class CryptoPpDlogZpSafePrime extends DlogGroupAbs implements DlogZpSafeP
 			throw new IndexOutOfBoundsException("The binary array to encode is too long.");
 		}
 	
-		//Denote the string of length k by s.
-		//Set the group element to be y=(s+1)^2 (this ensures that the result is not 0 and is a square)
+		//Pad the binaryString with a x01 byte in the most significant byte to ensure that the 
+		//encoding and decoding always work with positive numbers.
 		byte[] newString = new byte[binaryString.length + 1];
 		newString[0] = 1;
 		System.arraycopy(binaryString, 0, newString, 1, binaryString.length);
 	
+		//Denote the string of length k by s.
+		//Set the group element to be y=(s+1)^2 (this ensures that the result is not 0 and is a square)
 		BigInteger s = new BigInteger(newString);
 		BigInteger y = (s.add(BigInteger.ONE)).pow(2).mod(((ZpGroupParams) groupParams).getP());
 		//There is no need to check membership since the "element" was generated so that it is always an element.
@@ -387,4 +391,5 @@ public class CryptoPpDlogZpSafePrime extends DlogGroupAbs implements DlogZpSafeP
 	static {
 		System.loadLibrary("CryptoPPJavaInterface");
 	}
+
 }
