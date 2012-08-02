@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Properties;
 
-import org.bouncycastle.util.encoders.Hex;
-
 import edu.biu.scapi.primitives.dlog.DlogECF2m;
 import edu.biu.scapi.primitives.dlog.ECElement;
 import edu.biu.scapi.primitives.dlog.ECF2mUtility;
@@ -14,7 +12,6 @@ import edu.biu.scapi.primitives.dlog.groupParams.ECF2mGroupParams;
 import edu.biu.scapi.primitives.dlog.groupParams.ECF2mKoblitz;
 import edu.biu.scapi.primitives.dlog.groupParams.ECF2mPentanomialBasis;
 import edu.biu.scapi.primitives.dlog.groupParams.ECF2mTrinomialBasis;
-import edu.biu.scapi.primitives.dlog.groupParams.ECFpGroupParams;
 import edu.biu.scapi.primitives.dlog.groupParams.GroupParams;
 import edu.biu.scapi.securityLevel.DDH;
 
@@ -76,8 +73,12 @@ public class MiraclDlogECF2m extends MiraclAdapterDlogEC implements DlogECF2m, D
 	private void createUnderlyingCurveAndGenerator(){
 		BigInteger x;
 		BigInteger y;
-		if(groupParams instanceof ECF2mTrinomialBasis){
-			ECF2mTrinomialBasis triParams = (ECF2mTrinomialBasis)groupParams;
+		GroupParams params = groupParams;
+		if (groupParams instanceof ECF2mKoblitz){
+			params = ((ECF2mKoblitz) groupParams).getCurve();
+		}
+		if(params instanceof ECF2mTrinomialBasis){
+			ECF2mTrinomialBasis triParams = (ECF2mTrinomialBasis)params;
 			int k2 = 0;
 			int k3 = 0;
 			initF2mCurve(getMip(), triParams.getM(), triParams.getK1(), k2, k3, triParams.getA().toByteArray(), triParams.getB().toByteArray());
@@ -85,8 +86,8 @@ public class MiraclDlogECF2m extends MiraclAdapterDlogEC implements DlogECF2m, D
 			y = triParams.getYg();
 		}else{
 			//we assume that if it's not trinomial then it's pentanomial. We do not check.
-			ECF2mPentanomialBasis pentaParams = (ECF2mPentanomialBasis) groupParams;
-			
+			ECF2mPentanomialBasis pentaParams = (ECF2mPentanomialBasis) params;
+			//Miracl defines the parameters k1, k2, k3 of pentanomial curves in the opposite way to the way we hold them. 
 			initF2mCurve(getMip(), pentaParams.getM(), pentaParams.getK3(), pentaParams.getK2(), pentaParams.getK1(), pentaParams.getA().toByteArray(), pentaParams.getB().toByteArray());
 			x = pentaParams.getXg();
 			y = pentaParams.getYg();
