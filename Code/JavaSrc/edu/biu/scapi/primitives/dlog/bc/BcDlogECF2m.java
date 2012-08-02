@@ -216,14 +216,19 @@ public class BcDlogECF2m extends BcAdapterDlogEC implements DlogECF2m, DDH{
 
 	/**
 	 * This is 1-1 mapping of any element of this group to a byte array representation.
-	 * Currently we don't support this conversion. It will be implemented in the future.Meanwhile we return null.
 	 * @param groupElement the element to convert
 	 * @return the byte array representation
 	 */
 	public byte[] mapAnyGroupElementToByteArray(GroupElement groupElement) {
-		//Currently we do not have a proper algorithm for this.
-		//return null
-		return null;
+		//This function simply returns an array which is the result of concatenating 
+		//the byte array representation of x with the byte array representation of y.
+		if (!(groupElement instanceof ECF2mPointBc)) {
+			throw new IllegalArgumentException("element type doesn't match the group type");
+		}
+		ECF2mPointBc point = (ECF2mPointBc) groupElement;
+		//The actual work is implemented in ECF2mUtility since it is independent of the underlying library (BC, Miracl, or other)
+		//If we ever decide to change the implementation there will only one place to change it.
+		return util.mapAnyGroupElementToByteArray(point.getX(), point.getY());
 	}
 
 
