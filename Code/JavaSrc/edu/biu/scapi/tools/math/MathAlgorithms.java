@@ -20,7 +20,7 @@ public class MathAlgorithms {
      * 
      * @param congruences
      *            the congruences c_i
-     * @param primes
+     * @param moduli
      *            the primes p_i
      * @return an integer x for that x % p_i == c_i
      */
