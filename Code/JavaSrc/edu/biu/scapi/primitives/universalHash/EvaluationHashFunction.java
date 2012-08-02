@@ -114,7 +114,7 @@ public final class EvaluationHashFunction implements UniversalHash{
 
 	/**
 	 * Generates a secret key to initialize this UH object.
-	 * @param keySize algorithmParameterSpec contains the required secret key size in bits 
+	 * @param keyParams algorithmParameterSpec contains the required secret key size in bits 
 	 * @return the generated secret key
 	 * @throws InvalidParameterSpecException 
 	 */
