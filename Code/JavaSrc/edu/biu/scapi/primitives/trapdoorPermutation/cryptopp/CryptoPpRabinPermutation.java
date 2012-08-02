@@ -285,8 +285,8 @@ public final class CryptoPpRabinPermutation extends TrapdoorPermutationAbs imple
 	/**
 	 * Creates a Rabin Element based on the x value if the x value is valid for this permutation.<p>
 	 * If is succeeds, it is guaranteed that the element returned is a valid Rabin Element for this Rabin permutation instance.
-	 * @params x an integer value to set as the value of the Rabin element
-	 * @returns a Rabin Element based on the cryptoPP library suitable to use with this permutation.  
+	 * @param x an integer value to set as the value of the Rabin element
+	 * @return a Rabin Element based on the cryptoPP library suitable to use with this permutation.  
 	 * @throws IllegalStateException if keys aren't set
 	 * @throws IllegalArgumentException if the x value is not a valid value for this trapdoor permution
 	 * @throws ScapiRuntimeException if there is not enough information (trapdoor) to create this element

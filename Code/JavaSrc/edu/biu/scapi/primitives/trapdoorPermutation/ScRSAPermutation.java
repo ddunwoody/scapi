@@ -125,7 +125,7 @@ public final class ScRSAPermutation extends TrapdoorPermutationAbs implements RS
 	 * Computes the  RSA permutation on the given TPElement 
 	 * @param tpEl - the input for the computation
 	 * @return - the result TPElement
-	 * @throw IllegalArgumentException if the given element is not a RSA element
+	 * @throws IllegalArgumentException if the given element is not a RSA element
 	 */
 	public TPElement compute(TPElement tpEl) throws IllegalArgumentException{
 
