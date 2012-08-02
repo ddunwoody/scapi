@@ -24,6 +24,7 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.dlog.cryptopp.CryptoPpDlogZpSafePrime;
 import edu.biu.scapi.primitives.hash.CryptographicHash;
 import edu.biu.scapi.primitives.hash.cryptopp.CryptoPpSHA1;
+import edu.biu.scapi.securityLevel.CollisionResistant;
 import edu.biu.scapi.securityLevel.DDH;
 import edu.biu.scapi.tools.Factories.CryptographicHashFactory;
 import edu.biu.scapi.tools.Factories.DlogGroupFactory;
@@ -57,15 +58,23 @@ public abstract class CramerShoupAbs implements CramerShoupDDHEnc{
 	}
 
 	/**
-	 * Constructor that lets the user choose the underlying dlog, hash and source of randomness.
+	 * Constructor that lets the user choose the underlying dlog, hash and source of randomness.<p>
+	 * The underlying Dlog group has to have DDH security level.<p>
+	 * The underlying Hash function has to have CollisionResistant security level.
 	 * @param dlogGroup underlying DlogGroup to use.
 	 * @param hash underlying hash to use.
 	 * @param random source of randomness.
-	 * @throws IllegalArgumentException if the given dlog group does not have DDH security level.
+	 * @throws IllegalArgumentException if the given dlog group does not have DDH security level or if the hash function does not have CollisionResistant security level
 	 */
 	public CramerShoupAbs(DlogGroup dlogGroup, CryptographicHash hash, SecureRandom random){
+		//The Cramer-Shoup encryption scheme must work with a Dlog Group that has DDH security level
+		//and a Hash function that has CollisionResistant security level. If any of this conditions is not 
+		//met then cannot construct an object of type Cramer-Shoup encryption scheme; therefore throw exception.
 		if(!(dlogGroup instanceof DDH)){
 			throw new IllegalArgumentException("The Dlog group has to have DDH security level");
+		}
+		if(!(hash instanceof CollisionResistant)){
+			throw new IllegalArgumentException("The hash function has to have CollisionResistant security level");
 		}
 		// Everything is correct, then sets the member variables and creates object.
 		this.dlogGroup = dlogGroup;
