@@ -63,7 +63,7 @@ public interface SymmetricEnc extends Eav, Indistinguishable{
 	
 	/**
 	 * Encrypts a plaintext. It lets the system choose the random IV.
-	 * @param plaintext.
+	 * @param plaintext
 	 * @return  an IVCiphertext, which contains the IV used and the encrypted data.
 	 * @throws IllegalStateException if no secret key was set.
 	 * @throws IllegalArgumentException if the given plaintext does not match this encryption scheme.
@@ -72,8 +72,8 @@ public interface SymmetricEnc extends Eav, Indistinguishable{
 	
 	/**
 	 * This function encrypts a plaintext. It lets the user choose the random IV.
-	 * @param plaintext.
-	 * @param IV random bytes to use in the encryption pf the message.
+	 * @param plaintext
+	 * @param iv random bytes to use in the encryption pf the message.
 	 * @return an IVCiphertext, which contains the IV used and the encrypted data. 
 	 * @throws IllegalStateException if no secret key was set.
 	 * @throws IllegalArgumentException if the given plaintext does not match this encryption scheme.

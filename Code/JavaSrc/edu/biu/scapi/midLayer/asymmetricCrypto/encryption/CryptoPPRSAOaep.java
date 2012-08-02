@@ -65,7 +65,7 @@ public class CryptoPPRSAOaep extends RSAOaepAbs {
 	
 	/**
 	 * Constructor that lets the user choose the source of randomness.
-	 * @param random source of randomness.
+	 * @param secureRandom source of randomness.
 	 */
 	public CryptoPPRSAOaep(SecureRandom secureRandom){
 		this.random = secureRandom;

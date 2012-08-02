@@ -90,7 +90,7 @@ public class ScCbcMacPrepending implements CbcMac {
 
 	/**
 	 * Constructor that gets a prp object and sets it as the underlying prp. 
-	 * @param prpName the name of the underlying prp
+	 * @param prp the name of the underlying prp
 	 */
 	public ScCbcMacPrepending(PrpFixed prp){
 		//Call other constructor using default implementation of SecureRandom
@@ -99,7 +99,7 @@ public class ScCbcMacPrepending implements CbcMac {
 
 	/**
 	 * Constructor that gets a prp object and set it as the underlying prp and a SecureRandom object to use as source of randomness. 
-	 * @param prpName the name of the underlying prp.
+	 * @param prp the name of the underlying prp.
 	 * @param random source of randomness.
 	 */
 	public ScCbcMacPrepending(PrpFixed prp, SecureRandom random) {
@@ -335,7 +335,7 @@ public class ScCbcMacPrepending implements CbcMac {
 	 * Completes the mac computation and puts the result tag in the tag array.
 	 * @param msg the end of the message to mac.
 	 * @param offset the offset within the message array to take the bytes from.
-	 * @param msgLength the length of the message in bytes.
+	 * @param msgLen the length of the message in bytes.
 	 * @return the result tag from the mac operation.
 	 * @throws IllegalStateException if no secret key was set.
 	 */
@@ -405,7 +405,7 @@ public class ScCbcMacPrepending implements CbcMac {
 	 * Computes the mac operation.
 	 * @param inBytes the msg.
 	 * @param inOff the offset within the msg to take the bytes from.
-	 * @param outbytes the output array.
+	 * @param outBytes the output array.
 	 * @param outOff the offset within the out array to put the result from.
 	 * @throws IllegalStateException if no secret key was set.
 	 */
@@ -424,7 +424,7 @@ public class ScCbcMacPrepending implements CbcMac {
 	 * @param inBytes the msg.
 	 * @param inOff the offset within the msg to take the bytes from.
 	 * @param inLen the length of the msg in bytes.
-	 * @param outbytes the output array.
+	 * @param outBytes the output array.
 	 * @param outOff the offset within the out array to put the result from.
 	 * @param outLen the required length of the output array in bytes. Should be equal to this mac size.
 	 * @throws IllegalStateException if no secret key was set.
@@ -451,7 +451,7 @@ public class ScCbcMacPrepending implements CbcMac {
 	 * @param inBytes the msg.
 	 * @param inOff the offset within the msg to take the bytes from.
 	 * @param inLen the length of the msg in bytes.
-	 * @param outbytes the output array.
+	 * @param outBytes the output array.
 	 * @param outOff the offset within the out array to put the result from.
 	 * @throws IllegalStateException if no secret key was set.
 	 */

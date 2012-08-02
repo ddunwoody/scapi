@@ -64,7 +64,7 @@ public abstract class RSAOaepAbs implements RSAOaepEnc {
 	
 	/**
 	 * Generates a Plaintext suitable to ElGamal encryption scheme from the given message.
-	 * @param msg byte array to convert to a Plaintext object.
+	 * @param text byte array to convert to a Plaintext object.
 	 * @throws IllegalArgumentException if the given message's length is greater than the maximum. 
 	 */
 	public Plaintext generatePlaintext(byte[] text){

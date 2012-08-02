@@ -70,7 +70,7 @@ public class ScElGamalOnByteArray extends ElGamalAbs{
 	/**
 	 * Constructor that gets a DlogGroup name to create and sets it to the underlying group.
 	 * Uses default implementation of SecureRandom.
-	 * @param dlogGroup must be DDH secure.
+	 * @param dlogName must be DDH secure.
 	 * @throws FactoriesException if the creation of the dlog failed.
 	 * @throws IllegalArgumentException if the given dlog group does not have DDH security level. 
 	 */
@@ -83,7 +83,7 @@ public class ScElGamalOnByteArray extends ElGamalAbs{
 	
 	/**
 	 * Constructor that gets a DlogGroup name to create and random number generator to use.
-	 * @param dlogGroup must be DDH secure.
+	 * @param dlogName must be DDH secure.
 	 * @throws FactoriesException if the creation of the dlog failed.
 	 * @throws NoSuchAlgorithmException if the given random number generator is not supported.
 	 * @throws IllegalArgumentException if the given dlog group does not have DDH security level.
@@ -124,7 +124,7 @@ public class ScElGamalOnByteArray extends ElGamalAbs{
 	
 	/**
 	 * Generates a Plaintext suitable to ElGamal encryption scheme from the given message.
-	 * @param msg byte array to convert to a Plaintext object.
+	 * @param text byte array to convert to a Plaintext object.
 	 */
 	public Plaintext generatePlaintext(byte[] text){
 		
@@ -161,7 +161,7 @@ public class ScElGamalOnByteArray extends ElGamalAbs{
 	/**
 	 * Decrypts the given ciphertext using ElGamal encryption scheme.
 	 *
-	 * @param CipherText MUST be of type ElGamalOnByteArrayCiphertext contains the cipher to decrypt.
+	 * @param cipher MUST be of type ElGamalOnByteArrayCiphertext contains the cipher to decrypt.
 	 * @return Plaintext of type ByteArrayPlaintext which containing the decrypted message.
 	 * @throws KeyException if no private key was set.
 	 * @throws IllegalArgumentException if the given cipher is not instance of ElGamalOnByteArrayCiphertext.

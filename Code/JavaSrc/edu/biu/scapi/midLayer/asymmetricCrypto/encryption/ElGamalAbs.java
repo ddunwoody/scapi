@@ -88,7 +88,7 @@ public abstract class ElGamalAbs implements ElGamalEnc{
 	/**
 	 * Constructor that gets a DlogGroup name to create and sets it to the underlying group.
 	 * Uses default implementation of SecureRandom.
-	 * @param dlogGroup must be DDH secure.
+	 * @param dlogName must be DDH secure.
 	 * @throws FactoriesException if the creation of the dlog failed.
 	 * @throws IllegalArgumentException if the given dlog group does not have DDH security level. 
 	 */
@@ -100,7 +100,7 @@ public abstract class ElGamalAbs implements ElGamalEnc{
 	
 	/**
 	 * Constructor that gets a DlogGroup name to create and random number generator to use.
-	 * @param dlogGroup must be DDH secure.
+	 * @param dlogName must be DDH secure.
 	 * @throws FactoriesException if the creation of the dlog failed.
 	 * @throws NoSuchAlgorithmException if the given random number generator is not supported.
 	 * @throws IllegalArgumentException if the given dlog group does not have DDH security level.

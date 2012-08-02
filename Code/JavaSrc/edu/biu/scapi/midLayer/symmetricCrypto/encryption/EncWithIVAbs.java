@@ -154,7 +154,7 @@ abstract class EncWithIVAbs implements SymmetricEnc {
 	/**
 	 * This function encrypts a plaintext. It lets the user choose the random IV.
 	 * @param plaintext should be an instance of ByteArrayPlaintext.
-	 * @param IV random bytes to use in the encryption pf the message.
+	 * @param iv random bytes to use in the encryption pf the message.
 	 * @return an IVCiphertext, which contains the IV used and the encrypted data. 
 	 * @throws IllegalStateException if no secret key was set.
 	 * @throws IllegalArgumentException if the given plaintext is not an instance of ByteArrayPlaintext.

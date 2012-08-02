@@ -142,7 +142,7 @@ public class ScEncryptThenMac implements AuthenticatedEnc {
 
 	/**
 	 * Encrypts a plaintext. 
-	 * @param plaintext.
+	 * @param plaintext
 	 * @return a SymmetricCiphertext, which contains the basic cipher and the tag.
 	 * @throws IllegalStateException if no secret key was set.
 	 * @throws IllegalArgumentException if the given plaintext does not match the underlying encryption type.
@@ -161,8 +161,8 @@ public class ScEncryptThenMac implements AuthenticatedEnc {
 
 	/**
 	 * This function encrypts a plaintext. 
-	 * @param plaintext.
-	 * @param IV random bytes to use in the encryption pf the message.
+	 * @param plaintext
+	 * @param iv random bytes to use in the encryption pf the message.
 	 * @return an IVCiphertext, which contains the IV used and the encrypted data. 
 	 * @throws IllegalStateException if no secret key was set.
 	 * @throws IllegalArgumentException if the given plaintext does not match the underlying encryption scheme.

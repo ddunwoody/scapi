@@ -51,7 +51,7 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 	
 	/**
 	 * Constructor that lets the user choose the source of randomness.
-	 * @param random source of randomness.
+	 * @param rnd source of randomness.
 	 */
 	public ScDamgardJurikEnc(SecureRandom rnd){
 		random = rnd;
@@ -198,7 +198,7 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 	
 	/** 
 	 * This function performs the encryption of he given plain text
-	 * @param plaintext MUST be an instance of BigIntegerPlainText.
+	 * @param plainText MUST be an instance of BigIntegerPlainText.
 	 * @return an object of type DJCiphertext holding the encryption of the plaintext.
 	 * @throws IllegalStateException if no public key was set.
 	 * @throws IllegalArgumentException in the following cases:

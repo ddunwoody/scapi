@@ -119,7 +119,7 @@ public class ScCramerShoupDDHOnByteArray extends CramerShoupAbs{
 	
 	/**
 	 * Generates a Plaintext suitable to CramerShoup encryption scheme from the given message.
-	 * @param msg byte array to convert to a Plaintext object.
+	 * @param text byte array to convert to a Plaintext object.
 	 */
 	public Plaintext generatePlaintext(byte[] text){
 		
@@ -180,7 +180,7 @@ public class ScCramerShoupDDHOnByteArray extends CramerShoupAbs{
 	
 	/**
 	 * Decrypts the given ciphertext using this Cramer-Shoup encryption scheme.
-	 * @param cipher ciphertext to decrypt. MUST be an instance of CramerShoupOnByteArrayCiphertext.
+	 * @param ciphertext ciphertext to decrypt. MUST be an instance of CramerShoupOnByteArrayCiphertext.
 	 * @return Plaintext the decrypted cipher.
 	 * @throws KeyException if no private key was set.
 	 * @throws IllegalArgumentException if the given Ciphertext is not instance of CramerShoupOnByteArrayCiphertext.

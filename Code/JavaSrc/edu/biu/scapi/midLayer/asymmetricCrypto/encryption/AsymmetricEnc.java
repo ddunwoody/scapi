@@ -83,14 +83,14 @@ public interface AsymmetricEnc extends Cpa, Indistinguishable{
 	
 	/**
 	 * Generates a Plaintext suitable to this encryption scheme from the given message.
-	 * @param msg byte array to convert to a Plaintext object.
+	 * @param text byte array to convert to a Plaintext object.
 	 * @throws IllegalArgumentException if the given message's length is greater than the maximum. 
 	 */
 	public Plaintext generatePlaintext(byte[] text);
 	
 	/**
 	 * Encrypts the given plaintext using this asymmetric encryption scheme.
-	 * @param plaintext message to encrypt
+	 * @param plainText message to encrypt
 	 * @return Ciphertext the encrypted plaintext
 	 * @throws IllegalArgumentException if the given Plaintext doesn't match this encryption type.
 	 * @throws IllegalStateException if no public key was set.
