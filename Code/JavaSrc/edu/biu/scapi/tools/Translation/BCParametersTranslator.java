@@ -34,7 +34,7 @@ public final class BCParametersTranslator {
 	private BCParametersTranslator(){};
 
 	/** 
-	 * @return
+	 * @return a static instance of BCParametersTranslator
 	 */
 	public static BCParametersTranslator getInstance() {
 
@@ -121,8 +121,10 @@ public final class BCParametersTranslator {
 	}
 
 	/** 
-	 * @param param
-	 * @return
+	 * This function gets an on object of type AlgorithmParameterSpec and converts it or translates it to a suitable CipherParameters object of
+	 * Bouncy Castle, if exists.
+	 * @param param the AlgorithmParameterSpec to translate
+	 * @return a CipherParameters object from Bouncy Castle that matches the param passed as argument if exists, otherwise returns null
 	 */
 	public CipherParameters translateParameter(AlgorithmParameterSpec param) {
 		
@@ -138,10 +140,10 @@ public final class BCParametersTranslator {
 	}
 	
 	/** 
-	 * Translates the key and the parameters into a CipherParameter of BC. If one of the arguments is null then 
+	 * Translates the key and the source of randomness into a CipherParameter of BC. If one of the arguments is null then 
 	 * pass to one of the other two translateParameter functions.
-	 * @param key the KeySpec to translate to CipherParameters of BC
-	 * @param param The additional AlgorithmParametersSpec to transform including the key to relevant CipherParameter
+	 * @param key the Key to translate to CipherParameters of BC
+	 * @param random the source of randomness to translate
 	 */
 	public CipherParameters translateParameter(Key key, SecureRandom random) {
 	/*
