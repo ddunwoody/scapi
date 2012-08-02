@@ -6,7 +6,6 @@ import java.util.Properties;
 
 import org.bouncycastle.math.ec.ECCurve;
 import org.bouncycastle.math.ec.ECPoint;
-import org.bouncycastle.util.encoders.Hex;
 
 import edu.biu.scapi.primitives.dlog.DlogECF2m;
 import edu.biu.scapi.primitives.dlog.ECElement;
@@ -67,14 +66,18 @@ public class BcDlogECF2m extends BcAdapterDlogEC implements DlogECF2m, DDH{
 	private void createUnderlyingCurveAndGenerator(){
 		BigInteger x;
 		BigInteger y;
-		if(groupParams instanceof ECF2mTrinomialBasis){
-			ECF2mTrinomialBasis triParams = (ECF2mTrinomialBasis)groupParams;		
+		GroupParams params = groupParams;
+		if (groupParams instanceof ECF2mKoblitz){
+			params = ((ECF2mKoblitz) groupParams).getCurve();
+		}
+		if(params instanceof ECF2mTrinomialBasis){
+			ECF2mTrinomialBasis triParams = (ECF2mTrinomialBasis)params;		
 			curve = new ECCurve.F2m(triParams.getM(), triParams.getK1(), triParams.getA(), triParams.getB(), triParams.getQ(), triParams.getCofactor());
 			x = triParams.getXg();
 			y = triParams.getYg();
 		}else{
 			//we assume that if it's not trinomial then it's pentanomial. We do not check.
-			ECF2mPentanomialBasis pentaParams = (ECF2mPentanomialBasis) groupParams;
+			ECF2mPentanomialBasis pentaParams = (ECF2mPentanomialBasis) params;
 			curve = new ECCurve.F2m(pentaParams.getM(), pentaParams.getK1(), pentaParams.getK2(), pentaParams.getK3(),  pentaParams.getA(), pentaParams.getB(), pentaParams.getQ(), pentaParams.getCofactor());		
 			x = pentaParams.getXg();
 			y = pentaParams.getYg();
