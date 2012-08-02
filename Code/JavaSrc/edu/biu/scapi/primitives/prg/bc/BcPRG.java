@@ -113,7 +113,7 @@ public abstract class BcPRG implements PseudorandomGenerator {
 	 * Streams the bytes using the underlying stream cipher.
 	 * @param outBytes - output bytes. The result of streaming the bytes.
 	 * @param outOffset - output offset
-	 * @param outlen - the required output length
+	 * @param outLen - the required output length
 	 * @throws UnInitializedException if this object is not initialized
 	 */
 	public void getPRGBytes(byte[] outBytes, int outOffset,	int outLen){

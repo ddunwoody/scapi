@@ -38,7 +38,7 @@ public interface PseudorandomGenerator {
 	
 	/**
 	 * Generates a secret key to initialize this prg object.
-	 * @param keySize algorithmParameterSpec contains the required parameters for the key generation
+	 * @param keyParams algorithmParameterSpec contains the required parameters for the key generation
 	 * @return the generated secret key
 	 * @throws InvalidParameterSpecException 
 	 */
