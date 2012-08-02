@@ -216,4 +216,23 @@ public class ECF2mUtility {
 		return "ECF2m";
 	}
 	
+	/**
+	 * This function maps any group element to a byte array. This function does not have an inverse,<p>
+	 * that is, it is not possible to re-construct the original group element from the resulting byte array.
+	 * @param x coordinate of a point in the curve (this function does not check for membership)
+	 * @param y coordinate of a point in the curve (this function does not check for membership)
+	 * @return byte[] representation
+	 */
+	public byte[] mapAnyGroupElementToByteArray(BigInteger x, BigInteger y) {
+		//This function simply returns an array which is the result of concatenating 
+		//the byte array representation of x with the byte array representation of y.
+		byte[] xByteArray = x.toByteArray();
+		byte[] yByteArray = y.toByteArray();
+
+		byte[] result = new byte[xByteArray.length + yByteArray.length];
+		System.arraycopy(xByteArray, 0, result, 0, xByteArray.length);
+		System.arraycopy(yByteArray, 0, result, xByteArray.length, yByteArray.length);
+		return result;
+	}
+	
 }
