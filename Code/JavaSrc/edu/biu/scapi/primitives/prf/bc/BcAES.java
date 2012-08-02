@@ -64,7 +64,7 @@ public final class BcAES extends BcPRP implements AES{
 	
 	/**
 	 * This function should not be used to generate a key for AES and it throws UnsupportedOperationException
-	 * @param keySize algorithmParameterSpec contains the required secret key size in bits 
+	 * @param keyParams algorithmParameterSpec contains the required secret key size in bits 
 	 * @return the generated secret key
 	 * @throws UnsupportedOperationException 
 	 */

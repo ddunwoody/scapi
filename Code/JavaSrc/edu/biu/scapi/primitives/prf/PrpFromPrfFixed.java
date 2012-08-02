@@ -41,7 +41,7 @@ public abstract class PrpFromPrfFixed implements PrpFixed {
 	 * 
 	 * @param inBytes input bytes to compute
 	 * @param inOff input offset in the inBytes array
-	 * @param innLen input array length
+	 * @param inLen input array length
 	 * @param outBytes output bytes. The resulted bytes of compute
 	 * @param outOff output offset in the outBytes array to put the result from
 	 * @param outLen output array length

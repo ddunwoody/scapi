@@ -46,7 +46,7 @@ public interface PseudorandomFunction {
 	
 	/**
 	 * Generates a secret key to initialize this prf object.
-	 * @param keySize algorithmParameterSpec contains the required parameters for the key generation
+	 * @param keyParams algorithmParameterSpec contains the required parameters for the key generation
 	 * @return the generated secret key
 	 * @throws InvalidParameterSpecException 
 	 */
@@ -95,10 +95,10 @@ public interface PseudorandomFunction {
 	 * such interfaces.
 	 * 
 	 * @param inBytes input bytes to compute
-	 * @param inOff input offset in the inBytes array
+	 * @param inOffset input offset in the inBytes array
 	 * @param inLen the length of the input array
 	 * @param outBytes output bytes. The resulted bytes of compute.
-	 * @param outOff output offset in the outBytes array to put the result from
+	 * @param outOffset output offset in the outBytes array to put the result from
 	 * @throws IllegalBlockSizeException 
 	 */
 	public void computeBlock(byte[] inBytes, int inOffset, int inLen, byte[] outBytes, int outOffset) throws IllegalBlockSizeException;

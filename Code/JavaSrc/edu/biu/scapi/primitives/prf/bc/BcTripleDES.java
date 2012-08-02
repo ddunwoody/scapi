@@ -63,7 +63,7 @@ public final class BcTripleDES extends BcPRP implements TripleDES{
 
 	/**
 	 * This function should not be used to generate a key for TripleDes and it throws UnsupportedOperationException
-	 * @param keySize algorithmParameterSpec contains the required secret key size in bits 
+	 * @param keyParams algorithmParameterSpec contains the required secret key size in bits 
 	 * @return the generated secret key
 	 * @throws UnsupportedOperationException 
 	 */
