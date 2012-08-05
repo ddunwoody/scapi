@@ -109,7 +109,7 @@ public class ECF2mUtility {
 	/**
 	 * checks if the given point is in the given dlog group with the q prime order. 
 	 * A point is in the group if it in the q-order group which is a sub-group of the Elliptic Curve.
-	 * Tha basic assumption of this function is that checkCurveMembership function has already been called and returned true.
+	 * The basic assumption of this function is that checkCurveMembership function has already been called and returned true.
 	 * @param curve
 	 * @param point
 	 * @return true if the given point is in the given dlog group.
@@ -184,36 +184,51 @@ public class ECF2mUtility {
 			throw new IllegalArgumentException("curveName is not a curve over F2m field and doesn't match the DlogGroup type"); 
 		}
 
-		// get the curve parameters
+		// get the curve parameters:
+		// The degree of the field.
 		int m = Integer.parseInt(ecProperties.getProperty(curveName));
+		//If an irreducible trinomial t^m + t^k + 1 exists over GF(2), then the field polynomial p(t) is chosen to be the irreducible 
+		//trinomial with the lowest degree middle term t^k. 
+		//If no irreducible trinomial exists, then one selects instead a pentanomial t^m+t^k+t^k2+t^k3+1. The particular pentanomial 
+		//chosen has the following properties: the second term t^k has the lowest degree among all irreducible pentanomials of degree m; 
+		//the third term t^k2 has the lowest degree among all irreducible pentanomials of degree m and second term t^k; 
+		//and the fourth term t^k3 has the lowest degree among all irreducible pentanomials of degree m, second term t^k, and third term t^k2.
 		int k = Integer.parseInt(ecProperties.getProperty(curveName + "k"));
-		String k2Property = ecProperties.getProperty(curveName + "k2");
+		String k2Property = ecProperties.getProperty(curveName + "k2"); //we hold that as a string an not as int because is can be null.
 		String k3Property = ecProperties.getProperty(curveName + "k3");
+		
+		//Coefficients of the curve equaltion.
 		BigInteger a = new BigInteger(ecProperties.getProperty(curveName + "a"));
 		BigInteger b = new BigInteger(1,Hex.decode(ecProperties.getProperty(curveName+"b")));
+		
+		//Coordinates x, y, of the base point (generator).
 		BigInteger x = new BigInteger(1,Hex.decode(ecProperties.getProperty(curveName+"x")));
 		BigInteger y = new BigInteger(1,Hex.decode(ecProperties.getProperty(curveName+"y")));
+		
+		//The order of the group.
 		BigInteger q = new BigInteger(ecProperties.getProperty(curveName + "r"));
+		
+		//the cofactor of the curve.
 		BigInteger h = new BigInteger(ecProperties.getProperty(curveName + "h"));
 		
 		int k2 = 0;
 		int k3 = 0;
-		boolean trinomial;
 		
-		GroupParams groupParams;
-		if (k2Property == null && k3Property == null) { // for trinomial basis
+		GroupParams groupParams = null;
+		// for trinomial basis, where there is just one value represents the irreducible polynomial.
+		if (k2Property == null && k3Property == null) { 
 			groupParams = new ECF2mTrinomialBasis(q, x, y, m, k, a, b, h);
-			trinomial = true;
-		} else { // pentanomial basis
+			
+		} else if (k2Property != null && k3Property != null){ // pentanomial basis must have three k values.
 			k2 = Integer.parseInt(k2Property);
 			k3 = Integer.parseInt(k3Property);
-			trinomial = false;
 			groupParams = new ECF2mPentanomialBasis(q, x, y, m, k, k2, k3, a, b, h);
+		} else { //if the irreducible polynomial is not trinomial or pentanomial.
+			throw new IllegalArgumentException("the given irreducible polynomial is not trinomial or pentanomial basis");
 		}
 		// koblitz curve
 		if (curveName.contains("K-")) {
 
-			
 			groupParams = new ECF2mKoblitz((ECF2mGroupParams) groupParams, q, h);
 		}
 
