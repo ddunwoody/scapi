@@ -30,6 +30,7 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.SecretKey;
 
 import edu.biu.scapi.exceptions.FactoriesException;
+import edu.biu.scapi.exceptions.NoMaxException;
 import edu.biu.scapi.primitives.kdf.HKDF;
 import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
 import edu.biu.scapi.primitives.prf.PseudorandomFunction;
@@ -84,7 +85,7 @@ public class ScPrgFromPrf implements PseudorandomGenerator{
 		//If there is no limit on the block size, use default size.
 		try {
 			ctr = new byte[prf.getBlockSize()];
-		} catch (UnsupportedOperationException e){
+		} catch (NoMaxException e){
 			ctr = new byte[16];
 		}
 		
