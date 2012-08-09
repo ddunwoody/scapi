@@ -203,22 +203,8 @@ JNIEXPORT jbyteArray JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_encryp
 }
 
 
-JNIEXPORT jbyteArray JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_encryption_CryptoPPRSAOaep_getRSAModulus
-  (JNIEnv *env, jobject, jlong encryptor){
+JNIEXPORT jint JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_encryption_CryptoPPRSAOaep_getPlaintextLength
+  (JNIEnv *, jobject, jlong encryptor){
 
-	RSAES_OAEP_SHA_Encryptor * encryptorLocal = (RSAES_OAEP_SHA_Encryptor * )encryptor;
-
-	Integer mod = encryptorLocal->GetKey().GetModulus();
-	Utils utils;
-	return utils.CryptoPPIntegerTojbyteArray (env, mod);
+	  return ((RSAES_OAEP_SHA_Encryptor * )encryptor)->FixedMaxPlaintextLength();
 }
-
-
-JNIEXPORT jbyteArray JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_encryption_CryptoPPRSAOaep_getPubExponent
-  (JNIEnv *env, jobject, jlong encryptor) {
-	RSAES_OAEP_SHA_Encryptor * encryptorLocal = (RSAES_OAEP_SHA_Encryptor * )encryptor;
-	Integer pubExp = encryptorLocal->GetKey().GetPublicExponent();
-	Utils utils;
-	return utils.CryptoPPIntegerTojbyteArray (env, pubExp);
-}
-

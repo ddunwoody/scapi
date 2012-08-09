@@ -49,22 +49,6 @@ JNIEXPORT void JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_encryption_C
 
 /*
  * Class:     edu_biu_scapi_midLayer_asymmetricCrypto_encryption_CryptoPPRSAOaep
- * Method:    getRSAModulus
- * Signature: (J)[B
- */
-JNIEXPORT jbyteArray JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_encryption_CryptoPPRSAOaep_getRSAModulus
-  (JNIEnv *, jobject, jlong);
-
-/*
- * Class:     edu_biu_scapi_midLayer_asymmetricCrypto_encryption_CryptoPPRSAOaep
- * Method:    getPubExponent
- * Signature: (J)[B
- */
-JNIEXPORT jbyteArray JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_encryption_CryptoPPRSAOaep_getPubExponent
-  (JNIEnv *, jobject, jlong);
-
-/*
- * Class:     edu_biu_scapi_midLayer_asymmetricCrypto_encryption_CryptoPPRSAOaep
  * Method:    doEncrypt
  * Signature: (J[B)[B
  */
@@ -78,6 +62,14 @@ JNIEXPORT jbyteArray JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_encryp
  */
 JNIEXPORT jbyteArray JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_encryption_CryptoPPRSAOaep_doDecrypt
   (JNIEnv *, jobject, jlong, jbyteArray);
+
+/*
+ * Class:     edu_biu_scapi_midLayer_asymmetricCrypto_encryption_CryptoPPRSAOaep
+ * Method:    getPlaintextLength
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_encryption_CryptoPPRSAOaep_getPlaintextLength
+  (JNIEnv *, jobject, jlong);
 
 #ifdef __cplusplus
 }
