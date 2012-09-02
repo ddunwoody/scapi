@@ -359,6 +359,8 @@
       <packagedElement xmi:type="uml:PrimitiveType" xmi:id="_SaxH8JmgEeG-uPQXa16pig" name="PaddingScheme"/>
       <packagedElement xmi:type="uml:PrimitiveType" xmi:id="_RO4gQJ5ZEeG0m_RCXb2PiA" name="OAEPEncoding"/>
       <packagedElement xmi:type="uml:PrimitiveType" xmi:id="_iYfBUJ5gEeG0m_RCXb2PiA" name="PSSSigner"/>
+      <packagedElement xmi:type="uml:PrimitiveType" xmi:id="_IUm-gNVwEeG7tKlVcWTqJA" name="RSAPublicKey"/>
+      <packagedElement xmi:type="uml:PrimitiveType" xmi:id="_IbozkNVwEeG7tKlVcWTqJA" name="RSAPrivateKey"/>
     </packagedElement>
     <packagedElement xmi:type="uml:Package" xmi:id="_gNQrwP3pEd-nt4IVKKjkMA" name="edu">
       <eAnnotations xmi:id="_gOmIgP3pEd-nt4IVKKjkMA" source="uml2.diagrams"/>
@@ -2433,7 +2435,7 @@
                       <children xmi:type="notation:ListCompartment" xmi:id="_eTYw0jetEeGG0sdbzZXJ5g" type="FromConstraintCompartment"/>
                       <layoutConstraint xmi:type="notation:Location" xmi:id="_eTYw0TetEeGG0sdbzZXJ5g" y="1058"/>
                     </children>
-                    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_eTQ1AjetEeGG0sdbzZXJ5g" points="[6944, 2032, -22168, -8047]$[15665, 2032, -13447, -8047]$[15665, 6945, -13447, -3134]$[18994, 6945, -10118, -3134]"/>
+                    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_eTQ1AjetEeGG0sdbzZXJ5g" points="[6991, 1883, -20885, -7752]$[15289, 1883, -12587, -7752]$[15289, 6648, -12587, -2987]$[18989, 6648, -8887, -2987]"/>
                     <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_8DTEYDevEeGG0sdbzZXJ5g" id="(0.088559486,0.0)"/>
                     <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_8DTrcDevEeGG0sdbzZXJ5g" id="(0.7499518,1.0)"/>
                   </edges>
@@ -2475,7 +2477,7 @@
                       <children xmi:type="notation:ListCompartment" xmi:id="_xKuYUjevEeGG0sdbzZXJ5g" type="FromConstraintCompartment"/>
                       <layoutConstraint xmi:type="notation:Location" xmi:id="_xKuYUTevEeGG0sdbzZXJ5g" y="1058"/>
                     </children>
-                    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_xKmcgjevEeGG0sdbzZXJ5g" points="[3810, 1665, -18794, -3134]$[15860, 1665, -6744, -3134]"/>
+                    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_xKmcgjevEeGG0sdbzZXJ5g" points="[3836, 1559, -17922, -2796]$[15834, 1559, -5924, -2796]"/>
                     <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_8DR2QDevEeGG0sdbzZXJ5g" id="(0.49990776,0.0)"/>
                     <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_8DR2QTevEeGG0sdbzZXJ5g" id="(0.49990353,1.0)"/>
                   </edges>
@@ -2517,7 +2519,7 @@
                       <children xmi:type="notation:ListCompartment" xmi:id="_AB9SUjewEeGG0sdbzZXJ5g" type="FromConstraintCompartment"/>
                       <layoutConstraint xmi:type="notation:Location" xmi:id="_AB9SUTewEeGG0sdbzZXJ5g" y="1058"/>
                     </children>
-                    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_AB19kjewEeGG0sdbzZXJ5g" points="[3809, 204, -18796, 5144]$[12530, 204, -10075, 5144]$[12530, -4816, -10075, 124]$[15859, -4816, -6746, 124]"/>
+                    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_AB19kjewEeGG0sdbzZXJ5g" points="[3835, 135, -17923, 5283]$[12133, 135, -9625, 5283]$[12133, -4955, -9625, 193]$[15833, -4955, -5925, 193]"/>
                   </edges>
                   <edges xmi:type="umlnotation:UMLConnector" xmi:id="_MZOAoEgcEeGplbVnQcQchA" element="_JhqksEgcEeGplbVnQcQchA" source="_MZDokEgcEeGplbVnQcQchA" target="_6VatoDesEeGG0sdbzZXJ5g" routing="Rectilinear" lineColor="8421504" lineWidth="1" showStereotype="Text">
                     <children xmi:type="notation:DecorationNode" xmi:id="_MZPOwEgcEeGplbVnQcQchA" type="NameLabel">
@@ -2557,7 +2559,7 @@
                       <children xmi:type="notation:ListCompartment" xmi:id="_MZbcAEgcEeGplbVnQcQchA" type="FromConstraintCompartment"/>
                       <layoutConstraint xmi:type="notation:Location" xmi:id="_MZa08UgcEeGplbVnQcQchA" y="1058"/>
                     </children>
-                    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_MZOAokgcEeGplbVnQcQchA" points="[3809, 375, -18796, 10067]$[12530, 375, -10075, 10067]$[12530, -9568, -10075, 124]$[15859, -9568, -6746, 124]"/>
+                    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_MZOAokgcEeGplbVnQcQchA" points="[3359, 336, -18875, 10145]$[12609, 336, -9625, 10145]$[12609, -9646, -9625, 163]$[16309, -9646, -5925, 163]"/>
                   </edges>
                 </contents>
               </eAnnotations>
