@@ -64,7 +64,7 @@ public class MiraclDlogECF2m extends MiraclAdapterDlogEC implements DlogECF2m, D
 	 * @throws IllegalAccessException
 	 */
 	public MiraclDlogECF2m(String curveName) throws IllegalArgumentException, IOException{
-		this(PROPERTIES_FILES_PATH, curveName);
+		this(NISTEC_PROPERTIES_FILE, curveName);
 	}
 
 	/**

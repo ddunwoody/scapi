@@ -58,7 +58,7 @@ public class MiraclDlogECFp extends MiraclAdapterDlogEC implements DlogECFp, DDH
 	}
 
 	public MiraclDlogECFp(String curveName) throws IllegalArgumentException, IOException{
-		this(PROPERTIES_FILES_PATH, curveName);
+		this(NISTEC_PROPERTIES_FILE, curveName);
 	}
 
 	/**
