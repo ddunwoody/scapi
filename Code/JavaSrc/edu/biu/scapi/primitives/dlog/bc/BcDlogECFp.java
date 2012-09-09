@@ -56,7 +56,7 @@ public class BcDlogECFp extends BcAdapterDlogEC implements DlogECFp, DDH {
 	 * @throws IllegalAccessException
 	 */
 	public BcDlogECFp(String curveName) throws IllegalArgumentException, IOException {
-		this(PROPERTIES_FILES_PATH, curveName);
+		this(NISTEC_PROPERTIES_FILE, curveName);
 	}
 
 	/**
