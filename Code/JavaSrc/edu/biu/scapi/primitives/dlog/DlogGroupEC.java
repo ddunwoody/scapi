@@ -34,8 +34,9 @@ import edu.biu.scapi.primitives.dlog.miracl.ECFpPointMiracl;
 public abstract class DlogGroupEC extends DlogGroupAbs implements DlogEllipticCurve{
 
 	private  Properties nistProperties; // properties object to hold nist parameters
-	protected static String PROPERTIES_FILES_PATH = System.getProperty("java.class.path").toString().split(";")[0]+"\\propertiesFiles\\NISTEC.properties";
+	protected static final String NISTEC_PROPERTIES_FILE = System.getProperty("java.class.path").toString().split(";")[0]+"\\propertiesFiles\\NISTEC.properties";
 	protected String curveName;
+	protected String fileName;
 	
 	protected DlogGroupEC(){};
 	
@@ -49,12 +50,13 @@ public abstract class DlogGroupEC extends DlogGroupAbs implements DlogEllipticCu
 		Properties ecProperties;
 		
 		ecProperties = getProperties(fileName); //get properties object containing the curve data
-		PROPERTIES_FILES_PATH = fileName;
+		//PROPERTIES_FILES_PATH = fileName;
 		//checks that the curveName is in the file 
 		if(!ecProperties.containsKey(curveName)) { 
 			throw new IllegalArgumentException("no such elliptic curve in the given file");
 		}
 		this.curveName = curveName;
+		this.fileName = fileName;
 			
 		doInit(ecProperties, curveName); // set the data and initialize the curve
 		
@@ -68,7 +70,7 @@ public abstract class DlogGroupEC extends DlogGroupAbs implements DlogEllipticCu
 		Properties ecProperties = null;
 		
 		//If we had already open the NISTEC file then do not open it again, just return it.
-		if(fileName.contains("NISTEC") && nistProperties!=null){
+		if(fileName.equals(NISTEC_PROPERTIES_FILE) && nistProperties!=null){
 			return nistProperties;
 		}
 	
@@ -79,7 +81,9 @@ public abstract class DlogGroupEC extends DlogGroupAbs implements DlogEllipticCu
 		ecProperties.load(in);
 		in.close();
 		
-		if(fileName.contains("NISTEC")){
+		//Set the member variable nistProperties to the recently loaded ecProperties file, so that next time
+		//the NIST file has to be read, the already loaded file will be returned. (See above). 
+		if(fileName.equals(NISTEC_PROPERTIES_FILE)){
 			nistProperties = ecProperties;
 		}
 
@@ -91,7 +95,7 @@ public abstract class DlogGroupEC extends DlogGroupAbs implements DlogEllipticCu
 	}
 	
 	public String getFileName(){
-		return PROPERTIES_FILES_PATH;
+		return fileName;
 	}
 	
 	/**
