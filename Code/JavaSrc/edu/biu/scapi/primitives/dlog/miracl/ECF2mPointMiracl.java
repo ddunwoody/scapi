@@ -185,7 +185,7 @@ public class ECF2mPointMiracl implements ECElement, ECF2mPoint{
 	
 	@Override
 	public String toString() {
-		return "ECF2mPointMiracl [point= " + getX() + ", " + getY() + "]";
+		return "ECF2mPointMiracl [point= " + getX() + "; " + getY() + "]";
 	}
 	/**
 	 * delete the related point

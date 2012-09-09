@@ -146,7 +146,7 @@ public class ECFpPointMiracl implements ECElement, ECFpPoint{
 	
 	@Override
 	public String toString() {
-		return "ECFpPointMiracl [point= " + getX() + ", " + getY() + "]";
+		return "ECFpPointMiracl [point= " + getX() + "; " + getY() + "]";
 	}
 	
 	/**
