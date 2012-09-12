@@ -26,7 +26,7 @@ import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
 import edu.biu.scapi.tools.Factories.BCFactory;
 
 /**
- * concrete class of KDF for ISO18033. This class wraps the implementation of bouncy castle.
+ * This is a concrete class of KDF for ISO18033. This class wraps the implementation of bouncy castle.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Meital Levy)
  *
