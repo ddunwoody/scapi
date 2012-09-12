@@ -51,36 +51,6 @@ public class ECFpPointBc extends ECPointBc implements ECFpPoint{
 		point = curve.createPoint(x, y);
 	}
 
-	/**
-	 * Constructor that accepts x value of a point, calculates its corresponding
-	 * y value and create a point with these values.
-	 * @param x the x coordinate of the point
-	 * @param curve elliptic curve dlog group over Fp
-	 */
-	ECFpPointBc(BigInteger x, BcDlogECFp curve) {
-		// This constructor is NOT guarantee that the created point is in the group. 
-		// It creates a point on the curve, but this point is not necessarily a point in the dlog group, 
-		// which is a sub-group of the elliptic curve.
-
-		BigInteger p = ((ECFpGroupParams) curve.getGroupParams()).getP();
-		ECFieldElement.Fp xElement = new ECFieldElement.Fp(p, x);
-		ECFieldElement.Fp aElement = new ECFieldElement.Fp(p, ((ECGroupParams) curve.getGroupParams()).getA());
-		ECFieldElement.Fp bElement = new ECFieldElement.Fp(p, ((ECGroupParams) curve.getGroupParams()).getB());
-		// computes x^3
-		ECFieldElement.Fp x3 = (Fp) xElement.square().multiply(xElement);
-		// computes x^3+ax+b
-		ECFieldElement.Fp result = (Fp) x3.add(aElement.multiply(xElement)).add(bElement);
-		// computes sqrt(x^3+ax+b)
-		ECFieldElement.Fp yVal = (Fp) result.sqrt();
-		if (yVal != null) { // if there is a square root, creates a point
-			BigInteger y = yVal.toBigInteger();
-			// creates the point
-			point = ((BcAdapterDlogEC) curve).createPoint(x, y);
-		} else {
-			throw new IllegalArgumentException("the given x has no corresponding y in the current curve");
-		}
-	}
-
 	/*
 	 * Constructor that gets an element and sets it. 
 	 * Only our inner functions use this constructor to set an element. 
