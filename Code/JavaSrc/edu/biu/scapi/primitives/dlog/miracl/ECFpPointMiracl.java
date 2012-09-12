@@ -63,30 +63,6 @@ public class ECFpPointMiracl implements ECElement, ECFpPoint{
 	}
 	
 	/**
-	 * Constructor that gets a x coordinates , calculates its corresponding y and set the point with these arguments
-	 * @param x the x coordinate
-	 * @param curve 
-	 */
-	ECFpPointMiracl(BigInteger x, MiraclDlogECFp curve){
-		// This constructor does NOT guarantee that the created point is in the group. 
-		// It creates a point on the curve, but this point is not necessarily a point in the dlog group, 
-		// which is a sub-group of the elliptic curve.
-		
-		mip = curve.getMip();
-		
-		boolean validity[] = new boolean[1];
-		
-		//call for native function that creates random point in the field.
-		point = createFpPointFromX(mip, x.toByteArray(), validity);
-		
-		//if the algorithm for random element failed - throws exception
-		if(validity[0]==false){
-			point = 0;
-			throw new IllegalArgumentException("the given x has no corresponding y in the current curve");
-		}
-	}
-	
-	/**
 	 * Constructor that gets pointer to element and sets it.
 	 * Only our inner functions use this constructor to set an element. 
 	 * The ptr is a result of our DlogGroup functions, such as multiply.
