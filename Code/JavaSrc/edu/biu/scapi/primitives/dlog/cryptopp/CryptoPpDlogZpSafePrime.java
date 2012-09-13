@@ -13,8 +13,6 @@ package edu.biu.scapi.primitives.dlog.cryptopp;
 
 import java.math.BigInteger;
 
-import org.bouncycastle.util.Strings;
-
 import edu.biu.scapi.primitives.dlog.DlogGroupAbs;
 import edu.biu.scapi.primitives.dlog.DlogZpSafePrime;
 import edu.biu.scapi.primitives.dlog.GroupElement;
