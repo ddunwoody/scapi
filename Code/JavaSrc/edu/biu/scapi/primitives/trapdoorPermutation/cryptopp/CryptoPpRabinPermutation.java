@@ -13,6 +13,7 @@ package edu.biu.scapi.primitives.trapdoorPermutation.cryptopp;
 
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
+import java.security.KeyException;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -93,7 +94,7 @@ public final class CryptoPpRabinPermutation extends TrapdoorPermutationAbs imple
 		
 		//gets all the parameters
 		BigInteger r, s, p, q, u;
-		modN = pub.getModulus();
+		modulus = pub.getModulus();
 		r = pub.getQuadraticResidueModPrime1();
 		s = pub.getQuadraticResidueModPrime2();
 		p = priv.getPrime1();
@@ -102,7 +103,7 @@ public final class CryptoPpRabinPermutation extends TrapdoorPermutationAbs imple
 		
 	
 		//init the rabin native object
-		tpPtr = initRabinPublicPrivate(modN.toByteArray(), r.toByteArray(), s.toByteArray(), 
+		tpPtr = initRabinPublicPrivate(modulus.toByteArray(), r.toByteArray(), s.toByteArray(), 
 					 p.toByteArray(), q.toByteArray(), u.toByteArray());
 		
 		//calls the parent init that sets the keys
@@ -126,12 +127,12 @@ public final class CryptoPpRabinPermutation extends TrapdoorPermutationAbs imple
 		RabinPublicKey pub = (RabinPublicKey)publicKey;
 		//get the n, r, s parameters
 		BigInteger r,s;
-		modN = pub.getModulus();
+		modulus = pub.getModulus();
 		r = pub.getQuadraticResidueModPrime1();
 		s = pub.getQuadraticResidueModPrime2();
 		
 		//init the rabin native object
-		tpPtr = initRabinPublic(modN.toByteArray(), r.toByteArray(), s.toByteArray());
+		tpPtr = initRabinPublic(modulus.toByteArray(), r.toByteArray(), s.toByteArray());
 		
 		//calls the parent init that sets the key
 		super.setKey(publicKey);
@@ -216,15 +217,18 @@ public final class CryptoPpRabinPermutation extends TrapdoorPermutationAbs imple
 	 * Inverts the Rabin permutation on the given element 
 	 * @param tpEl - the input to invert
 	 * @return - the result element
+	 * @throws KeyException 
 	 * @throws - IllegalArgumentException if the given element is not CryptoPpRabinElement
 	 */
-	public TPElement invert(TPElement tpEl) throws IllegalArgumentException{
+	public TPElement invert(TPElement tpEl) throws IllegalArgumentException, KeyException{
 		if (!isKeySet()){
 			throw new IllegalStateException("keys aren't set");
 		}
-		//in case that the initialization was with public key and no private key - can't do the invert and returns null
-		if (privKey == null && pubKey!=null)
-			return null;
+		
+		//If the key set was only the public key and not the private key - can't do the invert, throw exception.
+		if (privKey == null && pubKey!=null){
+			throw new KeyException("in order to decrypt a message, this object must be initialized with private key");
+		}
 		
 		if (!(tpEl instanceof CryptoPpRabinElement)){
 			throw new IllegalArgumentException("trapdoor element type doesn't match the trapdoor permutation type");
@@ -266,7 +270,7 @@ public final class CryptoPpRabinPermutation extends TrapdoorPermutationAbs imple
 		TPElValidity validity = null;
 		
 		//if the trapdoor permutation or p,q are unknown - returns DONT_KNOW 
-		if ((modN == null) || ((privKey == null) && (pubKey != null))) {
+		if ((modulus == null) || ((privKey == null) && (pubKey != null))) {
 			validity = TPElValidity.DONT_KNOW;
 			
 		//if the value is valid (between 1 to (mod n) - 1 and has a square root mod (N)) - returns VALID 
@@ -290,12 +294,12 @@ public final class CryptoPpRabinPermutation extends TrapdoorPermutationAbs imple
 		if (!isKeySet()){
 			throw new IllegalStateException("keys aren't set");
 		}
-		return new CryptoPpRabinElement(modN);
+		return new CryptoPpRabinElement(modulus);
 	}
 
 	/**
 	 * Creates a Rabin Element based on the x value if the x value is valid for this permutation.<p>
-	 * If is succeeds, it is guaranteed that the element returned is a valid Rabin Element for this Rabin permutation instance.
+	 * If it succeeds, it is guaranteed that the element returned is a valid Rabin Element for this Rabin permutation instance.
 	 * @param x an integer value to set as the value of the Rabin element
 	 * @return a Rabin Element based on the cryptoPP library suitable to use with this permutation.  
 	 * @throws IllegalStateException if keys aren't set
@@ -309,7 +313,7 @@ public final class CryptoPpRabinPermutation extends TrapdoorPermutationAbs imple
 		if (!isKeySet()){
 			throw new IllegalStateException("keys aren't set");
 		}
-		CryptoPpRabinElement tpElement = new CryptoPpRabinElement(modN,x);
+		CryptoPpRabinElement tpElement = new CryptoPpRabinElement(modulus,x);
 		TPElValidity validity = isElement(tpElement);
 		
 		if(validity == TPElValidity.NOT_VALID)
