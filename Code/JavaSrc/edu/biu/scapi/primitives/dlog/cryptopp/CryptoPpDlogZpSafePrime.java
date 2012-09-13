@@ -170,7 +170,8 @@ public class CryptoPpDlogZpSafePrime extends DlogGroupAbs implements DlogZpSafeP
 	 * @return the random element
 	 */
 	public GroupElement createRandomElement() {
-		
+		//This function overrides the basic implementation of DlogGroupAbs. For the case of Zp Safe Prime this is a more efficient implementation.
+		//It calls the package private constructor of ZpSafePrimeElementCryptoPp, which randomly creates an element in Zp.
 		return new ZpSafePrimeElementCryptoPp(((ZpGroupParams) groupParams).getP());
 
 	}
@@ -364,6 +365,10 @@ public class CryptoPpDlogZpSafePrime extends DlogGroupAbs implements DlogZpSafeP
 	 * @return a byte[] decoding of the group element
 	 */
 	public byte[] decodeGroupElementToByteArray(GroupElement groupElement) {
+		if (!(groupElement instanceof ZpSafePrimeElementCryptoPp)){
+			throw new IllegalArgumentException("element type doesn't match the group type");
+		}
+		
 		//Given a group element y, find the two inverses z,-z. Take z to be the value between 1 and (p-1)/2. Return s=z-1
 		BigInteger y = ((ZpElement) groupElement).getElementValue();
 		BigInteger p = ((ZpGroupParams) groupParams).getP();
