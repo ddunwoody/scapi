@@ -14,14 +14,9 @@ package edu.biu.scapi.primitives.dlog;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.util.Properties;
 
-import org.bouncycastle.util.encoders.Hex;
-
-import edu.biu.scapi.primitives.dlog.groupParams.ECFpGroupParams;
-import edu.biu.scapi.primitives.dlog.groupParams.GroupParams;
-import edu.biu.scapi.primitives.dlog.miracl.ECFpPointMiracl;
+import edu.biu.scapi.exceptions.UnInitializedException;
 
 
 /**
