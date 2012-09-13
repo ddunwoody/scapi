@@ -89,11 +89,11 @@ public class IteratedPrfVarying extends PrfVaryingFromPrfVaryingInput {
 	 * 
 	 * This function is necessary since this prf has variable input and output length.
 	 * @param inBytes - input bytes to compute
-	 * @param inLen - the length of the input array
+	 * @param inLen - the length of the input array in bytes
 	 * @param inOff - input offset in the inBytes array
 	 * @param outBytes - output bytes. The resulted bytes of compute.
 	 * @param outOff - output offset in the outBytes array to put the result from
-	 * @param outLen - the length of the output array
+	 * @param outLen - the length of the output array in bytes
 	 */
 	public void computeBlock(byte[] inBytes, int inOff, int inLen, byte[] outBytes, int outOff, int outLen) {
 		if (!isKeySet()){
