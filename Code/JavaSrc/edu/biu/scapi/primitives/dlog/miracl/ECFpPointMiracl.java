@@ -11,9 +11,6 @@
 */
 package edu.biu.scapi.primitives.dlog.miracl;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.math.BigInteger;
 
 import edu.biu.scapi.primitives.dlog.ECElement;
