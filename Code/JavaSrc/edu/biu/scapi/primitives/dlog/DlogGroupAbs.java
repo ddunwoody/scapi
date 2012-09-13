@@ -95,6 +95,9 @@ public abstract class DlogGroupAbs implements primeOrderSubGroup{
 	 * @return the random element
 	 */
 	public GroupElement createRandomElement() {
+		//This is a default implementation that is valid for all the Dlog Groups and relies on mathematical properties of the generators.
+		//However, if a specific Dlog Group has a more efficient implementation then is it advised to override this function in that concrete
+		//Dlog group. For example we do so in CryptoPpDlogZpSafePrime.
 		BigInteger one = BigInteger.ONE;
 		BigInteger qMinusOne = groupParams.getQ().subtract(one);
 
