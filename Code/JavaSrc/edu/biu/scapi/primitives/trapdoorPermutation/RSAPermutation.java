@@ -11,6 +11,8 @@
 */
 package edu.biu.scapi.primitives.trapdoorPermutation;
 
+import java.math.BigInteger;
+
 /**
  * Marker interface. Each RSA concrete class should implement this interface.
  * 
@@ -18,4 +20,11 @@ package edu.biu.scapi.primitives.trapdoorPermutation;
  *
  */
 public interface RSAPermutation extends TrapdoorPermutation {
+	
+	/** 
+	 * RSA permutation is a trapdoor permutations written as exponentiation modulo a composite number N called the modulus. 
+	 * This function returns this modulus. 
+	 * @return the modulus of the permutation. 
+	 */
+	public BigInteger getModulus();
 }
