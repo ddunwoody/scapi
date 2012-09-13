@@ -28,7 +28,7 @@ final class CryptoPpRSAElement extends CryptoPpTrapdoorElement{
 	 * Constructor that chooses a random element according to the given modulus.
 	 * @param modN the modulus
 	 */
-	public CryptoPpRSAElement(BigInteger modN) {
+	CryptoPpRSAElement(BigInteger modN) {
 		/*
 		 * calls a native function that samples a random number between 1 to mondN-1 and returns its pointer.
 		 * sets the pointer to be the element pointer
@@ -44,7 +44,7 @@ final class CryptoPpRSAElement extends CryptoPpTrapdoorElement{
 	 * 				else, do not check and set x as is
 	 * @throws IllegalArgumentException if the element is not legal according to the modulus and check was requested
 	 */
-	public CryptoPpRSAElement(BigInteger modN, BigInteger x, boolean check) throws IllegalArgumentException{
+	CryptoPpRSAElement(BigInteger modN, BigInteger x, boolean check) throws IllegalArgumentException{
 		if( !check){
 			pointerToInteger = getPointerToElement(x.toByteArray());
 		}else {
