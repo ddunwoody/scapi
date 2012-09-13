@@ -13,6 +13,7 @@ package edu.biu.scapi.primitives.trapdoorPermutation;
 
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
+import java.security.KeyException;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -59,12 +60,7 @@ public interface TrapdoorPermutation {
 	 */
 	public PublicKey getPubKey();
 	
-	/** 
-	 * Some of the trapdoor permutations are written as exponentiation modulo a composite number. This function returns this modulus. 
-	 * @return the modulus of the permutation. 
-	 */
-	public BigInteger getModulus();
-
+	
 	/** 
 	 * @return the algorithm name. for example - RSA, Rabin.
 	 */
@@ -97,9 +93,10 @@ public interface TrapdoorPermutation {
 	 * Inverts the operation of this trapdoor permutation on the given TPElement.
 	 * @param tpEl - the input to invert
 	 * @return - the result TPElement from the invert operation
+	 * @throws KeyException if there is no private key
 	 * @throws IllegalArgumentException if the given element is invalid for this permutation
 	 */
-	public TPElement invert(TPElement tpEl) throws IllegalArgumentException;
+	public TPElement invert(TPElement tpEl) throws KeyException;
 
 	/** 
 	 * Computes the hard core predicate of the given tpElement. <p>
