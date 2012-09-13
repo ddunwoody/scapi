@@ -29,7 +29,7 @@ final class RSAElement implements TPElement{
 	 * Constructor that chooses a random element according to the given modulus.
 	 * @param modN the modulus
 	 */
-	public RSAElement(BigInteger modN) {
+	RSAElement(BigInteger modN) {
 		/*
 		 * samples a number between 1 to n-1
 		 */
@@ -55,7 +55,7 @@ final class RSAElement implements TPElement{
 	 * @param x - the element value
 	 * @throws IllegalArgumentException if the element is not legal according the modulus
 	 */
-	public RSAElement(BigInteger modN, BigInteger x, boolean check) throws IllegalArgumentException{
+	RSAElement(BigInteger modN, BigInteger x, boolean check) throws IllegalArgumentException{
 
 		if (! check){
 			element = x;
