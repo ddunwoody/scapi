@@ -29,7 +29,7 @@ final class CryptoPpRabinElement extends CryptoPpTrapdoorElement{
 	 * Constructor that chooses a random element according to the given modulus.
 	 * @param modN the modulus
 	 */
-	public CryptoPpRabinElement(BigInteger modN) {
+	CryptoPpRabinElement(BigInteger modN) {
 		/*
 		 * samples a number between 1 to mod n with a square root mod(N)
 		 */
@@ -44,7 +44,7 @@ final class CryptoPpRabinElement extends CryptoPpTrapdoorElement{
 	 * @param modN - modulus
 	 * @param x - the element value
 	 */
-	public CryptoPpRabinElement(BigInteger modN, BigInteger x) {
+	CryptoPpRabinElement(BigInteger modN, BigInteger x) {
 		pointerToInteger = getPointerToElement(x.toByteArray());
 	}
 	
