@@ -65,7 +65,6 @@ public class ZpSafePrimeElementCryptoPp implements ZpSafePrimeElement {
 	 * @throws IllegalArgumentException
 	 */
 	ZpSafePrimeElementCryptoPp(BigInteger p){
-
 		BigInteger element = null;
 		// find a number in the range [1, ..., p-1]
 		element = BigIntegers.createRandomInRange(BigInteger.ONE, p.subtract(BigInteger.ONE), new SecureRandom());
