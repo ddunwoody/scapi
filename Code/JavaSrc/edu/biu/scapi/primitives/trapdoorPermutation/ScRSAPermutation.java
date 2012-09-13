@@ -13,6 +13,7 @@ package edu.biu.scapi.primitives.trapdoorPermutation;
 
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
+import java.security.KeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -64,7 +65,7 @@ public final class ScRSAPermutation extends TrapdoorPermutationAbs implements RS
 			throw new InvalidKeyException("Key type doesn't match the trapdoor permutation type");
 		}
 
-		modN = ((RSAPublicKey)publicKey).getModulus();
+		modulus = ((RSAPublicKey)publicKey).getModulus();
 
 		//calls the father init that sets the keys
 		super.setKey(publicKey, privateKey);
@@ -84,7 +85,7 @@ public final class ScRSAPermutation extends TrapdoorPermutationAbs implements RS
 			throw new InvalidKeyException("Key type doesn't match the trapdoor permutation type");
 		}
 
-		modN = ((RSAPublicKey)publicKey).getModulus();
+		modulus = ((RSAPublicKey)publicKey).getModulus();
 
 		//calls the father init that sets the key
 		super.setKey(publicKey);
@@ -154,7 +155,7 @@ public final class ScRSAPermutation extends TrapdoorPermutationAbs implements RS
 		BigInteger result = element.modPow(
 				((RSAPublicKey)pubKey).getPublicExponent(), ((RSAPublicKey)pubKey).getModulus());
 		// builds the return element
-		RSAElement returnEl = new RSAElement(modN, result, false);	//create an RSAElement without checking since "result" is the result of the computation and it should be valid.		
+		RSAElement returnEl = new RSAElement(modulus, result, false);	//create an RSAElement without checking since "result" is the result of the computation and it should be valid.		
 		//returns the result of the computation
 		return returnEl;
 	}
@@ -164,14 +165,17 @@ public final class ScRSAPermutation extends TrapdoorPermutationAbs implements RS
 	 * @param tpEl - the input to invert
 	 * @return - the result 
 	 * @throws IllegalArgumentException if the given element is not a RSA element
+	 * @throws KeyException 
 	 */
-	public TPElement invert(TPElement tpEl)  throws IllegalArgumentException{
+	public TPElement invert(TPElement tpEl)  throws IllegalArgumentException, KeyException{
 		if (!isKeySet()){
 			throw new IllegalStateException("keys aren't set");
 		}
-		//in case that the initialization was with public key and no private key- can't do the invert and returns null
-		if (privKey == null && pubKey!=null)
-			return null;
+
+		//If the key set was only the public key and not the private key - can't do the invert, throw exception.
+		if (privKey == null && pubKey!=null){
+			throw new KeyException("in order to decrypt a message, this object must be initialized with private key");
+		}
 
 		if (!(tpEl instanceof RSAElement)) {
 			throw new IllegalArgumentException("trapdoor element doesn't match the trapdoor permutation");
@@ -182,7 +186,7 @@ public final class ScRSAPermutation extends TrapdoorPermutationAbs implements RS
 		//invert the permutation
 		BigInteger result = doInvert(element);
 		//builds the return element
-		RSAElement returnEl = new RSAElement(modN, result, false); //create an RSAElement without checking since "result" is the result of the computation and it should be valid.
+		RSAElement returnEl = new RSAElement(modulus, result, false); //create an RSAElement without checking since "result" is the result of the computation and it should be valid.
 		//returns the result
 		return returnEl;
 	}
@@ -256,11 +260,11 @@ public final class ScRSAPermutation extends TrapdoorPermutationAbs implements RS
 		BigInteger value = ((RSAElement)tpEl).getElement();
 
 		//if mod n is unknown - returns DONT_KNOW 
-		if (modN==null) {
+		if (modulus==null) {
 			validity = TPElValidity.DONT_KNOW;
 
 			//if the value is valid (between 1 to (mod n) - 1) returns VALID 
-		} else if(((value.compareTo(BigInteger.ZERO))>0) && (value.compareTo(modN)<0)) {
+		} else if(((value.compareTo(BigInteger.ZERO))>0) && (value.compareTo(modulus)<0)) {
 
 			validity = TPElValidity.VALID;
 			//if the value is invalid returns NOT_VALID 
@@ -280,7 +284,7 @@ public final class ScRSAPermutation extends TrapdoorPermutationAbs implements RS
 		if (!isKeySet()){
 			throw new IllegalStateException("keys aren't set");
 		}
-		return new RSAElement(modN);
+		return new RSAElement(modulus);
 	}
 	
 	/** 
@@ -293,7 +297,7 @@ public final class ScRSAPermutation extends TrapdoorPermutationAbs implements RS
 		if (!isKeySet()){
 			throw new IllegalStateException("keys aren't set");
 		}
-		return new RSAElement(modN, x, true);
+		return new RSAElement(modulus, x, true);
 	}
 
 	/** 
@@ -304,7 +308,7 @@ public final class ScRSAPermutation extends TrapdoorPermutationAbs implements RS
 	 */
 	public TPElement generateUncheckedTPElement(BigInteger x) throws IllegalArgumentException {
 	
-		return new RSAElement(modN, x, false);
+		return new RSAElement(modulus, x, false);
 	}
 
 	/**
