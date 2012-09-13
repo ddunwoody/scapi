@@ -13,6 +13,7 @@ package edu.biu.scapi.primitives.trapdoorPermutation.cryptopp;
 
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
+import java.security.KeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -97,7 +98,7 @@ public final class CryptoPpRSAPermutation extends TrapdoorPermutationAbs impleme
 		/* gets the values of modulus (N), pubExponent (e), privExponent (d)*/
 		BigInteger pubExponent = ((RSAPublicKey) publicKey).getPublicExponent();
 		BigInteger privExponent = ((RSAPrivateKey) privateKey).getPrivateExponent();
-		modN = ((RSAKey) publicKey).getModulus();
+		modulus = ((RSAKey) publicKey).getModulus();
 		
 		//if private key is CRT private key
 		if (privateKey instanceof RSAPrivateCrtKey)
@@ -111,14 +112,14 @@ public final class CryptoPpRSAPermutation extends TrapdoorPermutationAbs impleme
 			BigInteger crt = key.getCrtCoefficient();
 			
 			//initializes the native object
-			tpPtr = initRSAPublicPrivateCrt(modN.toByteArray(), pubExponent.toByteArray(), privExponent.toByteArray(), 
+			tpPtr = initRSAPublicPrivateCrt(modulus.toByteArray(), pubExponent.toByteArray(), privExponent.toByteArray(), 
 					p.toByteArray(), q.toByteArray(), dp.toByteArray(), dq.toByteArray(), crt.toByteArray());
 			
 		//if private key is key with N, e, d
 		} else {
 			
 			//init the native object with the RSA parameters - n, e, d
-			tpPtr = initRSAPublicPrivate(modN.toByteArray(), pubExponent.toByteArray(), privExponent.toByteArray());
+			tpPtr = initRSAPublicPrivate(modulus.toByteArray(), pubExponent.toByteArray(), privExponent.toByteArray());
 		}
 		
 		//calls the parent init that sets the keys
@@ -139,10 +140,10 @@ public final class CryptoPpRSAPermutation extends TrapdoorPermutationAbs impleme
 			
 		RSAPublicKey pub = (RSAPublicKey) publicKey;
 		BigInteger pubExponent = pub.getPublicExponent();
-		modN = pub.getModulus();
+		modulus = pub.getModulus();
 		
 		//init the native object with the RSA public parameters - n, e
-		tpPtr = initRSAPublic(modN.toByteArray(), pubExponent.toByteArray());
+		tpPtr = initRSAPublic(modulus.toByteArray(), pubExponent.toByteArray());
 
 		//calls the parent init
 		super.setKey(publicKey);
@@ -222,17 +223,20 @@ public final class CryptoPpRSAPermutation extends TrapdoorPermutationAbs impleme
 	 * Inverts the RSA permutation on the given element 
 	 * @param tpEl - the input to invert
 	 * @return - the result 
+	 * @throws KeyException 
 	 * @throws - IllegalArgumentException
 	 */
-	public TPElement invert(TPElement tpEl) throws IllegalArgumentException{
+	public TPElement invert(TPElement tpEl) throws IllegalArgumentException, KeyException{
 		
 		if (!isKeySet()){
 			throw new IllegalStateException("keys aren't set");
 		}
 		
-		//in case that the initialization was with public key and no private key - can't do the invert and returns null
-		if (privKey == null && pubKey!=null)
-			return null;
+
+		//If the key set was only the public key and not the private key - can't do the invert, throw exception.
+		if (privKey == null && pubKey!=null){
+			throw new KeyException("in order to decrypt a message, this object must be initialized with private key");
+		}
 		
 		if (!(tpEl instanceof CryptoPpRSAElement)){
 			throw new IllegalArgumentException("trapdoor element type doesn't match the trapdoor permutation type");
@@ -273,7 +277,7 @@ public final class CryptoPpRSAPermutation extends TrapdoorPermutationAbs impleme
 		long value = ((CryptoPpRSAElement)tpEl).getPointerToElement();
 		
 		//if the trapdoor permutation is unknown - returns DONT_KNOW 
-		if (modN == null) {
+		if (modulus == null) {
 			validity = TPElValidity.DONT_KNOW;
 		
 		//if the value is valid (between 1 to (mod n) - 1) returns VALID 
@@ -299,7 +303,7 @@ public final class CryptoPpRSAPermutation extends TrapdoorPermutationAbs impleme
 			throw new IllegalStateException("keys aren't set");
 		}
 		
-		return new CryptoPpRSAElement(modN);
+		return new CryptoPpRSAElement(modulus);
 	}
 	
 	@Override
@@ -308,7 +312,7 @@ public final class CryptoPpRSAPermutation extends TrapdoorPermutationAbs impleme
 			throw new IllegalStateException("keys aren't set");
 		}
 		
-		return new CryptoPpRSAElement(modN, x, true);
+		return new CryptoPpRSAElement(modulus, x, true);
 	}
 	
 	public TPElement generateUncheckedTPElement(BigInteger x) throws IllegalArgumentException {
@@ -316,7 +320,7 @@ public final class CryptoPpRSAPermutation extends TrapdoorPermutationAbs impleme
 			throw new IllegalStateException("keys aren't set");
 		}
 		*/
-		return new CryptoPpRSAElement(modN, x, false);
+		return new CryptoPpRSAElement(modulus, x, false);
 	}
 	
 	/**
