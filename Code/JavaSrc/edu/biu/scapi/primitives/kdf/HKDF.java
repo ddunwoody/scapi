@@ -37,12 +37,12 @@ public final class HKDF implements KeyDerivationFunction {
 	private Hmac hmac; // the underlying hmac
 	
 	/**
-	 * Constructor that accepts a name of hmac and creates the HKDF object with it.
+	 * Constructor that accepts a name of Hmac and creates the HKDF object with it.
 	 * @param hmac the underlying object
 	 * @throws FactoriesException if this object is not initialized
 	 */
 	public HKDF(String hmac) throws FactoriesException{
-		//creates the hmac by the prf factory, the SecureRandom object and call the extended constructor
+		//creates the underlying hmac via the prf factory, and calls the constructor that gets an object of type Hmac to continue to setting the key.
 		this((Hmac) PrfFactory.getInstance().getObject(hmac));
 	}
 	
@@ -174,7 +174,7 @@ public final class HKDF implements KeyDerivationFunction {
 
 	
 	/**
-	 * generates a new key from the source key material key.
+	 * This function derivates a new key from the source key material key.
 	 * The pseudocode of this function is as follows:
 	 * 
 	 *   COMPUTE PRK = HMAC(XTS, SKM) [key=XTS, data=SKM]
