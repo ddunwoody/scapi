@@ -26,7 +26,7 @@ public abstract class TrapdoorPermutationAbs implements TrapdoorPermutation {
 	
 	protected PrivateKey privKey = null;        //private key
 	protected PublicKey pubKey = null;          //public key
-	protected BigInteger modN = null;			//modulus
+	protected BigInteger modulus = null;		//the modulus of the permutation. It must be such that modulus = p*q and p = q = 3 mod 4
 	protected boolean isKeySet = false;		    // indicates if this object is initialized or not. Set to false until init is called
 
 	
@@ -59,7 +59,7 @@ public abstract class TrapdoorPermutationAbs implements TrapdoorPermutation {
 		if (!isKeySet()){
 			throw new IllegalStateException("keys aren't set");
 		}
-		return modN;
+		return modulus;
 	}
 	
 	
@@ -107,7 +107,7 @@ public abstract class TrapdoorPermutationAbs implements TrapdoorPermutation {
 		byte[] elementBytesValue = elementValue.toByteArray();
 		
 		//the number of bytes to get the log (N) least significant bits
-		double logBits = (modN.bitCount()/2);  //log N bits
+		double logBits = (modulus.bitCount()/2);  //log N bits
 		int logBytes = (int) Math.ceil(logBits/8); //log N bites in bytes
 		
 		//if the element length is less than log(N), the return byte[] should be all the element bytes
