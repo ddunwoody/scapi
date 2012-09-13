@@ -25,7 +25,6 @@ import org.bouncycastle.crypto.macs.HMac;
 
 import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.primitives.hash.CryptographicHash;
-import edu.biu.scapi.primitives.hash.cryptopp.CryptoPpSHA1;
 import edu.biu.scapi.primitives.prf.Hmac;
 import edu.biu.scapi.tools.Factories.BCFactory;
 import edu.biu.scapi.tools.Translation.BCParametersTranslator;
