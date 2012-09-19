@@ -115,7 +115,8 @@ public abstract class DlogGroupEC extends DlogGroupAbs implements DlogEllipticCu
 	 * The second way is to get the generator values from the user in the init function. In that way, it is the user's responsibility to check the validity of the parameters.
 	 * In both ways, the generator we set must be correct. However, currently the function isGenerator does not operate the validity check and always returns true.
 	 * Maybe in the future we will add the validity checks.
-	 * @return <code>true<code> is the generator is valid; <code>false<code> otherwise.
+	 * @return <code>true</code> is the generator is valid;<p>
+	 * 		   <code>false</code> otherwise.
 	 * @throws UnInitializedException
 	 */
 	public boolean isGenerator(){

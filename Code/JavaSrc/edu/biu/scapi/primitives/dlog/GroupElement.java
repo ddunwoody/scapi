@@ -22,7 +22,8 @@ public interface GroupElement {
 
 	/**
 	 * checks if this element is the identity of the group.
-	 * @return <code>true<code> if this element is the identity of the group; <code>false<code> otherwise.
+	 * @return <code>true</code> if this element is the identity of the group;<p>
+	 * 		   <code>false</code> otherwise.
 	 */
 	public boolean isIdentity();
 }

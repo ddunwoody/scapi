@@ -63,7 +63,7 @@ public abstract class PrpFromPrfVarying implements PrpVaryingIOLength {
 	 * 
 	 * This function is provided in the interface especially for the sub-family PrfVaryingIOLength, which may have variable input and output length.
 	 * Since this is a prp, both input and output variables should be equal and there is no need to send them both, so this function should not be called. 
-	 * If the user still wants to use this function, the specified arguments <code>inLen<code> and <code>outLen<code> should be the same, otherwise, throws an exception.
+	 * If the user still wants to use this function, the specified arguments <code>inLen</code> and <code>outLen</code> should be the same, otherwise, throws an exception.
 	 * 
 	 * @param inBytes input bytes to compute
 	 * @param inOff input offset in the inBytes array

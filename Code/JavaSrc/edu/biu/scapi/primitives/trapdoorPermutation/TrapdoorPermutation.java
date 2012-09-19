@@ -50,7 +50,7 @@ public interface TrapdoorPermutation {
 	 * Checks if this trapdoor permutation object has been previously initialized.<p> 
 	 * To initialize the object the setKey function has to be called with corresponding parameters after construction.
 	 * 
-	 * @return <code>true<code> if the object was initialized;
+	 * @return <code>true</code> if the object was initialized;<p>
 	 * 		   <code>false</code> otherwise.
 	 */
 	public boolean isKeySet();

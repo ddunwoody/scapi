@@ -66,14 +66,16 @@ public interface DlogGroup {
 	/**
 	 * Checks if the given element is a member of this Dlog group
 	 * @param element possible group element for which to check that it is a member of this group
-	 * @return <code>true<code> if the given element is a member of this group; <code>false<code> otherwise.
+	 * @return <code>true</code> if the given element is a member of this group;<p> 
+	 * 		   <code>false</code> otherwise.
 	 * @throws IllegalArgumentException
 	 */
 	public boolean isMember(GroupElement element) throws IllegalArgumentException;
 	
 	/**
 	 * Checks if the order is a prime number
-	 * @return <code>true<code> if the order is a prime number; <code>false<code> otherwise.
+	 * @return <code>true<code> if the order is a prime number; <p>
+	 * 		   <code>false</code> otherwise.
 	 * 
 	 */
 	public boolean isPrimeOrder();
@@ -81,19 +83,22 @@ public interface DlogGroup {
 	/**
 	 * Checks if the order of this group is greater than 2^numBits
 	 * @param numBits
-	 * @return <code>true<code> if the order is greater than 2^numBits; <code>false<code> otherwise.
+	 * @return <code>true</code> if the order is greater than 2^numBits;<p>
+	 * 		   <code>false</code> otherwise.
 	 */
 	public boolean isOrderGreaterThan(int numBits);
 	
 	/**
 	 * Checks if the element set as the generator is indeed the generator of this group.
-	 * @return <code>true<code> if the generator is valid; <code>false<code> otherwise.
+	 * @return <code>true</code> if the generator is valid;<p>
+	 *         <code>false</code> otherwise.
 	 */
 	public boolean isGenerator();
 	
 	/**
 	 * Checks parameters of this group to see if they conform to the type this group is supposed to be. 
-	 * @return <code>true<code> if valid; <code>false<code> otherwise.
+	 * @return <code>true</code> if valid;<p>
+	 *  	   <code>false</code> otherwise.
 	 */
 	public boolean validateGroup();
 	

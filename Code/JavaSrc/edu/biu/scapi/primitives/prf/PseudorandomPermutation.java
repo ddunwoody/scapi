@@ -37,7 +37,7 @@ public interface PseudorandomPermutation extends PseudorandomFunction {
 	/** 
 	 * Inverts the permutation using the given key. <p>
 	 * Since PseudorandomPermutation can also have varying input and output length (although the input and the output should be the same length), 
-	 * the common parameter <code>len<code> of the input and the output is needed.
+	 * the common parameter <code>len</code> of the input and the output is needed.
 	 * @param inBytes input bytes to invert.
 	 * @param inOff input offset in the inBytes array
 	 * @param outBytes output bytes. The resulted bytes of invert

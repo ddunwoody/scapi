@@ -47,7 +47,7 @@ public abstract class PrpFromPrfFixed implements PrpFixed {
 	 * 
 	 * This function is provided in the interface especially for the sub-family PrfVaryingIOLength, which may have variable input and output length.
 	 * Since this is a prp fixed, both input and output variables are equal and fixed, so this function should not normally be called. 
-	 * If the user still wants to use this function, the specified arguments <code>inLen<code> and <code>outLen<code> should be the same as 
+	 * If the user still wants to use this function, the specified arguments <code>inLen</code> and <code>outLen</code> should be the same as 
 	 * the result of getBlockSize. otherwise, throws an exception.
 	 * 
 	 * @param inBytes input bytes to compute
@@ -121,7 +121,7 @@ public abstract class PrpFromPrfFixed implements PrpFixed {
 	 * 
 	 * This function is suitable for cases where the input/output lengths are varying.
 	 * Since in this case, both input and output variables are fixed this function should not normally be called. 
-	 * If the user still wants to use this function, the specified argument <code>len<code> should be the same as 
+	 * If the user still wants to use this function, the specified argument <code>len</code> should be the same as 
 	 * the result of getBlockSize, otherwise, throws an exception. 
 	 * 
 	 * @param inBytes input bytes to invert

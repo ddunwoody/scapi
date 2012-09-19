@@ -216,7 +216,7 @@ public abstract class BcPRP implements PrpFixed{
 	 * This function is provided in the interface especially for the sub-family PrfVaryingIOLength, which may have variable input/output lengths.
 	 * Since both Input and output variables are fixed this function should not normally be called. 
 	 * If the user still wants to use this function, the input and output lengths should be the same as 
-	 * the result of <code>getBlockSize<code>, otherwise, throws an exception.
+	 * the result of <code>getBlockSize</code>, otherwise, throws an exception.
 	 * @param inBytes input bytes to compute
 	 * @param inOff input offset in the inBytes array
 	 * @param outBytes output bytes. The resulted bytes of compute.
@@ -272,8 +272,8 @@ public abstract class BcPRP implements PrpFixed{
 	/**
 	 * This function is provided in the interface especially for the sub-family PrpVarying, which may have variable input/output lengths.
 	 * Since in this case, both input and output variables are fixed this function should not normally be called. 
-	 * If the user still wants to use this function, the specified argument <code>len<code> should be the same as 
-	 * the result of <code>getBlockSize<code>, otherwise, throws an exception. 
+	 * If the user still wants to use this function, the specified argument <code>len</code> should be the same as 
+	 * the result of <code>getBlockSize</code>, otherwise, throws an exception. 
 	 * @param inBytes input bytes to invert
 	 * @param inOff input offset in the inBytes array
 	 * @param outBytes output bytes. The resulted bytes of invert.

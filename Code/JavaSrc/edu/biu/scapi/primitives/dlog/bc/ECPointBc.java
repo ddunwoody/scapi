@@ -51,7 +51,7 @@ public abstract class ECPointBc implements ECElement{
 	
 	/**
 	 * checks if the element is the identity of this Dlog group.
-	 * @return <code>true<code> if this element is the identity of the group; <code>false<code> otherwise.
+	 * @return <code>true</code> if this element is the identity of the group; <code>false</code> otherwise.
 	 */
 	public boolean isIdentity(){
 

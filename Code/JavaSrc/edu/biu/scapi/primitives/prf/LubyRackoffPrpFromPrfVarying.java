@@ -161,7 +161,7 @@ public final class LubyRackoffPrpFromPrfVarying extends PrpFromPrfVarying {
 	/** 
 	 * Inverts LubyRackoff permutation using the given key. <p>
 	 * Since LubyRackoff permutation can also have varying input and output length 
-	 * (although the input and the output should be the same length), the common parameter <code>len<code> of the input and the output is needed.
+	 * (although the input and the output should be the same length), the common parameter <code>len</code> of the input and the output is needed.
 	 * LubyRackoff has a feistel structure and thus invert is possible even though the underlying PRF is not invertible.
 	 * The pseudocode for inverting such a structure is the following
 	 * FOR i = 4 to 1

@@ -101,8 +101,8 @@ public class ZpSafePrimeElementCryptoPp implements ZpSafePrimeElement {
 	}
 	
 	/**
-	 * checks if this element is the identity of the Dlog group.
-	 * @return <code>true<code> if this element is the identity of the group; <code>false<code> otherwise.
+	 * This function checks if this element is the identity of the Dlog group.
+	 * @return <code>true</code> if this element is the identity of the group; <code>false</code> otherwise.
 	 */
 	public boolean isIdentity(){
 		
