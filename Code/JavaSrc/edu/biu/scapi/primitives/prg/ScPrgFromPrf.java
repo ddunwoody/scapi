@@ -142,7 +142,7 @@ public class ScPrgFromPrf implements PseudorandomGenerator{
 	 * Generates pseudorandom bytes using the underlying prf.
 	 * @param outBytes - output bytes. The result of streaming the bytes.
 	 * @param outOffset - output offset
-	 * @param outlen - the required output length.
+	 * @param outLen - the required output length.
 	 * @throws IllegalStateException if no key was set.
 	 * @throws ArrayIndexOutOfBoundsException if the given offset or length is invalid.
 	 */
