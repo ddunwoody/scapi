@@ -260,7 +260,7 @@ class FactoriesUtility {
 			for(int i=0;i<size;i++){
 				classes[i] = params[i].getClass();
 			}
-			//get the constructor that has <code>classes.length<code> number of arguments of string type  
+			//get the constructor that has <code>classes.length</code> number of arguments of string type  
 			Constructor constructor = algClass.getConstructor(classes);
 			
 			
@@ -394,8 +394,8 @@ class FactoriesUtility {
 		
 		/*
 		 * 
-		 * Retrieves the main algorithm from the String <code>algorithmCommand<code> and generates the string
-		 * <code>algorithmParamsAsOneString<code>.
+		 * Retrieves the main algorithm from the String <code>algorithmCommand</code> and generates the string
+		 * <code>algorithmParamsAsOneString</code>.
 		 */
 		void splitToNameAndParamsAsString()
 		{
@@ -429,7 +429,7 @@ class FactoriesUtility {
 		
 		/*
 		 * 
-		 * Retrieves the parameters of the algorithm from the String <code>algorithmParamsAsOneString<code>.
+		 * Retrieves the parameters of the algorithm from the String <code>algorithmParamsAsOneString</code>.
 		 * @return a vector holding each parameter
 		 */
 		Vector<String> getParsedParams(){

@@ -56,7 +56,7 @@ public interface AsymmetricEnc extends Cpa, Indistinguishable{
 	
 	/**
 	 * Checks if this AsymmetricEnc object has been previously initialized with corresponding keys.<p> 
-	 * @return <code>true<code> if either the Public Key has been set or the key pair (Public Key, Private Key) has been set;<P>
+	 * @return <code>true</code> if either the Public Key has been set or the key pair (Public Key, Private Key) has been set;<P>
 	 * 		   <code>false</code> otherwise.
 	 */
 	public boolean isKeySet();

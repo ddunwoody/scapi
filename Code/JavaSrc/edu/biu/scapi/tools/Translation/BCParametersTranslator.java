@@ -93,7 +93,7 @@ public final class BCParametersTranslator {
 	}
 
 	/** 
-	 * This function translates a secret key into a <code>KeyParameter<code> or other asymmetric key parameters. 
+	 * This function translates a secret key into a <code>KeyParameter</code> or other asymmetric key parameters. 
 	 * @param key the key
 	 * @return KeyParameter this is used in may of the bc BlockCipher and bc StreamCipher.
 	 *         AssymetricKeyParameter for trapdoor permutation and asymmetric encryption

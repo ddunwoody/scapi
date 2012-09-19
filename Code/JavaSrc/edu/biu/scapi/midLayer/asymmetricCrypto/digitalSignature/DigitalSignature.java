@@ -52,7 +52,7 @@ public interface DigitalSignature {
 	
 	/**
 	 * Checks if this digital signature object has been given a key already.<p> 
-	 * @return <code>true<code> if the object has been given a key;
+	 * @return <code>true</code> if the object has been given a key;
 	 * 		   <code>false</code> otherwise.
 	 */
 	public boolean isKeySet();

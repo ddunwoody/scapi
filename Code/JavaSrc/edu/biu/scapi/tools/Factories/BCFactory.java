@@ -51,7 +51,7 @@ public final class BCFactory {
 	/** 
 	 * Returns the equivalent BC block cipher according to the specified name.
 	 * @param name the name of the pseudo random permutation equivalent to the BC block cipher
-	 * @return BC <code>BlockCipher<code> object
+	 * @return BC <code>BlockCipher</code> object
 	 * @throws FactoriesException 
 	 */
 	public BlockCipher getBlockCipher(String name) throws FactoriesException {
@@ -62,7 +62,7 @@ public final class BCFactory {
 	/** 
 	 * Returns the equivalent BC asymmetric block cipher according to the specified name.
 	 * @param name the name of the trapdoor permutation equivalent to the BC asymmetric block cipher
-	 * @return BC <code>AsymmetricBlockCipher<code> object
+	 * @return BC <code>AsymmetricBlockCipher</code> object
 	 * @throws FactoriesException 
 	 */
 	public AsymmetricBlockCipher getAsymetricBlockCipher(String name) throws FactoriesException {
@@ -73,7 +73,7 @@ public final class BCFactory {
 	/** 
 	 * Returns the equivalent BC digest according to the specified name.
 	 * @param name the name of the collision resistant hash equivalent to the BC digest cipher
-	 * @return BC <code>Digest<code> object
+	 * @return BC <code>Digest</code> object
 	 * @throws FactoriesException 
 	 */
 	public Digest getDigest(String name) throws FactoriesException {
@@ -84,7 +84,7 @@ public final class BCFactory {
 	/** 
 	 * Returns the equivalent BC stream cipher according to the specified name. 
 	 * @param name the name of the pseudo random generator equivalent to the BC stream cipher
-	 * @return BC <code>StreamCipher<code> object
+	 * @return BC <code>StreamCipher</code> object
 	 * @throws FactoriesException 
 	 */
 	public StreamCipher getStreamCipher(String name) throws FactoriesException {
