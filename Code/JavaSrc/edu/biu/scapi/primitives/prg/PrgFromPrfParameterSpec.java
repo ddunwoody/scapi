@@ -38,7 +38,6 @@ public class PrgFromPrfParameterSpec implements AlgorithmParameterSpec{
 	/**
 	 * Constructor that gets random bit sequence, kdf key size in bits and prf key size in bits and sets them.
 	 * @param entropySource random bit sequence.
-	 * @param kdfKeySize kdf key size in bits
 	 * @param prfKeySize prf key size in bits.
 	 */
 	public PrgFromPrfParameterSpec(byte[] entropySource, int prfKeySize){
