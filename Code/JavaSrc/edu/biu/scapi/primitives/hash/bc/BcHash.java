@@ -67,6 +67,15 @@ public abstract class BcHash implements CryptographicHash {
 		if ((inOffset > in.length) || (inOffset+inLen > in.length)){
 			throw new ArrayIndexOutOfBoundsException("wrong offset for the given input buffer");
 		}
+		
+		if (inLen < 0){
+			throw new NegativeArraySizeException("wrong length for the given input buffer");
+		}
+		
+		if (inLen == 0){
+			throw new ArrayIndexOutOfBoundsException("wrong length for the given input buffer");
+		}
+		
 		//delegates the update request to the underlying digest
 		digest.update(in, inOffset, inLen);
 	}
