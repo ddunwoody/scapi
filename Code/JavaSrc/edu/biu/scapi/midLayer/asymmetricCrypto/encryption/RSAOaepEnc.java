@@ -21,6 +21,6 @@ import edu.biu.scapi.securityLevel.NonMalleable;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public interface RSAOaepEnc extends AsymmetricEnc, Cca2, NonMalleable{
+public interface RSAOaepEnc extends AsymmetricEnc, Cca2{
 
 }
