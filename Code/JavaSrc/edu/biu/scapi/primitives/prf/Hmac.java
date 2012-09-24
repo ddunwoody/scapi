@@ -12,6 +12,7 @@
 package edu.biu.scapi.primitives.prf;
 
 import edu.biu.scapi.midLayer.symmetricCrypto.mac.UniqueTagMac;
+import edu.biu.scapi.securityLevel.UnlimitedTimes;
 
 /** 
  * Marker interface. Every class that implements it is signed as Hmac.
@@ -19,5 +20,5 @@ import edu.biu.scapi.midLayer.symmetricCrypto.mac.UniqueTagMac;
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Meital Levy)
  */
-public interface Hmac extends PrfVaryingInputLength, UniqueTagMac {
+public interface Hmac extends PrfVaryingInputLength, UniqueTagMac, UnlimitedTimes {
 }
