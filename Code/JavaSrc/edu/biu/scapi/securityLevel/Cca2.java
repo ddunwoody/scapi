@@ -9,24 +9,16 @@
 * SCAPI uses Crypto++, Miracl, NTL and Bouncy Castle. Please see these projects for any further licensing issues.
 *
 */
-/**
-* This file is part of SCAPI.
-* SCAPI is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-* SCAPI is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-* You should have received a copy of the GNU General Public License along with SCAPI.  If not, see <http://www.gnu.org/licenses/>.
-*
-* Any publication and/or code referring to and/or based on SCAPI must contain an appropriate citation to SCAPI, including a reference to http://crypto.cs.biu.ac.il/SCAPI.
-*
-* SCAPI uses Crypto++, Miracl, NTL and Bouncy Castle. Please see these projects for any further licensing issues.
-*
-*/
+
 package edu.biu.scapi.securityLevel;
 
 /**
- * Any encryption scheme that has CCA2 security level should implement this interface.
+ * An encryption scheme that is secure in the presence of (full) chosen-ciphertext attacks should implement this interface. 
+ * Note that any Cca2 scheme is both Indistinguishable and NonMalleable. Thus, Cca2 extends both Cca1 and NonMalleable, 
+ * and it suffices to have a CCA2-secure scheme implement only the Cca2 interface.
+ * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
- *
  */
-public interface Cca2 extends Cca1 {
+public interface Cca2 extends Cca1, NonMalleable {
 
 }

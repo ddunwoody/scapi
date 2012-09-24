@@ -9,22 +9,15 @@
 * SCAPI uses Crypto++, Miracl, NTL and Bouncy Castle. Please see these projects for any further licensing issues.
 *
 */
-/**
-* This file is part of SCAPI.
-* SCAPI is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-* SCAPI is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-* You should have received a copy of the GNU General Public License along with SCAPI.  If not, see <http://www.gnu.org/licenses/>.
-*
-* Any publication and/or code referring to and/or based on SCAPI must contain an appropriate citation to SCAPI, including a reference to http://crypto.cs.biu.ac.il/SCAPI.
-*
-* SCAPI uses Crypto++, Miracl, NTL and Bouncy Castle. Please see these projects for any further licensing issues.
-*
-*/
+
 package edu.biu.scapi.securityLevel;
 
 /**
- *  This interface is the root interface of the secure computation protocol's security level family. The different security levels of secure computation protocols can be:<p>
- *  Semihonest, Malicious and Covert.
+ * This interface is the root interface of the security level hierarchy for (secure computation) protocols.<p>
+ * There are three different subhierarchies in this family. The first relates to the adversary’s capabilities and includes 
+ * Semihonest, Malicious and Covert. The second relates to the question of composition and includes StandAlone and UC (universally composable). 
+ * The third relates to the corruption strategy of the adversary and includes AdaptiveWithErasures and AdaptiveNoErasures 
+ * (if no interface here is implemented then static security is assumed).
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
