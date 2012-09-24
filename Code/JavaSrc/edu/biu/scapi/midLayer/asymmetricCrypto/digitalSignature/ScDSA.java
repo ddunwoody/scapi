@@ -40,7 +40,6 @@ import edu.biu.scapi.primitives.dlog.cryptopp.CryptoPpDlogZpSafePrime;
 import edu.biu.scapi.primitives.dlog.miracl.MiraclDlogECFp;
 import edu.biu.scapi.primitives.hash.CryptographicHash;
 import edu.biu.scapi.primitives.hash.cryptopp.CryptoPpSHA1;
-import edu.biu.scapi.securityLevel.ACMA;
 import edu.biu.scapi.securityLevel.UnlimitedTimes;
 import edu.biu.scapi.tools.Factories.CryptographicHashFactory;
 import edu.biu.scapi.tools.Factories.DlogGroupFactory;
@@ -51,7 +50,7 @@ import edu.biu.scapi.tools.Factories.DlogGroupFactory;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class ScDSA implements DSABasedSignature, UnlimitedTimes, ACMA{
+public class ScDSA implements DSABasedSignature{
 
 	private DSAPublicKey publicKey;
 	private DSAPrivateKey privateKey;

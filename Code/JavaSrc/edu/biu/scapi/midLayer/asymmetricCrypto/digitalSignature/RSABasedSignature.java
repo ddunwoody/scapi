@@ -11,7 +11,6 @@
 */
 package edu.biu.scapi.midLayer.asymmetricCrypto.digitalSignature;
 
-import edu.biu.scapi.securityLevel.ACMA;
 import edu.biu.scapi.securityLevel.UnlimitedTimes;
 
 /**
@@ -21,6 +20,6 @@ import edu.biu.scapi.securityLevel.UnlimitedTimes;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public interface RSABasedSignature extends DigitalSignature, UnlimitedTimes, ACMA{
+public interface RSABasedSignature extends DigitalSignature, UnlimitedTimes {
 
 }

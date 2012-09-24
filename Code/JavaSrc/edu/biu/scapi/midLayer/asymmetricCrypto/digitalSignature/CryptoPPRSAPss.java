@@ -25,7 +25,6 @@ import java.security.interfaces.RSAPublicKey;
 
 import edu.biu.scapi.midLayer.signature.RSASignature;
 import edu.biu.scapi.midLayer.signature.Signature;
-import edu.biu.scapi.securityLevel.ACMA;
 import edu.biu.scapi.securityLevel.UnlimitedTimes;
 
 /**
@@ -35,7 +34,7 @@ import edu.biu.scapi.securityLevel.UnlimitedTimes;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class CryptoPPRSAPss extends RSAPssAbs implements UnlimitedTimes, ACMA{
+public class CryptoPPRSAPss extends RSAPssAbs {
 
 	private long signer;		//Pointer to the native Crypto++ signer object.
 	private long verifier;		//Pointer to the native Crypto++ verifier object.

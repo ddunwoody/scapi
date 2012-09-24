@@ -32,7 +32,6 @@ import edu.biu.scapi.exceptions.ScapiRuntimeException;
 import edu.biu.scapi.midLayer.signature.RSASignature;
 import edu.biu.scapi.midLayer.signature.Signature;
 import edu.biu.scapi.primitives.hash.CryptographicHash;
-import edu.biu.scapi.securityLevel.ACMA;
 import edu.biu.scapi.securityLevel.UnlimitedTimes;
 import edu.biu.scapi.tools.Factories.BCFactory;
 import edu.biu.scapi.tools.Translation.BCParametersTranslator;
@@ -44,7 +43,7 @@ import edu.biu.scapi.tools.Translation.BCParametersTranslator;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class BcRSAPss extends RSAPssAbs implements UnlimitedTimes, ACMA{
+public class BcRSAPss extends RSAPssAbs {
 
 	private CipherParameters privateParameters;		//parameters that contain the private key and the random
 	private CipherParameters publicParameters;		//parameters that contain the public key and the random
