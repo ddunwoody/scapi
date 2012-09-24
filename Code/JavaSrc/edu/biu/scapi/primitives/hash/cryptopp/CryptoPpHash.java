@@ -87,6 +87,14 @@ public abstract class CryptoPpHash implements CryptographicHash {
 			throw new ArrayIndexOutOfBoundsException("wrong offset for the given input buffer");
 		}
 		
+		if (inLen < 0){
+			throw new NegativeArraySizeException("wrong length for the given input buffer");
+		}
+		
+		if (inLen == 0){
+			throw new ArrayIndexOutOfBoundsException("wrong length for the given input buffer");
+		}
+		
 		//the dll function does the update from offset 0.
 		//if the given offset is greater than 0, copies the relevant bytes to a new array and send it to the dll function.
 		if (inOffset>0){
