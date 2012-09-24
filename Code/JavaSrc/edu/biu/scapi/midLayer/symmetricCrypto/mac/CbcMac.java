@@ -12,6 +12,7 @@
 package edu.biu.scapi.midLayer.symmetricCrypto.mac;
 
 import edu.biu.scapi.primitives.prf.PrfVaryingInputLength;
+import edu.biu.scapi.securityLevel.UnlimitedTimes;
 
 /**
  * General interface for CBC-Mac. every class that implement the cbc-mac algorithm should implement this interface.
@@ -19,7 +20,7 @@ import edu.biu.scapi.primitives.prf.PrfVaryingInputLength;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public interface CbcMac extends UniqueTagMac, PrfVaryingInputLength{
+public interface CbcMac extends UniqueTagMac, PrfVaryingInputLength, UnlimitedTimes{
 
 	/**
 	 * Pre-pends the length if the message to the message.
