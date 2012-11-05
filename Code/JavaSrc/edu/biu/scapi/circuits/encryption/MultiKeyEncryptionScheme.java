@@ -1,0 +1,155 @@
+/**
+* This file is part of SCAPI.
+* SCAPI is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+* SCAPI is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+* You should have received a copy of the GNU General Public License along with SCAPI.  If not, see <http://www.gnu.org/licenses/>.
+*
+* Any publication and/or code referring to and/or based on SCAPI must contain an appropriate citation to SCAPI, including a reference to http://crypto.cs.biu.ac.il/SCAPI.
+*
+* SCAPI uses Crypto++, Miracl, NTL and Bouncy Castle. Please see these projects for any further licensing issues.
+*
+*/
+package edu.biu.scapi.circuits.encryption;
+
+import java.security.InvalidKeyException;
+
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.SecretKey;
+
+import edu.biu.scapi.midLayer.ciphertext.ByteArraySymCiphertext;
+import edu.biu.scapi.midLayer.plaintext.ByteArrayPlaintext;
+
+/**
+ * A general interface for creating multiple key encryption schemes. When
+ * constructing a garbled circuit, an encryption scheme must be specified. The
+ * Garbled circuit will use the specified scheme to encrypt each gate.
+ * <p>
+ * See <i> Garbling Schemes</i> by Mihir Bellare, Viet Tung Hoang, and Phillip
+ * Rogaway. In this paper, the authors present the idea of a Garbling
+ * Scheme--i.e. the notion to treat Garbling Schemes as cryptographic primitive.
+ * In the paper, they present a number of different efficient garbling schemes.
+ * We have implemented a number of the ones that they mentioned, and any other
+ * garbling schemes can easily be implemented and used anywhere in our code as
+ * long as they implement this interface. 
+ * 
+ * @author Steven Goldfeder
+ * 
+ */
+public interface MultiKeyEncryptionScheme {
+
+	/**
+	 * This method generates a <b>single</b> {@codeSecretKey} NOT a
+	 * {@code MultiSecretKey}. This is necessary since the user will often need
+	 * to generate single keys first and then combine them to a single
+	 * {@code MultiSecretKey}.
+	 * <p>
+	 * Consider the following problem: Say we want to garble and compute a gate
+	 * in Yao's protocol. Consider a 2 input gate. Each input Wire will have two
+	 * possible garbled values--corresponding to a 0 value and a 1 value. These
+	 * values are <@code SecretKey}s <b>NOT</b? {@code MultiSecretKey}s. When we
+	 * encrypt the truth table, we combine the single keys to create
+	 * {@code MultiSecretKey}s. So, if we want to encrypt the 0-0 entry of the
+	 * truth table, we will take the 0 key from each {@code GarbledWire} and
+	 * combine them to a {@code MultiSecretKey} (using the
+	 * {@code generateMultiKey()} method. Then if we want to encrypt the 0-1
+	 * entry, we will use the 0-key from the first wire and the 1-key from the
+	 * second wire. We will combine these 2 keys into a single
+	 * {@code MultiSecretKey} and use this to encrypt. Note that in this example,
+	 * the 0-key from the first Wire is part of 2 different {@code MultiSecretKey}
+	 * s. First we combined it with the 0-key of the second wire and then we
+	 * combined it with the 1-key.
+	 * <p>
+	 * Thus, it is necessary to have a method to generate individual keys and a
+	 * separate method to combine different single keys into
+	 * {@code MultiSecretKey}s. are single keys, not MultiKeys
+	 * 
+	 * @return generates a {@link SecretKey} of the specified size. One or more of
+	 *         these keys will be combined into a {@code MultiSecretKey} to
+	 *         encrypt and decrypt on.
+	 */
+	SecretKey generateKey();
+
+	/**
+	 * This method is provided with individual {@code SecretKey}s and combines
+	 * them into a {@code MultiSecretKey} that can be used for encryption and
+	 * decryption with the {@code MultiKeyEncryptionScheme}.
+	 * 
+	 * @param keys
+	 *          the individual {@link SecretKey}s that make up the
+	 *          {@code MultiSecretKey}. The {@code SecretKey} objects can be
+	 *          passed in an array or as individual parameters.
+	 * @return a {@code MultiSecretKey} made up of the {@code SecretKey}s that
+	 *         were passed as parameters
+	 */
+	MultiSecretKey generateMultiKey(SecretKey... keys);
+
+	/**
+	 * Sets the key to the specified {@code MultiKeyEncryptionScheme}. The key
+	 * that it is currently set to will be used for encryption and decryption
+	 * until {@code setKey()} is called again.
+	 * 
+	 * @param key
+	 *          the {@code MultiSecretKey} to be used for encryption and
+	 *          decryption.
+	 */
+	void setKey(MultiSecretKey key);
+
+	/**
+	 * This method used the individual {@code SecretKey}s that make up the
+	 * {@code MultiSecretKey} to encrypt the plaintext
+	 * 
+	 * @param plaintext
+	 *          The plaintext to be encrypted
+	 * @return the ciphertext--i.e. the plainetext encrypted with the currently
+	 *         set key.
+	 * @throws KeyNotSetException
+	 * @throws TweakNotSetException
+	 * @throws InvalidKeyException
+	 * @throws IllegalBlockSizeException
+	 * @throws PlaintextTooLongException
+	 */
+
+	ByteArraySymCiphertext encrypt(ByteArrayPlaintext plaintext)
+			throws KeyNotSetException, TweakNotSetException, InvalidKeyException,
+			IllegalBlockSizeException, PlaintextTooLongException;
+
+	/**
+	 * @param ciphertext
+	 *          The ciphertext to be decrypted
+	 * @return the plaintext--i.e. the ciphertext decrypted with the currently set
+	 *         key.
+	 * @throws CiphertextTooLongException
+	 * @throws KeyNotSetException
+	 * @throws TweakNotSetException
+	 * @throws InvalidKeyException
+	 * @throws IllegalBlockSizeException
+	 */
+
+	ByteArrayPlaintext decrypt(ByteArraySymCiphertext ciphertext)
+			throws CiphertextTooLongException, KeyNotSetException,
+			TweakNotSetException, InvalidKeyException, IllegalBlockSizeException;
+
+	/**
+	 * This method checks if the key for this {@code MultiKeyEncryptionScheme} has
+	 * been set returning {@code true} if it has been and {@code false} if it has
+	 * not been. Before encrypting and decrypting, the key must be set.
+	 * 
+	 * @return {@code true} if the key has been set, {@code false} otherwise
+	 */
+	boolean isKeySet();
+
+	/**
+	 * See <i> Garbling Schemes</i> by Mihir Bellare, Viet Tung Hoang, and Phillip
+	 * Rogaway. Some encryption schemes use a tweak and instead of encrypting
+	 * directly on the entry of the plaintext encrypt on the tweak and then XOR
+	 * the result with the plaintext. Some encryption schemes do not make use of a
+	 * tweak, in which case calls to set the tweak have no effect.If you are
+	 * implementing an encryption scheme that does not use a tweak, just leave the
+	 * body of this method blank.
+	 * 
+	 * @param tweak
+	 *          The tweak to be used for this encryption scheme
+	 */
+	public void setTweak(byte[] tweak);
+
+}
