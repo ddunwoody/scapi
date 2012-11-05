@@ -12,6 +12,7 @@
 package edu.biu.scapi.comm;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 /**
  * 
@@ -20,9 +21,24 @@ import java.io.Serializable;
 /** 
  * @author LabTest
  */
-public class Message implements Serializable{
+public class Message extends MessageAbs implements Serializable{
 	
 	
+
+	/**
+	 * @param specialData
+	 */
+	public Message(byte[] specialData) {
+		super(specialData);
+		// TODO Auto-generated constructor stub
+	}
+
+	/**
+	 * 
+	 */
+	public Message() {
+		// TODO Auto-generated constructor stub
+	}
 
 	/**
 	 * 
@@ -46,4 +62,11 @@ public class Message implements Serializable{
 	public byte[] getData() {
 		return data;
 	}
+
+	@Override
+	public String toString() {
+		return "Message [data=" + Arrays.toString(data) + "]";
+	}
+	
+	
 }
