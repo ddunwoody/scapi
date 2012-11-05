@@ -77,6 +77,7 @@ public class ApplicationTest {
 			if(listOfParties.get(0).getPort()==8001){
 				try {
 					ch.send(msg);
+					System.out.println("Sent msg1: " + msg);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -86,6 +87,7 @@ public class ApplicationTest {
 			
 				try {
 					ch.receive();
+					System.out.println("Received msg2: " + msg);
 				} catch (ClassNotFoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
