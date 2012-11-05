@@ -21,10 +21,6 @@
  */
 package edu.biu.scapi.comm;
 
-import edu.biu.scapi.comm.Channel;
-import edu.biu.scapi.exceptions.InvalidChannel;
-import edu.biu.scapi.generals.Logging;
-
 import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.util.Collection;
@@ -32,6 +28,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Level;
+
+import edu.biu.scapi.exceptions.InvalidChannel;
+import edu.biu.scapi.generals.Logging;
 
 
 /** 

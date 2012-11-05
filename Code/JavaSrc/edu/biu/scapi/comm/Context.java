@@ -15,7 +15,6 @@ package edu.biu.scapi.comm;
  * 
  */
 
-import edu.biu.scapi.comm.ConnectivitySuccessVerifier;
 
 /** 
  * <!-- begin-UML-doc -->

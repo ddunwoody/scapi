@@ -23,11 +23,9 @@ import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.security.InvalidKeyException;
-import java.security.Key;
 
 import javax.crypto.SecretKey;
 
-import edu.biu.scapi.midLayer.symmetricCrypto.encryption.SymmetricEnc;
 import edu.biu.scapi.midLayer.symmetricCrypto.mac.Mac;
 import edu.biu.scapi.midLayer.symmetricCrypto.mac.TaggedObject;
 

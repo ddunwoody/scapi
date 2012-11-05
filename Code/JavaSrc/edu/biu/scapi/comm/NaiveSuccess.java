@@ -16,8 +16,6 @@ package edu.biu.scapi.comm;
 
 import java.util.List;
 
-import edu.biu.scapi.comm.EstablishedConnections;
-
 /** 
  * @author LabTest
  */

@@ -23,14 +23,12 @@ import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.security.InvalidKeyException;
-import java.security.Key;
 
 import javax.crypto.SecretKey;
 
 import edu.biu.scapi.midLayer.ciphertext.IVCiphertext;
 import edu.biu.scapi.midLayer.ciphertext.SymmetricCiphertext;
 import edu.biu.scapi.midLayer.plaintext.ByteArrayPlaintext;
-import edu.biu.scapi.midLayer.plaintext.Plaintext;
 import edu.biu.scapi.midLayer.symmetricCrypto.encryption.SymmetricEnc;
 
 /** 

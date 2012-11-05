@@ -50,10 +50,9 @@ import edu.biu.scapi.exceptions.DuplicatePartyException;
 import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.generals.Logging;
 import edu.biu.scapi.midLayer.symmetricCrypto.encryption.SymmetricEnc;
-import edu.biu.scapi.primitives.prf.AES;
+import edu.biu.scapi.midLayer.symmetricCrypto.mac.Mac;
 import edu.biu.scapi.tools.Factories.MacFactory;
 import edu.biu.scapi.tools.Factories.SymmetricEncFactory;
-import edu.biu.scapi.midLayer.symmetricCrypto.mac.Mac;
 
 
 

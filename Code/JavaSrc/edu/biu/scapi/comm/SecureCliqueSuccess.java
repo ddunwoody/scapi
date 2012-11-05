@@ -16,8 +16,6 @@ package edu.biu.scapi.comm;
 
 import java.util.List;
 
-import edu.biu.scapi.comm.EstablishedConnections;
-
 /** 
  * <!-- begin-UML-doc -->
  * <!-- end-UML-doc -->
