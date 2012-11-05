@@ -11,6 +11,7 @@
 */
 package edu.biu.scapi.primitives.trapdoorPermutation;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
@@ -40,7 +41,7 @@ final class RSAElement implements TPElement{
 		do {
 			//samples a random BigInteger with modN.bitLength()+1 bits
 			randNumber = new BigInteger(modN.bitLength()+1, generator);
-			//drops the element if it bigger then mod(N)-2
+			//drops the element if it's bigger than mod(N)-2
 		} while(randNumber.compareTo(modN.add(new BigInteger("-2")))>0);
 		//gets a random BigInteger between 1 to modN-1
 		randNumber = randNumber.add(new BigInteger("1"));
@@ -79,6 +80,14 @@ final class RSAElement implements TPElement{
 	 */
 	public BigInteger getElement() {
 		return element;
+	}
+
+	/* (non-Javadoc)
+	 * @see edu.biu.scapi.primitives.trapdoorPermutation.TPElement#generateSendableData()
+	 */
+	@Override
+	public TPElementSendableData generateSendableData() {
+		return new TPElementSendableData(element);
 	}
 
 

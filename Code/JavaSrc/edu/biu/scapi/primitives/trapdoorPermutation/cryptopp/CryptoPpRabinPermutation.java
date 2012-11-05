@@ -65,7 +65,7 @@ public final class CryptoPpRabinPermutation extends TrapdoorPermutationAbs imple
 	//returns the QuadraticResidueModPrime1 (s)
 	private native byte[]getQuadraticResidueModPrime2(long ptr);
 	//checks if the given element value is valid for this Rabin permutation
-	private native boolean checkRabinValidity(long value, long tpPtr);
+	//private native boolean checkRabinValidity(long value, long tpPtr);
 	
 	//computes Rabin permutation
 	private native long computeRabin(long tpr, long x);
@@ -227,7 +227,7 @@ public final class CryptoPpRabinPermutation extends TrapdoorPermutationAbs imple
 		
 		//If the key set was only the public key and not the private key - can't do the invert, throw exception.
 		if (privKey == null && pubKey!=null){
-			throw new KeyException("in order to decrypt a message, this object must be initialized with private key");
+			throw new KeyException("in order to invert a RabinElement, this object must be initialized with private key");
 		}
 		
 		if (!(tpEl instanceof CryptoPpRabinElement)){
@@ -255,33 +255,42 @@ public final class CryptoPpRabinPermutation extends TrapdoorPermutationAbs imple
 	 * VALID (it is an element)
 	 * NOT_VALID (it is not an element)
 	 * DON’T_KNOW (there is not enough information to check if it is an element or not)  
+	 * @throws KeyException 
 	 * @throws - IllegalArgumentException if the given element is not CryptoPpRabinElement
 	 */
 	public TPElValidity isElement(TPElement tpEl) throws IllegalArgumentException{
-		
+
 		if (!isKeySet()){
 			throw new IllegalStateException("keys aren't set");
 		}
 		if (!(tpEl instanceof CryptoPpRabinElement)){
 			throw new IllegalArgumentException("trapdoor element type doesn't match the trapdoor permutation type");
 		}
-			
-		long value = ((CryptoPpRabinElement)tpEl).getPointerToElement();
+
+		//long value = ((CryptoPpRabinElement)tpEl).getPointerToElement();
+		BigInteger value = ((CryptoPpRabinElement)tpEl).getElement();
+
+		//if the value is not between 1 to (mod n) - 1 thenthere is no need to continue checking, just return NOT_VALID
+		if(!((value.compareTo(BigInteger.ZERO))>0) && (value.compareTo(modulus)<0)) {
+			return TPElValidity.NOT_VALID;
+		}
 		TPElValidity validity = null;
-		
-		//if the trapdoor permutation or p,q are unknown - returns DONT_KNOW 
-		if ((modulus == null) || ((privKey == null) && (pubKey != null))) {
+		try {
+			//The function checkRabinElementValidity throws KeyException if the Private key was not set for this Rabin Permutation object, that is,
+			//only the party that knows the Private key can check if the element is valid or not  
+			if(checkRabinElementValidity(tpEl)) {
+
+				validity = TPElValidity.VALID;
+				//if the value is invalid returns NOT_VALID 
+			} else {
+				validity = TPElValidity.NOT_VALID;
+			}
+		} catch (KeyException e) {
+			//If we got here, it means that this Rabin Permutation object does not have enough information (i.e. it does not have the Private key) to check
+			//if this is a valid element or not. Therefore, it returns TPElValidity.DONT_KNOW
 			validity = TPElValidity.DONT_KNOW;
-			
-		//if the value is valid (between 1 to (mod n) - 1 and has a square root mod (N)) - returns VALID 
-		} else if(checkRabinValidity(value, tpPtr)) {
-			
-			validity = TPElValidity.VALID;
-		//if the value is invalid returns NOT_VALID 
-		} else {
-			validity = TPElValidity.NOT_VALID;
 		}		
-		
+
 		//returns the correct TPElValidity
 		return validity;
 	}
@@ -339,6 +348,25 @@ public final class CryptoPpRabinPermutation extends TrapdoorPermutationAbs imple
 		}*/
 		return new CryptoPpRabinElement(null,x);
 		
+	}
+	
+	
+	private boolean checkRabinElementValidity(TPElement elementToCheck) throws IllegalArgumentException, KeyException{
+		//Algorithm for checking the validity of elementToCheck:
+		//- Get the BigInteger value y of the elementToCheck
+		//- Calculate z = y^2 mod N
+		//- Calculate the y' = inverse(z)
+		//- If (y' == y) then
+		//		elementToCheck is VALID
+		//-	else
+		//		elementToCheck is NOT_VALID
+		
+		BigInteger y = elementToCheck.getElement();
+		BigInteger z = y.modPow(BigInteger.valueOf(2), modulus);
+		TPElement yTag = invert(generateUncheckedTPElement(z));
+		if(yTag.getElement().equals(elementToCheck.getElement()))
+			return true;
+		return false;
 	}
 	
 	/**

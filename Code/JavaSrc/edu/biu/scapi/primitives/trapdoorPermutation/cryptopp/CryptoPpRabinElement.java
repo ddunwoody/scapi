@@ -31,7 +31,7 @@ final class CryptoPpRabinElement extends CryptoPpTrapdoorElement{
 	 */
 	CryptoPpRabinElement(BigInteger modN) {
 		/*
-		 * samples a number between 1 to mod n with a square root mod(N)
+		 * samples a number between 1 to modulus -1 with a square root mod(N)
 		 */
 		pointerToInteger = getPointerToRandomRabinElement(modN.toByteArray());
 	}

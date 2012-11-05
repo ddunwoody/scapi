@@ -155,4 +155,11 @@ public interface TrapdoorPermutation {
 	 */
 	public TPElement generateUncheckedTPElement(BigInteger x);
 	
+	/**
+	 * Creates a TPElement from data that was probably obtained via the serialization mechanism. See explanation in {@link TPElementSendableData}
+	 * @param data 
+	 * @return TPElement
+	 */
+	public TPElement generateTPElement(TPElementSendableData data);
+	
 }

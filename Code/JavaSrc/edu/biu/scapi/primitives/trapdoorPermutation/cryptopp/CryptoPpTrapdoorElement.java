@@ -14,6 +14,7 @@ package edu.biu.scapi.primitives.trapdoorPermutation.cryptopp;
 import java.math.BigInteger;
 
 import edu.biu.scapi.primitives.trapdoorPermutation.TPElement;
+import edu.biu.scapi.primitives.trapdoorPermutation.TPElementSendableData;
 
 /**
  * This class implements some common functionality of the wrappers of crypto++ trapdoor elements.
@@ -55,6 +56,14 @@ public abstract class CryptoPpTrapdoorElement implements TPElement{
 		 * BigInteger has a constructor that accepts this byte array and returns a BigInteger object with the same value as the Integer.
 		 */
 		return new BigInteger(getElement(pointerToInteger));
+	}
+	
+	/** 
+	 * @see edu.biu.scapi.primitives.trapdoorPermutation.TPElement#generateSendableData()
+	 */
+	@Override
+	public TPElementSendableData generateSendableData() {
+		return new TPElementSendableData(getElement());
 	}
 	
 	/**

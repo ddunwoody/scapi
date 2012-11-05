@@ -118,5 +118,13 @@ public abstract class TrapdoorPermutationAbs implements TrapdoorPermutation {
 		return leastSignificantBytes;
 	
 	}
+	
+
+	/** 
+	 * @see edu.biu.scapi.primitives.trapdoorPermutation.TrapdoorPermutation#generateTPElement(edu.biu.scapi.primitives.trapdoorPermutation.TPElementSendableData)
+	 */
+	public TPElement generateTPElement(TPElementSendableData data){
+		return generateTPElement(data.getX());
+	}
 
 }
