@@ -12,6 +12,7 @@
 package edu.biu.scapi.midLayer.ciphertext;
 
 import edu.biu.scapi.primitives.dlog.GroupElement;
+import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
 
 public class ElGamalOnByteArrayCiphertext implements AsymmetricCiphertext{
 
@@ -45,4 +46,40 @@ public class ElGamalOnByteArrayCiphertext implements AsymmetricCiphertext{
 	public byte[] getC2(){
 		return cipher2;
 	}
+	
+	/**
+	 * @see edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertext#generateSendableData()
+	 */
+	@Override
+	public AsymmetricCiphertextSendableData generateSendableData() {
+		return new ElGamalOnByteArraySendableData(cipher1.generateSendableData(), cipher2);
+	}
+	
+	static public class ElGamalOnByteArraySendableData implements AsymmetricCiphertextSendableData {
+
+		private static final long serialVersionUID = -4094624693278838188L;
+
+		//First part of the ciphertext.
+		private GroupElementSendableData cipher1;
+		//Second part of the ciphertext.
+		private byte[] cipher2;
+		
+		public ElGamalOnByteArraySendableData(GroupElementSendableData cipher1,
+				byte[] cipher2) {
+			super();
+			this.cipher1 = cipher1;
+			this.cipher2 = cipher2;
+		}
+		public GroupElementSendableData getCipher1() {
+			return cipher1;
+		}
+		public byte[] getCipher2() {
+			return cipher2;
+		}
+
+
+
+	}
+
+	
 }

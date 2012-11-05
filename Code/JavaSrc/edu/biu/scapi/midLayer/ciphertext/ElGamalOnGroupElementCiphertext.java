@@ -12,6 +12,7 @@
 package edu.biu.scapi.midLayer.ciphertext;
 
 import edu.biu.scapi.primitives.dlog.GroupElement;
+import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
 
 /**
  * This class is a container that encapsulates the cipher data resulting from applying the El Gamal encryption.
@@ -49,4 +50,37 @@ public class ElGamalOnGroupElementCiphertext implements AsymmetricCiphertext {
 	public GroupElement getC2(){
 		return cipher2;
 	}
+
+	/**
+	 * @see edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertext#generateSendableData()
+	 */
+	@Override
+	public AsymmetricCiphertextSendableData generateSendableData() {
+		return new ElGamalOnGrElSendableData(cipher1.generateSendableData(), cipher2.generateSendableData());
+	}
+	
+	static public class ElGamalOnGrElSendableData implements AsymmetricCiphertextSendableData {
+
+
+		private static final long serialVersionUID = 4480691511084748707L;
+
+		GroupElementSendableData cipher1;
+		GroupElementSendableData cipher2;
+		public ElGamalOnGrElSendableData(GroupElementSendableData cipher1,
+				GroupElementSendableData cipher2) {
+			super();
+			this.cipher1 = cipher1;
+			this.cipher2 = cipher2;
+		}
+		public GroupElementSendableData getCipher1() {
+			return cipher1;
+		}
+		public GroupElementSendableData getCipher2() {
+			return cipher2;
+		}
+		
+		
+		
+	}
+
 }

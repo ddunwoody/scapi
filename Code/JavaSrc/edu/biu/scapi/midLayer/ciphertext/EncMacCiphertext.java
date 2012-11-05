@@ -14,14 +14,18 @@
  */
 package edu.biu.scapi.midLayer.ciphertext;
 
+import java.io.Serializable;
+
 /**
  * This class is a container for cipher-texts that include actual encrypted data and the resulting tag.
  * This is a concrete decorator in the Decorator Pattern used for Symmetric Ciphertext.
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-public class EncMacCiphertext extends SymCiphertextDecorator {
-	
+public class EncMacCiphertext extends SymCiphertextDecorator implements Serializable {
+
+	private static final long serialVersionUID = 5005071569923354531L;
+
 	//The MAC tag.
 	byte[] tag;
 

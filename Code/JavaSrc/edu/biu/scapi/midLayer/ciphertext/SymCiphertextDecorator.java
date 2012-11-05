@@ -10,6 +10,9 @@
 *
 */
 package edu.biu.scapi.midLayer.ciphertext;
+
+import java.io.Serializable;
+
 /**
  * The decorator pattern has been used to implement different types of symmetric ciphertext.<p>   
  * This abstract class is the decorator part of the pattern. It allows wrapping the base symmetric ciphertext with extra functionality.
@@ -17,11 +20,17 @@ package edu.biu.scapi.midLayer.ciphertext;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-abstract class SymCiphertextDecorator implements SymmetricCiphertext {
+abstract class SymCiphertextDecorator implements SymmetricCiphertext, Serializable{
+
+	private static final long serialVersionUID = -5676459536949678320L;
 
 	//The symmetric ciphertext we want to decorate.
 	protected SymmetricCiphertext cipher;
 	
+	public SymCiphertextDecorator() {
+		super();
+	}
+
 	/**
 	 * This constructor gets the symmetric ciphertext that we need to decorate.
 	 * @param cipher

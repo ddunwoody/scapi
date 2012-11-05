@@ -10,11 +10,19 @@
 *
 */
 package edu.biu.scapi.midLayer.ciphertext;
+
+
 /**
  * This is a marker interface for all cipher-texts.
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
 public interface AsymmetricCiphertext {
-
+	/**
+	 * This function is used when an asymmetric ciphertext needs to be sent via a {@link edu.biu.scapi.comm#Channel} or any other means of sending data (including serialization).
+	 * It retrieves all the data needed to reconstruct this ciphertext at a later time and/or in a different VM.
+	 * It puts all the data in an instance of the relevant class that implements the AsymmetricCiphertextSendableData interface.
+	 * @return the AsymmetricCiphertextSendableData object
+	 */
+	public AsymmetricCiphertextSendableData generateSendableData();
 }

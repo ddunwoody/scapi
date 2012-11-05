@@ -11,6 +11,8 @@
 */
 package edu.biu.scapi.midLayer.ciphertext;
 
+import java.io.Serializable;
+
 /**
  * This class represents the most basic symmetric ciphertext.
  * It is a data holder for the ciphertext calculated by some symmetric encryption algorithm. <p>
@@ -18,9 +20,11 @@ package edu.biu.scapi.midLayer.ciphertext;
  *  
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  */
-public class ByteArraySymCiphertext implements SymmetricCiphertext {
+public class ByteArraySymCiphertext implements SymmetricCiphertext, Serializable {
 
-	byte[] data = null;
+	private static final long serialVersionUID = -5263587288535853337L;
+
+	byte[] data;
 	
 	
 	/**

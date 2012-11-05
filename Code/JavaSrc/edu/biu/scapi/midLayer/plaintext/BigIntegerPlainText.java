@@ -11,7 +11,10 @@
 */
 package edu.biu.scapi.midLayer.plaintext;
 
+import java.io.Serializable;
 import java.math.BigInteger;
+
+import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertextSendableData;
 
 /**
  * This class holds the plaintext as a BigInteger.
@@ -19,7 +22,11 @@ import java.math.BigInteger;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-public class BigIntegerPlainText implements Plaintext {
+public class BigIntegerPlainText implements Plaintext, PlaintextSendableData {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6018721600601611396L;
 	private BigInteger x;
 
 	public BigInteger getX() {
@@ -50,4 +57,14 @@ public class BigIntegerPlainText implements Plaintext {
 		return true;
 	}
 	
+	/**
+	 * @see edu.biu.scapi.midLayer.plaintext.Plaintext#generateSendableData()
+	 */
+	@Override
+	public PlaintextSendableData generateSendableData() {
+		//Since BigIntegerPlainText is both a Plaintext and a PlaintextSendableData, on the one hand it has to implement
+		//the generateSendableData() function, but on the other hand it is in itself an PlaintextSendableData, so we do not really
+		//generate sendable data, but just return this object.
+		return this;
+	}
 }

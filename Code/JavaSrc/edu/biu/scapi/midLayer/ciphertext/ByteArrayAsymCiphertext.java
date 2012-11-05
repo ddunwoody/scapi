@@ -11,7 +11,9 @@
 */
 package edu.biu.scapi.midLayer.ciphertext;
 
-public class ByteArrayAsymCiphertext implements AsymmetricCiphertext {
+public class ByteArrayAsymCiphertext implements AsymmetricCiphertext, AsymmetricCiphertextSendableData {
+
+	private static final long serialVersionUID = -4795659243317232551L;
 
 	byte[] data = null;
 	
@@ -31,5 +33,17 @@ public class ByteArrayAsymCiphertext implements AsymmetricCiphertext {
 
 	public int getLength() {
 		return data.length;
+	}
+
+
+	/**
+	 * @see edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertext#generateSendableData()
+	 */
+	@Override
+	public AsymmetricCiphertextSendableData generateSendableData() {
+		//Since ByteArrayAsymCiphertext is both an AsymmetricCiphertext and a AsymmetricCiphertextSendableData, on the one hand it has to implement
+		//the generateSendableData() function, but on the other hand it is in itself an AsymmetricCiphertextSendableData, so we do not really
+		//generate sendable data, but just return this object.
+		return this;
 	}
 }

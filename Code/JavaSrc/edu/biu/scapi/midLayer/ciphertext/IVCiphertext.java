@@ -14,13 +14,18 @@
  */
 package edu.biu.scapi.midLayer.ciphertext;
 
+import java.io.Serializable;
+
 /**
  * This class is a container for cipher-texts that include actual cipher data and the IV used.
  * This is a concrete decorator in the Decorator Pattern used for Symmetric Ciphertext.
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-public class IVCiphertext extends SymCiphertextDecorator {
+public class IVCiphertext extends SymCiphertextDecorator implements Serializable {
+	
+	private static final long serialVersionUID = -503467002396867700L;
+
 	private byte[] iv;
 	
 	/**

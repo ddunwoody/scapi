@@ -11,7 +11,11 @@
 */
 package edu.biu.scapi.midLayer.signature;
 
-public class RSASignature implements Signature{
+import java.io.Serializable;
+
+public class RSASignature implements Signature, Serializable{
+	
+	private static final long serialVersionUID = 3793456438150512575L;
 	
 	private byte[] signature;
 	

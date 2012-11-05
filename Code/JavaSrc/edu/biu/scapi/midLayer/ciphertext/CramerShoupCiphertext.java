@@ -12,6 +12,7 @@
 package edu.biu.scapi.midLayer.ciphertext;
 
 import edu.biu.scapi.primitives.dlog.GroupElement;
+import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
 
 public abstract class CramerShoupCiphertext implements AsymmetricCiphertext{
 
@@ -36,4 +37,36 @@ public abstract class CramerShoupCiphertext implements AsymmetricCiphertext{
 	public GroupElement getV() {
 		return v;
 	}
+	
+	static public abstract class CramerShoupCiphertextSendableData implements AsymmetricCiphertextSendableData {
+
+		private static final long serialVersionUID = -6925856352814870257L;
+		
+		GroupElementSendableData u1;
+		GroupElementSendableData u2;
+		GroupElementSendableData v;
+		
+		public CramerShoupCiphertextSendableData(GroupElementSendableData u1, GroupElementSendableData u2, GroupElementSendableData v) {
+			super();
+			this.u1 = u1;
+			this.u2 = u2;
+			this.v = v;
+		}
+
+	
+		public GroupElementSendableData getU1() {
+			return u1;
+		}
+
+		public GroupElementSendableData getU2() {
+			return u2;
+		}
+
+		public GroupElementSendableData getV() {
+			return v;
+		}
+		
+		
+	}
+
 }

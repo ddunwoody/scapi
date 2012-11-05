@@ -12,6 +12,7 @@
 package edu.biu.scapi.midLayer.plaintext;
 
 import edu.biu.scapi.primitives.dlog.GroupElement;
+import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
 
 /**
  * This class holds the plaintext as a GroupElement.
@@ -19,7 +20,7 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class GroupElementPlaintext implements Plaintext{
+public class GroupElementPlaintext implements Plaintext {
 
 	private GroupElement element;
 	
@@ -43,5 +44,46 @@ public class GroupElementPlaintext implements Plaintext{
 		} 
 		
 		return true;
+	}
+	
+	
+
+	@Override
+	public String toString() {
+		return "GroupElementPlaintext [element=" + element + "]";
+	}
+
+	/**
+	 * @see edu.biu.scapi.midLayer.plaintext.Plaintext#generateSendableData()
+	 */
+	@Override
+	public PlaintextSendableData generateSendableData() {
+		return new GroupElementPlaintextSendableData(element.generateSendableData());
+	}
+	
+	
+	static public class GroupElementPlaintextSendableData implements PlaintextSendableData {
+
+		private static final long serialVersionUID = -5267306672307327063L;
+
+		GroupElementSendableData groupElementData;
+
+		public GroupElementPlaintextSendableData(
+				GroupElementSendableData groupElementData) {
+			super();
+			this.groupElementData = groupElementData;
+		}
+
+		public GroupElementSendableData getGroupElement() {
+			return groupElementData;
+		}
+
+		@Override
+		public String toString() {
+			return "GroupElementPlaintextSendableData [groupElementData="
+					+ groupElementData + "]";
+		}
+		
+		
 	}
 }

@@ -12,6 +12,7 @@
 package edu.biu.scapi.midLayer.ciphertext;
 
 import edu.biu.scapi.primitives.dlog.GroupElement;
+import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
 
 public class CramerShoupOnByteArrayCiphertext extends CramerShoupCiphertext{
 
@@ -25,6 +26,29 @@ public class CramerShoupOnByteArrayCiphertext extends CramerShoupCiphertext{
 
 	public byte[] getE() {
 		return e;
+	}
+
+	public AsymmetricCiphertextSendableData generateSendableData(){
+		return new CrShOnByteArraySendableData(getU1().generateSendableData(), getU2().generateSendableData(), getV().generateSendableData(), e);
+	}
+	
+	static public class CrShOnByteArraySendableData extends CramerShoupCiphertextSendableData {
+
+		private static final long serialVersionUID = 8318304796976977262L;
+
+		private byte[] e;
+		/**
+		 * @param u1
+		 * @param u2
+		 */
+		public CrShOnByteArraySendableData(GroupElementSendableData u1, GroupElementSendableData u2, GroupElementSendableData v, byte[] e) {
+			super(u1, u2, v);
+			this.e = e;
+		}
+		public byte[] getE() {
+			return e;
+		}
+
 	}
 
 }

@@ -17,7 +17,10 @@ import java.math.BigInteger;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-public class BigIntegerCiphertext implements AsymmetricCiphertext {
+public class BigIntegerCiphertext implements AsymmetricCiphertext, AsymmetricCiphertextSendableData {
+	
+	private static final long serialVersionUID = 5129403259299156094L;
+	
 	private BigInteger cipher;
 
 	public BigIntegerCiphertext(BigInteger cipher) {
@@ -27,6 +30,17 @@ public class BigIntegerCiphertext implements AsymmetricCiphertext {
 
 	public BigInteger getCipher() {
 		return cipher;
+	}
+
+	/**
+	 * @see edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertext#generateSendableData()
+	 */
+	@Override
+	public AsymmetricCiphertextSendableData generateSendableData() {
+		//Since BigIntegerCiphertext is both an AsymmetricCiphertext and a AsymmetricCiphertextSendableData, on the one hand it has to implement
+		//the generateSendableData() function, but on the other hand it is in itself an AsymmetricCiphertextSendableData, so we do not really
+		//generate sendable data, but just return this object.
+		return this;
 	}
 	
 }

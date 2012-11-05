@@ -11,13 +11,19 @@
 */
 package edu.biu.scapi.midLayer.plaintext;
 
+import java.io.Serializable;
+
 /**
  * This class holds the plaintext as a ByteArray.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-public class ByteArrayPlaintext implements Plaintext {
+public class ByteArrayPlaintext implements Plaintext, PlaintextSendableData  {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7793696997942346814L;
 	private byte[] text = null;
 	
 	public ByteArrayPlaintext (byte[] text) {
@@ -46,5 +52,17 @@ public class ByteArrayPlaintext implements Plaintext {
 		}
 		
 		return true;
+	}
+	
+
+	/**
+	 * @see edu.biu.scapi.midLayer.plaintext.Plaintext#generateSendableData()
+	 */
+	@Override
+	public PlaintextSendableData generateSendableData() {
+		//Since ByteArrayPlainText is both a Plaintext and a PlaintextSendableData, on the one hand it has to implement
+		//the generateSendableData() function, but on the other hand it is in itself an PlaintextSendableData, so we do not really
+		//generate sendable data, but just return this object.
+		return this;
 	}
 }

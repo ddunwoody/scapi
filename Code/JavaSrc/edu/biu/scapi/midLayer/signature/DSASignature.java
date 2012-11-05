@@ -11,10 +11,13 @@
 */
 package edu.biu.scapi.midLayer.signature;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 
-public class DSASignature implements Signature{
-	
+public class DSASignature implements Signature, Serializable{
+
+	private static final long serialVersionUID = 5103428378965330455L;
+
 	private BigInteger r;
 	private BigInteger s;
 	
