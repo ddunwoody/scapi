@@ -31,6 +31,7 @@ package edu.biu.scapi.comm;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.security.InvalidKeyException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -39,11 +40,20 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.logging.Level;
 
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+
 import org.apache.commons.exec.TimeoutObserver;
 import org.apache.commons.exec.Watchdog;
 
 import edu.biu.scapi.exceptions.DuplicatePartyException;
+import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.generals.Logging;
+import edu.biu.scapi.midLayer.symmetricCrypto.encryption.SymmetricEnc;
+import edu.biu.scapi.primitives.prf.AES;
+import edu.biu.scapi.tools.Factories.MacFactory;
+import edu.biu.scapi.tools.Factories.SymmetricEncFactory;
+import edu.biu.scapi.midLayer.symmetricCrypto.mac.Mac;
 
 
 
@@ -84,6 +94,7 @@ public class CommunicationSetup implements TimeoutObserver{
 	 * @param timeOut the maximum amount of time we allow for the connection stage
 	 * @return true if the success function has succeeded and false otherwise
 	 */
+	//We should also allow the user to choose the Mac algorithm and Encryption Scheme if needed together with the security level
 	public Map<InetSocketAddress, Channel> prepareForCommunication(List<Party> listOfParties,
 			KeyExchangeProtocol keyExchange, SecurityLevel securityLevel,
 			ConnectivitySuccessVerifier successLevel, long timeOut) {
@@ -342,8 +353,14 @@ public class CommunicationSetup implements TimeoutObserver{
 	 *  				  iteration ( we would get the ConcurrentModificationException exception) and thus we create a temporary map with the decorated channels and at the end clear the map and add all
 	 *  				  the decorated channels.
 	 */
+	@SuppressWarnings("unused")
 	private void setSecurityLevel() {
 		
+		//For the moment the only security level supported is PLAIN. Therefore,return immediately from this function without
+		//performing the necessary tasks to provide the channel with higher levels of security.
+		//As soon as we finish implementing the EncryptedChannel and the AuthenticatedChannel, this return statement should be removed.
+		if (true)
+			return;
 		
 		if(securityLevel==SecurityLevel.PLAIN)//If it is plain there is nothing to decorate
 			return;
@@ -377,7 +394,23 @@ public class CommunicationSetup implements TimeoutObserver{
 		    		case ENCRYPTED :{
 		    			
 		    			//create an encrypted channel
-		    			EncryptedChannel encChannel = new EncryptedChannel(ch, keyExchangeOutput.getEncKey());
+		    			//For now we are going to hard-code the Encryption Scheme being used, but we should allow the external user to choose it.
+		    			SymmetricEnc aesEnc = null;
+						try {
+							aesEnc = SymmetricEncFactory.getInstance().getObject("CBCEncRandomIV");
+						} catch (FactoriesException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						byte[] fixedKey = new byte[]{7, -126, 83, -82, 68, 67, -46, -58, 70, 123, -127, -66, -4, 37, -1, 15};
+					SecretKey key = new SecretKeySpec(fixedKey,"AES" );
+					try {
+						aesEnc.setKey(key);
+					} catch (InvalidKeyException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+		    			EncryptedChannel encChannel = new EncryptedChannel(ch, aesEnc);
 		    			//establishedConnections.addConnection(encChannel, localInetSocketAddress);
 		    			tempConnectionsMap.put(localInetSocketAddress,encChannel);
 		    			break;
@@ -385,7 +418,29 @@ public class CommunicationSetup implements TimeoutObserver{
 		    		case AUTHENTICATED : {
 		    			
 		    			//create an authenticated channel
-		    			AuthenticatedChannel authenChannel = new AuthenticatedChannel(ch, keyExchangeOutput.getMacKey());
+		    			//For now we are going to hard-code the MAC algorithm being used, but we should allow the external user to choose it.
+		    			Mac mac = null;
+						try {
+							mac = MacFactory.getInstance().getObject("CBCMacPrepending");
+						} catch (FactoriesException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+		    			//SecretKey key = mac.generateKey(128);
+		    			//byte[] keyRep = key.getEncoded();
+		    			//for(int i = 0 ; i < keyRep.length; i++)
+		    			//	System.out.println(keyRep[i]);
+						byte[] fixedKey = new byte[]{-82, 123, 72, -83, 92, 100, -17, 51, -34, -49, 59, 112, 122, 5, -116, 32};
+						SecretKey key = new SecretKeySpec(fixedKey,"AES" );
+						
+						
+						try {
+							mac.setKey(key);
+						} catch (InvalidKeyException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+		    			AuthenticatedChannel authenChannel = new AuthenticatedChannel(ch, mac);
 		    			//establishedConnections.addConnection(authenChannel, localInetSocketAddress);
 		    			tempConnectionsMap.put(localInetSocketAddress, authenChannel);
 		    			break;
@@ -393,8 +448,38 @@ public class CommunicationSetup implements TimeoutObserver{
 		    		case SECURE : {
 		    			
 		    			//decorate with authentication and then with encryption - order is important for security
-		    			AuthenticatedChannel authenChannel = new AuthenticatedChannel(ch, keyExchangeOutput.getMacKey());
-		    			EncryptedChannel secureChannel = new EncryptedChannel(authenChannel, keyExchangeOutput.getEncKey());
+		    			//For now we are going to hard-code the MAC algorithm and Encryption Scheme being used, but we should allow the external user to choose it.
+		    			Mac mac = null;
+						try {
+							mac = MacFactory.getInstance().getObject("CBCMac");
+						} catch (FactoriesException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+		    			SecretKey keyMac = mac.generateKey(64);
+		    			try {
+							mac.setKey(keyMac);
+						} catch (InvalidKeyException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+		    			AuthenticatedChannel authenChannel = new AuthenticatedChannel(ch, mac);
+		    			
+		    			SymmetricEnc aesEnc = null;
+						try {
+							aesEnc = SymmetricEncFactory.getInstance().getObject("CBCEncRandomIV");
+						} catch (FactoriesException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+		    			SecretKey keyEnc = aesEnc.generateKey(128);
+		    			try {
+							aesEnc.setKey(keyEnc);
+						} catch (InvalidKeyException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+		    			EncryptedChannel secureChannel = new EncryptedChannel(authenChannel, aesEnc);
 		    			
 		    			//establishedConnections.addConnection(secureChannel, localInetSocketAddress);
 		    			tempConnectionsMap.put(localInetSocketAddress, secureChannel);
@@ -415,7 +500,7 @@ public class CommunicationSetup implements TimeoutObserver{
 	 */
 	public void timeoutOccured(Watchdog w) {
 
-		Logging.getLogger().log(Level.INFO, "Timeout accured");
+		Logging.getLogger().log(Level.INFO, "Timeout occured");
 		
 		//timeout has passed set the flag
 		bTimedOut = true;
