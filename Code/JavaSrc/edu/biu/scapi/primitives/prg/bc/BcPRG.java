@@ -120,7 +120,7 @@ public abstract class BcPRG implements PseudorandomGenerator {
 			throw new NegativeArraySizeException("key size must be greater than 0");
 		}
 		//creates a byte array of size keySize
-		byte[] genBytes = new byte[keySize];
+		byte[] genBytes = new byte[keySize/8];
 
 		//generates the bytes using the random
 		//Do we need to seed random??
