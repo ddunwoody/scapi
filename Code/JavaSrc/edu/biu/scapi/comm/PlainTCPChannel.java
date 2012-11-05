@@ -17,6 +17,7 @@ package edu.biu.scapi.comm;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -76,23 +77,25 @@ public class PlainTCPChannel extends PlainChannel{
 	 * @param msg
 	 * @throws IOException 
 	 */
-	public void send(Message msg) throws IOException {
+	public void send(Serializable msg) throws IOException {
 		
-		
+	
 		
 		outStream.writeObject(msg);
 		
-		System.out.println("Sending " + msg.getData()[0] + msg.getData()[1]);
+		//System.out.println("Sending " + msg.getClass().getName());
+		
+	
 	}
 
 	/** 
 	 * @throws ClassNotFoundException 
 	 * @throws IOException 
 	 */
-	public Message receive() throws ClassNotFoundException, IOException {
+	public Serializable receive() throws ClassNotFoundException, IOException {
 		
-		
-		Message msg = (Message)inStream.readObject();
+		/*
+		Serializable msg = (Serializable)inStream.readObject();
 		int accum=0;
 		for(int i=0;i<(msg.getData()).length; i++){
 			
@@ -102,6 +105,8 @@ public class PlainTCPChannel extends PlainChannel{
 		System.out.println("receiving... " +  accum);
 		
 		return msg;
+		*/
+		return (Serializable) inStream.readObject();
 	}
 
 	/**
@@ -124,10 +129,14 @@ public class PlainTCPChannel extends PlainChannel{
 		}
 	}
 
+	public boolean isClosed(){
+		return socket.isInputShutdown() || socket.isOutputShutdown() || socket.isClosed() || !socket.isConnected();
+	}
+
 	
 	/** 
 	 * Connects the socket to the InetSocketAddress of this object. If the server we are trying to connect to 
-	 * 			 is not up yet than we sleep for a while and try again until the connection is established.
+	 * 			 is not up yet then we sleep for a while and try again until the connection is established.
 	 * 			 After the connection has succeeded the input and output streams are set for the send and receive functions.
 	 * @return
 	 * @throws IOException 
@@ -193,7 +202,6 @@ public class PlainTCPChannel extends PlainChannel{
 	Socket getSocket(){
 		return socket;
 	}
-
 
 	
 }
