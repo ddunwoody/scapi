@@ -30,7 +30,7 @@ import edu.biu.scapi.midLayer.asymmetricCrypto.keys.CramerShoupPublicKey;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.KeySendableData;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScCramerShoupPrivateKey;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScCramerShoupPublicKey;
-import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScCramerShoupPublicKeySendableData;
+import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScCramerShoupPublicKey.ScCramerShoupPublicKeySendableData;
 import edu.biu.scapi.midLayer.ciphertext.CramerShoupCiphertext;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
