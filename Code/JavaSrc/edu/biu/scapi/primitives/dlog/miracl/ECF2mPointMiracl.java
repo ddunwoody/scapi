@@ -17,8 +17,10 @@ import java.io.ObjectOutputStream;
 import java.math.BigInteger;
 
 import edu.biu.scapi.primitives.dlog.ECElement;
+import edu.biu.scapi.primitives.dlog.ECElementSendableData;
 import edu.biu.scapi.primitives.dlog.ECF2mPoint;
 import edu.biu.scapi.primitives.dlog.ECF2mUtility;
+import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
 import edu.biu.scapi.primitives.dlog.groupParams.ECF2mGroupParams;
 /**
  * This class is an adapter for F2m points of miracl
@@ -29,7 +31,7 @@ public class ECF2mPointMiracl implements ECElement, ECF2mPoint{
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 5263481969362114289L;
+	//private static final long serialVersionUID = 5263481969362114289L;
 
 	private native long createF2mPoint(long mip, byte[] x, byte[] y);
 	private native long createF2mPointFromX(long mip, byte[] x, boolean[] validity);
@@ -81,38 +83,7 @@ public class ECF2mPointMiracl implements ECElement, ECF2mPoint{
 		curveName = curve.getCurveName();
 		fileName = curve.getFileName();
 	}
-	
-	private void writeObject(ObjectOutputStream out) throws IOException{ 
-		out.writeObject(curveName); 
-		out.writeObject(fileName);
-		byte[] x = getXValueF2mPoint(mip, point);
-		byte[] y = getYValueF2mPoint(mip, point);
-		out.writeObject(x);
-		out.writeObject(y);
-	}
-	
-	private void readObject(ObjectInputStream in) throws IOException { 
-		byte [] x = null, y = null;
-		try {
-			curveName = (String) in.readObject();
-			fileName = (String) in.readObject();
-			x = (byte[]) in.readObject();
-			y = (byte[]) in.readObject();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		MiraclDlogECF2m dlog = new MiraclDlogECF2m(fileName, curveName);
-		
-		boolean valid = util.checkCurveMembership((ECF2mGroupParams) dlog.getGroupParams(), new BigInteger(x), new BigInteger(y));
-		// checks validity
-		if (valid == false) // if not valid, throws exception
-			throw new IllegalArgumentException("x, y values are not a point on this curve");
-		
-		mip = dlog.getMip();
-		point = createF2mPoint(mip, x, y);
-	}
-	
+
 	/**
 	 * 
 	 * @return the pointer to the point
@@ -145,6 +116,15 @@ public class ECF2mPointMiracl implements ECElement, ECF2mPoint{
 		}
 		
 		return new BigInteger(getYValueF2mPoint(mip, point));
+	}
+	
+	
+	/** 
+	 * @see edu.biu.scapi.primitives.dlog.GroupElement#generateSendableData()
+	 */
+	@Override
+	public GroupElementSendableData generateSendableData() {
+		return new ECElementSendableData(getX(), getY());
 	}
 	
 	public boolean equals(Object elementToCompare){

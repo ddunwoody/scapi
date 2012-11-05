@@ -11,6 +11,7 @@
 */
 package edu.biu.scapi.primitives.dlog.groupParams;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.security.spec.AlgorithmParameterSpec;
 
@@ -21,7 +22,9 @@ import java.security.spec.AlgorithmParameterSpec;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public abstract class GroupParams implements AlgorithmParameterSpec {
+public abstract class GroupParams implements AlgorithmParameterSpec, Serializable {
+
+	private static final long serialVersionUID = -2073134974201958294L;
 
 	protected BigInteger q; //the group order
 

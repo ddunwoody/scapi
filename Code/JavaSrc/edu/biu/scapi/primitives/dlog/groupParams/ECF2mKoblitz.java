@@ -13,18 +13,20 @@ package edu.biu.scapi.primitives.dlog.groupParams;
 
 import java.math.BigInteger;
 
-/*
+/**
  * Koblitz curve is an extended elliptic curve. 
  * In addition to the regular curve, Koblitz curve also contains the order of the subgroup and cofactor.
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
 public class ECF2mKoblitz extends ECF2mGroupParams{
-	
+
+	private static final long serialVersionUID = -1070828281903801704L;
+
 	private BigInteger n; 	//order of the main subgroup
-	ECF2mGroupParams curve; //underline curve
+	ECF2mGroupParams curve; //underlying curve
 	
-	/*
+	/**
 	 * Constructor that sets the underlying curve and the additional parameters
 	 * @param curve the underlying curve
 	 * @param n order of the sub group
@@ -36,7 +38,7 @@ public class ECF2mKoblitz extends ECF2mGroupParams{
 		this.h = h;
 	}
 	
-	/*
+	/**
 	 * Returns the exponent of the underlying curve
 	 * @return m
 	 */
@@ -44,7 +46,7 @@ public class ECF2mKoblitz extends ECF2mGroupParams{
 		return curve.getM();
 	}
 
-	/*
+	/**
 	 * Returns the integer <code>k1</code> of the underlying curve where <code>x<sup>m</sup> +
      * x<sup>k3</sup> + x<sup>k2</sup> + x<sup>k1</sup> + 1</code>
      * represents the reduction polynomial <code>f(z)</code>.
@@ -61,7 +63,7 @@ public class ECF2mKoblitz extends ECF2mGroupParams{
 		return k1;
 	}
 	
-	/*
+	/**
 	 * Returns the integer <code>k2</code> of the underlying curve where <code>x<sup>m</sup> +
      * x<sup>k3</sup> + x<sup>k2</sup> + x<sup>k1</sup> + 1</code>
      * represents the reduction polynomial <code>f(z)</code>.
@@ -78,7 +80,7 @@ public class ECF2mKoblitz extends ECF2mGroupParams{
 		return k2;
 	}
 	
-	/*
+	/**
 	 * Returns the integer <code>k3</code> where <code>x<sup>m</sup> +
      * x<sup>k3</sup> + x<sup>k2</sup> + x<sup>k1</sup> + 1</code>
      * represents the reduction polynomial <code>f(z)</code>.
@@ -95,7 +97,7 @@ public class ECF2mKoblitz extends ECF2mGroupParams{
 		return k3;
 	}
 	
-	/*
+	/**
 	 * Returns the order of this group
 	 * @return q the group order
 	 */
@@ -103,7 +105,7 @@ public class ECF2mKoblitz extends ECF2mGroupParams{
 		return curve.getQ();
 	}
 	
-	/*
+	/**
 	 * Returns the x coordinate of the generator of this group
 	 * @return xG the x coordinate of the generator 
 	 */
@@ -111,7 +113,7 @@ public class ECF2mKoblitz extends ECF2mGroupParams{
 		return curve.getXg();
 	}
 	
-	/*
+	/**
 	 * Returns the y coordinate of the generator of this group
 	 * @return yG the y coordinate of the generator 
 	 */
@@ -119,7 +121,7 @@ public class ECF2mKoblitz extends ECF2mGroupParams{
 		return curve.getYg();
 	}
 	
-	/*
+	/**
 	 * Returns the a coefficient of this elliptic curve equation
 	 * @return a the a coefficient of this elliptic curve equation
 	 */
@@ -127,7 +129,7 @@ public class ECF2mKoblitz extends ECF2mGroupParams{
 		return curve.getA();
 	}
 	
-	/*
+	/**
 	 * Returns the b coefficient of this elliptic curve equation
 	 * @return b the b coefficient of this elliptic curve equation
 	 */
@@ -135,7 +137,7 @@ public class ECF2mKoblitz extends ECF2mGroupParams{
 		return curve.getB();
 	}
 	
-	/*
+	/**
 	 * Returns the subgroup order of this group
 	 * @return n the subgroup order
 	 */
@@ -143,11 +145,28 @@ public class ECF2mKoblitz extends ECF2mGroupParams{
 		return n;
 	}
 	
-	/*
+	/**
 	 * Returns the underlying curve
 	 * @return the underlying curve
 	 */
 	public ECF2mGroupParams getCurve(){
 		return curve;
 	}
+
+	@Override
+	public String toString() {
+		return "ECF2mKoblitz [getM()=" + getM() + ", getK1()=" + getK1()
+				+ ", getK2()=" + getK2() + ", getK3()=" + getK3() + ", getQ()="
+				+ getQ() + ", getXg()=" + getXg() + ", getYg()=" + getYg()
+				+ ", getA()=" + getA() + ", getB()=" + getB()
+				+ ", getSubGroupOrder()=" + getSubGroupOrder()
+				+ ", getCurve()=" + getCurve() + ", getCofactor()="
+				+ getCofactor() + ", getClass()=" + getClass()
+				+ ", hashCode()=" + hashCode() + ", toString()="
+				+ super.toString() + "]";
+	}
+
+	
+	
+	
 }

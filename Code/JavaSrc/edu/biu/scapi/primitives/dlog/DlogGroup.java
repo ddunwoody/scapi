@@ -124,7 +124,7 @@ public interface DlogGroup {
 	 * @param groupElement1
 	 * @param groupElement2
 	 * @return the multiplication result
-	 * throws IllegalArgumentException
+	 * @throws IllegalArgumentException
 	 */
 	public GroupElement multiplyGroupElements(GroupElement groupElement1, GroupElement groupElement2) throws IllegalArgumentException;
 	
@@ -140,6 +140,20 @@ public interface DlogGroup {
 	 */
 	public GroupElement createRandomGenerator();
 	
+	/**
+	 * This function allows the generation of a group element by a protocol that holds a Dlog Group but does not know if it is a Zp Dlog Group or an Elliptic Curve Dlog Group.
+	 * It receives the possible values of a group element and whether to check membership of the group element to the group or not.
+	 * It may be not necessary to check membership if the source of values is a trusted source (it can be the group itself after some calculation). On the other hand,
+	 * to work with a generated group element that is not really an element in the group is wrong. It is up to the caller of the function to decide if to check membership or not.
+	 * If bCheckMembership is false always generate the element. Else, generate it only if the values are correct. 
+	 * @param bCheckMembership
+	 * @param values
+	 * @return the generated GroupElement
+	 * @throws IllegalArgumentException
+	 */
+	public GroupElement generateElement(boolean bCheckMembership, BigInteger...values) throws IllegalArgumentException;
+	
+	public GroupElement generateElement(boolean bCheckMembership, GroupElementSendableData data);
 	
 	/**
 	 * Computes the product of several exponentiations with distinct bases 

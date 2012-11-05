@@ -14,8 +14,10 @@ package edu.biu.scapi.primitives.dlog.miracl;
 import java.math.BigInteger;
 
 import edu.biu.scapi.primitives.dlog.ECElement;
+import edu.biu.scapi.primitives.dlog.ECElementSendableData;
 import edu.biu.scapi.primitives.dlog.ECFpPoint;
 import edu.biu.scapi.primitives.dlog.ECFpUtility;
+import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
 import edu.biu.scapi.primitives.dlog.groupParams.ECFpGroupParams;
 
 /**
@@ -104,6 +106,14 @@ public class ECFpPointMiracl implements ECElement, ECFpPoint{
 		
 		return new BigInteger(getYValueFpPoint(mip, point));
 		
+	}
+	
+	/** 
+	 * @see edu.biu.scapi.primitives.dlog.GroupElement#generateSendableData()
+	 */
+	@Override
+	public GroupElementSendableData generateSendableData() {
+		return new ECElementSendableData(getX(), getY());
 	}
 	
 	public boolean equals(Object elementToCompare){

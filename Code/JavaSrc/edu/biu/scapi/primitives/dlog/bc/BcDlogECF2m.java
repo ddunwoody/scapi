@@ -159,7 +159,8 @@ public class BcDlogECF2m extends BcAdapterDlogEC implements DlogECF2m, DDH{
 		
 		return point;
 	}
-	
+
+		
 	/**
 	 * Creates ECPoint.F2m with the given parameters
 	 */
@@ -242,7 +243,5 @@ public class BcDlogECF2m extends BcAdapterDlogEC implements DlogECF2m, DDH{
 		return util.mapAnyGroupElementToByteArray(point.getX(), point.getY());
 	}
 
-
-	
 
 }

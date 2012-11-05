@@ -25,5 +25,5 @@ public interface DlogZp extends DlogGroup{
 	 * @param x
 	 * @return the created element
 	 */
-	public ZpElement generateElement (BigInteger x, Boolean bCheckMembership);
+	public ZpElement generateElement (Boolean bCheckMembership, BigInteger x);
 }

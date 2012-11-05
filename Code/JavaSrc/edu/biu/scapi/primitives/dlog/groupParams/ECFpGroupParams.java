@@ -13,16 +13,18 @@ package edu.biu.scapi.primitives.dlog.groupParams;
 
 
 import java.math.BigInteger;
-/*
+/**
  * This class holds the parameters of an Elliptic curve over Zp.
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
 public class ECFpGroupParams extends ECGroupParams{
 
+	private static final long serialVersionUID = -5003549154325155956L;
+
 	private BigInteger p; //modulus 
 	
-	/*
+	/**
 	 * Sets the order, generator and coefficients parameters
 	 * @param q group order
 	 * @param xG x coordinate of the generator point
@@ -42,11 +44,18 @@ public class ECFpGroupParams extends ECGroupParams{
 		this.h = h;
 	}
 	
-	/*
+	/**
 	 * Returns the prime modulus of the group
 	 * @return p
 	 */
 	public BigInteger getP(){
 		return p;
 	}
+
+	@Override
+	public String toString() {
+		return "ECFpGroupParams [p=" + p + ", /na=" + a + ", /nb=" + b + ", /nxG=" + xG + ", /nyG=" + yG + ", /nh=" + h + ", /nq=" + q + "]";
+	}
+	
+	
 }

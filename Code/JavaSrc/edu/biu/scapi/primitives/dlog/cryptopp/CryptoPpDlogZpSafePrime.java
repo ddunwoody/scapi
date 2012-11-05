@@ -16,7 +16,9 @@ import java.math.BigInteger;
 import edu.biu.scapi.primitives.dlog.DlogGroupAbs;
 import edu.biu.scapi.primitives.dlog.DlogZpSafePrime;
 import edu.biu.scapi.primitives.dlog.GroupElement;
+import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
 import edu.biu.scapi.primitives.dlog.ZpElement;
+import edu.biu.scapi.primitives.dlog.ZpElementSendableData;
 import edu.biu.scapi.primitives.dlog.groupParams.ZpGroupParams;
 import edu.biu.scapi.securityLevel.DDH;
 import edu.biu.scapi.tools.math.MathAlgorithms;
@@ -303,11 +305,33 @@ public class CryptoPpDlogZpSafePrime extends DlogGroupAbs implements DlogZpSafeP
 	 * 
 	 * @return the created element
 	 */
-	public ZpElement generateElement(BigInteger x, Boolean bCheckMembership) {
+	public ZpElement generateElement(Boolean bCheckMembership, BigInteger x) {
 
 		return new ZpSafePrimeElementCryptoPp(x, ((ZpGroupParams) groupParams).getP(), bCheckMembership);
 	}
 
+	
+	/* (non-Javadoc)
+	 * @see edu.biu.scapi.primitives.dlog.DlogGroup#generateElement(boolean, java.math.BigInteger[])
+	 */
+	@Override
+	public GroupElement generateElement(boolean bCheckMembership, BigInteger... values) throws IllegalArgumentException {
+		if(values.length != 1){
+			throw new IllegalArgumentException("To generate an ZpElement you should pass the x value of the point");
+		}
+		return generateElement(bCheckMembership, values[0] );
+		
+	}
+	
+	/* (non-Javadoc)
+	 * @see edu.biu.scapi.primitives.dlog.DlogGroup#generateElement(boolean, edu.biu.scapi.primitives.dlog.GroupElementSendableData)
+	 */
+	@Override
+	public GroupElement generateElement(boolean bCheckMembership, GroupElementSendableData data) {
+		if (!(data instanceof ZpElementSendableData))
+			throw new IllegalArgumentException("data type doesn't match the group type");
+		return generateElement(bCheckMembership, ((ZpElementSendableData)data).getX());
+	}
 
 	/**
 	 * deletes the related Dlog group object
@@ -406,4 +430,5 @@ public class CryptoPpDlogZpSafePrime extends DlogGroupAbs implements DlogZpSafeP
 		System.loadLibrary("CryptoPPJavaInterface");
 	}
 
+	
 }

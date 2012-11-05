@@ -16,6 +16,8 @@ import java.security.SecureRandom;
 
 import org.bouncycastle.util.BigIntegers;
 
+import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
+import edu.biu.scapi.primitives.dlog.ZpElementSendableData;
 import edu.biu.scapi.primitives.dlog.ZpSafePrimeElement;
 
 /**
@@ -149,5 +151,13 @@ public class ZpSafePrimeElementCryptoPp implements ZpSafePrimeElement {
 
 	static {
 		System.loadLibrary("CryptoPPJavaInterface");
+	}
+
+	/** 
+	 * @see edu.biu.scapi.primitives.dlog.GroupElement#generateSendableData()
+	 */
+	@Override
+	public GroupElementSendableData generateSendableData() {
+		return new ZpElementSendableData(getElementValue());
 	}
 }

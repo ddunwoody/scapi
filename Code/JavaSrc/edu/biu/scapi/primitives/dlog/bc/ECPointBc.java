@@ -16,6 +16,9 @@ import java.math.BigInteger;
 import org.bouncycastle.math.ec.ECPoint;
 
 import edu.biu.scapi.primitives.dlog.ECElement;
+import edu.biu.scapi.primitives.dlog.ECElementSendableData;
+import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
+import edu.biu.scapi.primitives.dlog.ZpElementSendableData;
 
 /**
  * This class is an adapter for BC point.
@@ -62,6 +65,10 @@ public abstract class ECPointBc implements ECElement{
 		return point.isInfinity();
 	}
 	
+	/**
+	 * Two points are equal if they are both of type ECPointBc and their (x,y) coordinates are equal.
+	 * 
+	 */
 	public boolean equals(Object elementToCompare){
 		if (elementToCompare == null || elementToCompare.getClass() != this.getClass()) 
 			return false;
@@ -73,7 +80,14 @@ public abstract class ECPointBc implements ECElement{
 		
 		return false;
 	}
-
+	/** 
+	 * @see edu.biu.scapi.primitives.dlog.GroupElement#generateSendableData()
+	 */
+	@Override
+	public GroupElementSendableData generateSendableData() {
+		return new ECElementSendableData(getX(), getY());
+	}
+	
 	@Override
 	public String toString() {
 		return "ECPointBc [point=" + getX()+"; " + getY() + "]";

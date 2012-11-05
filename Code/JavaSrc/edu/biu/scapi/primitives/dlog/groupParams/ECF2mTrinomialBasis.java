@@ -13,7 +13,7 @@ package edu.biu.scapi.primitives.dlog.groupParams;
 
 import java.math.BigInteger;
 
-/*
+/**
  * Elliptic curves over F2m can be constructed with two basis types, trinomial type or pentanomial type.
  * This class manages the trinomial basis.
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
@@ -21,10 +21,12 @@ import java.math.BigInteger;
  */
 public class ECF2mTrinomialBasis extends ECF2mGroupParams{
 
+	private static final long serialVersionUID = 3119886165694042812L;
+	
 	private int k; //the integer k where x^m + x^k + 1 represents the reduction polynomial f(z)
 	
-	/*
-	 * constructor that sets the parameters
+	/**
+	 * Constructor that sets the parameters
 	 * @param q  group order
 	 * @param xG x coordinate of the generator point
 	 * @param yG y coordinate of the generator point
@@ -46,11 +48,20 @@ public class ECF2mTrinomialBasis extends ECF2mGroupParams{
 		this.h = h;
 	}
 	
-	/*
+	/**
 	 * Returns the integer <code>k</code> where <code>x<sup>m</sup> + x<sup>k</sup> + 1</code> 
 	 * @return k
 	 */
 	public int getK1(){
 		return k;
 	}
+
+	@Override
+	public String toString() {
+		return "ECF2mTrinomialBasis [k=" + k + ", m=" + m + ", a=" + a + ", b="
+				+ b + ", xG=" + xG + ", yG=" + yG + ", h=" + h + ", q=" + q
+				+ "]";
+	}
+	
+	
 }

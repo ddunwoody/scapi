@@ -13,7 +13,7 @@ package edu.biu.scapi.primitives.dlog.groupParams;
 
 import java.math.BigInteger;
 
-/*
+/**
  * Elliptic curves over F2m can be constructed with two basis types, trinomial type or pentanomial type.
  * This class manages the pentanomial basis.
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
@@ -21,13 +21,15 @@ import java.math.BigInteger;
  */
 public class ECF2mPentanomialBasis extends ECF2mGroupParams{
 
+	private static final long serialVersionUID = -2591866669252876049L;
+
 	// x^m + x^k3 + x^k2 + x^k1 + 1 represents the reduction polynomial f(z)
 	private int k1; 
 	private int k2;
 	private int k3;
 	
 	
-	/*
+	/**
 	 * Sets the parameters
 	 * @param q the group order
 	 * @param xG x coordinate of the generator point
@@ -59,7 +61,7 @@ public class ECF2mPentanomialBasis extends ECF2mGroupParams{
 		this.h = h;
 	}
 	
-	/*
+	/**
 	 * Returns the integer <code>k1</code> where <code>x<sup>m</sup> +
      * x<sup>k3</sup> + x<sup>k2</sup> + x<sup>k1</sup> + 1</code>
      * represents the reduction polynomial <code>f(z)</code>.
@@ -69,7 +71,8 @@ public class ECF2mPentanomialBasis extends ECF2mGroupParams{
 		return k1;
 	}
 	
-	/* Returns the integer <code>k2</code> where <code>x<sup>m</sup> +
+	/**
+	 * Returns the integer <code>k2</code> where <code>x<sup>m</sup> +
      * x<sup>k3</sup> + x<sup>k2</sup> + x<sup>k1</sup> + 1</code>
      * represents the reduction polynomial <code>f(z)</code>.
      * @return k2
@@ -78,13 +81,21 @@ public class ECF2mPentanomialBasis extends ECF2mGroupParams{
 		return k2;
 	}
 	
-	/* Returns the integer <code>k3</code> where <code>x<sup>m</sup> +
+	/** 
+	 * Returns the integer <code>k3</code> where <code>x<sup>m</sup> +
      * x<sup>k3</sup> + x<sup>k2</sup> + x<sup>k1</sup> + 1</code>
      * represents the reduction polynomial <code>f(z)</code>.
      * @return k3
      */
 	public int getK3(){
 		return k3;
+	}
+
+	@Override
+	public String toString() {
+		return "ECF2mPentanomialBasis [k1=" + k1 + ", k2=" + k2 + ", k3=" + k3
+				+ ", m=" + m + ", a=" + a + ", b=" + b + ", xG=" + xG + ", yG="
+				+ yG + ", h=" + h + ", q=" + q + "]";
 	}
 
 	

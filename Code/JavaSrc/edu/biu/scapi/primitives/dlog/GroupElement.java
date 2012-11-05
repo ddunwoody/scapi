@@ -18,7 +18,7 @@ package edu.biu.scapi.primitives.dlog;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public interface GroupElement {
+public interface GroupElement{
 
 	/**
 	 * checks if this element is the identity of the group.
@@ -26,4 +26,13 @@ public interface GroupElement {
 	 * 		   <code>false</code> otherwise.
 	 */
 	public boolean isIdentity();
+	
+	/**
+	 * This function is used when a group element needs to be sent via a {@link Channel} or any other means of sending data (including serialization).
+	 * It retrieves all the data needed to reconstruct this Group Element at a later time and/or in a different VM.
+	 * It puts all the data in an instance of the relevant class that implements the GroupElementSendableData interface.
+	 * @return the GroupElementSendableData object
+	 */
+	public GroupElementSendableData generateSendableData();
+	
 }

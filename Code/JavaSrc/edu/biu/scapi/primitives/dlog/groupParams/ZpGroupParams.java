@@ -11,13 +11,16 @@
 */
 package edu.biu.scapi.primitives.dlog.groupParams;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 /**
  * This class holds the parameters of a Dlog group over Zp*.
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class ZpGroupParams extends GroupParams{
+public class ZpGroupParams extends GroupParams implements Serializable{
+
+	private static final long serialVersionUID = 1458597565512141731L;
 
 	private BigInteger p; //modulus
 	private BigInteger xG; //generator value
@@ -51,4 +54,10 @@ public class ZpGroupParams extends GroupParams{
 	public BigInteger getXg(){
 		return xG;
 	}
+
+	@Override
+	public String toString() {
+		return "ZpGroupParams [p=" + p + ", xG=" + xG + "]";
+	}
+	
 }
