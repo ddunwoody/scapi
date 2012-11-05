@@ -77,7 +77,8 @@ public class LoadParties {
 			try {
 				//ip = InetAddress.getLocalHost();
 				ip = InetAddress.getByName(parties.getProperty("IP" + i));
-				port = Integer.parseInt(parties.getProperty("Port" + i));
+				String portS = parties.getProperty("Port" + i);
+				port = Integer.parseInt(portS);
 			} catch (UnknownHostException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
