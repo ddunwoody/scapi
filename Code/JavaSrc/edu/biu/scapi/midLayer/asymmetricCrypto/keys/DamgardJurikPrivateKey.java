@@ -26,4 +26,6 @@ public interface DamgardJurikPrivateKey extends PrivateKey {
 	BigInteger getT();
 
 	BigInteger getDForS1();
+	
+	KeySendableData generateSendableData();
 }

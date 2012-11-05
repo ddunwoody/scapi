@@ -13,7 +13,7 @@ package edu.biu.scapi.midLayer.asymmetricCrypto.keys;
 
 import java.math.BigInteger;
 
-public class ScElGamalPrivateKey implements ElGamalPrivateKey {
+public class ScElGamalPrivateKey implements ElGamalPrivateKey, KeySendableData {
 
 	private static final long serialVersionUID = -5215891366473399087L;
 	private BigInteger x;
@@ -40,4 +40,16 @@ public class ScElGamalPrivateKey implements ElGamalPrivateKey {
 	public BigInteger getX(){
 		return x;
 	}
+	
+	/* (non-Javadoc)
+	 * @see edu.biu.scapi.midLayer.asymmetricCrypto.keys.CramerShoupPrivateKey#generateSendableData()
+	 */
+	@Override
+	public KeySendableData generateSendableData() {
+		//Since ScElGamalPrivateKey is both a PrivateKey and a KeySendableData, on the one hand it has to implement
+		//the generateSendableData() function, but on the other hand it is in itself an KeySendableData, so we do not really
+		//generate sendable data, but just return this object.
+		return this;
+	}
+	
 }

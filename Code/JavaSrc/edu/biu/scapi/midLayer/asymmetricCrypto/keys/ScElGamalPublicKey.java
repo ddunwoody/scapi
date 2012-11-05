@@ -11,7 +11,9 @@
 */
 package edu.biu.scapi.midLayer.asymmetricCrypto.keys;
 
+import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScCramerShoupPublicKey.ScCramerShoupPublicKeySendableData;
 import edu.biu.scapi.primitives.dlog.GroupElement;
+import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
 
 public class ScElGamalPublicKey implements ElGamalPublicKey {
 
@@ -40,6 +42,31 @@ public class ScElGamalPublicKey implements ElGamalPublicKey {
 	
 	public GroupElement getH(){
 		return h;
+	}
+
+	/* (non-Javadoc)
+	 * @see edu.biu.scapi.midLayer.asymmetricCrypto.keys.CramerShoupPublicKey#generateSendableData()
+	 */
+	@Override
+	public KeySendableData generateSendableData() {
+		return new ScElGamalPublicKeySendableData(h.generateSendableData());
+	}
+	
+	
+	static public class ScElGamalPublicKeySendableData implements KeySendableData {
+			private static final long serialVersionUID = 334589064982559017L;
+		private GroupElementSendableData c;
+
+		public ScElGamalPublicKeySendableData(GroupElementSendableData c) {
+			super();
+			this.c = c;
+		}
+
+		public GroupElementSendableData getC() {
+			return c;
+		}
+		
+		
 	}
 
 }

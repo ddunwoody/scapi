@@ -18,5 +18,6 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
 public interface DSAPublicKey extends PublicKey {
 
 	public GroupElement getY();
-
+	
+	KeySendableData generateSendableData();
 }

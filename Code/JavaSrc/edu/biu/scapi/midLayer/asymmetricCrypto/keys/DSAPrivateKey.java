@@ -17,5 +17,5 @@ import java.security.PrivateKey;
 public interface DSAPrivateKey extends PrivateKey {
 
 	public BigInteger getX();
-
+	KeySendableData generateSendableData();
 }

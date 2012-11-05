@@ -27,6 +27,8 @@ import java.math.BigInteger;
 public class ScCramerShoupPrivateKey implements CramerShoupPrivateKey, KeySendableData {
 
 
+	private static final long serialVersionUID = -7574938842156670770L;
+	
 	private BigInteger x1;
 	private BigInteger x2;
 	private BigInteger y1;
@@ -111,18 +113,5 @@ public class ScCramerShoupPrivateKey implements CramerShoupPrivateKey, KeySendab
 		return this;
 	}
 
-	/*
-	//Even though ScCramerShoupPrivateKey should be Serializable (it implements the Key interface which is Serializable), we need to stop the regular serialization mechanism.
-	//In the cas of Cramer Shoup's private key, we could serialize it in the regular way because its fields are only BigInteger, but for the sake of 
-	//consistency with Cramer Shoup's public key that contains GroupElements and cannot be serialized in the regular way we stop the serialization here too!
-	private void writeObject(ObjectOutputStream out) throws IOException
-	{
-		throw new NotSerializableException("To serialize this object call the generateSendableData() function which returns a KeySendableData object which can be serialized");
-	}
-	private void readObject(ObjectInputStream in) throws IOException
-	{
-		throw new NotSerializableException("To serialize this object call the generateSendableData() function which returns a KeySendableData object which can be serialized");
-	}
-	*/
-
+	
 }

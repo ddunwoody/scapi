@@ -24,4 +24,6 @@ import java.security.PublicKey;
 public interface DamgardJurikPublicKey extends PublicKey {
 
 	BigInteger getModulus();
+	
+	KeySendableData generateSendableData();
 }

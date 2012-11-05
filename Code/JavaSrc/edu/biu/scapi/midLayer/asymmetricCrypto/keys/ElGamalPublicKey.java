@@ -18,4 +18,6 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
 public interface ElGamalPublicKey extends PublicKey {
 	
 	public GroupElement getH();
+	
+	KeySendableData generateSendableData();
 }

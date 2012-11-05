@@ -20,7 +20,9 @@ import java.math.BigInteger;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-public class ScDamgardJurikPublicKey implements DamgardJurikPublicKey {
+public class ScDamgardJurikPublicKey implements DamgardJurikPublicKey, KeySendableData {
+
+	private static final long serialVersionUID = -2189628744318571245L;
 
 	BigInteger modulus;
 	public ScDamgardJurikPublicKey(BigInteger modulus){
@@ -61,4 +63,14 @@ public class ScDamgardJurikPublicKey implements DamgardJurikPublicKey {
 		return modulus;
 	}
 
+	/* (non-Javadoc)
+	 * @see edu.biu.scapi.midLayer.asymmetricCrypto.keys.CramerShoupPrivateKey#generateSendableData()
+	 */
+	@Override
+	public KeySendableData generateSendableData() {
+		//Since ScDamgardJurikPublicKey is both a PrivateKey and a KeySendableData, on the one hand it has to implement
+		//the generateSendableData() function, but on the other hand it is in itself an KeySendableData, so we do not really
+		//generate sendable data, but just return this object.
+		return this;
+	}
 }

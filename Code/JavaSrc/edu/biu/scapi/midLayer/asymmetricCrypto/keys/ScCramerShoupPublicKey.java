@@ -20,6 +20,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import edu.biu.scapi.primitives.dlog.GroupElement;
+import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
 
 /**
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
@@ -97,6 +98,57 @@ public class ScCramerShoupPublicKey implements CramerShoupPublicKey {
 	@Override
 	public KeySendableData generateSendableData() {
 		return new ScCramerShoupPublicKeySendableData(c.generateSendableData(), d.generateSendableData(), h.generateSendableData(), g1.generateSendableData(), g2.generateSendableData());
+	}
+	
+	
+	static public class ScCramerShoupPublicKeySendableData implements KeySendableData {
+
+
+		private static final long serialVersionUID = 5602965604695530544L;
+		
+		private GroupElementSendableData c;
+		private GroupElementSendableData d;
+		private GroupElementSendableData h;
+		private GroupElementSendableData g1;
+		private GroupElementSendableData g2;
+		
+		
+		public ScCramerShoupPublicKeySendableData(GroupElementSendableData c,
+				GroupElementSendableData d, GroupElementSendableData h,
+				GroupElementSendableData g1, GroupElementSendableData g2) {
+			super();
+			this.c = c;
+			this.d = d;
+			this.h = h;
+			this.g1 = g1;
+			this.g2 = g2;
+		}
+
+
+		public GroupElementSendableData getC() {
+			return c;
+		}
+
+
+		public GroupElementSendableData getD() {
+			return d;
+		}
+
+
+		public GroupElementSendableData getH() {
+			return h;
+		}
+
+
+		public GroupElementSendableData getG1() {
+			return g1;
+		}
+
+
+		public GroupElementSendableData getG2() {
+			return g2;
+		}
+		
 	}
 	
 

@@ -17,4 +17,6 @@ import java.security.PrivateKey;
 public interface ElGamalPrivateKey extends PrivateKey {
 	
 	public BigInteger getX();
+	
+	KeySendableData generateSendableData();
 }
