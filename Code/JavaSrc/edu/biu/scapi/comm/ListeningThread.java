@@ -57,7 +57,7 @@ class ListeningThread extends Thread{
 		//prepare the listener.
 		try {
 			listener = ServerSocketChannel.open();
-			listener.socket().bind (new InetSocketAddress (port));
+			listener.socket().bind (new InetSocketAddress (InetAddress.getLocalHost(), port));
 			listener.configureBlocking (false);
 		} catch (IOException e) {
 			
