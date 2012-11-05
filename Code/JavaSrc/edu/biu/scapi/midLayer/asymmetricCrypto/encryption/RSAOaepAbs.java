@@ -22,6 +22,9 @@ import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.InvalidParameterSpecException;
 import java.security.spec.RSAKeyGenParameterSpec;
 
+import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertext;
+import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertextSendableData;
+import edu.biu.scapi.midLayer.ciphertext.ByteArrayAsymCiphertext;
 import edu.biu.scapi.midLayer.plaintext.ByteArrayPlaintext;
 import edu.biu.scapi.midLayer.plaintext.Plaintext;
 
@@ -74,7 +77,7 @@ public abstract class RSAOaepAbs implements RSAOaepEnc {
 	}
 	
 	/**
-	 * Generates a Plaintext suitable to ElGamal encryption scheme from the given message.
+	 * Generates a Plaintext suitable to RSA/Oaep encryption scheme from the given message.
 	 * @param text byte array to convert to a Plaintext object.
 	 * @throws IllegalArgumentException if the given message's length is greater than the maximum. 
 	 */
@@ -136,5 +139,15 @@ public abstract class RSAOaepAbs implements RSAOaepEnc {
 		}
 		return null;
 	}
+	
+	/* (non-Javadoc)
+	 * @see edu.biu.scapi.midLayer.asymmetricCrypto.encryption.AsymmetricEnc#generateCiphertext(edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertextSendableData)
+	 */
+	@Override
+	public AsymmetricCiphertext generateCiphertext(	AsymmetricCiphertextSendableData data) {
+		if(! (data instanceof ByteArrayAsymCiphertext))
+			throw new IllegalArgumentException("The input data has to be of type ByteArrayAsymCiphertext");
 
+		return (ByteArrayAsymCiphertext) data;
+	}
 }

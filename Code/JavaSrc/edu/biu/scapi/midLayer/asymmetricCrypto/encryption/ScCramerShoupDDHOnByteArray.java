@@ -21,7 +21,9 @@ import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.exceptions.NoMaxException;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.CramerShoupPrivateKey;
 import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertext;
+import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertextSendableData;
 import edu.biu.scapi.midLayer.ciphertext.CramerShoupOnByteArrayCiphertext;
+import edu.biu.scapi.midLayer.ciphertext.CramerShoupOnByteArrayCiphertext.CrShOnByteArraySendableData;
 import edu.biu.scapi.midLayer.plaintext.ByteArrayPlaintext;
 import edu.biu.scapi.midLayer.plaintext.Plaintext;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
@@ -257,4 +259,20 @@ public class ScCramerShoupDDHOnByteArray extends CramerShoupAbs{
 		
 		return ((ByteArrayPlaintext) plaintext).getText();
 	}
+	
+	/** 
+	 * @see edu.biu.scapi.midLayer.asymmetricCrypto.encryption.AsymmetricEnc#generateCiphertext(edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertextSendableData)
+	 */
+	@Override
+	public AsymmetricCiphertext generateCiphertext(AsymmetricCiphertextSendableData data) {
+		if(! (data instanceof CrShOnByteArraySendableData))
+				throw new IllegalArgumentException("The input data has to be of type CrShOnGroupElSendableData");
+		CrShOnByteArraySendableData data1 = (CrShOnByteArraySendableData)data;
+		GroupElement u1 = dlogGroup.generateElement(true, data1.getU1());
+		GroupElement u2 = dlogGroup.generateElement(true, data1.getU2());
+		GroupElement v = dlogGroup.generateElement(true, data1.getV());
+			
+		return new CramerShoupOnByteArrayCiphertext(u1, u2, data1.getE(), v);
+	}
+		
 }

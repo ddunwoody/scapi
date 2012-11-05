@@ -26,8 +26,10 @@ import org.bouncycastle.crypto.encodings.OAEPEncoding;
 import org.bouncycastle.crypto.engines.RSABlindedEngine;
 
 import edu.biu.scapi.exceptions.ScapiRuntimeException;
+import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertextSendableData;
 import edu.biu.scapi.midLayer.ciphertext.ByteArrayAsymCiphertext;
 import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertext;
+import edu.biu.scapi.midLayer.ciphertext.CramerShoupOnByteArrayCiphertext.CrShOnByteArraySendableData;
 import edu.biu.scapi.midLayer.plaintext.ByteArrayPlaintext;
 import edu.biu.scapi.midLayer.plaintext.Plaintext;
 import edu.biu.scapi.tools.Translation.BCParametersTranslator;
@@ -215,5 +217,6 @@ public class BcRSAOaep extends RSAOaepAbs {
 		//Returns a plaintext with the decrypted ciphertext.
 		return new ByteArrayPlaintext(plaintext);
 	}
+
 	
 }

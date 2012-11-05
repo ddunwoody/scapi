@@ -20,4 +20,6 @@ public interface CramerShoupPrivateKey extends PrivateKey {
 	BigInteger getPrivateExp3();
 	BigInteger getPrivateExp4();
 	BigInteger getPrivateExp5();
+	
+	KeySendableData generateSendableData();
 }

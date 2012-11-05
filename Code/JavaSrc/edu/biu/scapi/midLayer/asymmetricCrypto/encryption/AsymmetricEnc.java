@@ -21,6 +21,7 @@ import java.security.spec.InvalidParameterSpecException;
 
 import edu.biu.scapi.exceptions.NoMaxException;
 import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertext;
+import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertextSendableData;
 import edu.biu.scapi.midLayer.plaintext.Plaintext;
 import edu.biu.scapi.securityLevel.Cpa;
 import edu.biu.scapi.securityLevel.Indistinguishable;
@@ -98,6 +99,15 @@ public interface AsymmetricEnc extends Cpa, Indistinguishable{
 	 * @throws IllegalArgumentException if the given message's length is greater than the maximum. 
 	 */
 	public Plaintext generatePlaintext(byte[] text);
+	
+	
+	/**
+	 * Generates (reconstructs) a suitable AsymmetricCiphertext from data that was probably obtained via a Channel or any other means of sending data (including serialization).<p>
+	 * We emphasize that this is NOT in any way an encryption function, it just receives ENCRYPTED DATA and places it in a ciphertext object. 
+	 * @param data contains all the necessary information to construct a suitable ciphertext.  
+	 * @return the AsymmetricCiphertext that corresponds to the implementing encryption scheme, for ex: CramerShoupCiphertext
+	 */
+	public AsymmetricCiphertext generateCiphertext(AsymmetricCiphertextSendableData data);
 	
 	/**
 	 * Encrypts the given plaintext using this asymmetric encryption scheme.

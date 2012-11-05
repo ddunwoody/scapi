@@ -31,7 +31,9 @@ import edu.biu.scapi.midLayer.asymmetricCrypto.keys.DamgardJurikPublicKey;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScDamgardJurikPrivateKey;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScDamgardJurikPublicKey;
 import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertext;
+import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertextSendableData;
 import edu.biu.scapi.midLayer.ciphertext.BigIntegerCiphertext;
+import edu.biu.scapi.midLayer.ciphertext.ByteArrayAsymCiphertext;
 import edu.biu.scapi.midLayer.plaintext.BigIntegerPlainText;
 import edu.biu.scapi.midLayer.plaintext.Plaintext;
 import edu.biu.scapi.primitives.trapdoorPermutation.RSAModulus;
@@ -532,6 +534,16 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 		BigInteger d = MathAlgorithms.chineseRemainderTheorem(congruences, moduli);
 		return d;
 	}
-	
+
+	/* (non-Javadoc)
+	 * @see edu.biu.scapi.midLayer.asymmetricCrypto.encryption.AsymmetricEnc#generateCiphertext(edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertextSendableData)
+	 */
+	@Override
+	public AsymmetricCiphertext generateCiphertext(	AsymmetricCiphertextSendableData data) {
+		if(! (data instanceof BigIntegerCiphertext))
+			throw new IllegalArgumentException("The input data has to be of type BigIntegerCiphertext");
+
+		return (BigIntegerCiphertext) data;
+	}
 }
 

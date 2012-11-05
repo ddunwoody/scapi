@@ -20,7 +20,11 @@ import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.exceptions.NoMaxException;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ElGamalPrivateKey;
 import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertext;
+import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertextSendableData;
+import edu.biu.scapi.midLayer.ciphertext.CramerShoupOnByteArrayCiphertext;
 import edu.biu.scapi.midLayer.ciphertext.ElGamalOnByteArrayCiphertext;
+import edu.biu.scapi.midLayer.ciphertext.CramerShoupOnByteArrayCiphertext.CrShOnByteArraySendableData;
+import edu.biu.scapi.midLayer.ciphertext.ElGamalOnByteArrayCiphertext.ElGamalOnByteArraySendableData;
 import edu.biu.scapi.midLayer.plaintext.ByteArrayPlaintext;
 import edu.biu.scapi.midLayer.plaintext.Plaintext;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
@@ -224,5 +228,19 @@ public class ScElGamalOnByteArray extends ElGamalAbs{
 		}
 		
 		return ((ByteArrayPlaintext) plaintext).getText();
+	}
+	
+	
+	/** 
+	 * @see edu.biu.scapi.midLayer.asymmetricCrypto.encryption.AsymmetricEnc#generateCiphertext(edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertextSendableData)
+	 */
+	@Override
+	public AsymmetricCiphertext generateCiphertext(AsymmetricCiphertextSendableData data) {
+		if(! (data instanceof ElGamalOnByteArraySendableData))
+				throw new IllegalArgumentException("The input data has to be of type ElGamalOnByteArraySendableData");
+		ElGamalOnByteArraySendableData data1 = (ElGamalOnByteArraySendableData)data;
+		GroupElement cipher1 = dlog.generateElement(true, data1.getCipher1());
+			
+		return new ElGamalOnByteArrayCiphertext(cipher1, data1.getCipher2());
 	}
 }

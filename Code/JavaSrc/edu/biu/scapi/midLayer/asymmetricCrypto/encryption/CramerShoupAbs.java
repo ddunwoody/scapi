@@ -27,8 +27,10 @@ import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.exceptions.ScapiRuntimeException;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.CramerShoupPrivateKey;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.CramerShoupPublicKey;
+import edu.biu.scapi.midLayer.asymmetricCrypto.keys.KeySendableData;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScCramerShoupPrivateKey;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScCramerShoupPublicKey;
+import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScCramerShoupPublicKeySendableData;
 import edu.biu.scapi.midLayer.ciphertext.CramerShoupCiphertext;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
@@ -223,6 +225,43 @@ public abstract class CramerShoupAbs implements CramerShoupDDHEnc{
 	public KeyPair generateKey(AlgorithmParameterSpec keyParams) throws InvalidParameterSpecException {
 		//No need for parameters to generate an Cramer-Shoup key pair. Therefore this operation is not supported.
 		throw new UnsupportedOperationException("To generate Cramer-Shoup keys use the other generateKey function");
+	}
+	
+	
+	/**
+	 * This function does NOT create a new private key. It reconstructs a private key that has been previously serialized.
+	 * @param data
+	 * @return
+	 */
+	public CramerShoupPrivateKey generatePrivateKey(KeySendableData data){
+		if(! (data instanceof CramerShoupPrivateKey))
+				throw new IllegalArgumentException("To generate the key from sendable data, the data has to be of type CramerShoupPrivateKey");
+		return (CramerShoupPrivateKey)data;
+	}
+	
+	/**
+	 * This function does NOT create a new public key. It reconstructs a public key that has been previously serialized.
+	 * @param data
+	 * @return
+	 */
+	public CramerShoupPublicKey generatePublicKey(KeySendableData data){
+		if(! (data instanceof ScCramerShoupPublicKeySendableData))
+				throw new IllegalArgumentException("To generate the key from sendable data, the data has to be of type ScCramerShoupPublicKeySendableData");
+		ScCramerShoupPublicKeySendableData data1 = (ScCramerShoupPublicKeySendableData)data;
+		GroupElement c = dlogGroup.generateElement(true, data1.getC());
+		GroupElement d = dlogGroup.generateElement(true, data1.getD());
+		GroupElement h = dlogGroup.generateElement(true, data1.getH());
+		GroupElement g1 = dlogGroup.generateElement(true, data1.getG1());
+		GroupElement g2 = dlogGroup.generateElement(true, data1.getG2());
+		
+		return new ScCramerShoupPublicKey(c,d,h,g1,g2);
+	}
+	
+	public KeyPair generateKeyPair(KeySendableData publicKeyData, KeySendableData privateKeyData){
+		if(! (publicKeyData instanceof ScCramerShoupPublicKeySendableData) || (! (privateKeyData instanceof ScCramerShoupPrivateKey)))
+			throw new IllegalArgumentException("wrong type of KeySendableData");
+		
+		return new KeyPair(generatePublicKey(publicKeyData), generatePrivateKey(privateKeyData));
 	}
 	
 	@Override

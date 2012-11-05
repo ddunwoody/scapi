@@ -21,4 +21,6 @@ public interface CramerShoupPublicKey extends PublicKey {
 	GroupElement getH();
 	GroupElement getGenerator1();
 	GroupElement getGenerator2();
+	
+	KeySendableData generateSendableData();
 }

@@ -23,7 +23,11 @@ import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ElGamalPrivateKey;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScElGamalPrivateKey;
 import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertext;
+import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertextSendableData;
+import edu.biu.scapi.midLayer.ciphertext.ElGamalOnByteArrayCiphertext;
 import edu.biu.scapi.midLayer.ciphertext.ElGamalOnGroupElementCiphertext;
+import edu.biu.scapi.midLayer.ciphertext.ElGamalOnByteArrayCiphertext.ElGamalOnByteArraySendableData;
+import edu.biu.scapi.midLayer.ciphertext.ElGamalOnGroupElementCiphertext.ElGamalOnGrElSendableData;
 import edu.biu.scapi.midLayer.plaintext.GroupElementPlaintext;
 import edu.biu.scapi.midLayer.plaintext.Plaintext;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
@@ -264,6 +268,17 @@ public class ScElGamalOnGroupElement extends ElGamalAbs implements AsymMultiplic
 	}
 
 	
-	
+	/** 
+	 * @see edu.biu.scapi.midLayer.asymmetricCrypto.encryption.AsymmetricEnc#generateCiphertext(edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertextSendableData)
+	 */
+	@Override
+	public AsymmetricCiphertext generateCiphertext(AsymmetricCiphertextSendableData data) {
+		if(! (data instanceof ElGamalOnGrElSendableData))
+				throw new IllegalArgumentException("The input data has to be of type ElGamalOnGrElSendableData");
+		ElGamalOnGrElSendableData data1 = (ElGamalOnGrElSendableData)data;
+		GroupElement cipher1 = dlog.generateElement(true, data1.getCipher1());
+		GroupElement cipher2 = dlog.generateElement(true, data1.getCipher2());	
+		return new ElGamalOnGroupElementCiphertext(cipher1, cipher2);
+	}
 
 }
