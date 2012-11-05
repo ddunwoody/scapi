@@ -20,15 +20,18 @@
 package edu.biu.scapi.comm;
 
 import java.io.IOException;
+import java.io.Serializable;
 
 /** 
  * @author LabTest
  */
 public interface Channel{
 	
-	public void send(Message msg) throws IOException;
+	public void send(Serializable data) throws IOException;
 
-	public Message receive() throws ClassNotFoundException, IOException;
+	public Serializable receive() throws ClassNotFoundException, IOException;
 	
 	public void close();
+	
+	public boolean isClosed();
 }
