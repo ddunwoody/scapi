@@ -22,32 +22,34 @@
 * 
 */
 
-/**
- * Project: scapi.
- * Package: edu.biu.scapi.exceptions.
- * File: DuplicatePartyException.java.
- * Creation date Mar 7, 2011
- * Created by LabTest
- *
- *
- * This file TODO
- */
-package edu.biu.scapi.exceptions;
+package edu.biu.scapi.paddings;
 
-/**
- * @author LabTest
- *
- * 
- */
-public class DuplicatePartyException extends Exception {
+public class TestStam {
 
-	private static final long serialVersionUID = -4620613680953090260L;
-
-	public DuplicatePartyException() {
-		
+	public byte[] removePad(byte[] paddedInput) {
+		int i;
+		//find the index of the first padding byte
+		for(i = paddedInput.length-1; i>=0; i--){
+			if (paddedInput[i] == (byte) 0x80){
+				break;
+			}
+		}
+		//copy the array without the padding to a new array and return it
+		byte[] original = new byte[i];
+		System.arraycopy(paddedInput, 0, original, 0, i);
+		return original;
 	}
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		TestStam t = new TestStam();
+		byte[] paddedInput = new byte[3];
+		paddedInput[0] = 1;
+		paddedInput[1] = 2;
+		paddedInput[2] = 3;
+		byte[] result = t.removePad(paddedInput);
 	
-	public DuplicatePartyException(String message){
-		super(message);
 	}
+
 }
