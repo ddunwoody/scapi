@@ -1,19 +1,33 @@
 /**
-* This file is part of SCAPI.
-* SCAPI is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-* SCAPI is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-* You should have received a copy of the GNU General Public License along with SCAPI.  If not, see <http://www.gnu.org/licenses/>.
-*
-* Any publication and/or code referring to and/or based on SCAPI must contain an appropriate citation to SCAPI, including a reference to http://crypto.cs.biu.ac.il/SCAPI.
-*
+* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+* 
+* Copyright (c) 2012 - SCAPI (http://crypto.biu.ac.il/scapi)
+* DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+* 
+* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
+* to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+* and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+* 
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+* 
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+* FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+* 
+* We request that any publication and/or code referring to and/or based on SCAPI contain an appropriate citation to SCAPI, including a reference to
+* http://crypto.biu.ac.il/SCAPI.
+* 
 * SCAPI uses Crypto++, Miracl, NTL and Bouncy Castle. Please see these projects for any further licensing issues.
-*
+* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+* 
 */
+
 package edu.biu.scapi.primitives.dlog;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.util.Properties;
 
@@ -30,7 +44,8 @@ import edu.biu.scapi.exceptions.UnInitializedException;
 public abstract class DlogGroupEC extends DlogGroupAbs implements DlogEllipticCurve{
 
 	private  Properties nistProperties; // properties object to hold nist parameters
-	protected static final String NISTEC_PROPERTIES_FILE = System.getProperty("java.class.path").toString().split(";")[0]+"\\propertiesFiles\\NISTEC.properties";
+	//protected static final String NISTEC_PROPERTIES_FILE = System.getProperty("java.class.path").toString().split(";")[0]+"\\propertiesFiles\\NISTEC.properties";
+	protected static final String NISTEC_PROPERTIES_FILE =  "/propertiesFiles/NISTEC.properties";
 	protected String curveName;
 	protected String fileName;
 	
@@ -71,12 +86,12 @@ public abstract class DlogGroupEC extends DlogGroupAbs implements DlogEllipticCu
 		}
 	
 		ecProperties = new Properties();
-		/*load the EC file*/
-		File file = new File (fileName);
-		FileInputStream in=  new FileInputStream(file);
+		//Load the elliptic curves file
+		//Instead of loading the plain file, which only works from outside a jar file, we load it as a resource 
+		//that can also work from within a jar file. The path from which we load the properties file from is from now under bin\propertiesFiles.
+		InputStream in=  (InputStream) getClass().getResourceAsStream(fileName);
 		ecProperties.load(in);
-		in.close();
-		
+		 
 		//Set the member variable nistProperties to the recently loaded ecProperties file, so that next time
 		//the NIST file has to be read, the already loaded file will be returned. (See above). 
 		if(fileName.equals(NISTEC_PROPERTIES_FILE)){
