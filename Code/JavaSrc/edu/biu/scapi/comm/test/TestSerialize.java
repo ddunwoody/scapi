@@ -23,36 +23,49 @@
 */
 
 
-/**
- * Project: scapi.
- * Package: edu.biu.scapi.comm.test.
- * File: AutomaticGenerations.java.
- * Creation date Mar 10, 2011
- * Created by LabTest
- *
- *
- * This file TODO
- */
+
 package edu.biu.scapi.comm.test;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.math.BigInteger;
+import java.security.InvalidKeyException;
+import java.security.KeyPair;
+import java.security.spec.InvalidParameterSpecException;
+import java.security.spec.RSAKeyGenParameterSpec;
+
+import edu.biu.scapi.exceptions.FactoriesException;
+import edu.biu.scapi.primitives.trapdoorPermutation.TrapdoorPermutation;
+import edu.biu.scapi.primitives.trapdoorPermutation.TPElement;
+import edu.biu.scapi.tools.Factories.TrapdoorPermutationFactory;
+
 /**
- * @author LabTest
+ * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-public class AutomaticGenerationsApp {
+public class TestSerialize {
 
-	/**
-	 * main
-	 * @param args
-	 */
-	public static void main(String[] args) {
+	public static void main(String args[]) throws IOException, FactoriesException, InvalidKeyException, InvalidParameterSpecException {	
+		/*Message msg1 = new Message();
+		byte[] data = {0,1,2,3,4};
+		msg1.setData(data);
+		 */
+		TrapdoorPermutation rsa = TrapdoorPermutationFactory.getInstance().getObject("RSA", "Scapi");
 		
-		
-		//AutomaticFilesBuilder propertiesBuilder = new AutomaticFilesBuilder(50, 8000, "132.70.6.63", "132.70.6.194", "Party");
-		AutomaticFilesBuilder propertiesBuilder = new AutomaticFilesBuilder(10, 8000, "132.70.6.63", null, "Party");
-		
-		propertiesBuilder.generateAllPropertiesFiles();
-		propertiesBuilder.generateAllBatchFiles();
+		BigInteger e = new BigInteger(Integer.toString(79));
+		System.out.println("e =" + e);
+		int bitLength = 1024;
+		RSAKeyGenParameterSpec param = new RSAKeyGenParameterSpec(bitLength, e);
+		KeyPair keys = rsa.generateKey(param);
+		rsa.setKey(keys.getPublic(), keys.getPrivate());
+
+		TPElement el = rsa.generateRandomTPElement();
+		System.out.println("Rand el is: " + el.getElement());
+		FileOutputStream fos = new FileOutputStream("temp.out");	
+		ObjectOutputStream oos = new ObjectOutputStream(fos);	
+		oos.writeObject(el);	
+		oos.flush();	
+		oos.close();
 	}
-
 }

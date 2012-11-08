@@ -23,36 +23,28 @@
 */
 
 
-/**
- * Project: scapi.
- * Package: edu.biu.scapi.comm.test.
- * File: AutomaticGenerations.java.
- * Creation date Mar 10, 2011
- * Created by LabTest
- *
- *
- * This file TODO
- */
+
 package edu.biu.scapi.comm.test;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
+
+import edu.biu.scapi.primitives.dlog.GroupElement;
+import edu.biu.scapi.primitives.trapdoorPermutation.TPElement;
+
 /**
- * @author LabTest
+ * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-public class AutomaticGenerationsApp {
-
-	/**
-	 * main
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		
-		
-		//AutomaticFilesBuilder propertiesBuilder = new AutomaticFilesBuilder(50, 8000, "132.70.6.63", "132.70.6.194", "Party");
-		AutomaticFilesBuilder propertiesBuilder = new AutomaticFilesBuilder(10, 8000, "132.70.6.63", null, "Party");
-		
-		propertiesBuilder.generateAllPropertiesFiles();
-		propertiesBuilder.generateAllBatchFiles();
+public class TestDeserialization {
+	public static void main(String args[]) throws IOException, ClassNotFoundException {	
+	FileInputStream fis = new FileInputStream("temp.out");	
+	ObjectInputStream oin = new ObjectInputStream(fis);	
+	Serializable msg = (Serializable) oin.readObject();	
+	System.out.println("received msg is: " + msg);
+	TPElement el = (TPElement)msg;
+	System.out.println("Reconstructed el is: " + el.getElement());
 	}
-
 }
