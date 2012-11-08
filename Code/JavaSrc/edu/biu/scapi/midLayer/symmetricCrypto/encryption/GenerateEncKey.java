@@ -22,17 +22,53 @@
 * 
 */
 
-package edu.biu.scapi.midLayer.asymmetricCrypto.encryption;
+	package edu.biu.scapi.midLayer.symmetricCrypto.encryption;
 
-import edu.biu.scapi.securityLevel.*;
+	import java.security.InvalidKeyException;
 
-/**
- * General interface for CramerShoup encryption scheme. Every concrete implementation of CramerShoup encryption should implement this interface.
- * By definition, this encryption scheme is CCA-secure and NonMalleable.
- * 
- * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
- *
- */
-public interface CramerShoupDDHEnc extends AsymmetricEnc, Cca2 {
+	import javax.crypto.SecretKey;
+	import javax.crypto.spec.SecretKeySpec;
 
-}
+	import edu.biu.scapi.exceptions.FactoriesException;
+import edu.biu.scapi.tools.Factories.MacFactory;
+import edu.biu.scapi.tools.Factories.SymmetricEncFactory;
+
+	/**
+	 * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
+	 *
+	 */
+	public class GenerateEncKey {
+
+		/**
+		 * @param args
+		 */
+		public static void main(String[] args) {
+			// TODO Auto-generated method stub
+			SymmetricEnc enc = null;
+			try {
+				enc = SymmetricEncFactory.getInstance().getObject("CBCEncRandomIV");
+			} catch (FactoriesException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			SecretKey key = enc.generateKey(128);
+			byte[] keyRep = key.getEncoded();
+			for(int i = 0 ; i < keyRep.length; i++)
+				System.out.print(keyRep[i] + ", ");
+			
+			byte[] fixedKey = new byte[]{7, -126, 83, -82, 68, 67, -46, -58, 70, 123, -127, -66, -4, 37, -1, 15};
+			SecretKey key2 = new SecretKeySpec(fixedKey,"AES" );
+			try {
+				enc.setKey(key2);
+				System.out.println("Set the key");
+			} catch (InvalidKeyException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+
+	}
+
+
+
