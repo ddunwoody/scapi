@@ -40,7 +40,7 @@ import java.util.Vector;
  */
 public class LicenseCommentInserter {
 
-		public final static String BASE_PATH_CODE = "C:\\work\\LAST_Project\\SDK\\Code\\JavaSrc\\edu\\biu\\scapi\\tools";
+		public final static String BASE_PATH_CODE = "C:\\work\\LAST_Project\\SDK\\Code\\JavaSrc\\edu\\biu\\scapi\\tests\\configClasses";
 		
 		
 		public void addCommentToFile(String fileName) throws IOException{
@@ -90,7 +90,7 @@ public class LicenseCommentInserter {
 			out.println("*/");
 			out.println();
 			//for (String lineToPrint : lines){
-			for (int i = 11; i < lines.size(); i++){
+			for (int i = 0; i < lines.size(); i++){
 				out.println(lines.get(i));
 			}
 			out.flush();
