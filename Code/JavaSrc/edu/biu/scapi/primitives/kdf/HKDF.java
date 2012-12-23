@@ -2,6 +2,7 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 * Copyright (c) 2012 - SCAPI (http://crypto.biu.ac.il/scapi)
+* This file is part of the SCAPI project.
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
 * 
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
@@ -21,6 +22,7 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
+
 
 package edu.biu.scapi.primitives.kdf;
 
@@ -66,13 +68,7 @@ public final class HKDF implements KeyDerivationFunction {
 	public HKDF(Hmac hmac) {
 		
 		this.hmac = hmac;
-		try {
-			//Sets the hmac object with a fixed key that was randomly generated once.
-			hmac.setKey(new SecretKeySpec(Hex.decode("606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8a9aaabacadaeaf"), ""));
-		} catch (InvalidKeyException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
 	}
 
 	/**
@@ -179,9 +175,9 @@ public final class HKDF implements KeyDerivationFunction {
 	}
 
 
-	public SecretKey derivateKey(byte[] entropySource, int inOff, int inLen, int outLen) {
+	public SecretKey deriveKey(byte[] entropySource, int inOff, int inLen, int outLen) {
 		//there is no auxiliary information, sends an empty iv.
-		return derivateKey(entropySource, inOff, inLen, outLen, null);
+		return deriveKey(entropySource, inOff, inLen, outLen, null);
 		
 	}
 
@@ -200,13 +196,21 @@ public final class HKDF implements KeyDerivationFunction {
 	 *   @param iv - CTXInfo 
 	 * 
 	 */
-	public SecretKey derivateKey(byte[] entropySource, int inOff, int inLen, int outLen, byte[] iv) {
+	public SecretKey deriveKey(byte[] entropySource, int inOff, int inLen, int outLen, byte[] iv) {
 		
 		//checks that the offset and length are correct
 		if ((inOff > entropySource.length) || (inOff+inLen > entropySource.length)){
 			throw new ArrayIndexOutOfBoundsException("wrong offset for the given input buffer");
 		}
 		
+		//Sets the hmac object with a fixed key that was randomly generated once. This is done every time a new derived key is requested otherwise the result of deriving
+		//a key from the same entropy source will be different in subsequent calls to this function (as long as the same instance of HKDF is used). 
+		try {
+			hmac.setKey(new SecretKeySpec(Hex.decode("606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8a9aaabacadaeaf"), ""));
+		} catch (InvalidKeyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		int hmacLength = hmac.getBlockSize();                           //the size of the output of the hmac.
 		byte[] outBytes = new byte[outLen];                             //the output key
 		byte[] roundKey = new byte[hmacLength];							//PRK from the pseudocode
