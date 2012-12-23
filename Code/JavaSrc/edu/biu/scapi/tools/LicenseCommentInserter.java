@@ -2,6 +2,7 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 * Copyright (c) 2012 - SCAPI (http://crypto.biu.ac.il/scapi)
+* This file is part of the SCAPI project.
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
 * 
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
@@ -23,6 +24,7 @@
 */
 
 
+
 package edu.biu.scapi.tools;
 
 import java.io.BufferedReader;
@@ -40,7 +42,7 @@ import java.util.Vector;
  */
 public class LicenseCommentInserter {
 
-		public final static String BASE_PATH_CODE = "C:\\work\\LAST_Project\\SDK\\Code\\JavaSrc\\edu\\biu\\scapi\\tests\\configClasses";
+		public final static String BASE_PATH_CODE = "C:\\work\\LAST_Project\\SDK\\Code\\JavaSrc\\edu\\biu\\scapi\\tools";
 		
 		
 		public void addCommentToFile(String fileName) throws IOException{
@@ -54,21 +56,11 @@ public class LicenseCommentInserter {
 			br.close();
 			
 			PrintWriter out = new PrintWriter(fileName);
-			/*out.println("/**");
-			out.println("* This file is part of SCAPI."); 
-			out.println("* SCAPI is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.");
-			out.println("* SCAPI is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.");
-			out.println("* You should have received a copy of the GNU General Public License along with SCAPI.  If not, see <http://www.gnu.org/licenses/>.");
-			out.println("*"); 
-			out.println("* Any publication and/or code referring to and/or based on SCAPI must contain an appropriate citation to SCAPI, including a reference to http://crypto.cs.biu.ac.il/SCAPI.");
-			out.println("*");
-			out.println("* SCAPI uses Crypto++, Miracl, NTL and Bouncy Castle. Please see these projects for any further licensing issues.");
-			out.println("*");
-			out.println("*//*"); */
 			out.println("/**");
 			out.println("* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 			out.println("* ");
 			out.println("* Copyright (c) 2012 - SCAPI (http://crypto.biu.ac.il/scapi)");
+			out.println("* This file is part of the SCAPI project.");
 			out.println("* DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.");
 			out.println("* "); 
 			out.println("* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"),");
@@ -90,7 +82,7 @@ public class LicenseCommentInserter {
 			out.println("*/");
 			out.println();
 			//for (String lineToPrint : lines){
-			for (int i = 0; i < lines.size(); i++){
+			for (int i = 23; i < lines.size(); i++){
 				out.println(lines.get(i));
 			}
 			out.flush();
