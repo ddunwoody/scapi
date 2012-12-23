@@ -2,6 +2,7 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 * Copyright (c) 2012 - SCAPI (http://crypto.biu.ac.il/scapi)
+* This file is part of the SCAPI project.
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
 * 
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
@@ -21,6 +22,7 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
+
 
 package edu.biu.scapi.midLayer.asymmetricCrypto.encryption;
 
@@ -175,7 +177,7 @@ public class ScElGamalOnByteArray extends ElGamalAbs{
 		byte[] msg = ((ByteArrayPlaintext) plaintext).getText();
 	
 		byte[] hyBytes = dlog.mapAnyGroupElementToByteArray(hy);
-		byte[] c2 = kdf.derivateKey(hyBytes, 0, hyBytes.length, msg.length).getEncoded();
+		byte[] c2 = kdf.deriveKey(hyBytes, 0, hyBytes.length, msg.length).getEncoded();
 		
 		//Xores the result from the kdf with the plaintext.
 		for(int i=0; i<msg.length; i++){
@@ -216,7 +218,7 @@ public class ScElGamalOnByteArray extends ElGamalAbs{
 		byte[] sBytes = dlog.mapAnyGroupElementToByteArray(s);
 		byte[] c2 = ciphertext.getC2();
 		//Calculates the plaintext element m = KDF(s) ^ c2.
-		byte[] m = kdf.derivateKey(sBytes, 0, sBytes.length, c2.length).getEncoded();
+		byte[] m = kdf.deriveKey(sBytes, 0, sBytes.length, c2.length).getEncoded();
 		
 		//Xores the result from the kdf with the plaintext.
 		for(int i=0; i<c2.length; i++){

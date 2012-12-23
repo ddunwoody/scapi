@@ -2,6 +2,7 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 * Copyright (c) 2012 - SCAPI (http://crypto.biu.ac.il/scapi)
+* This file is part of the SCAPI project.
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
 * 
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
@@ -21,6 +22,7 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
+
 
 package edu.biu.scapi.midLayer.asymmetricCrypto.encryption;
 
@@ -184,7 +186,7 @@ public class ScCramerShoupDDHOnByteArray extends CramerShoupAbs{
 		GroupElement u2 = calcU2(r);
 		GroupElement hExpr = calcHExpR(r);
 		byte[] hrBytes = dlogGroup.mapAnyGroupElementToByteArray(hExpr);
-		byte[] e = kdf.derivateKey(hrBytes, 0, hrBytes.length, msg.length).getEncoded();
+		byte[] e = kdf.deriveKey(hrBytes, 0, hrBytes.length, msg.length).getEncoded();
 		
 		//Xores the result from the kdf with the plaintext.
 		for(int i=0; i<msg.length; i++){
@@ -245,7 +247,7 @@ public class ScCramerShoupDDHOnByteArray extends CramerShoupAbs{
 		//Calculates m = KDF((u1^z) XOR e. 
 		GroupElement u1ExpZ = dlogGroup.exponentiate(cipher.getU1(), privateKey.getPrivateExp5());
 		byte[] u1ExpZBytes = dlogGroup.mapAnyGroupElementToByteArray(u1ExpZ);
-		byte[] m = kdf.derivateKey(u1ExpZBytes, 0, u1ExpZBytes.length, e.length).getEncoded();
+		byte[] m = kdf.deriveKey(u1ExpZBytes, 0, u1ExpZBytes.length, e.length).getEncoded();
 		
 		//Xores the result from the kdf with the plaintext.
 		for(int i=0; i<e.length; i++){
