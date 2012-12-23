@@ -2,6 +2,7 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 * Copyright (c) 2012 - SCAPI (http://crypto.biu.ac.il/scapi)
+* This file is part of the SCAPI project.
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
 * 
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
@@ -21,6 +22,7 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
+
 
 package edu.biu.scapi.primitives.kdf.bc;
 
@@ -68,14 +70,14 @@ public class BcKdfISO18033 implements KeyDerivationFunction {
 		//creates a digest of the given hash type through the factory and passes it to the KDF
 		bcKdfGenerator = new KDF1BytesGenerator(BCFactory.getInstance().getDigest(hash.getAlgorithmName()));
 	}
-
-	public SecretKey derivateKey(byte[] entropySource, int inOff, int inLen, int outLen){
+	
+	public SecretKey deriveKey(byte[] entropySource, int inOff, int inLen, int outLen){
 		//calls the generateKey with iv=null
-		return derivateKey(entropySource, inOff, inLen, outLen, null);
+		return deriveKey(entropySource, inOff, inLen, outLen, null);
 		
 	}
 	
-	public SecretKey derivateKey(byte[] entropySource, int inOff, int inLen, int outLen, byte[] iv){
+	public SecretKey deriveKey(byte[] entropySource, int inOff, int inLen, int outLen, byte[] iv){
 		
 		//checks that the offset and length are correct
 		if ((inOff > entropySource.length) || (inOff+inLen > entropySource.length)){
@@ -110,7 +112,6 @@ public class BcKdfISO18033 implements KeyDerivationFunction {
 		}
 		
 	}
-
 
 	
 }
