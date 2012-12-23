@@ -2,6 +2,7 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 * Copyright (c) 2012 - SCAPI (http://crypto.biu.ac.il/scapi)
+* This file is part of the SCAPI project.
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
 * 
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
@@ -22,9 +23,11 @@
 * 
 */
 
+
 package edu.biu.scapi.primitives.prf.bc;
 
 import java.security.InvalidKeyException;
+import java.security.InvalidParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
@@ -130,7 +133,7 @@ public abstract class BcPRP implements PrpFixed{
 	
 	/**
 	 * Generates a secret key to initialize this PRP object.
-	 * @param keySize is the required secret key size in bits 
+	 * @param keySize is the required secret key size in bits (it has to be greater than 0 or a multiple of 8) 
 	 * @return the generated secret key 
 	 */
 	public SecretKey generateKey(int keySize){
@@ -157,11 +160,15 @@ public abstract class BcPRP implements PrpFixed{
 		//then, generate a random string of bits of length keySize, which has to be greater than zero. 
 		} catch (NoSuchAlgorithmException e) {
 			//if the key size is zero or less - throw exception
-			if (keySize < 0){
-				throw new NegativeArraySizeException("key size must be greater than 0");
+			if (keySize <= 0){
+				throw new NegativeArraySizeException("Key size must be greater than 0");
 			}
+			if ((keySize % 8) != 0)  {
+				throw new InvalidParameterException("Wrong key size: must be a multiple of 8");
+			}	              
+
 			//creates a byte array of size keySize
-			byte[] genBytes = new byte[keySize];
+			byte[] genBytes = new byte[keySize/8];
 
 			//generates the bytes using the random
 			random.nextBytes(genBytes);
