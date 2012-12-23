@@ -2,6 +2,7 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 * Copyright (c) 2012 - SCAPI (http://crypto.biu.ac.il/scapi)
+* This file is part of the SCAPI project.
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
 * 
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
@@ -21,6 +22,7 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
+
 
 package edu.biu.scapi.primitives.generators;
 
@@ -138,7 +140,7 @@ public class SecretKeyGeneratorSpi extends KeyGeneratorSpi{
 				throw new IllegalStateException("SecretKeyGeneratorSpi must be initialized before used");
 			}
 			//if the key size is zero or less - throw exception
-			if (keySize < 0){
+			if (keySize <= 0){
 				throw new NegativeArraySizeException("key size must be greater than 0");
 			}
 			//creates a byte array of size keySize
