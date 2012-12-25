@@ -1,26 +1,28 @@
 /**
-* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-* 
-* Copyright (c) 2012 - SCAPI (http://crypto.biu.ac.il/scapi)
-* DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
-* 
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
-* to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
-* and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-* 
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-* 
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-* FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-* 
-* We request that any publication and/or code referring to and/or based on SCAPI contain an appropriate citation to SCAPI, including a reference to
-* http://crypto.biu.ac.il/SCAPI.
-* 
-* SCAPI uses Crypto++, Miracl, NTL and Bouncy Castle. Please see these projects for any further licensing issues.
-* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-* 
-*/
+ * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ * 
+ * Copyright (c) 2012 - SCAPI (http://crypto.biu.ac.il/scapi)
+ * This file is part of the SCAPI project.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+ * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * 
+ * We request that any publication and/or code referring to and/or based on SCAPI contain an appropriate citation to SCAPI, including a reference to
+ * http://crypto.biu.ac.il/SCAPI.
+ * 
+ * SCAPI uses Crypto++, Miracl, NTL and Bouncy Castle. Please see these projects for any further licensing issues.
+ * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ * 
+ */
+
 
 package edu.biu.scapi.primitives.dlog.miracl;
 
@@ -54,12 +56,12 @@ public class MiraclDlogECF2m extends MiraclAdapterDlogEC implements DlogECF2m, D
 	private native boolean validateF2mGenerator(long mip, long generator, byte[] x, byte[] y);
 	private native boolean isF2mMember(long mip, long point);
 	private native long createInfinityF2mPoint(long mip);
-	private native long createECF2mObject(long mip, int m, int k1, int k2, int k3, byte[] a, byte[] b);
-	private native long exponentiateF2mWithPreComputed(long mip, long dlogGroup, long base, byte[] size, int window, int maxBits);
-	
+	private native long initF2mExponentiateWithPrecomputedValues(long mip, int m, int k1, int k2, int k3, byte[] a, byte[] b, long base, int window, int maxBits);
+	private native long computeF2mExponentiateWithPrecomputedValues(long mip, long ebrickPointer, byte[] exponent);
+
 	private long nativeDlog = 0;
 	private ECF2mUtility util;
-	
+
 	/**
 	 * Default constructor. Initializes this object with K-163 NIST curve.
 	 */
@@ -89,11 +91,11 @@ public class MiraclDlogECF2m extends MiraclAdapterDlogEC implements DlogECF2m, D
 	protected void doInit(Properties ecProperties, String curveName) {
 		util = new ECF2mUtility();
 		groupParams = util.checkAndCreateInitParams(ecProperties, curveName);
-		
+
 		createUnderlyingCurveAndGenerator();
-		
+
 	}
-	
+
 	private void createUnderlyingCurveAndGenerator(){
 		BigInteger x;
 		BigInteger y;
@@ -116,7 +118,7 @@ public class MiraclDlogECF2m extends MiraclAdapterDlogEC implements DlogECF2m, D
 			x = pentaParams.getXg();
 			y = pentaParams.getYg();
 		}
-			
+
 		// create the generator
 		// here we assume that (x,y) are the coordinates of a point that is indeed a generator
 		generator = new ECF2mPointMiracl(x, y, this);
@@ -136,7 +138,7 @@ public class MiraclDlogECF2m extends MiraclAdapterDlogEC implements DlogECF2m, D
 	 * @throws IllegalArgumentException
 	 */
 	public GroupElement getInverse(GroupElement groupElement) throws IllegalArgumentException{
-		
+
 		//if the GroupElement doesn't match the DlogGroup, throw exception
 		if (!(groupElement instanceof ECF2mPointMiracl)){
 			throw new IllegalArgumentException("groupElement doesn't match the DlogGroup");
@@ -199,8 +201,8 @@ public class MiraclDlogECF2m extends MiraclAdapterDlogEC implements DlogECF2m, D
 	 * @throws IllegalArgumentException
 	 */
 	public GroupElement exponentiate(GroupElement base, BigInteger exponent) 
-									 throws IllegalArgumentException{
-		
+			throws IllegalArgumentException{
+
 		//if the GroupElements don't match the DlogGroup, throw exception
 		if (!(base instanceof ECF2mPointMiracl)){
 			throw new IllegalArgumentException("groupElement doesn't match the DlogGroup");
@@ -231,7 +233,7 @@ public class MiraclDlogECF2m extends MiraclAdapterDlogEC implements DlogECF2m, D
 	@Override
 	public GroupElement simultaneousMultipleExponentiations(GroupElement[] groupElements, 
 			BigInteger[] exponentiations) {
-		
+
 		//Koblitz curve has an optimization that causes the naive algorithm to be faster than the following optimized algorithm.
 		//so currently we use the naive algorithm instead of the optimized algorithm.
 		// may be in the future this will be change.
@@ -262,62 +264,19 @@ public class MiraclDlogECF2m extends MiraclAdapterDlogEC implements DlogECF2m, D
 		// build a ECF2mPointMiracl element from the result value
 		return new ECF2mPointMiracl(result, this);
 	}
-
+	
 	@Override
-	public GroupElement exponentiateWithPreComputedValues
-			(GroupElement groupElement, BigInteger exponent){
-		
-		//if the GroupElements don't match the DlogGroup, throw exception
-		if (!(groupElement instanceof ECF2mPointMiracl)){
-			throw new IllegalArgumentException("groupElement doesn't match the DlogGroup");
+	public GroupElement exponentiateWithPreComputedValues(GroupElement base, BigInteger exponent) {
+		//Performance checks have shown that for Koblitz curves the plain exponentiate function is faster
+		//than the one with precomputed values. Therefore, we have no choice but to check here if the 
+		//this instance is a Koblitz curve, and if so we return the calculation of the plain exponentiate function.
+		if (groupParams instanceof ECF2mKoblitz){
+			return exponentiate(base, exponent);
 		}
-
-		ECF2mPointMiracl base = (ECF2mPointMiracl) groupElement;
-
-		// infinity remains the same after any exponentiate
-		if (base.isInfinity()) {
-			return base;
-		}
-
-		if (nativeDlog == 0) {
-
-			int m, k1 = 0, k2 = 0, k3 = 0;
-			boolean trinomial = false;
-			ECF2mGroupParams params = (ECF2mGroupParams) groupParams;
-			BigInteger a, b;
-			m = params.getM();
-			a = params.getA();
-			b = params.getB();
-			// create the curve
-			if (params instanceof ECF2mKoblitz) {
-				params = ((ECF2mKoblitz) params).getCurve();
-			}
-			if (params instanceof ECF2mTrinomialBasis) {
-				ECF2mTrinomialBasis paramsT = (ECF2mTrinomialBasis) params;
-				k1 = paramsT.getK1();
-				trinomial = true;
-			} else if (params instanceof ECF2mPentanomialBasis) {
-				ECF2mPentanomialBasis paramsP = (ECF2mPentanomialBasis) params;
-				k1 = paramsP.getK1();
-				k2 = paramsP.getK2();
-				k3 = paramsP.getK3();
-				trinomial = false;
-			}
-
-			if (trinomial) {
-				nativeDlog = createECF2mObject(mip, m, k1, 0, 0, a.toByteArray(), b.toByteArray());
-			} else{
-				nativeDlog = createECF2mObject(mip, m, k3, k2, k1, a.toByteArray(), b.toByteArray());
-			}
-		}
-
-		// call to native exponentiate function
-		long result = exponentiateF2mWithPreComputed(mip, nativeDlog, base.getPoint(), exponent.toByteArray(), getWindow(), getOrder().bitLength());
-
-		// build a ECF2mPointMiracl element from the result value
-		return new ECF2mPointMiracl(result, this);
+		return super.exponentiateWithPreComputedValues(base, exponent);
 	}
 
+	
 	/**
 	 * Creates a point in the F2m field with the given parameters
 	 * 
@@ -326,16 +285,16 @@ public class MiraclDlogECF2m extends MiraclAdapterDlogEC implements DlogECF2m, D
 	public ECElement generateElement(BigInteger x, BigInteger y) throws IllegalArgumentException{
 		//Creates element with the given values.
 		ECF2mPointMiracl point =  new ECF2mPointMiracl(x, y, this);
-		
+
 		//if the element was created, it is a point on the curve.
 		//checks if the point is in the sub-group, too.
 		boolean valid = util.checkSubGroupMembership(this, point);
-		
+
 		//if the point is not in the sub-group, throw exception.
 		if (valid == false){
 			throw new IllegalArgumentException("Could not generate the element. The given (x, y) is not a point in this Dlog group");
 		}
-		
+
 		return point;
 	}
 
@@ -367,7 +326,7 @@ public class MiraclDlogECF2m extends MiraclAdapterDlogEC implements DlogECF2m, D
 
 		boolean valid = util.checkCurveMembership((ECF2mGroupParams) groupParams, point.getX(), point.getY());
 		valid = valid && util.checkSubGroupMembership(this, point);
-		
+
 		return valid;
 	}
 
@@ -403,7 +362,7 @@ public class MiraclDlogECF2m extends MiraclAdapterDlogEC implements DlogECF2m, D
 		return null;
 	}
 
-	
+
 	/**
 	 * This is 1-1 mapping of any element of this group to a byte array representation.
 	 * @param groupElement the element to convert
@@ -420,10 +379,81 @@ public class MiraclDlogECF2m extends MiraclAdapterDlogEC implements DlogECF2m, D
 		//If we ever decide to change the implementation there will only be one place to change it.
 		return util.mapAnyGroupElementToByteArray(point.getX(), point.getY());
 	}
-	
-	
+
+
 	// upload MIRACL library
 	static {
-			System.loadLibrary("MiraclJavaInterface");
+		System.loadLibrary("MiraclJavaInterface");
+	}
+
+
+	/* (non-Javadoc)
+	 * @see edu.biu.scapi.primitives.dlog.miracl.MiraclAdapterDlogEC#basicAndInfinityChecksForExpForPrecomputedValues(edu.biu.scapi.primitives.dlog.GroupElement)
+	 */
+	@Override
+	protected boolean basicAndInfinityChecksForExpForPrecomputedValues(GroupElement base) {
+		//if the GroupElement doesn't match the DlogGroup, throw exception
+		if (!(base instanceof ECF2mPointMiracl)){
+			throw new IllegalArgumentException("groupElement doesn't match the DlogGroup");
 		}
+
+		ECF2mPointMiracl baseECf2m = (ECF2mPointMiracl) base;
+
+		// infinity remains the same after any exponentiate
+		return baseECf2m.isInfinity();		
+
+
+	}
+	/* (non-Javadoc)
+	 * @see edu.biu.scapi.primitives.dlog.miracl.MiraclAdapterDlogEC#initExponentiateWithPrecomputedValues(edu.biu.scapi.primitives.dlog.GroupElement, java.math.BigInteger, int, int)
+	 */
+	@Override
+	protected long initExponentiateWithPrecomputedValues( GroupElement baseElement, BigInteger exponent, int window, int maxBits) {
+
+		int m, k1 = 0, k2 = 0, k3 = 0;
+		boolean trinomial = false;
+		ECF2mGroupParams params = (ECF2mGroupParams) groupParams;
+		BigInteger a, b;
+		m = params.getM();
+		a = params.getA();
+		b = params.getB();
+		// create the curve
+		if (params instanceof ECF2mKoblitz) {
+			params = ((ECF2mKoblitz) params).getCurve();
+		}
+		if (params instanceof ECF2mTrinomialBasis) {
+			ECF2mTrinomialBasis paramsT = (ECF2mTrinomialBasis) params;
+			k1 = paramsT.getK1();
+			trinomial = true;
+		} else if (params instanceof ECF2mPentanomialBasis) {
+			ECF2mPentanomialBasis paramsP = (ECF2mPentanomialBasis) params;
+			k1 = paramsP.getK1();
+			k2 = paramsP.getK2();
+			k3 = paramsP.getK3();
+			trinomial = false;
+		}
+
+		long ebrick2;
+		//createECF2mObject(long mip, int m, int k1, int k2, int k3, byte[] a, byte[] b);
+		//initF2mExponentiateWithPrecomputedValues(long mip, int m, int k1, int k2, int k3, byte[] a, byte[] b, long base, int window, int maxBits);
+		if (trinomial) {
+			ebrick2 = initF2mExponentiateWithPrecomputedValues(mip, m, k1, 0, 0, a.toByteArray(), b.toByteArray(),((ECF2mPointMiracl)baseElement).getPoint(),window, maxBits );
+		} else{
+			ebrick2 = initF2mExponentiateWithPrecomputedValues(mip, m, k3, k2, k1, a.toByteArray(), b.toByteArray(),((ECF2mPointMiracl)baseElement).getPoint(),window, maxBits);
+		}
+		return ebrick2;
+	}
+	/* (non-Javadoc)
+	 * @see edu.biu.scapi.primitives.dlog.miracl.MiraclAdapterDlogEC#computeExponentiateWithPrecomputedValue(long, java.math.BigInteger)
+	 */
+	@Override
+	protected GroupElement computeExponentiateWithPrecomputedValue(long ebrickPointer, BigInteger exponent) {
+		// call to native exponentiate function
+		long result = computeF2mExponentiateWithPrecomputedValues(mip, ebrickPointer, exponent.toByteArray());
+
+		// build a ECF2mPointMiracl element from the result value
+		return new ECF2mPointMiracl(result, this);
+	}
+	
+	
 }
