@@ -1,38 +1,29 @@
 /**
-* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-* 
-* Copyright (c) 2012 - SCAPI (http://crypto.biu.ac.il/scapi)
-* DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
-* 
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
-* to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
-* and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-* 
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-* 
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-* FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-* 
-* We request that any publication and/or code referring to and/or based on SCAPI contain an appropriate citation to SCAPI, including a reference to
-* http://crypto.biu.ac.il/SCAPI.
-* 
-* SCAPI uses Crypto++, Miracl, NTL and Bouncy Castle. Please see these projects for any further licensing issues.
-* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-* 
-*/
+ * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ * 
+ * Copyright (c) 2012 - SCAPI (http://crypto.biu.ac.il/scapi)
+ * This file is part of the SCAPI project.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+ * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * 
+ * We request that any publication and/or code referring to and/or based on SCAPI contain an appropriate citation to SCAPI, including a reference to
+ * http://crypto.biu.ac.il/SCAPI.
+ * 
+ * SCAPI uses Crypto++, Miracl, NTL and Bouncy Castle. Please see these projects for any further licensing issues.
+ * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ * 
+ */
 
-/**
-* This file is part of SCAPI.
-* SCAPI is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-* SCAPI is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-* You should have received a copy of the GNU General Public License along with SCAPI.  If not, see <http://www.gnu.org/licenses/>.
-*
-* Any publication and/or code referring to and/or based on SCAPI must contain an appropriate citation to SCAPI, including a reference to http://crypto.cs.biu.ac.il/SCAPI.
-*
-* SCAPI uses Crypto++, Miracl, NTL and Bouncy Castle. Please see these projects for any further licensing issues.
-*
-*/
+
 package edu.biu.scapi.primitives.prg;
 
 import java.security.InvalidKeyException;
@@ -44,52 +35,48 @@ import javax.crypto.SecretKey;
 
 import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.exceptions.NoMaxException;
-import edu.biu.scapi.primitives.kdf.HKDF;
-import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
 import edu.biu.scapi.primitives.prf.PseudorandomFunction;
 import edu.biu.scapi.primitives.prf.bc.BcAES;
-import edu.biu.scapi.primitives.prf.bc.BcHMAC;
-import edu.biu.scapi.tools.Factories.KdfFactory;
 import edu.biu.scapi.tools.Factories.PrfFactory;
 
+/**
+ * This is a simple way of generating a pseudorandom stream from a pseudorandom function. The seed for the pseudorandom generator is the key to the pseudorandom function. 
+ * Then, the algorithm initializes a counter to 1 and applies the pseudorandom function to the counter, increments it, and repeats.
+ * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
+ *
+ */
 public class ScPrgFromPrf implements PseudorandomGenerator{
 
-	private KeyDerivationFunction kdf;	// Underlying KDF.
 	private PseudorandomFunction prf;	// Underlying PRF.
 	private byte[] ctr;					//Counter used for key generation.
 	private boolean isKeySet;
-	
+
 	/**
-	 * Default constructor. Uses default implementations of KDF and PRF.
+	 * Default constructor. Uses default implementation PRF.
 	 */
 	public ScPrgFromPrf(){
-		
-		kdf = new HKDF(new BcHMAC());
 		prf = new BcAES();
 	}
-	
+
 	/**
-	 * Constructor that lets the user choose the underlying KDF and PRF algorithms.
-	 * @param kdf underlying KeyDerivationFunction.
+	 * Constructor that lets the user choose the underlying PRF algorithm.
 	 * @param prf underlying PseudorandomFunction.
 	 */
-	public ScPrgFromPrf(KeyDerivationFunction kdf, PseudorandomFunction prf){
-		this.kdf = kdf;
+	public ScPrgFromPrf(PseudorandomFunction prf){
 		this.prf = prf;
 	}
-	
+
 	/**
-	 * Constructor that lets the user choose the underlying KDF and PRF algorithms.
-	 * @param kdfName KeyDerivationFunction algorithm name.
+	 * Constructor that lets the user choose the underlying PRF algorithm.
 	 * @param prfName PseudorandomFunction algorithm name.
 	 */
-	public ScPrgFromPrf(String kdfName, String prfName) throws FactoriesException{
-		this(KdfFactory.getInstance().getObject(kdfName), PrfFactory.getInstance().getObject(prfName));
+	public ScPrgFromPrf(String prfName) throws FactoriesException{
+		this(PrfFactory.getInstance().getObject(prfName));
 	}
-	
+
 	/**
 	 * Initializes this PRG with SecretKey.
-	 * @param secretKey
+	 * @param secretKey suitable for the given Prf
 	 * @throws InvalidKeyException 
 	 */
 	public void setKey(SecretKey secretKey) throws InvalidKeyException {
@@ -101,11 +88,11 @@ public class ScPrgFromPrf implements PseudorandomGenerator{
 		} catch (NoMaxException e){
 			ctr = new byte[16];
 		}
-		
+
 		//Initializes the counter to 1.
 		ctr[ctr.length-1] = 1;
 		isKeySet = true;
-		
+
 	}
 
 	@Override
@@ -119,7 +106,7 @@ public class ScPrgFromPrf implements PseudorandomGenerator{
 	 */
 	@Override
 	public String getAlgorithmName() {
-		
+
 		return "PRG_from_" + prf.getAlgorithmName();
 	}
 
@@ -130,17 +117,7 @@ public class ScPrgFromPrf implements PseudorandomGenerator{
 	 * @throws InvalidParameterSpecException if the given params is not an instance of PrgFromPrfParameterSpec
 	 */
 	public SecretKey generateKey(AlgorithmParameterSpec keyParams) throws InvalidParameterSpecException {
-		if (!(keyParams instanceof PrgFromPrfParameterSpec)){
-			throw new IllegalArgumentException("keyParams should be an instance of PrgFromPrfParameterSpec");
-		}
-		
-		//Gets the prg parameters.
-		PrgFromPrfParameterSpec params = (PrgFromPrfParameterSpec) keyParams;
-		byte[] entropy = params.getEntropySource();
-		int prfKeySize = params.getPrfKeySize();
-		
-		//Uses the KDF to generate a PRF key.
-		return kdf.derivateKey(entropy, 0, entropy.length, prfKeySize/8);
+		return prf.generateKey(keyParams);
 	}
 
 	/**
@@ -148,7 +125,7 @@ public class ScPrgFromPrf implements PseudorandomGenerator{
 	 * @throws UnsupportedOperationException 
 	 */
 	public SecretKey generateKey(int keySize) {
-		throw new UnsupportedOperationException("To generate a key for this prg object use the generateKey(AlgorithmParameterSpec keyParams) function");
+		return prf.generateKey(keySize);
 	}
 
 	/**
@@ -168,10 +145,10 @@ public class ScPrgFromPrf implements PseudorandomGenerator{
 		if ((outOffset > outBytes.length) || ((outOffset + outLen) > outBytes.length)){
 			throw new ArrayIndexOutOfBoundsException("wrong offset for the given output buffer");
 		}
-		
+
 		int numGeneratedBytes = 0;	//Number of current generated bytes.
 		byte [] generatedBytes = new byte[ctr.length];
-		
+
 		while(numGeneratedBytes < outLen){
 			try {
 				//If the prf can output any length (for example, IteratedPrfVarying) call the computeBlock with the outputLen.
@@ -212,18 +189,18 @@ public class ScPrgFromPrf implements PseudorandomGenerator{
 			//Increases the counter.
 			increaseCtr();
 		}
-		
+
 	}
 
 	/**
 	 * Increases the ctr byte array by 1 bit.
 	 */
 	private void increaseCtr(){
-		
+
 		//increase the counter by one.
 		int    carry = 1;
 		int len = ctr.length;
-		
+
 		for (int i = len - 1; i >= 0; i--)
 		{
 			int    x = (ctr[i] & 0xff) + carry;
@@ -240,6 +217,6 @@ public class ScPrgFromPrf implements PseudorandomGenerator{
 			ctr[i] = (byte)x;
 		}
 	} 
-	
-	
+
+
 }
