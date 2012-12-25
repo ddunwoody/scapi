@@ -2,6 +2,7 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 * Copyright (c) 2012 - SCAPI (http://crypto.biu.ac.il/scapi)
+* This file is part of the SCAPI project.
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
 * 
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
@@ -21,6 +22,7 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
+
 
 package edu.biu.scapi.primitives.dlog.miracl;
 
@@ -51,11 +53,11 @@ public class MiraclDlogECFp extends MiraclAdapterDlogEC implements DlogECFp, DDH
 	private native boolean validateFpGenerator(long mip, long generator, byte[] x, byte[] y);
 	private native boolean isFpMember(long mip, long point);
 	private native long createInfinityFpPoint(long mip);
-	private native long createECFpObject(long mip, byte[] p, byte[] a, byte[] b);
-	private native long exponentiateFpWithPreComputed(long mip, long dlogGroup, long base, byte[] size, int window, int maxBits);
-
-	private long nativeDlog = 0;
+	private native long initFpExponentiateWithPrecomputedValues(long mip,byte[]p, byte[]a, byte[]b, long base, byte[] exponent, int window, int maxBits);
+	private native long computeFpExponentiateWithPrecomputedValues(long mip, long ebrickPointer, byte[] exponent);
+	
 	private ECFpUtility util;
+	
 	/**
 	 * Default constructor. Initializes this object with P-192 NIST curve.
 	 */
@@ -231,36 +233,7 @@ public class MiraclDlogECFp extends MiraclAdapterDlogEC implements DlogECFp, DDH
 		return new ECFpPointMiracl(result, this);
 	}
 
-	@Override
-	public GroupElement exponentiateWithPreComputedValues
-			(GroupElement groupElement, BigInteger exponent){
-
-		//Results showed that the naive algorithm is faster so we decided not to use this algorithm but the naive
-
-		// if the GroupElements don't match the DlogGroup, throw exception
-		if (!(groupElement instanceof ECFpPointMiracl)) {
-			throw new IllegalArgumentException("groupElement doesn't match the DlogGroup");
-		}
-
-		ECFpPointMiracl base = (ECFpPointMiracl) groupElement;
-
-		// infinity remains the same after any exponentiate
-		if (base.isInfinity()) {
-			return base;
-		}
-
-		if (nativeDlog == 0) {
-			ECFpGroupParams params = (ECFpGroupParams) getGroupParams();
-			nativeDlog = createECFpObject(mip, params.getP().toByteArray(), params.getA().mod(params.getP()).toByteArray(), params.getB().toByteArray());
-		}
-		
-		//call the native exponentiate function
-		long result = exponentiateFpWithPreComputed(mip, nativeDlog, base.getPoint(), exponent.toByteArray(), getWindow(), getOrder().bitLength());
-
-		// build a ECFpPointMiracl element from the result value
-		return new ECFpPointMiracl(result, this);
-	}
-
+	
 	/**
 	 * Creates a point in the Fp field with the given parameters
 	 * 
@@ -349,8 +322,6 @@ public class MiraclDlogECFp extends MiraclAdapterDlogEC implements DlogECFp, DDH
 		ECFpPointMiracl point = (ECFpPointMiracl) groupElement;
 		//The actual work is implemented in ECFpUtility since it is independent of the underlying library (BC, Miracl, or other)
 		//If we ever decide to change the implementation there will only be one place to change it.
-//		return util.getKLeastSignBytes(point.getX(), k);
-		
 		byte[] b1 = util.getKLeastSignBytes(point.getX(), k +1);
 		byte[] b2 = new byte[b1.length -1];
 		System.arraycopy(b1, 1, b2, 0, b2.length);
@@ -374,7 +345,49 @@ public class MiraclDlogECFp extends MiraclAdapterDlogEC implements DlogECFp, DDH
 		return util.mapAnyGroupElementToByteArray(point.getX(), point.getY());
 	}
 
+
+	/* (non-Javadoc)
+	 * @see edu.biu.scapi.primitives.dlog.miracl.MiraclAdapterDlogEC#basicAndInfinityChecksForExpForPrecomputedValues()
+	 */
+	@Override
+	protected boolean basicAndInfinityChecksForExpForPrecomputedValues(GroupElement base) {
 	
+		// if the GroupElements does not match the DlogGroup, throw exception
+		if (!(base instanceof ECFpPointMiracl)) {
+			throw new IllegalArgumentException("groupElement doesn't match the DlogGroup");
+		}
+
+		ECFpPointMiracl baseECFp = (ECFpPointMiracl) base;
+
+		// infinity remains the same after any exponentiate
+		return baseECFp.isInfinity();				
+	}
+	
+	/* (non-Javadoc)
+	 * returns a pointer to newly created Ebrick structure in Miracl's native code.
+	 * @see edu.biu.scapi.primitives.dlog.miracl.MiraclAdapterDlogEC#initExponentiateWithPrecomputedValues(edu.biu.scapi.primitives.dlog.GroupElement, java.math.BigInteger, int, int)
+	 */
+	@Override
+	protected long initExponentiateWithPrecomputedValues(GroupElement baseElement, BigInteger exponent, int window, int maxBits) {
+		
+		ECFpGroupParams params = (ECFpGroupParams) getGroupParams();
+		return initFpExponentiateWithPrecomputedValues(mip, params.getP().toByteArray(), params.getA().mod(params.getP()).toByteArray(), params.getB().toByteArray(),
+				((ECFpPointMiracl)baseElement).getPoint() ,exponent.toByteArray(), window, maxBits);
+	}
+	/* (non-Javadoc)
+	 * actually compute the exponentiation in Miracl's native code using the previously created and computed Ebrick structure. The native function returns a pointer
+	 * to the computed result and this function converts it to the right GroupElement. 
+	 * @see edu.biu.scapi.primitives.dlog.miracl.MiraclAdapterDlogEC#computeExponentiateWithPrecomputedValue(long, java.math.BigInteger)
+	 */
+	@Override
+	protected GroupElement computeExponentiateWithPrecomputedValue(	long ebrickPointer, BigInteger exponent) {
+		//Perform the calculation in the native code
+		long result = computeFpExponentiateWithPrecomputedValues(mip, ebrickPointer, exponent.toByteArray());
+		
+		//Build a ECFpPointMiracl element from the result value
+		return new ECFpPointMiracl(result, this);
+	}
+
 	
 	
 	
@@ -383,6 +396,7 @@ public class MiraclDlogECFp extends MiraclAdapterDlogEC implements DlogECFp, DDH
 	static {
 		System.loadLibrary("MiraclJavaInterface");
 	}
+	
 
 
 }
