@@ -2,6 +2,7 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 * Copyright (c) 2012 - SCAPI (http://crypto.biu.ac.il/scapi)
+* This file is part of the SCAPI project.
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
 * 
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
@@ -22,17 +23,7 @@
 * 
 */
 
-/**
-* This file is part of SCAPI.
-* SCAPI is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-* SCAPI is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-* You should have received a copy of the GNU General Public License along with SCAPI.  If not, see <http://www.gnu.org/licenses/>.
-*
-* Any publication and/or code referring to and/or based on SCAPI must contain an appropriate citation to SCAPI, including a reference to http://crypto.cs.biu.ac.il/SCAPI.
-*
-* SCAPI uses Crypto++, Miracl, NTL and Bouncy Castle. Please see these projects for any further licensing issues.
-*
-*/
+
 package edu.biu.scapi.primitives.prg.bc;
 
 import java.security.NoSuchAlgorithmException;
@@ -45,7 +36,8 @@ import org.bouncycastle.crypto.engines.RC4Engine;
 import edu.biu.scapi.primitives.prg.RC4;
 
 /**
- * Concrete class of PRF for RC4. This class is a wrapper class for BC implementation of RC4.
+ * RC4 is a well known stream cipher, that is essentially a pseudorandom generator.<p> 
+ * In our implementation, we throw out the first 1024 bits since the first few bytes have been shown to have some bias. 
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Meital Levy)
  *
