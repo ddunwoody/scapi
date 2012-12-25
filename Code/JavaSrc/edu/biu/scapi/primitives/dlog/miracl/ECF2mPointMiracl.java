@@ -2,6 +2,7 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 * Copyright (c) 2012 - SCAPI (http://crypto.biu.ac.il/scapi)
+* This file is part of the SCAPI project.
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
 * 
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
@@ -22,6 +23,7 @@
 * 
 */
 
+
 package edu.biu.scapi.primitives.dlog.miracl;
 
 import java.io.IOException;
@@ -41,10 +43,6 @@ import edu.biu.scapi.primitives.dlog.groupParams.ECF2mGroupParams;
  *
  */
 public class ECF2mPointMiracl implements ECElement, ECF2mPoint{
-	/**
-	 * 
-	 */
-	//private static final long serialVersionUID = 5263481969362114289L;
 
 	private native long createF2mPoint(long mip, byte[] x, byte[] y);
 	private native long createF2mPointFromX(long mip, byte[] x, boolean[] validity);
@@ -140,6 +138,18 @@ public class ECF2mPointMiracl implements ECElement, ECF2mPoint{
 		return new ECElementSendableData(getX(), getY());
 	}
 	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 17;
+		int hashCodeX = getX().hashCode();
+		int hashCodeY = getY().hashCode();
+		result = prime * result + hashCodeX;
+		result = prime * result + hashCodeY;
+		return result;
+	}
+	
+	@Override
 	public boolean equals(Object elementToCompare){
 		if (!(elementToCompare instanceof ECF2mPointMiracl)){
 			return false;
