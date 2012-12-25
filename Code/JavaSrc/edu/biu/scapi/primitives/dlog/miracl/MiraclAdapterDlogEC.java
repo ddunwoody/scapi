@@ -2,6 +2,7 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 * Copyright (c) 2012 - SCAPI (http://crypto.biu.ac.il/scapi)
+* This file is part of the SCAPI project.
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
 * 
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
@@ -22,29 +23,63 @@
 * 
 */
 
+
 package edu.biu.scapi.primitives.dlog.miracl;
 
 
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.math.BigInteger;
+import java.util.HashMap;
 
 import edu.biu.scapi.primitives.dlog.DlogEllipticCurve;
 import edu.biu.scapi.primitives.dlog.DlogGroupEC;
+import edu.biu.scapi.primitives.dlog.GroupElement;
 
 public abstract class MiraclAdapterDlogEC extends DlogGroupEC 
 										  implements DlogEllipticCurve{
 	
+	// upload MIRACL library
+	static {
+		System.loadLibrary("MiraclJavaInterface");
+	}
+
+	
+	//Native code functions:
+	private native long createMip();
+
+	
+	//Class members:
 	protected int window = 0;
+	protected long mip; ///MIRACL pointer
+	protected HashMap <GroupElement, Long> exponentiationsMap; // Map that holds a pointer to the precomputed values of exponentiating a given group element (the base) 
+																//calculated in Miracl's native code
+	
+	
+	//temp member variable used for debug:
+	PrintWriter file;
+
+	
+	//Functions:
 	protected MiraclAdapterDlogEC(){}
 	
 	public MiraclAdapterDlogEC(String fileName, String curveName) throws IOException {
 		super(fileName, curveName);
+		exponentiationsMap = new HashMap <GroupElement, Long>();
+		
+		try {
+			file= new PrintWriter("EcFpPointMiracleResults.csv");
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
-	private native long createMip();
-
-	protected long mip; ///MIRACL pointer
-
+	protected abstract boolean basicAndInfinityChecksForExpForPrecomputedValues(GroupElement base);
+	protected abstract long initExponentiateWithPrecomputedValues(GroupElement baseElement, BigInteger exponent, int window, int maxBits);
+	protected abstract GroupElement computeExponentiateWithPrecomputedValue(long ebrickPointer, BigInteger exponent);
 	/*
 	 * 
 	 * @return mip - miracl pointer
@@ -59,6 +94,35 @@ public abstract class MiraclAdapterDlogEC extends DlogGroupEC
 		window = val;
 	}
 	
+	
+	public GroupElement exponentiateWithPreComputedValues(GroupElement base, BigInteger exponent) {
+		//This function performs basic checks on the group element, such as if it is of the right type for the relevant Dlog and checks if the 
+		//base group element is the infinity. If so, then the result of exponentiating is the base group element itself, return it.
+		boolean infinity = basicAndInfinityChecksForExpForPrecomputedValues(base);
+		if (infinity){
+			return base;
+		}
+		//Look for the base in the map. If this is the first time we calculate the exponentiations for this base then:
+		//1) we will not find the base in the map
+		//2) we need to perform the pre-computation for this base
+		//3) and then save the pre-computation for this base in the map
+		Long ebrickPointer = exponentiationsMap.get(base);
+		//If didn't find the pointer for the base element, create one:
+		if(ebrickPointer == null){
+			//the actual pre-computation is performed by Miracl. The call to this function returns a pointer to an "ebrick"
+			//structure created and held by the Miracl code. We save this pointer in the map for the current base and pass it on
+			//to the actual computation of the exponentiation in the step below.
+			ebrickPointer = initExponentiateWithPrecomputedValues(base, exponent, getWindow(), getOrder().bitLength());
+			exponentiationsMap.put(base, ebrickPointer);
+		}
+		
+		//At this stage we have a pointer to the ebrick pointer in native code, and we pass it on to compute base^exponent and obtain the resulting Group Element
+		return computeExponentiateWithPrecomputedValue(ebrickPointer, exponent);
+
+	}
+	
+	
+	//The window size is used when calling Miracl's implementation of exponentiate with pre-computed values. It is used as part of the Ebrick algorithm.
 	protected int getWindow(){
 		if (window != 0){
 			return window;
