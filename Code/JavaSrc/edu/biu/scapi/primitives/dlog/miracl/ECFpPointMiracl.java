@@ -2,6 +2,7 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 * Copyright (c) 2012 - SCAPI (http://crypto.biu.ac.il/scapi)
+* This file is part of the SCAPI project.
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
 * 
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
@@ -22,8 +23,11 @@
 * 
 */
 
+
 package edu.biu.scapi.primitives.dlog.miracl;
 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.math.BigInteger;
 
 import edu.biu.scapi.primitives.dlog.ECElement;
@@ -72,6 +76,7 @@ public class ECFpPointMiracl implements ECElement, ECFpPoint{
 		//call for a native function that creates an element in the field
 		point = createFpPoint(mip, x.toByteArray(), y.toByteArray());
 			
+		
 	}
 	
 	/**
@@ -129,6 +134,22 @@ public class ECFpPointMiracl implements ECElement, ECFpPoint{
 		return new ECElementSendableData(getX(), getY());
 	}
 	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 17;
+		int hashCodeX = getX().hashCode();
+		int hashCodeY = getY().hashCode();
+		result = prime * result + hashCodeX;
+		result = prime * result + hashCodeY;
+		return result;
+	}
+	
+	/**
+	 * Compares this Fp Point with elementToCompare.
+	 * @return <code>true </code> if this (x,y) coordinates are equal to elementToCompare's (x,y) coordinates<p>
+	 *  		<code>false </code>, otherwise
+	 */
 	public boolean equals(Object elementToCompare){
 		if (!(elementToCompare instanceof ECFpPointMiracl)){
 			return false;
@@ -146,10 +167,9 @@ public class ECFpPointMiracl implements ECElement, ECFpPoint{
 	}
 	
 	/**
-	 * delete the related point
+	 * delete the related point in Miracl's native code.
 	 */
 	protected void finalize() throws Throwable{
-		
 		//delete from the dll the dynamic allocation of the point.
 		deletePointFp(point);
 	}
