@@ -692,85 +692,75 @@ epoint* getIdentity(miracl* mip, int field){
 	return identity;
 }
 
-/*
- * Creates the exponentiations map in the first time it required
- */
-JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_miracl_MiraclDlogECFp_createECFpObject
-  (JNIEnv *env, jobject, jlong m, jbyteArray p, jbyteArray a, jbyteArray b){
-	  
-	  //translate parameters  to miracl notation
-	  miracl* mip = (miracl*)m;
-	  big pB = byteArrayToMiraclBig(env, mip, p);
-	  big aB = byteArrayToMiraclBig(env, mip, a);
-	  big bB = byteArrayToMiraclBig(env, mip, b);
-	  ECFp* dlog = new ECFp(mip, pB, aB, bB);
-
-	  return (jlong)dlog;
-	 
-}
 
 /*
- * Computes the product of several exponentiations of the same base
- * and distinct exponents for Fp curves. 
- * An optimization is used to compute it more quickly by keeping in memory 
- * the result of h1, h2, h4,h8,... and using it in the calculation.
- * Note that if we want a one-time exponentiation of h it is preferable to use the basic exponentiation function 
- * since there is no point to keep anything in memory if we have no intention to use it. 
+ * Class:     edu_biu_scapi_primitives_dlog_miracl_MiraclDlogECFp
+ * Method:    initFpExponentiateWithPrecomputedValues
+ * Signature: (J[B[B[BJ[BII)J
+ *
+ * This function wraps the creation of an ebrick structure used to precompute exponentiations for a certain base for Dlog groups over Fp. It returns
+ * a pointer to the ebrick structure which will be kept by the calling application (edu.biu.scapi...) in some data structure and will
+ * be used for further calls to exponentiations with the same base.
  */
-JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_miracl_MiraclDlogECFp_exponentiateFpWithPreComputed
-  (JNIEnv *env, jobject obj, jlong m, jlong dlog, jlong base, jbyteArray size, jint window, jint maxBits){
-	   
-	  //translate parameters  to miracl notation
-	  miracl* mip = (miracl*)m;
-	  big exponent = byteArrayToMiraclBig(env, mip, size);
+JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_miracl_MiraclDlogECFp_initFpExponentiateWithPrecomputedValues
+  (JNIEnv *env, jobject, jlong m, jbyteArray p, jbyteArray a, jbyteArray b, jlong base, jbyteArray exponent, jint window, jint maxBits){
 
-	  ECFp* dlogGroup = (ECFp*) dlog;
 
-	  jlong result =  dlogGroup->exponentiateWithPreComputedValues((epoint*)base, exponent, window, maxBits);
-	  
-	  mirkill(exponent);
+
+    //translate parameters  to miracl notation
+	miracl* mip = (miracl*)m;
+	big exponentB = byteArrayToMiraclBig(env, mip, exponent);
+	big pB = byteArrayToMiraclBig(env, mip, p);
+	big aB = byteArrayToMiraclBig(env, mip, a);
+	big bB = byteArrayToMiraclBig(env, mip, b);
+
+	//Create a new structure to hold the precomputed values for given base and exponent
+	ebrick* exponentiations = new ebrick();
 	
-	  return result;
-	 
-}
-
-ECFp::ECFp(miracl* mip, big p, big a, big b){
-	this->p = p;
-	this->a = a;
-	this->b = b;
-	exponentiationsMap = new map<epoint*, ebrick*>;
-	this->mip = mip;
-}
-
-ECFp::~ECFp(){
-	exponentiationsMap->clear();
-	delete(exponentiationsMap);
-	mirkill(p);
-	mirkill(a);
-	mirkill(b);
-}
-
-long ECFp::exponentiateWithPreComputedValues(epoint* base, big exponent, int window, int maxBits){
-	map<epoint*, ebrick*>::iterator it;
+	//Get the coordinates (x,y) from the requested base point: 
 	big x, y;
 	x = mirvar(mip, 0);
 	y = mirvar(mip, 0);
+	epoint_get(mip, (epoint*)base, x, y);
 
-	//get the base exponentiations from the map
-	it=exponentiationsMap->find((epoint*)base);
-	ebrick* exponentiations = (*it).second;
-	//if there is no exponentiations in the map for this base - creates them
-	if (it == exponentiationsMap->end()){
-		exponentiations = new ebrick();
-		  
-		epoint_get(mip, base, x, y);
-		ebrick_init(mip, exponentiations, x, y, a, b, p, window, maxBits);
-		exponentiationsMap->insert(pair<epoint*, ebrick*>((epoint*)base, exponentiations));
-	}
+	//Perform precomputation
+	ebrick_init(mip, exponentiations, x, y, aB, bB, pB, window, maxBits);
+	
+	//clean up
+	mirkill(exponentB);
+	mirkill(pB);
+	mirkill(aB);
+	mirkill(bB);
 
+	//Return the pointer to the structure where the precomputed values are held
+	return (jlong)exponentiations;
+}
+
+/*
+ * Class:     edu_biu_scapi_primitives_dlog_miracl_MiraclDlogECFp
+ * Method:    computeFpExponentiateWithPrecomputedValue
+ * Signature: (JJ[B)J
+ * 
+ * This function wraps the actual computation of the exponentation with precomputed values for the requested base for Dlog groups over Fp. It gets as a parameter
+ * a pointer to the ebrick structure created by a previous call to initFpExponentiateWithPrecomputedValues. This implies that initFpExponentiateWithPrecomputedValues
+ * MUST have been called prior to this function for the same base.
+ */
+JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_miracl_MiraclDlogECFp_computeFpExponentiateWithPrecomputedValues
+  (JNIEnv * env, jobject, jlong m, jlong ebrickPointer, jbyteArray exponent){
+
+	//translate parameters  to miracl notation
+	miracl* mip = (miracl*)m;
+	big exponentB = byteArrayToMiraclBig(env, mip, exponent);
+
+	//(x,y) are the coordinates of the point which is the result of the exponentiation
+	big x, y;
+	x = mirvar(mip, 0);
+	y = mirvar(mip, 0);
 	//calculates the required exponent
-	mul_brick(mip, exponentiations, exponent, x, y);
-
+	mul_brick(mip, (ebrick*)ebrickPointer, exponentB, x, y);
+	
+	//printf("The result of mul_brick(mip, exponentiations, exponent, x, y) is x=%d, y=%d\n", (*x).w,(*y).w);
+	
 	epoint* p = new epoint();
 	p = epoint_init(mip);
 	epoint_set(mip, x, y, 0, p);
@@ -779,89 +769,85 @@ long ECFp::exponentiateWithPreComputedValues(epoint* base, big exponent, int win
 	mirkill(y);
 
 	return (jlong)p;
+
+}
+
+/*
+ * Class:     edu_biu_scapi_primitives_dlog_miracl_MiraclDlogECFp
+ * Method:    endFpExponentiateWithPreComputedValues
+ * Signature: (J)V
+ *
+ * This function cleans up used resources after performing exponentiation with precomputed values for a certain base.
+ * It should be used if the calling application has finished working with the specified base.
+ */
+JNIEXPORT void JNICALL Java_edu_biu_scapi_primitives_dlog_miracl_MiraclDlogECFp_endFpExponentiateWithPreComputedValues
+  (JNIEnv * env, jobject, jlong base){
+	  //Call Miracl's function that cleans up after an application of the Comb method for GF(p) elliptic curves.
+	  ebrick_end((ebrick *)base);
 }
 
 
 /*
- * Creates the exponentiations map in the first time it required
+ * Class:     edu_biu_scapi_primitives_dlog_miracl_MiraclDlogECF2m
+ * Method:    initF2mExponentiateWithPrecomputedValues
+ * Signature: (JIIII[B[BJ[BII)J
+ *
+ * This function wraps the creation of an ebrick structure used to precompute exponentiations for a certain base for Dlog groups over Fp. It returns
+ * a pointer to the ebrick structure which will be kept by the calling application (edu.biu.scapi...) in some data structure and will
+ * be used for further calls to exponentiations with the same base.
  */
-JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_miracl_MiraclDlogECF2m_createECF2mObject
-  (JNIEnv *env, jobject, jlong m, jint mod, jint k1, jint k2, jint k3, jbyteArray a, jbyteArray b){
-	  
-	  //translate parameters  to miracl notation
-	  miracl* mip = (miracl*)m;
-	  big aB = byteArrayToMiraclBig(env, mip, a);
-	  big bB = byteArrayToMiraclBig(env, mip, b);
-	  ECF2m* dlog = new ECF2m(mip, mod, k1, k2, k3, aB, bB);
-	 
-	  return (jlong)dlog;
-	 
-}
+JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_miracl_MiraclDlogECF2m_initF2mExponentiateWithPrecomputedValues
+	(JNIEnv * env, jobject, jlong mipp, jint mod, jint k1, jint k2, jint k3, jbyteArray a, jbyteArray b, jlong base, jint window, jint maxBits){
 
-/*
- * Computes the product of several exponentiations of the same base
- * and distinct exponents for Fp curves. 
- * An optimization is used to compute it more quickly by keeping in memory 
- * the result of h1, h2, h4,h8,... and using it in the calculation.
- * Note that if we want a one-time exponentiation of h it is preferable to use the basic exponentiation function 
- * since there is no point to keep anything in memory if we have no intention to use it. 
- */
-JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_miracl_MiraclDlogECF2m_exponentiateF2mWithPreComputed
-  (JNIEnv *env, jobject obj, jlong m, jlong dlog, jlong base, jbyteArray size, jint window, int maxBits){
-	   
-	  //translate parameters  to miracl notation
-	  miracl* mip = (miracl*)m;
-	  big exponent = byteArrayToMiraclBig(env, mip, size);
+	//translate parameters  to miracl notation
+	miracl* mip = (miracl*)mipp;
+	big aB = byteArrayToMiraclBig(env, mip, a);
+	big bB = byteArrayToMiraclBig(env, mip, b);
 
-	  ECF2m* dlogGroup = (ECF2m*) dlog;
-
-	  jlong result =  dlogGroup->exponentiateWithPreComputedValues((epoint*)base, exponent, window, maxBits);
-
-	  mirkill(exponent);
-
-	  return result;
-	 
-}
-
-ECF2m::ECF2m(miracl* mip, int mod, int k1, int k2, int k3, big a, big b){
-	this->m = mod;
-	this->a = a;
-	this->b = b;
-	this->k1 = k1;
-	this->k2 = k2;
-	this->k3 = k3;
-	exponentiationsMap = new map<epoint*, ebrick2*>;
-	this->mip = mip;
-}
-
-ECF2m::~ECF2m(){
-	exponentiationsMap->clear();
-	delete(exponentiationsMap);
-	mirkill(a);
-	mirkill(b);
-}
-
-long ECF2m::exponentiateWithPreComputedValues(epoint* base, big exponent, int window, int maxBits){
-	map<epoint*, ebrick2*>::iterator it;
+	//Get the coordinates (x,y) from the requested base point: 
 	big x, y;
 	x = mirvar(mip, 0);
 	y = mirvar(mip, 0);
+	epoint2_get(mip, (epoint*)base, x, y);
 
-	//get the base exponentiations from the map
-	it=exponentiationsMap->find((epoint*)base);
-	ebrick2* exponentiations = (*it).second;
-	//if there is no exponentiations in the map for this base - creates them
-	if (it == exponentiationsMap->end()){
-		exponentiations = new ebrick2();
-		  
-		epoint2_get(mip, base, x, y);
+	//Create a new structure to hold the precomputed values for given base and exponent
+	ebrick2* exponentiations = new ebrick2();
+	//Perform precomputation
+	ebrick2_init(mip, exponentiations, x, y, aB, bB, mod, k1, k2, k3, window, maxBits);
+	//clean up
+	mirkill(aB);
+	mirkill(bB);
+	//May be clan up also x and y
+	mirkill(x);
+	mirkill(y);
+	//Return the pointer to the structure where the precomputed values are held
+	return (jlong)exponentiations;
+}
 
-		ebrick2_init(mip, exponentiations, x, y, a, b, m, k1, k2, k3, window, maxBits);
-		exponentiationsMap->insert(pair<epoint*, ebrick2*>((epoint*)base, exponentiations));
-	}
+/*
+ * Class:     edu_biu_scapi_primitives_dlog_miracl_MiraclDlogECF2m
+ * Method:    computeF2mExponentiateWithPrecomputedValues
+ * Signature: (JJ[B)J
+ * This function wraps the actual computation of the exponentation with precomputed values for the requested base for Dlog groups over F2m. It gets as a parameter
+ * a pointer to the ebrick structure created by a previous call to initFpExponentiateWithPrecomputedValues. This implies that initFpExponentiateWithPrecomputedValues
+ * MUST have been called prior to this function for the same base.
 
+ */
+JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_miracl_MiraclDlogECF2m_computeF2mExponentiateWithPrecomputedValues
+  (JNIEnv * env, jobject, jlong mipp, jlong ebrick2Pointer, jbyteArray exponent){
+
+//private native long computeF2mExponentiateWithPrecomputedValues(long mip, long ebrickPointer, byte[] exponent);
+	//translate parameters  to miracl notation
+	miracl* mip = (miracl*)mipp;
+	big exponentB = byteArrayToMiraclBig(env, mip, exponent);
+
+	//(x,y) are the coordinates of the point which is the result of the exponentiation
+	big x, y;
+	x = mirvar(mip, 0);
+	y = mirvar(mip, 0);
+	
 	//calculates the required exponent
-	mul2_brick(mip, exponentiations, exponent, x, y);
+	mul2_brick(mip, (ebrick2*)ebrick2Pointer, exponentB, x, y);
 
 	epoint* p = new epoint();
 	p = epoint_init(mip);
@@ -874,121 +860,16 @@ long ECF2m::exponentiateWithPreComputedValues(epoint* base, big exponent, int wi
 }
 
 /*
- * The class GroupElementExponentiations is a nested class of DlogGroupAbs.
- * It performs the actual work of exponentially multiple exponentiations for one base.
- * It is composed of two main elements. The group element for which the optimized computations 
- * are built for, called the base and a vector of group elements that are the result of 
- * exponentiations of order 1,2,4,8,… 
+ * Class:     edu_biu_scapi_primitives_dlog_miracl_MiraclDlogECF2m
+ * Method:    endF2mExponentiateWithPreComputedValues
+ * Signature: (J)V
+ *
+ * This function cleans up used resources after performing exponentiation with precomputed values for a certain base.
+ * It should be used if the calling application has finished working with the specified base.
  */
-/*GroupElementsExponentiations::GroupElementsExponentiations(miracl* mip, epoint* base, bool fp){
-	this->mip = mip;
-	this->fp = fp;
-	big two = mirvar(mip, 2); //2
-	
-	exponentiations.push_back(base); //add the base - base^1
-	
-	//add the base raised to the exponentiations 2, 4, 8
-	for (int i=1; i<4; i++){
-		epoint* multI = epoint_init(mip);
-		if (fp == true){ // the operation depends on the given curve type
-			ecurve_mult(mip, two, exponentiations[i-1], multI);
-		} else {
-			ecurve2_mult(mip, two, exponentiations[i-1], multI);
-		}
-		exponentiations.push_back(multI);
-	}
-	mirkill(two);
+JNIEXPORT void JNICALL Java_edu_biu_scapi_primitives_dlog_miracl_MiraclDlogECF2m_endF2mExponentiateWithPreComputedValues
+  (JNIEnv * env, jobject, jlong base){
+	  //Call Miracl's function that cleans up after an application of the Comb method for GF(2m) elliptic curves.
+	  ebrick2_end((ebrick2 *)base);
 }
-
-/*
- * Destructor
- */
-/*GroupElementsExponentiations::~GroupElementsExponentiations(){
-	//free all the points in the vector
-	int size = exponentiations.size();
-	for (int i=0; i<size; i++){
-		epoint_free(exponentiations[i]);
-	}
-}
-
-/*
- * Calculates the necessary additional exponentiations and fills the exponentiations vector with them.
- */
-/*void GroupElementsExponentiations::prepareExponentiations(big size){
-
-	big two = mirvar(mip, 2); //2
-
-	//find log of the number - this is the index of the size-exponent in the exponentiation array 
-	int index = logb2(mip, size)-1;
-
-	// calculates the necessary exponentiations and put them in the exponentiations vector 
-	for (int i=exponentiations.size(); i<=index; i++){
-		epoint* multI = epoint_init(mip);
-		if (fp == true){// the operation depends on the given curve type
-			ecurve_mult(mip, two, exponentiations[i-1], multI);
-		} else {
-			ecurve2_mult(mip, two, exponentiations[i-1], multI);
-		}
-		exponentiations.push_back(multI);
-	}
-	mirkill(two);
-}
-
-/*
- * Checks if the exponentiations had already been calculated for the required size. 
- * If so, returns them, else it calls the private function prepareExponentiations with the given size.
- */
-/*epoint* GroupElementsExponentiations::getExponentiation(big size){
-	
-	/**
-	* The exponents in the exponents vector are all power of 2.
-	* In order to achieve the exponent size, we calculate its closest power 2 in the exponents vector 
-	* and continue the calculations from there.
-	*/
-/*
-	//find log of the number - this is the index of the size-exponent in the exponentiation array 
-	int index = logb2(mip, size)-1;
-	
-	epoint* exponent = epoint_init(mip);
-	// if the requested index out of the vector bounds, the exponents have not been calculated yet, so calculates them.
-	if (exponentiations.size() <= index)
-		prepareExponentiations(size);
-	big x= mirvar(mip, 0);
-	big y= mirvar(mip, 0);
-
-	// copy the exponent in the right index to the new point
-	if (fp == true){ // the operation depends on the given curve type
-		epoint_get(mip, exponentiations[index], x, y);
-		epoint_set(mip, x,y,0, exponent);
-	} else{
-		epoint2_get(mip, exponentiations[index], x, y);
-		epoint2_set(mip, x,y,0, exponent);
-	}
-	  
-	mirkill(x);
-	mirkill(y);
- 
-	// if size is not power 2, calculates the additional multiplications 
-	big lastExp = mirvar(mip, 0);
-	expb2(mip, index, lastExp);
-	big difference = mirvar(mip, 0);
-	big zero = mirvar(mip, 0);
-	subtract(mip, size, lastExp, difference);
-	big newSize = mirvar(mip, 0);
-	if (compare(difference, zero) > 0){
-		subtract(mip, size, lastExp, newSize);
-		epoint* diff = getExponentiation(newSize);
-		if (fp == true){ // the operation depends on the given curve type
-			ecurve_add(mip, diff, exponent);
-		} else {
-			ecurve2_add(mip, diff, exponent);
-		}
-	}
-	mirkill(lastExp);
-	mirkill(difference);
-	mirkill(zero);
-	mirkill(newSize);
-	return exponent;		
-	
-}*/
 

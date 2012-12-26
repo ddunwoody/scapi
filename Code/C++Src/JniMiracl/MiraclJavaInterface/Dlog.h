@@ -157,18 +157,69 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_miracl_MiraclDlogECFp
  */
 JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_miracl_MiraclDlogECF2m_createInfinityF2mPoint
   (JNIEnv *, jobject, jlong);
-
+/*
 JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_miracl_MiraclDlogECFp_createECFpObject
   (JNIEnv *, jobject, jlong m, jbyteArray, jbyteArray, jbyteArray);
-
+*/
 JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_miracl_MiraclDlogECF2m_createECF2mObject
   (JNIEnv *, jobject, jlong m, jint, jint, jint, jint, jbyteArray, jbyteArray);
-
+/*
 JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_miracl_MiraclDlogECFp_exponentiateFpWithPreComputed
   (JNIEnv *, jobject, jlong, jlong, jlong, jbyteArray, jint, jint);
-
+*/
 JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_miracl_MiraclDlogECF2m_exponentiateF2mWithPreComputed
   (JNIEnv *, jobject, jlong, jlong, jlong, jbyteArray, jint, jint);
+
+/*
+ * Class:     edu_biu_scapi_primitives_dlog_miracl_MiraclDlogECFp
+ * Method:    initFpExponentiateWithPrecomputedValues
+ * Signature: (J[B[B[BJ[BII)J
+ */
+JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_miracl_MiraclDlogECFp_initFpExponentiateWithPrecomputedValues
+  (JNIEnv *, jobject, jlong, jbyteArray, jbyteArray, jbyteArray, jlong, jbyteArray, jint, jint);
+
+/*
+ * Class:     edu_biu_scapi_primitives_dlog_miracl_MiraclDlogECFp
+ * Method:    computeFpExponentiateWithPrecomputedValue
+ * Signature: (JJ[B)J
+ */
+JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_miracl_MiraclDlogECFp_computeFpExponentiateWithPrecomputedValues
+  (JNIEnv *, jobject, jlong, jlong, jbyteArray);
+
+
+/*
+ * Class:     edu_biu_scapi_primitives_dlog_miracl_MiraclDlogECFp
+ * Method:    endFpExponentiateWithPreComputedValues
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_edu_biu_scapi_primitives_dlog_miracl_MiraclDlogECFp_endFpExponentiateWithPreComputedValues
+  (JNIEnv *, jobject, jlong);
+
+
+/*
+ * Class:     edu_biu_scapi_primitives_dlog_miracl_MiraclDlogECF2m
+ * Method:    initF2mExponentiateWithPrecomputedValues
+ * Signature: (JIIII[B[BJ[BII)J
+ */
+JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_miracl_MiraclDlogECF2m_initF2mExponentiateWithPrecomputedValues
+  (JNIEnv *, jobject, jlong, jint, jint, jint, jint, jbyteArray, jbyteArray, jlong, jint, jint);
+
+/*
+ * Class:     edu_biu_scapi_primitives_dlog_miracl_MiraclDlogECF2m
+ * Method:    computeF2mExponentiateWithPrecomputedValues
+ * Signature: (JJ[B)J
+ */
+JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_miracl_MiraclDlogECF2m_computeF2mExponentiateWithPrecomputedValues
+  (JNIEnv *, jobject, jlong, jlong, jbyteArray);
+
+/*
+ * Class:     edu_biu_scapi_primitives_dlog_miracl_MiraclDlogECF2m
+ * Method:    endF2mExponentiateWithPreComputedValues
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_edu_biu_scapi_primitives_dlog_miracl_MiraclDlogECF2m_endF2mExponentiateWithPreComputedValues
+  (JNIEnv *, jobject, jlong);
+
   
 #ifdef __cplusplus
 }
@@ -181,40 +232,4 @@ epoint* computeLoop(miracl* mip, big* exponentiations, int w, int h, epoint*** p
 epoint*** createLLPreCompTable(miracl* mip, epoint** points, int w, int h, int n, int field);
 epoint* getIdentity(miracl* mip, int field);
 
-class ECFp{
-
-private:
-	big p, a, b;
-	miracl* mip;
-	map<epoint*, ebrick*>* exponentiationsMap;
-
-public:
-	ECFp(miracl* mip, big p, big a, big b);
-	~ECFp();
-	long exponentiateWithPreComputedValues(epoint* base, big exponent, int window, int maxBits);
-};
-
-class ECF2m{
-
-private:
-	int m, k1, k2, k3;
-	big a, b;
-	miracl* mip;
-	map<epoint*, ebrick2*>* exponentiationsMap;
-
-public:
-	ECF2m(miracl* mip, int m, int k1, int k2, int k3, big a, big b);
-	~ECF2m();
-	long exponentiateWithPreComputedValues(epoint* base, big exponent, int window, int maxBits);
-};
-
-/*class GroupElementsExponentiations{
-	vector<epoint*> exponentiations;
-	int fp;
-public:
-	GroupElementsExponentiations(miracl* mip, epoint* base, bool fp);
-	~GroupElementsExponentiations();
-	void prepareExponentiations(big size);
-	epoint* getExponentiation(big size);
-};*/
 
