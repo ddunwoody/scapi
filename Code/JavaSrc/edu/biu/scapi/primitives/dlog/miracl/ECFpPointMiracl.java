@@ -53,6 +53,16 @@ public class ECFpPointMiracl implements ECElement, ECFpPoint{
 	private native byte[] getYValueFpPoint(long mip, long point);
 	
 	private long point;
+	//For performance reasons we decided to keep redundant information about the point. Once we have the member long point which is a pointer
+	//to the actual point generated in the native code we do not really have a need to keep the BigIntegers x and y, since this data can be retrieved from the point.
+	//However, to retrieve these values we need to perform an extra JNI call for each one plus we need to create a new BigInteger each time. It follows that each time
+	//anywhere in the code the function ECFpPointMiracl::getX() gets called the following code would occur:
+	//...
+	//return new BigInteger(getXValueFpPoint(mip, point))
+	//This seems to be very wasteful performance-wise, so we decided to keep the redundant data here. We think that it is not that terrible since this class is
+	//immutable and once it is constructed there is not external way of re-setting the X and Y coordinates.
+	private BigInteger x;
+	private BigInteger y;
 	private long mip;
 	
 	private ECFpUtility util;
@@ -75,8 +85,9 @@ public class ECFpPointMiracl implements ECElement, ECFpPoint{
 
 		//call for a native function that creates an element in the field
 		point = createFpPoint(mip, x.toByteArray(), y.toByteArray());
-			
-		
+		//Keep the coordinates for performance reasons. See long comment above next to declaration.
+		this.x = x;
+		this.y = y;
 	}
 	
 	/**
@@ -88,6 +99,16 @@ public class ECFpPointMiracl implements ECElement, ECFpPoint{
 	ECFpPointMiracl(long ptr, MiraclDlogECFp curve){
 		this.point = ptr;
 		mip = curve.getMip();
+		//Set X and Y coordinates:
+		//in case of infinity, there are no coordinates and we set them to null
+		if (checkInfinityFp(ptr)){
+			this.x = null;
+			this.y  =null;
+		}else{
+			this.x = new BigInteger(getXValueFpPoint(mip, point));
+			this.y = new BigInteger(getYValueFpPoint(mip, point));
+		}
+			
 	}
 	
 	public boolean isIdentity(){
@@ -107,23 +128,27 @@ public class ECFpPointMiracl implements ECElement, ECFpPoint{
 	}
 	
 	public BigInteger getX(){
+		/*
 		//in case of infinity, there is no coordinates and returns null
 		if (isInfinity()){
 			return null;
 		}
 		
 		return new BigInteger(getXValueFpPoint(mip, point));
-		
+		*/
+		return x;
 	}
 	
 	public BigInteger getY(){
+		/*
 		//in case of infinity, there is no coordinates and returns null
 		if (isInfinity()){
 			return null;
 		}
 		
 		return new BigInteger(getYValueFpPoint(mip, point));
-		
+		*/
+		return y;
 	}
 	
 	/** 

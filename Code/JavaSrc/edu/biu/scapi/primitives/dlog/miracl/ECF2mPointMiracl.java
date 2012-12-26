@@ -53,6 +53,16 @@ public class ECF2mPointMiracl implements ECElement, ECF2mPoint{
 	private native void deletePointF2m(long p);
 	
 	private long point = 0;
+	//For performance reasons we decided to keep redundant information about the point. Once we have the member long point which is a pointer
+	//to the actual point generated in the native code we do not really have a need to keep the BigIntegers x and y, since this data can be retrieved from the point.
+	//However, to retrieve these values we need to perform an extra JNI call for each one plus we need to create a new BigInteger each time. It follows that each time
+	//anywhere in the code the function ECFpPointMiracl::getX() gets called the following code would occur:
+	//...
+	//return new BigInteger(getXValueFpPoint(mip, point))
+	//This seems to be very wasteful performance-wise, so we decided to keep the redundant data here. We think that it is not that terrible since this class is
+	//immutable and once it is constructed there is not external way of re-setting the X and Y coordinates.
+	private BigInteger x;
+	private BigInteger y;
 	private long mip = 0;
 	private String curveName;
 	private String fileName;
@@ -78,6 +88,8 @@ public class ECF2mPointMiracl implements ECElement, ECF2mPoint{
 		
 		//creates a point in the field with the given parameters
 		point = createF2mPoint(mip, x.toByteArray(), y.toByteArray());
+		this.x = x;
+		this.y = y;
 	
 	}
 	
@@ -93,6 +105,16 @@ public class ECF2mPointMiracl implements ECElement, ECF2mPoint{
 		mip = curve.getMip();
 		curveName = curve.getCurveName();
 		fileName = curve.getFileName();
+		//Set X and Y coordinates:
+		//in case of infinity, there are no coordinates and we set them to null
+		if (checkInfinityF2m(ptr)){
+			this.x = null;
+			this.y  =null;
+		}else{
+			this.x = new BigInteger(getXValueF2mPoint(mip, point));
+			this.y = new BigInteger(getYValueF2mPoint(mip, point));
+		}
+
 	}
 
 	/**
@@ -112,21 +134,27 @@ public class ECF2mPointMiracl implements ECElement, ECF2mPoint{
 	}
 	
 	public BigInteger getX(){
+		/*
 		//in case of infinity, there is no coordinates and returns null
 		if (isInfinity()){
 			return null;
 		}
 		
 		return new BigInteger(getXValueF2mPoint(mip, point));
+		*/
+		return x;
 	}
 	
 	public BigInteger getY(){
+		/*
 		//in case of infinity, there is no coordinates and returns null
 		if (isInfinity()){
 			return null;
 		}
 		
 		return new BigInteger(getYValueF2mPoint(mip, point));
+		*/
+		return y;
 	}
 	
 	
