@@ -336,6 +336,14 @@ public abstract class DlogGroupAbs implements primeOrderSubGroup{
 		
 	}
 	
+	/* (non-Javadoc)
+	 * @see edu.biu.scapi.primitives.dlog.DlogGroup#endExponentiateWithPreComputedValues(edu.biu.scapi.primitives.dlog.GroupElement)
+	 */
+	@Override
+	public void endExponentiateWithPreComputedValues(GroupElement base) {
+		exponentiationsMap.remove(base);
+	}
+	
 	/**
 	 * The class GroupElementExponentiations is a nested class of DlogGroupAbs.<p>
 	 * It performs the actual work of pre-computation of the exponentiations for one base.

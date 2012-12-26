@@ -192,7 +192,14 @@ public interface DlogGroup {
 	 * @param exponent
 	 * @return the exponentiation result
 	 */
-	public GroupElement exponentiateWithPreComputedValues(GroupElement groupElement, BigInteger exponent);
+	public GroupElement exponentiateWithPreComputedValues(GroupElement base, BigInteger exponent);
+	
+	/**
+	 * This function cleans up any resources used by exponentiateWithPreComputedValues for the requested base.
+	 * It is recommended to call it whenever an application does not need to continue calculating exponentiations for this specific base.   
+	 * @param base
+	 */
+	public void endExponentiateWithPreComputedValues(GroupElement base);
 	
 	/**
 	 * Converts a byte array to a GroupElement.
