@@ -43,7 +43,11 @@ import edu.biu.scapi.securityLevel.DDH;
  * It uses JNI technology to call Miracl's native code.
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  */
-public class MiraclDlogECFp extends MiraclAdapterDlogEC implements DlogECFp, DDH{
+public class MiraclDlogECFp extends MiraclAdapterDlogEC implements DlogECFp, DDH{	
+	// upload MIRACL library
+	static {
+		System.loadLibrary("MiraclJavaInterface");
+	}
 
 	private native void initFpCurve(long mip, byte[] p, byte[] a,byte[] b);
 	private native long multiplyFpPoints(long mip, long p1, long p2);
@@ -55,6 +59,7 @@ public class MiraclDlogECFp extends MiraclAdapterDlogEC implements DlogECFp, DDH
 	private native long createInfinityFpPoint(long mip);
 	private native long initFpExponentiateWithPrecomputedValues(long mip,byte[]p, byte[]a, byte[]b, long base, byte[] exponent, int window, int maxBits);
 	private native long computeFpExponentiateWithPrecomputedValues(long mip, long ebrickPointer, byte[] exponent);
+	private native void endFpExponentiateWithPreComputedValues(long ebrickPointer);	
 	
 	private ECFpUtility util;
 	
@@ -345,7 +350,15 @@ public class MiraclDlogECFp extends MiraclAdapterDlogEC implements DlogECFp, DDH
 		return util.mapAnyGroupElementToByteArray(point.getX(), point.getY());
 	}
 
+	@Override
+	public void endExponentiateWithPreComputedValues(GroupElement base){
+		Long ebrickPointer = exponentiationsMap.remove(base);
+		if (ebrickPointer != null){
+			endFpExponentiateWithPreComputedValues(ebrickPointer);
+		}
+	}
 
+	
 	/* (non-Javadoc)
 	 * @see edu.biu.scapi.primitives.dlog.miracl.MiraclAdapterDlogEC#basicAndInfinityChecksForExpForPrecomputedValues()
 	 */
@@ -380,25 +393,14 @@ public class MiraclDlogECFp extends MiraclAdapterDlogEC implements DlogECFp, DDH
 	 * @see edu.biu.scapi.primitives.dlog.miracl.MiraclAdapterDlogEC#computeExponentiateWithPrecomputedValue(long, java.math.BigInteger)
 	 */
 	@Override
-	protected GroupElement computeExponentiateWithPrecomputedValue(	long ebrickPointer, BigInteger exponent) {
+	protected GroupElement computeExponentiateWithPrecomputedValues(	long ebrickPointer, BigInteger exponent) {
 		//Perform the calculation in the native code
 		long result = computeFpExponentiateWithPrecomputedValues(mip, ebrickPointer, exponent.toByteArray());
 		
 		//Build a ECFpPointMiracl element from the result value
 		return new ECFpPointMiracl(result, this);
 	}
-
 	
-	
-	
-	
-	// upload MIRACL library
-	static {
-		System.loadLibrary("MiraclJavaInterface");
-	}
-	
-
-
 }
 
 

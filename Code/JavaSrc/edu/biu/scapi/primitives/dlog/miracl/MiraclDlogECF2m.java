@@ -48,6 +48,12 @@ import edu.biu.scapi.securityLevel.DDH;
  */
 public class MiraclDlogECF2m extends MiraclAdapterDlogEC implements DlogECF2m, DDH{
 
+	// upload MIRACL library
+	static {
+		System.loadLibrary("MiraclJavaInterface");
+	}
+
+	
 	private native void initF2mCurve(long mip, int m, int k1, int k2, int k3, byte[] a, byte[] b);
 	private native long multiplyF2mPoints(long mip, long p1, long p2);
 	private native long simultaneousMultiplyF2m(long mip, long[] points, byte[][] exponents);
@@ -58,8 +64,9 @@ public class MiraclDlogECF2m extends MiraclAdapterDlogEC implements DlogECF2m, D
 	private native long createInfinityF2mPoint(long mip);
 	private native long initF2mExponentiateWithPrecomputedValues(long mip, int m, int k1, int k2, int k3, byte[] a, byte[] b, long base, int window, int maxBits);
 	private native long computeF2mExponentiateWithPrecomputedValues(long mip, long ebrickPointer, byte[] exponent);
-
-	private long nativeDlog = 0;
+	private native void endF2mExponentiateWithPreComputedValues(long ebrickPointer);
+	
+	//private long nativeDlog = 0;
 	private ECF2mUtility util;
 
 	/**
@@ -381,12 +388,14 @@ public class MiraclDlogECF2m extends MiraclAdapterDlogEC implements DlogECF2m, D
 	}
 
 
-	// upload MIRACL library
-	static {
-		System.loadLibrary("MiraclJavaInterface");
+	@Override
+	public void endExponentiateWithPreComputedValues(GroupElement base){
+		Long ebrickPointer = exponentiationsMap.remove(base);
+		if (ebrickPointer != null){
+			endF2mExponentiateWithPreComputedValues(ebrickPointer);
+		}
 	}
-
-
+	
 	/* (non-Javadoc)
 	 * @see edu.biu.scapi.primitives.dlog.miracl.MiraclAdapterDlogEC#basicAndInfinityChecksForExpForPrecomputedValues(edu.biu.scapi.primitives.dlog.GroupElement)
 	 */
@@ -447,7 +456,7 @@ public class MiraclDlogECF2m extends MiraclAdapterDlogEC implements DlogECF2m, D
 	 * @see edu.biu.scapi.primitives.dlog.miracl.MiraclAdapterDlogEC#computeExponentiateWithPrecomputedValue(long, java.math.BigInteger)
 	 */
 	@Override
-	protected GroupElement computeExponentiateWithPrecomputedValue(long ebrickPointer, BigInteger exponent) {
+	protected GroupElement computeExponentiateWithPrecomputedValues(long ebrickPointer, BigInteger exponent) {
 		// call to native exponentiate function
 		long result = computeF2mExponentiateWithPrecomputedValues(mip, ebrickPointer, exponent.toByteArray());
 
