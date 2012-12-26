@@ -79,7 +79,7 @@ public abstract class MiraclAdapterDlogEC extends DlogGroupEC
 
 	protected abstract boolean basicAndInfinityChecksForExpForPrecomputedValues(GroupElement base);
 	protected abstract long initExponentiateWithPrecomputedValues(GroupElement baseElement, BigInteger exponent, int window, int maxBits);
-	protected abstract GroupElement computeExponentiateWithPrecomputedValue(long ebrickPointer, BigInteger exponent);
+	protected abstract GroupElement computeExponentiateWithPrecomputedValues(long ebrickPointer, BigInteger exponent);
 	/*
 	 * 
 	 * @return mip - miracl pointer
@@ -115,13 +115,12 @@ public abstract class MiraclAdapterDlogEC extends DlogGroupEC
 			ebrickPointer = initExponentiateWithPrecomputedValues(base, exponent, getWindow(), getOrder().bitLength());
 			exponentiationsMap.put(base, ebrickPointer);
 		}
-		
 		//At this stage we have a pointer to the ebrick pointer in native code, and we pass it on to compute base^exponent and obtain the resulting Group Element
-		return computeExponentiateWithPrecomputedValue(ebrickPointer, exponent);
+		return computeExponentiateWithPrecomputedValues(ebrickPointer, exponent);
 
 	}
 	
-	
+		
 	//The window size is used when calling Miracl's implementation of exponentiate with pre-computed values. It is used as part of the Ebrick algorithm.
 	protected int getWindow(){
 		if (window != 0){
