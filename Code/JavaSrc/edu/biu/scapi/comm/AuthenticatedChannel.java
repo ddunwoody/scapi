@@ -39,8 +39,10 @@ import java.security.InvalidKeyException;
 
 import javax.crypto.SecretKey;
 
+import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.midLayer.symmetricCrypto.mac.Mac;
 import edu.biu.scapi.midLayer.symmetricCrypto.mac.TaggedObject;
+import edu.biu.scapi.securityLevel.UnlimitedTimes;
 
 /** 
  * @author LabTest
@@ -51,17 +53,18 @@ class AuthenticatedChannel extends ChannelDecorator {
 	Mac macAlg;
 	
 	/**
+	 * @throws SecurityLevelException 
 	 * 
 	 *  
 	 */
-	AuthenticatedChannel(InetAddress ipAddress, int port, Mac mac){
+	AuthenticatedChannel(InetAddress ipAddress, int port, Mac mac) throws SecurityLevelException{
 		super(new PlainTCPChannel(ipAddress,  port));
-		this.macAlg = mac;
+		doConstruct(macAlg);
 	}
 	
-	AuthenticatedChannel(InetSocketAddress socketAddress, Mac mac){
+	AuthenticatedChannel(InetSocketAddress socketAddress, Mac mac) throws SecurityLevelException{
 		super(new PlainTCPChannel(socketAddress));
-		this.macAlg = mac;
+		doConstruct(macAlg);
 	}
 	
 	
@@ -69,32 +72,26 @@ class AuthenticatedChannel extends ChannelDecorator {
 	 * @param channel
 	 * @param digSign
 	 * @param setOfKeys
+	 * @throws SecurityLevelException 
 	 */
-	AuthenticatedChannel(Channel channel, Mac mac) {
+	AuthenticatedChannel(Channel channel, Mac mac) throws SecurityLevelException {
 		super(channel);	
-		this.macAlg = mac;
+		doConstruct(macAlg);
 	}
+	
+	//This function checks that the MAC algorithm passed is UnlimitedTimes-secure. If so, it continues constructing the object, otherwise it throws exception.
+	private void doConstruct(Mac macAlg) throws SecurityLevelException{
+		if (! (macAlg instanceof UnlimitedTimes ))
+			throw new SecurityLevelException("The encryption scheme passed is not CPA-secure");	
+		this.macAlg = macAlg;
+	}
+
+	
 	
 	public void setKey( SecretKey key) throws InvalidKeyException{
 		this.macAlg.setKey(key);
 	}
 	
-
-	/** 
-	 * @param data
-	 */
-	private byte[] sign(byte[] data) {
-	
-		//TODO perform sign
-		return data;
-	}
-
-	/** 
-	 * @param data
-	 */
-	private void verify(byte[] data) {
-		
-	}
 	
 	/**
 	 * Receives a message. Since the message is authenticated you should un-mac the message before reading it.
@@ -115,7 +112,7 @@ class AuthenticatedChannel extends ChannelDecorator {
 		if(!isVerified)
 			return null;
 		
-		//Deserialize the object. The caller of this function doesn't need to know anything about authentication, therfore he should 
+		//Deserialize the object. The caller of this function doesn't need to know anything about authentication, therefore he should get 
 		//the plain object that was sent by the sender.
 		ByteArrayInputStream bStream = new ByteArrayInputStream(taggedObj.getObject());
 		ObjectInputStream ois = new ObjectInputStream(bStream);
