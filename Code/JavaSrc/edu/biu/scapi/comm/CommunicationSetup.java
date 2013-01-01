@@ -83,11 +83,11 @@ public class CommunicationSetup implements TimeoutObserver{
 	private EstablishedConnections establishedConnections;
 	private KeyExchangeProtocol keyExchangeProtocol;
 	private ConnectivitySuccessVerifier connectivitySuccessVerifier;
-	private SecurityLevel securityLevel;
+	//private SecurityLevel securityLevel;
 	private ListeningThread listeningThread;
 	private Vector<SecuringConnectionThread> threadsVector;
 	private Map<InetSocketAddress,KeyExchangeOutput> keyExchangeMap;
-	
+	private Watchdog watchdog;
 	
 	
 	
@@ -113,14 +113,14 @@ public class CommunicationSetup implements TimeoutObserver{
 	 */
 	//We should also allow the user to choose the Mac algorithm and Encryption Scheme if needed together with the security level
 	public Map<InetSocketAddress, Channel> prepareForCommunication(List<Party> listOfParties,
-			KeyExchangeProtocol keyExchange, SecurityLevel securityLevel,
+			KeyExchangeProtocol keyExchange, /*SecurityLevel securityLevel,*/
 			ConnectivitySuccessVerifier successLevel, long timeOut) {
 		
 		
 		//set parameters
 		partiesList = listOfParties;
 		keyExchangeProtocol = keyExchange;
-		this.securityLevel = securityLevel;
+		//this.securityLevel = securityLevel;
 		connectivitySuccessVerifier = successLevel;
 		
 		establishedConnections = new EstablishedConnections();
@@ -130,7 +130,7 @@ public class CommunicationSetup implements TimeoutObserver{
 		keyExchangeMap = new HashMap<InetSocketAddress,KeyExchangeOutput>();
 		
 		//start the watch dog with timeout
-		Watchdog watchdog = new Watchdog(timeOut);
+		watchdog = new Watchdog(timeOut);
 		//add this instance as the observer in order to receive the event of time out.
 		watchdog.addTimeoutObserver(this);
 		
@@ -162,7 +162,7 @@ public class CommunicationSetup implements TimeoutObserver{
 		establishedConnections.enableNagle(enableNagle);
 		
 		//update the security level for each connection
-		setSecurityLevel();
+		//setSecurityLevel();
 		
 		//return the map of channels held in the established connection object.
 		return establishedConnections.getConnections();
@@ -182,7 +182,7 @@ public class CommunicationSetup implements TimeoutObserver{
 		
 		this.enableNagle = enableNagle;
 		
-		return prepareForCommunication(listOfParties, keyExchange, securityLevel, successLevel, timeOut);
+		return prepareForCommunication(listOfParties, keyExchange, /*securityLevel,*/ successLevel, timeOut);
 	}
 
 
@@ -334,9 +334,9 @@ public class CommunicationSetup implements TimeoutObserver{
 	 * 							is to let all the threads finish running before proceeding. 
 	 */ 
 	private void verifyConnectingStatus() {
-
+		boolean allConnected = false;
 		//while the thread has not been stopped and not all the channels are connected
-		while(!bTimedOut && !establishedConnections.areAllConnected()){
+		while(!bTimedOut && !(allConnected = establishedConnections.areAllConnected())){
 			try {
 				Thread.sleep(500);
 			} catch (InterruptedException e) {
@@ -344,6 +344,9 @@ public class CommunicationSetup implements TimeoutObserver{
 				Logging.getLogger().log(Level.FINEST, e.toString());
 			}
 		}
+		//If we already know that all the connectios were established we can stop the watchdog.
+		if(allConnected)
+			watchdog.stop();
 	}
 
 	/** 
@@ -371,15 +374,17 @@ public class CommunicationSetup implements TimeoutObserver{
 	 *  				  the decorated channels.
 	 */
 	@SuppressWarnings("unused")
+	
+	/*
 	private void setSecurityLevel() {
 		
 		//For the moment the only security level supported is PLAIN. Therefore,return immediately from this function without
 		//performing the necessary tasks to provide the channel with higher levels of security.
 		//As soon as we finish implementing the EncryptedChannel and the AuthenticatedChannel, this return statement should be removed.
-		if (true)
+		/*if (true)
 			return;
-		
-		if(securityLevel==SecurityLevel.PLAIN)//If it is plain there is nothing to decorate
+		*/
+		/*if(securityLevel==SecurityLevel.PLAIN)//If it is plain there is nothing to decorate
 			return;
 		else{//Set the security level only if the security level is not plain. 
 			
@@ -510,7 +515,41 @@ public class CommunicationSetup implements TimeoutObserver{
 		    establishedConnections.getConnections().putAll(tempConnectionsMap);
 		}	
 	}
-
+	*/
+	public void enxryptedChannel(Channel ch){
+		SymmetricEnc aesEnc = null;
+		try {
+			aesEnc = SymmetricEncFactory.getInstance().getObject("CBCEncRandomIV");
+		} catch (FactoriesException e) {
+			e.printStackTrace();
+		}
+		//byte[] fixedKey = new byte[]{7, -126, 83, -82, 68, 67, -46, -58, 70, 123, -127, -66, -4, 37, -1, 15};
+		//SecretKey key = new SecretKeySpec(fixedKey,"AES" );
+		SecretKey key = aesEnc.generateKey(128);
+		try {
+			aesEnc.setKey(key);
+		} catch (InvalidKeyException e) {
+			e.printStackTrace();
+		}
+		EncryptedChannel encChannel = new EncryptedChannel(ch, aesEnc);
+	}
+	
+	public void authChannel(Channel ch){
+		Mac mac = null;
+		try {
+			mac = MacFactory.getInstance().getObject("CBCMacPrepending");
+		} catch (FactoriesException e) {
+			e.printStackTrace();
+		}
+		SecretKey key = mac.generateKey(128);		
+		try {
+			mac.setKey(key);
+		} catch (InvalidKeyException e) {
+			e.printStackTrace();
+		}
+		AuthenticatedChannel authenChannel = new AuthenticatedChannel(ch, mac);
+	}
+	
 	/**
 	 * An event called if the timeout has passed. This is called by the infrastructure of the watchdog and the fact that
 	 * 					this class is also an observer.
@@ -538,8 +577,10 @@ public class CommunicationSetup implements TimeoutObserver{
 			listeningThread.stopConnecting();
 	}
 	
+	/*
 	public Map<InetSocketAddress, Channel> getConnections(){
 		return establishedConnections.getConnections();
 		
 	}
+	*/
 }
