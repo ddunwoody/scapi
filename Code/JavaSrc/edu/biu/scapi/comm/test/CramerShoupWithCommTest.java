@@ -1,27 +1,27 @@
 /**
-* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-* 
-* Copyright (c) 2012 - SCAPI (http://crypto.biu.ac.il/scapi)
-* This file is part of the SCAPI project.
-* DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
-* 
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
-* to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
-* and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-* 
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-* 
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-* FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-* 
-* We request that any publication and/or code referring to and/or based on SCAPI contain an appropriate citation to SCAPI, including a reference to
-* http://crypto.biu.ac.il/SCAPI.
-* 
-* SCAPI uses Crypto++, Miracl, NTL and Bouncy Castle. Please see these projects for any further licensing issues.
-* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-* 
-*/
+ * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ * 
+ * Copyright (c) 2012 - SCAPI (http://crypto.biu.ac.il/scapi)
+ * This file is part of the SCAPI project.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+ * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * 
+ * We request that any publication and/or code referring to and/or based on SCAPI contain an appropriate citation to SCAPI, including a reference to
+ * http://crypto.biu.ac.il/SCAPI.
+ * 
+ * SCAPI uses Crypto++, Miracl, NTL and Bouncy Castle. Please see these projects for any further licensing issues.
+ * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ * 
+ */
 
 
 
@@ -79,12 +79,12 @@ import edu.biu.scapi.tools.Factories.DlogGroupFactory;
 public class CramerShoupWithCommTest {
 	/*
 	 This is an application that does the following:
-		
+
  		a.       For 3 different curves (1 over a prime field, one over a GF field and one Koblitz curve; all of sizes about 200) 
  				 and with Zp (with a 1024 bit prime and a 2048 bit prime), and with SHA1 for the elliptic curve instantiations and SHA256 with the Zp instantiations:
 
                    i.      Initializes Cramer Shoup
- 
+
                    ii.      Generates a group element
 
                    iii.      Encrypts 1000 times; output average encryption time (saying which instantiation)
@@ -92,12 +92,12 @@ public class CramerShoupWithCommTest {
                    iv.      Decrypts 1000 times; output average decryption time (saying which instantiation)
 
 	 */
-	
-	private static final String FILES_PATH = System.getProperty("user.dir") + "/javaSrc/edu/biu/scapi/tests/midLayer/cramerShoup/";
-	
-	
+
+	//private static final String FILES_PATH = System.getProperty("user.dir") + "/javaSrc/edu/biu/scapi/tests/midLayer/cramerShoup/";
+	private static final String FILES_PATH = "C:\\work\\LAST_Project\\SDK\\Code\\JavaSrc\\edu\\biu\\scapi\\comm\\test\\";
+
 	static public Map<InetSocketAddress, Channel> prepareCommunication(String[] args){
-		System.out.println("Prepare communcation");
+		System.out.println("Prepare communication");
 		List<Party> listOfParties;
 		LoadParties loadParties;
 
@@ -107,7 +107,7 @@ public class CramerShoupWithCommTest {
 		}
 		else{
 			//load the parties
-			loadParties = new LoadParties("C://work//LAST_Project//SDK//Code//JavaSrc//edu//biu//scapi//comm//Parties.properties");
+			loadParties = new LoadParties("C://work//LAST_Project//SDK//Code//JavaSrc//edu//biu//scapi//comm//test//Parties.properties");
 
 		}
 
@@ -122,12 +122,12 @@ public class CramerShoupWithCommTest {
 
 		System.out.print("Before call to prepare\n");
 
-		return commSetup.prepareForCommunication(listOfParties, keyP, SecurityLevel.PLAIN, naive, 200000);
+		return commSetup.prepareForCommunication(listOfParties, keyP,/* SecurityLevel.ENCRYPTED, */naive, 60000);
 
 	}
-	
-	
-	
+
+
+
 	static public String runTest(CramerShoupTestConfig config, Channel channel) throws FactoriesException{
 		DlogGroup dlogGroup;
 		//Create the requested Dlog Group object. Do this via the factory.
@@ -137,14 +137,14 @@ public class CramerShoupWithCommTest {
 			config.setDlogProvider("Default");
 			dlogGroup = DlogGroupFactory.getInstance().getObject(config.getDlogGroup()+"("+config.getAlgorithmParameterSpec()+")");
 		}
-		
+
 		System.out.println("Sending Dlog Group params");
 		try {
 			channel.send(dlogGroup.getGroupParams());
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		
+
 		CryptographicHash hash;
 		//Create the requested hash. Do this via the factory.
 		if(config.getHashProvider() != null){
@@ -153,14 +153,14 @@ public class CramerShoupWithCommTest {
 			config.setHashProvider("Default");
 			hash = CryptographicHashFactory.getInstance().getObject(config.getHash());
 		}
-		
+
 		System.out.println("Sending hash alg name");
 		try {
 			channel.send(hash.getAlgorithmName());
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		
+
 		//Create a random group element. This element will be encrypted several times as specified in config file and decrypted several times
 		//as specified in config. 
 		//Measure and output the average running time for encrypting and the average running time for decrypting.
@@ -173,11 +173,11 @@ public class CramerShoupWithCommTest {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		
-		
+
+
 		//Create a Cramer Shoup Encryption/Decryption object. Do this directly by calling the relevant constructor. (Can be done instead via the factory).
 		ScCramerShoupDDHOnGroupElement enc = new ScCramerShoupDDHOnGroupElement(dlogGroup, hash);
-		
+
 		System.out.println("Sending encryption scheme's name");
 		try {
 			channel.send(enc.getAlgorithmName());
@@ -185,20 +185,20 @@ public class CramerShoupWithCommTest {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		
+
 		//Generate and set a suitable key.
 		KeyPair keyPair = enc.generateKey();
 		//System.out.println("Sending the encryption schemes public key: " + keyPair.getPublic());
 		System.out.println("Sending the encryption schemes private key: " + keyPair.getPrivate());
-		
+
 		try {
 			channel.send(((ScCramerShoupPublicKey)keyPair.getPublic()).generateSendableData());
 			channel.send(((ScCramerShoupPrivateKey)keyPair.getPrivate()).generateSendableData());
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		
-		
+
+
 		try {
 			enc.setKey(keyPair.getPublic(),keyPair.getPrivate());
 		} catch (InvalidKeyException e) {
@@ -208,24 +208,24 @@ public class CramerShoupWithCommTest {
 		//Wrap the group element we want to encrypt with a Plaintext object.
 		Plaintext plainText = new GroupElementPlaintext(gEl);
 		System.out.println("Sending the GroupElementPlaintext: " + gEl);
-		
+
 		try {
 			channel.send(plainText.generateSendableData());
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		
-		
+
+
 		AsymmetricCiphertext cipher = null;
-		
+
 		//Measure the time it takes to encrypt each time. Calculate and output the average running time.
 		//Calendar cal = Calendar.getInstance();
 		long allTimes = 0;
-		
+
 		long start = System.currentTimeMillis();
 		long stop = 0;
 		long duration = 0;
-		
+
 		int encTestTimes = new Integer(config.getNumTimesToEnc()).intValue();
 		for(int i = 0; i < encTestTimes; i++){
 			cipher = enc.encrypt(plainText);
@@ -236,15 +236,15 @@ public class CramerShoupWithCommTest {
 			allTimes += duration;
 		}
 		double encAvgTime = (double)allTimes/(double)encTestTimes;
-		
+
 		System.out.println("Sending the cipher: " + cipher);
-		
+
 		try {
 			channel.send(cipher.generateSendableData());
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		
+
 		GroupElementPlaintext decrypted = null;
 		allTimes = 0;
 		int decTestTimes = new Integer(config.getNumTimesToDec()).intValue();
@@ -260,7 +260,7 @@ public class CramerShoupWithCommTest {
 				e.printStackTrace();
 			}
 		}
-		
+
 		System.out.println("Sending the decrypted msg: " + decrypted);
 
 		try {
@@ -269,13 +269,13 @@ public class CramerShoupWithCommTest {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		boolean equal = gEl.equals(decrypted.getElement());
 		double decAvgTime = (double)allTimes/(double)decTestTimes;
 		//Prepare an output string (csv format)
 		String result = config.getDlogGroup() + "," + config.getDlogProvider() + "," + config.getAlgorithmParameterSpec() + "," + config.getHash() + "," + config.getHashProvider() + "," + config.getNumTimesToEnc();
 		result += "," + encAvgTime + "," + config.getNumTimesToDec() + "," + decAvgTime + "," + equal;
-				
+
 		System.out.println("Going to sleep for 10 seconds");
 		try {
 			Thread.sleep(10000);
@@ -285,7 +285,7 @@ public class CramerShoupWithCommTest {
 		}
 		return result;
 	}
-	
+
 	static public String runPerformanceOfSerializationTest(CramerShoupTestConfig config, Channel channel) throws FactoriesException{
 		DlogGroup dlogGroup;
 		String result;
@@ -304,7 +304,7 @@ public class CramerShoupWithCommTest {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		
+
 		//Create a random group element. This element will be sent to the other side several times. 
 		//Measure the time it takes to send each time. Calculate and output the average running time.
 
@@ -312,10 +312,10 @@ public class CramerShoupWithCommTest {
 		long start = System.currentTimeMillis();
 		long stop = 0;
 		long duration = 0;
-		
+
 		int runTestTimes = new Integer(config.getNumTimesToEnc()).intValue();
 		double encAvgTime;
-		
+
 		try {
 			channel.send("New random element");
 		} catch (IOException e) {
@@ -340,22 +340,22 @@ public class CramerShoupWithCommTest {
 				System.out.println("The last group element sent is: " + gEl);
 				System.out.println("Its sendable data is: " + gEl.generateSendableData());
 			}
-			
+
 		}
 		encAvgTime = (double)allTimes/(double)runTestTimes;
-		
+
 		result = "The average time of sending a new random group element " + runTestTimes + " times is: " + encAvgTime;
 		System.out.println(result);
-		
+
 		try {
 			channel.send("End of communication");
 		} catch (IOException e2) {
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
 		}
-		
-		
-		
+
+
+
 		/*
 		GroupElement gEl = dlogGroup.createRandomElement();
 		try {
@@ -379,7 +379,7 @@ public class CramerShoupWithCommTest {
 			}
 		}
 		encAvgTime = (double)allTimes/(double)runTestTimes;
-		
+
 		result = "The average time of sending the same random group element " + runTestTimes + " times is: " + encAvgTime;
 		System.out.println(result);
 		try {
@@ -388,8 +388,8 @@ public class CramerShoupWithCommTest {
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
 		}
-		
-				
+
+
 		try {
 			channel.send("Values of random element");
 		} catch (IOException e) {
@@ -421,7 +421,7 @@ public class CramerShoupWithCommTest {
 			}
 		}
 		encAvgTime = (double)allTimes/(double)runTestTimes;
-		
+
 		result = "The average time of sending the values of a random group element " + runTestTimes + " times is: " + encAvgTime;
 		System.out.println(result);
 		try {
@@ -430,21 +430,21 @@ public class CramerShoupWithCommTest {
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
 		}
-		
-		
-		*/
-		
-		System.out.println("Going to sleep for 300 seconds");
+
+
+		 */
+
+		System.out.println("Going to sleep for 30 seconds");
 		try {
-			Thread.sleep(300000);
+			Thread.sleep(30000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		return result;
 	}
-	
+
 	static CramerShoupTestConfig[] readConfigFile() {
 		CramerShoupTestConfig[] configArray = null;
 		try {
@@ -497,11 +497,11 @@ public class CramerShoupWithCommTest {
 					tokens = line.split("=");
 					numTimesToDec = tokens[1].trim();
 				}
-				
+
 				count++;
 				if (count == 7) {
 					configArray[i] = new CramerShoupTestConfig(dlogGroup, dlogProvider, algorithmParameterSpec, hash, hashProvider, numTimesToEnc, numTimesToDec); 
-															
+
 					i++;
 					count = 0;
 				}
@@ -516,8 +516,8 @@ public class CramerShoupWithCommTest {
 	}
 
 
-	
-	
+
+
 	/**
 	 * This program tests the average running times of encrypting and decrypting a Group Element with the Cramer Shoup encryption scheme. 
 	 * It reads a set a tests from a config files, runs them and prints the results. The set of tests contains information about the Dlog Group to use, 
@@ -537,7 +537,7 @@ public class CramerShoupWithCommTest {
 			out.println("Dlog Group,Dlog Provider,Dlog Parameter,Hash,Hash Provider,Number of Times Encrypting, Average Encrypting Time (ms),Number of Times Decrypting,Average Decrypting Time (ms),Decrypted Element Equals Plaintext");
 			out.flush();
 			String result = null;
-			
+
 			Map<InetSocketAddress, Channel> map = prepareCommunication(args);
 			//set an iterator for the connection map.
 			Collection<Channel> c = map.values();
@@ -545,21 +545,23 @@ public class CramerShoupWithCommTest {
 
 			Channel channel;
 			//Get the first channel available
-			channel = itr.next();
-			
-			for (int i = 0; i < config.length; i++) {
-				//result = runTest(config[i], channel);
-				//out.println(result);
-				//System.out.println(result);
-				result = runPerformanceOfSerializationTest(config[i], channel);
-				out.println(result);
+			if(itr.hasNext()){
+				channel = itr.next();
+
+				for (int i = 0; i < config.length; i++) {
+					//result = runTest(config[i], channel);
+					//out.println(result);
+					//System.out.println(result);
+					result = runPerformanceOfSerializationTest(config[i], channel);
+					out.println(result);
+				}
 			}
 			out.flush();
 			out.close();
 		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
-				e.printStackTrace();
+			e.printStackTrace();
 		} catch (FactoriesException e) {
 			e.printStackTrace();
 		}
