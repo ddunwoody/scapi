@@ -39,41 +39,50 @@ import java.security.InvalidKeyException;
 
 import javax.crypto.SecretKey;
 
-import edu.biu.scapi.midLayer.ciphertext.IVCiphertext;
+import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.midLayer.ciphertext.SymmetricCiphertext;
 import edu.biu.scapi.midLayer.plaintext.ByteArrayPlaintext;
 import edu.biu.scapi.midLayer.symmetricCrypto.encryption.SymmetricEnc;
+import edu.biu.scapi.securityLevel.Cpa;
 
 /** 
- * @author LabTest
+ * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  */
 class EncryptedChannel extends ChannelDecorator {
 	private SymmetricEnc encScheme; 
 
 	/**
+	 * @throws SecurityLevelException 
 	 * 
 	 *  
 	 */
-	EncryptedChannel(InetAddress ipAddress, int port, SymmetricEnc encScheme){
+	EncryptedChannel(InetAddress ipAddress, int port, SymmetricEnc encScheme) throws SecurityLevelException{
 		super(new PlainTCPChannel(ipAddress,  port));
-		this.encScheme = encScheme;
+		doConstruct( encScheme);
 	}
 	
-	EncryptedChannel(InetSocketAddress socketAddress, SymmetricEnc encScheme){
+	EncryptedChannel(InetSocketAddress socketAddress, SymmetricEnc encScheme) throws SecurityLevelException{
 		super(new PlainTCPChannel(socketAddress));
-		this.encScheme = encScheme;
+		doConstruct( encScheme);
 	}
 	
 	/** 
 	 * @param channel
-	 * @param algName
-	 * @param setOfKeys
+	 * @param encScheme
+	 * @throws SecurityLevelException 
 	 */
-	EncryptedChannel(Channel channel, SymmetricEnc encScheme) {
+	EncryptedChannel(Channel channel, SymmetricEnc encScheme) throws SecurityLevelException {
 		super(channel);
-		this.encScheme = encScheme;
+		doConstruct( encScheme);
 	}
 
+	//This function checks that the encryption scheme passed is CPA-secure. If so, it continues constructing the object, otherwise it throws exception.
+	private void doConstruct(SymmetricEnc encScheme) throws SecurityLevelException{
+		if (! (encScheme instanceof Cpa))
+			throw new SecurityLevelException("The encryption scheme passed is not CPA-secure");	
+		this.encScheme = encScheme;
+	}
+	
 	public void setKey( SecretKey key) throws InvalidKeyException{
 		this.encScheme.setKey(key);
 	}
@@ -103,12 +112,12 @@ class EncryptedChannel extends ChannelDecorator {
 		//SymmetricCiphertext cipher = (SymmetricCiphertext) channel.receive();
 		//IVCiphertext cipher = (IVCiphertext) channel.receive();
 		Serializable rcvMsg = (Serializable)  channel.receive(); 
-		IVCiphertext cipher = (IVCiphertext)rcvMsg;
+		SymmetricCiphertext cipher = (SymmetricCiphertext)rcvMsg;
 		//decrypt the encrypted message
 		ByteArrayPlaintext msg = (ByteArrayPlaintext) encScheme.decrypt(cipher);
 		//return msg;
 		
-		//Deserialize the object. The caller of this function doesn't need to know anything about encryption, therfore he should 
+		//Deserialize the object. The caller of this function doesn't need to know anything about encryption, therfore he should get
 		//the plain object that was sent by the sender.
 		ByteArrayInputStream bStream = new ByteArrayInputStream(msg.getText());
 		ObjectInputStream ois = new ObjectInputStream(bStream);
