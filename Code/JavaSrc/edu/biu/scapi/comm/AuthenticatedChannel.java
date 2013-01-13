@@ -45,23 +45,36 @@ import edu.biu.scapi.midLayer.symmetricCrypto.mac.TaggedObject;
 import edu.biu.scapi.securityLevel.UnlimitedTimes;
 
 /** 
- * @author LabTest
+ * This channel ensures UnlimitedTimes security level. The owner of the channel is responsible for setting the MAC algorithm to use and make sure the 
+ * the MAC is initialized with a suitable key. Then, every message sent via this channel is authenticated using the underlying MAC algorithm and every message received is verified by it.<p>
+ * The user needs not to worry about any of the authentication and verification tasks. The owner of this channel can rest assure that when an object gets sent over this channel 
+ * it gets authenticated with the defined MAC algorithm. In the same way, when receiving a message sent over this channel (which was authenticated by the other party) 
+ * the owner of the channel receives an already verified and plain object. 
+ *    
+ * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  */
-class AuthenticatedChannel extends ChannelDecorator {
+public class AuthenticatedChannel extends ChannelDecorator {
 
-	//Key authKey;
-	Mac macAlg;
+	Mac macAlg; //The MAC used to authenticate the messages sent by this channel
 	
 	/**
-	 * @throws SecurityLevelException 
-	 * 
-	 *  
+	 * This constructor can only be used by SCAPI's CommunicationSetup class.
+	 * @param ipAddress the IP address to connect to
+	 * @param port the port to connect to
+	 * @param mac the MAC algorithm required to authenticate the messages sent by this channel
+	 * @throws SecurityLevelException if the MAC algorithm passed is not UnlimitedTimes-secure
 	 */
 	AuthenticatedChannel(InetAddress ipAddress, int port, Mac mac) throws SecurityLevelException{
 		super(new PlainTCPChannel(ipAddress,  port));
 		doConstruct(macAlg);
 	}
 	
+	/**
+	 * This constructor can only be used by SCAPI's CommunicationSetup class.
+	 * @param socketAddress object that has the IP address and port to connect to
+	 * @param mac the MAC algorithm required to authenticate the messages sent by this channel
+	 * @throws SecurityLevelException if the MAC algorithm passed is not UnlimitedTimes-secure
+	 */
 	AuthenticatedChannel(InetSocketAddress socketAddress, Mac mac) throws SecurityLevelException{
 		super(new PlainTCPChannel(socketAddress));
 		doConstruct(macAlg);
@@ -69,12 +82,15 @@ class AuthenticatedChannel extends ChannelDecorator {
 	
 	
 	/** 
-	 * @param channel
-	 * @param digSign
-	 * @param setOfKeys
-	 * @throws SecurityLevelException 
+	 * This public constructor can be used by anyone holding a channel that is connected. Such a channel can be obtained by running the prepareForCommunications function
+	 * of {@link CommunicationSetup} which returns a set of already connected channels. (Note that {@link PlainTCPChannel} does not have a public constructor, if you wish to establish
+	 * a connection without the CommunicationSetup you will need to write your own Channel class).<p>
+	 *   
+	 * @param channel an already connected channel
+	 * @param mac the MAC algorithm required to authenticate the messages sent by this channel
+	 * @throws SecurityLevelException if the MAC algorithm passed is not UnlimitedTimes-secure
 	 */
-	AuthenticatedChannel(Channel channel, Mac mac) throws SecurityLevelException {
+	public AuthenticatedChannel(Channel channel, Mac mac) throws SecurityLevelException {
 		super(channel);	
 		doConstruct(macAlg);
 	}
@@ -87,14 +103,22 @@ class AuthenticatedChannel extends ChannelDecorator {
 	}
 
 	
-	
+	/**
+	 * Sets the key of the underlying MAC algorithm. This function must be called before sending or receiving messages if the MAC algorithm passed to this
+	 * channel had not been set with a key yet. The key can be set indefinite number of times depending on the needs of the application. 
+	 * @param key a suitable SecretKey
+	 * @throws InvalidKeyException if the given key does not match the underlying MAC algorithm.
+	 */
 	public void setKey( SecretKey key) throws InvalidKeyException{
 		this.macAlg.setKey(key);
 	}
 	
 	
 	/**
-	 * Receives a message. Since the message is authenticated you should un-mac the message before reading it.
+	 * Receives an authenticated message sent by the other party. It then verifies the message and returns the actual message without the MAC tag.
+	 * The caller of this function needs NOT to worry at all about the verification of the message, all the work is performed inside the channel
+	 * @return <B> the actual object </B> sent by the other party, if the message verifies<p>
+	 * 		   <B>{@code null}</B> if the message does not verify	  
 	 */
 	public Serializable receive() throws ClassNotFoundException, IOException {
 		//Since this is an authenticated channel, the other side must have sent a TaggedObject containing 
@@ -123,7 +147,9 @@ class AuthenticatedChannel extends ChannelDecorator {
 	
 
 	/**
-	 * Sends a message on the channel. Before sending it by passing it to the channel mac the message.
+	 * Sends an authenticated message on the channel, using the underlying MAC algorithm. The caller of this function needs NOT to worry at all about the authentication,
+	 * all the work is performed inside the channel
+	 * @param msg the object to send to the other party  AS IS, the only constraint is that it must be Serializable
 	 */
 	public void send(Serializable msg) throws IOException {
 		
@@ -141,7 +167,7 @@ class AuthenticatedChannel extends ChannelDecorator {
 	}
 
 	/**
-	 * Pass the close request to the attached channel
+	 * Close the channel.
 	 */
 	public void close() {
 
