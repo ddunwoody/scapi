@@ -23,23 +23,16 @@
 * 
 */
 
-
-
-/**
- * A connection will be represented by a Channel class. We use the Decorator Design Pattern to implement different types of channels. 
- * In order to enforce the right usage of the Channel class we will restrict the ability to instantiate one, 
- * only to classes within the Communication Layer’s package. This means that the constructor of the channel will be unreachable from 
- * another package. However, the send, receive and close functions will be declared public, therefore allowing anyone holding a channel 
- * to be able to use them.
- * At the connecting state, each channel is held by the EstablishedConnections container as well as by a thread of type SecuringConnectionThread.
- */
 package edu.biu.scapi.comm;
 
 import java.io.IOException;
 import java.io.Serializable;
 
-/** 
- * @author LabTest
+/**
+ * This interface represents a connection between two parties. Once a channel is open and the connection is established it can be used to send and receive messages over it.
+ * There are different types of channels and we use the Decorator Design Pattern to implement some of them. 
+ *
+ *  @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Meital Levy)
  */
 public interface Channel{
 	
