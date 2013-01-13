@@ -81,17 +81,8 @@ public class Party {
 		
 		//first create the two strings of the two parties
 		String thisString = ipAddress.toString() + ":" + port;
-		
-		System.out.println(thisString);
 		String otherString = otherParty.getIpAddress().toString() + ":" + otherParty.getPort();
-		System.out.println(otherString);
-		
-		
-		
 		int ret = thisString.compareTo(otherString);
-		
-		System.out.println(ret);
-		
 		return ret;
 		
 	}
