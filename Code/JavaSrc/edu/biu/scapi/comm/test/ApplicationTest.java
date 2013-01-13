@@ -90,7 +90,8 @@ public class ApplicationTest {
 
 		System.out.print("Before call to prepare\n");
 
-		commSetup.prepareForCommunication(listOfParties, keyP, SecurityLevel.PLAIN, naive, 200000);
+		Collection<Channel> c = commSetup.prepareForCommunication(listOfParties, keyP, naive, 200000).values();
+		Iterator<Channel> itr = c.iterator();
 
 		//Channel ch = (Channel)((commSetup.getConnections().values()).toArray())[0];
 
@@ -123,10 +124,7 @@ public class ApplicationTest {
 		//ECF2mKoblitz msg = new ECF2mKoblitz((ECF2mGroupParams) groupParams, BigInteger.valueOf(777), BigInteger.valueOf(8));
 		
 		
-		//set an iterator for the connection map.
-		Collection<Channel> c = commSetup.getConnections().values();
-		Iterator<Channel> itr = c.iterator();
-
+		
 		Channel channel;
 		//Give each READY channel to a ReceivingThread for processing.
 		while(itr.hasNext()){
