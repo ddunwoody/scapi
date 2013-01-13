@@ -27,18 +27,20 @@
 
 package edu.biu.scapi.comm;
 
+
 /** 
-  * @author LabTest
+ * We use the Decorator Pattern in order to add features to the basic Channel. This class is the Decorator component of the pattern.
+  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Meital Levy)
  */
 public abstract class ChannelDecorator implements Channel {
 	protected Channel channel;
 	
 
 	/**
-	 * 
+	 * This constructor wraps the given Channel with a new ChannelDecorator.
 	 * @param channel 
 	 */
-	public ChannelDecorator(Channel channel) {
+	public ChannelDecorator(Channel channel){
 		this.channel = channel;
 	}
 	
