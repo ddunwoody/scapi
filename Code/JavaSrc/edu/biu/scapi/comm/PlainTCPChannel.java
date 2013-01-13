@@ -39,18 +39,26 @@ import java.util.logging.Level;
 import edu.biu.scapi.generals.Logging;
 
 /** 
- * @author LabTest
+ * This class represents a concrete channel in the Decorator Pattern used to create Channels. This channel ensures TCP type of communication.
+ * In order to enforce the right usage of the Channel class we will restrict the ability to instantiate one, 
+ * only to classes within the Communication Layer’s package. This means that the constructor of the channel will be unreachable from 
+ * another package. However, the send, receive and close functions will be declared public, therefore allowing anyone holding a channel 
+ * to be able to use them.
+ *  
+ * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Meital Levy)
  */
 public class PlainTCPChannel extends PlainChannel{
+	
 	private Socket socket = new Socket();
 	private ObjectOutputStream outStream;
 	private ObjectInputStream inStream;
 	private InetSocketAddress socketAddress;
 
 	
-	/** 
-	 * @param ipAddress
-	 * @param port
+	/**
+	 * Creates a channel given the IP address and the port to connect to. 
+	 * @param ipAddress other end's IP address
+	 * @param port other end's port
 	 */
 	PlainTCPChannel(InetAddress ipAddress, int port) {
 		
@@ -58,73 +66,39 @@ public class PlainTCPChannel extends PlainChannel{
 	}
 	
 	/**
-	 * 
+	 * Creates a channel given an InetSocketAddress.
+	 * @param socketAddress other end's InetSocketAddress
 	 */
-	public PlainTCPChannel(InetSocketAddress socketAddress) {
+	PlainTCPChannel(InetSocketAddress socketAddress) {
 
 		this.socketAddress = socketAddress;
 	}
 
-	/** 
-	 * @param existingChannel
-	 */
-	PlainTCPChannel(Channel existingChannel) {
-		// begin-user-code
-		// TODO Auto-generated constructor stub
-		// end-user-code
-	}
-
-	/** 
-	 * @param ipAddress
-	 * @param port
-	 * @param typeOfConnection
-	 */
-	PlainTCPChannel(InetAddress ipAddress, int port, Object typeOfConnection) {
 		
-	}
-
-	
-	
 	
 	/** 
-	 * @param msg
-	 * @throws IOException 
+	 * Sends the message to the other end-user of the channel with TCP protocol.
+	 *  
+	 * @param msg the object to send
+	 * @throws IOException Any of the usual Input/Output related exceptions.  
 	 */
 	public void send(Serializable msg) throws IOException {
-		
-	
-		
 		outStream.writeObject(msg);
-		
-		//System.out.println("Sending " + msg.getClass().getName());
-		
-	
 	}
 
 	/** 
-	 * @throws ClassNotFoundException 
-	 * @throws IOException 
+	 * Receives the message sent by the other end-user of the channel. 
+	 * 
+	 * @throws ClassNotFoundException Class of a serialized object cannot be found. 
+	 * @throws IOException Any of the usual Input/Output related exceptions.
 	 */
 	public Serializable receive() throws ClassNotFoundException, IOException {
 		
-		/*
-		Serializable msg = (Serializable)inStream.readObject();
-		int accum=0;
-		for(int i=0;i<(msg.getData()).length; i++){
-			
-			accum+=msg.getData()[i];
-		}
-		
-		System.out.println("receiving... " +  accum);
-		
-		return msg;
-		*/
 		return (Serializable) inStream.readObject();
 	}
 
 	/**
-	 * 
-	 * Closes the socket and the out and in streams.
+	 * Closes the socket and all other used resources.
 	 */
 	public void close() {
 
@@ -142,6 +116,7 @@ public class PlainTCPChannel extends PlainChannel{
 		}
 	}
 
+	
 	public boolean isClosed(){
 		return socket.isInputShutdown() || socket.isOutputShutdown() || socket.isClosed() || !socket.isConnected();
 	}
@@ -149,8 +124,9 @@ public class PlainTCPChannel extends PlainChannel{
 	
 	/** 
 	 * Connects the socket to the InetSocketAddress of this object. If the server we are trying to connect to 
-	 * 			 is not up yet then we sleep for a while and try again until the connection is established.
-	 * 			 After the connection has succeeded the input and output streams are set for the send and receive functions.
+	 * is not up yet then we sleep for a while and try again until the connection is established. This is done by the SecuringConnectionThread which keeps trying
+	 * until it succeeds or a timeout has been reached.<p>		
+	 * After the connection has succeeded the input and output streams are set for the send and receive functions.
 	 * @return
 	 * @throws IOException 
 	 */
@@ -162,9 +138,7 @@ public class PlainTCPChannel extends PlainChannel{
 		
 		//create and connect the socket. Cannot reconnect if the function connect fails since it closes the socket.
 		socket = new Socket(socketAddress.getAddress(), socketAddress.getPort());
-		//socket.connect(socketAddress,1000);
 			
-		
 		if(socket.isConnected()){
 			try {
 				Logging.getLogger().log(Level.INFO, "Socket connected");
@@ -179,8 +153,9 @@ public class PlainTCPChannel extends PlainChannel{
 		return true;
 		
 	}
+	
 	/**
-	 * returns if the socket is connected
+	 * Returns if the socket is connected
 	 */
 	boolean isConnected(){
 		
@@ -195,7 +170,7 @@ public class PlainTCPChannel extends PlainChannel{
 
 	/**
 	 * Sets the socket and the input and output streams. If the user uses this function it means that 
-	 * 			   the connect function will not be called and thus, the streams should be set here.
+	 * the connect function will not be called and thus, the streams should be set here.
 	 * @param socket the socket to set
 	 * 		
 	 */
@@ -212,6 +187,10 @@ public class PlainTCPChannel extends PlainChannel{
 		}
 	}
 	
+	/**
+	 * Return the underlying socket. Used only internally.
+	 * @return the underlying socket
+	 */
 	Socket getSocket(){
 		return socket;
 	}
