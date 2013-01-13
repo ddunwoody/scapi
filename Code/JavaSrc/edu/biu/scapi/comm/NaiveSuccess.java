@@ -30,24 +30,27 @@ package edu.biu.scapi.comm;
 import java.util.List;
 
 /** 
- * @author LabTest
+ * NaiveSuccess does not actually check the connections but rather always returns true. It can be used when there is no need to verify any level of success in establishing
+ * the connections.
+ *  
+ * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Meital Levy)
  */
 public class NaiveSuccess implements ConnectivitySuccessVerifier {
 	
 	/**
-	 * 
+	 *  
 	 */
 	public NaiveSuccess() {
 		
 	}
 	
-	/** 
-	 * @param estCon
+	/**
+	 * This function always returns true. It does not check whether the required connections were established. We may find it useful for certain cases. 
+	 * @param estCon 
 	 * @param originalListOfParties
 	 * @return
 	 */
-	public boolean hasSucceded(EstablishedConnections estCon,
-			List<Party> originalListOfParties) {
+	public boolean hasSucceded(EstablishedConnections estCon, List<Party> originalListOfParties) {
 
 		//always return true
 		return true;
