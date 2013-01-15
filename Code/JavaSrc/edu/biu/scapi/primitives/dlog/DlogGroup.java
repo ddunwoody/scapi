@@ -188,7 +188,7 @@ public interface DlogGroup {
 	 * the result of h1, h2, h4,h8,... and using it in the calculation.<p>
 	 * Note that if we want a one-time exponentiation of h it is preferable to use the basic exponentiation function 
 	 * since there is no point to keep anything in memory if we have no intention to use it. 
-	 * @param groupElement
+	 * @param base
 	 * @param exponent
 	 * @return the exponentiation result
 	 */

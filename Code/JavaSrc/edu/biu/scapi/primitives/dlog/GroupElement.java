@@ -43,7 +43,7 @@ public interface GroupElement{
 	public boolean isIdentity();
 	
 	/**
-	 * This function is used when a group element needs to be sent via a {@link Channel} or any other means of sending data (including serialization).
+	 * This function is used when a group element needs to be sent via a {@link edu.biu.scapi.comm.Channel} or any other means of sending data (including serialization).
 	 * It retrieves all the data needed to reconstruct this Group Element at a later time and/or in a different VM.
 	 * It puts all the data in an instance of the relevant class that implements the GroupElementSendableData interface.
 	 * @return the GroupElementSendableData object
