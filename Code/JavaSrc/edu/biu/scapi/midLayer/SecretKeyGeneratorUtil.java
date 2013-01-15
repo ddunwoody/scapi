@@ -46,7 +46,7 @@ public class SecretKeyGeneratorUtil {
 	
 	/**
 	 * This static function generates a SecretKey. It looks for a default provider implementation for the algorithm name requested.
-	 * If found then uses it. Otherwise it creates the Key using {@link}SecretKeyGeneratorSpi {@link}.
+	 * If found then uses it. Otherwise it creates the Key using {@link SecretKeyGeneratorSpi}.
 	 * This function should be used when the key size is known.
 	 * It requires a key size greater than zero, otherwise it throws NegativeArraySizeException.
 	 * 
@@ -77,7 +77,7 @@ public class SecretKeyGeneratorUtil {
 	}
 	/**
 	 * This static function generates a SecretKey. It looks for a default provider implementation for the algorithm name requested.
-	 * If found then uses it. Otherwise it creates the Key using {@link}SecretKeyGeneratorSpi {@link}.
+	 * If found then uses it. Otherwise it creates the Key using {@link SecretKeyGeneratorSpi}.
 	 * This function is useful if there is a default key size for the requested algorithm, 
 	 * and there is a default provider implementation for it. 
 	 *
@@ -95,7 +95,7 @@ public class SecretKeyGeneratorUtil {
 	}
 	/**
 	 * This static function generates a SecretKey. It looks for a default provider implementation for the algorithm name requested.
-	 * If found then uses it. Otherwise it creates the Key using {@link}SecretKeyGeneratorSpi {@link}.
+	 * If found then uses it. Otherwise it creates the Key using {@link SecretKeyGeneratorSpi}.
 	 * This function is useful if there is a default key size for the requested algorithm, 
 	 * and there is a default provider implementation for it. 
 	 * This function uses SCAPI's default source of randomness.

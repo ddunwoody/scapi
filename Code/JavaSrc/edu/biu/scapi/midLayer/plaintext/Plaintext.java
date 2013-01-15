@@ -38,7 +38,7 @@ import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertextSendableData;
  */
 public interface Plaintext {
 	/**
-	 * This function is used when a Plaintex needs to be sent via a {@link edu.biu.scapi.comm#Channel} or any other means of sending data (including serialization).
+	 * This function is used when a Plaintex needs to be sent via a {@link edu.biu.scapi.comm.Channel} or any other means of sending data (including serialization).
 	 * It retrieves all the data needed to reconstruct this Plaintext at a later time and/or in a different VM.
 	 * It puts all the data in an instance of the relevant class that implements the PlaintextSendableData interface.
 	 * @return the PlaintextSendableData object

@@ -34,7 +34,7 @@ package edu.biu.scapi.midLayer.ciphertext;
  */
 public interface AsymmetricCiphertext {
 	/**
-	 * This function is used when an asymmetric ciphertext needs to be sent via a {@link edu.biu.scapi.comm#Channel} or any other means of sending data (including serialization).
+	 * This function is used when an asymmetric ciphertext needs to be sent via a {@link edu.biu.scapi.comm.Channel} or any other means of sending data (including serialization).
 	 * It retrieves all the data needed to reconstruct this ciphertext at a later time and/or in a different VM.
 	 * It puts all the data in an instance of the relevant class that implements the AsymmetricCiphertextSendableData interface.
 	 * @return the AsymmetricCiphertextSendableData object
