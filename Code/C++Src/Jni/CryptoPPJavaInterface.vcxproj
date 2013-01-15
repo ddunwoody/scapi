@@ -68,15 +68,15 @@
     <OutDir>.\Release\</OutDir>
     <IntDir>.\Release\</IntDir>
     <LinkIncremental>true</LinkIncremental>
-    <LibraryPath>C:\work\LAST_Project\SDK\Code\C++Src\Jni;C:\Users\user\Downloads\cryptopp561\development_files;$(LibraryPath)</LibraryPath>
-    <IncludePath>C:\work\LAST_Project\SDK\Code\C++Src\Jni;C:\Program Files\CryptoPP\cryptopp561;C:\Program Files %28x86%29\IBM\SDP\jdk\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\work\LAST_Project\SDK\Code\C++Src\Jni\cryptlib\Win32;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\work\LAST_Project\SDK\Code\C++Src\Jni;C:\Program Files\CryptoPP\cryptopp561;C:\Program Files %28x86%29\Java\jdk1.6.0_10\include\win32;C:\Program Files %28x86%29\Java\jdk1.6.0_10\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>.\Release</OutDir>
-    <IntDir>.\Release</IntDir>
+    <OutDir>.\Release64</OutDir>
+    <IntDir>.\Release64</IntDir>
     <LinkIncremental>false</LinkIncremental>
-    <LibraryPath>C:\work\LAST_Project\SDK\Code\C++Src\Jni;C:\Users\user\Downloads\cryptopp561\development_files;$(LibraryPath)</LibraryPath>
-    <IncludePath>C:\work\LAST_Project\SDK\Code\C++Src\Jni;C:\Program Files\CryptoPP\cryptopp561;C:\Program Files %28x86%29\IBM\SDP\jdk\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\work\LAST_Project\SDK\Code\C++Src\Jni\cryptlib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\work\LAST_Project\SDK\Code\C++Src\Jni;C:\Program Files\CryptoPP\cryptopp561;C:\Program Files %28x86%29\Java\jdk1.6.0_10\include;C:\Program Files %28x86%29\Java\jdk1.6.0_10\include\win32;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>.\Debug\</OutDir>
@@ -168,8 +168,8 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <LinkDLL>true</LinkDLL>
       <SubSystem>Console</SubSystem>
-      <OutputFile>.\Release\CryptoPPJavaInterface.dll</OutputFile>
-      <ImportLibrary>.\Release\CryptoPPJavaInterface.lib</ImportLibrary>
+      <OutputFile>.\Release64\CryptoPPJavaInterface.dll</OutputFile>
+      <ImportLibrary>.\Release64\CryptoPPJavaInterface.lib</ImportLibrary>
       <AdditionalDependencies>cryptlib.lib;odbc32.lib;odbccp32.lib</AdditionalDependencies>
       <ShowProgress>NotSet</ShowProgress>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
