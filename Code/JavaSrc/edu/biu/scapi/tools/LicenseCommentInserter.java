@@ -42,7 +42,7 @@ import java.util.Vector;
  */
 public class LicenseCommentInserter {
 
-		public final static String BASE_PATH_CODE = "C:\\work\\LAST_Project\\SDK\\Code\\JavaSrc\\edu\\biu\\scapi\\tools";
+		public final static String BASE_PATH_CODE = "C:\\work\\LAST_Project\\SDK\\Code\\C++Src\\JniNtl";
 		
 		
 		public void addCommentToFile(String fileName) throws IOException{
@@ -82,7 +82,7 @@ public class LicenseCommentInserter {
 			out.println("*/");
 			out.println();
 			//for (String lineToPrint : lines){
-			for (int i = 23; i < lines.size(); i++){
+			for (int i = 0; i < lines.size(); i++){
 				out.println(lines.get(i));
 			}
 			out.flush();
@@ -94,7 +94,7 @@ public class LicenseCommentInserter {
 			File[] allFiles = dir.listFiles();
 			for (int i = 0; i < allFiles.length; ++i) {
 				if (allFiles[i].isFile()) {
-					if(allFiles[i].getName().endsWith(".java")){
+					if(allFiles[i].getName().endsWith(".c") || allFiles[i].getName().endsWith(".h")){
 						String path = allFiles[i].getPath();
 						String name = allFiles[i].getName(); 
 						addCommentToFile(path );
