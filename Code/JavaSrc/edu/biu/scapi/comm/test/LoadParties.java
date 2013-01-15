@@ -50,7 +50,9 @@ import java.util.Properties;
 import edu.biu.scapi.comm.Party;
 
 /**
- * @author LabTest
+ * Utility class for reading a list of parties from some file. You can create your own list using other tools.
+ * 
+ * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Meital Levy)
  *
  */
 public class LoadParties {

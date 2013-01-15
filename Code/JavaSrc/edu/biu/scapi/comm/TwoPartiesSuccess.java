@@ -30,7 +30,8 @@ package edu.biu.scapi.comm;
 import java.util.List;
 
 /** 
-* @author LabTest
+ * For future implementation.
+ * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University
  */
 public class TwoPartiesSuccess implements ConnectivitySuccessVerifier {
 	
@@ -42,12 +43,9 @@ public class TwoPartiesSuccess implements ConnectivitySuccessVerifier {
 	}
 	
 	/** 
-	 * @param estCon
-	 * @param originalListOfParties
-	 * @return
+	 * <B>This function is for future implementation.</B>
 	 */
-	public boolean hasSucceded(EstablishedConnections estCon,
-			List<Party> originalListOfParties) {
+	public boolean hasSucceded(EstablishedConnections estCon, List<Party> originalListOfParties) {
 		return false;
 		
 	}

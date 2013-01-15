@@ -48,7 +48,7 @@ public class NaiveSuccess implements ConnectivitySuccessVerifier {
 	 * This function always returns true. It does not check whether the required connections were established. We may find it useful for certain cases. 
 	 * @param estCon 
 	 * @param originalListOfParties
-	 * @return
+	 * @return true always
 	 */
 	public boolean hasSucceded(EstablishedConnections estCon, List<Party> originalListOfParties) {
 

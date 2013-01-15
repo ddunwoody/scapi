@@ -43,39 +43,30 @@ import java.net.InetAddress;
 import java.security.Key;
 
 /** 
- * @author LabTest
+ * An immutable class that holds data for a very basic party that can participate in an MPC.
+ * 
+ * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Meital Levy)
  */
 public class Party {
-	private final String name;
 	private final InetAddress ipAddress;
-	private final Key key;
 	private final int port;
-	private final Role role;
-	
 	/**
-	 * A constructor which sets all the data of a Party. Since all the fields are final once they are set they can not be changed.
-	 * @param name
-	 * @param ipAdress
-	 * @param key
+	 * A constructor which sets all the data of a Party.
+	 * @param ipAdress 
 	 * @param port
-	 * @param role
 	 */
 	public Party(String name, InetAddress ipAdress, Key key, int port, Role role){
 		
-		this.name = name;
 		this.ipAddress = ipAdress;
-		this.key = key;
 		this.port = port;
-		this.role = role;
 		
 	}
 	/**
-	 * 
-	 * Compares the ip and port represented as strings between two parties.
+	 * Compares two parties.
 	 * @param otherParty the other party to compare to
 	 * @return 0 if the two parties are equal 
-	 * 		   <0 if this party's string is smaller than the otherParty string.
-	 * 		   >0 if this party's string is larger than the otherParty string.
+	 * 		   <0 if this party's string is smaller than the otherParty's string representation.
+	 * 		   >0 if this party's string is larger than the otherParty's string representation.
 	 */
 	public int compareTo(Party otherParty){
 		

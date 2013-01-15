@@ -78,6 +78,8 @@ import edu.biu.scapi.tools.Factories.SymmetricEncFactory;
  * From this point onwards, the application can send and receive messages in each connection as required by the protocol.<p>
  * CommunicationSetup implements the org.apache.commons.exec.TimeoutObserver interface. 
  * This interface supplies a mechanism for notifying classes that a timeout has arrived. 
+ * 
+ * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University
  */
 
 public class CommunicationSetup implements TimeoutObserver{
@@ -103,10 +105,10 @@ public class CommunicationSetup implements TimeoutObserver{
 	}
 	
 	/** 
-	 * The main function of the class. The prepareForCommunication functions are also the only public function in the class. An application that wants to use
-	 * the communication layer will call this function in order to prepare for communication after providing the required parameters. 
+	 * An application that wants to use the communication layer will call this function in order to prepare for communication after providing the required parameters. 
 	 * This function initiates the creation of the final actual socket connections between the parties. If this function succeeds, the 
 	 * application may use the send and receive functions of the created channels to pass messages.
+	 * This function is package private and is called by the public prepareFunctions. It requests a KeyExchangeProtocol that has not been implemented yet.
 	 * 
 	 * @param listOfParties the original list of parties to connect to. As a convention, we will set the <B>first party</B> in the list to be the <B>requesting party</B>, that is, 
 	 * 	 					the party represented by the application.
@@ -115,7 +117,7 @@ public class CommunicationSetup implements TimeoutObserver{
 	 * @param timeOut the maximum amount of time we allow for the connection stage
 	 * @return true if the success function has succeeded and false otherwise
 	 */
-	public Map<InetSocketAddress, Channel> prepareForCommunication(List<Party> listOfParties, KeyExchangeProtocol keyExchange,	ConnectivitySuccessVerifier successLevel, long timeOut) {		
+	Map<InetSocketAddress, Channel> prepareForCommunication(List<Party> listOfParties, KeyExchangeProtocol keyExchange,	ConnectivitySuccessVerifier successLevel, long timeOut) {		
 		//set parameters
 		partiesList = listOfParties;
 		keyExchangeProtocol = keyExchange;
@@ -170,19 +172,53 @@ public class CommunicationSetup implements TimeoutObserver{
 	/**
 	 * 
 	 * Does the same as the other prepareForCommunication function only sets the flag of enableNagle first.
+	 * This function is package private and is called by the public prepareFunctions. It requests a KeyExchangeProtocol that has not been implemented yet.
 	 * 
 	 * @param enableNagle a flag indicating weather or not to use the Nagle optimization algorithm 
 	 * @return
 	 */
-	public Map<InetSocketAddress, Channel> prepareForCommunication(List<Party> listOfParties,
-			KeyExchangeProtocol keyExchange, SecurityLevel securityLevel,
-			ConnectivitySuccessVerifier successLevel, long timeOut, boolean enableNagle) {
+	Map<InetSocketAddress, Channel> prepareForCommunication(List<Party> listOfParties, KeyExchangeProtocol keyExchange, ConnectivitySuccessVerifier successLevel, 
+															long timeOut, boolean enableNagle) {
 		
 		this.enableNagle = enableNagle;
 		
 		return prepareForCommunication(listOfParties, keyExchange, successLevel, timeOut);
 	}
 
+	/** 
+	 * An application that wants to use the communication layer will call this function in order to prepare for communication after providing the required parameters. 
+	 * This function initiates the creation of the final actual socket connections between the parties. If this function succeeds, the 
+	 * application may use the send and receive functions of the created channels to pass messages. Note that using this function you can choose to use or not to use the Nagle algorithm.
+	 * 
+	 * @param listOfParties the original list of parties to connect to. As a convention, we will set the <B>first party</B> in the list to be the <B>requesting party</B>, that is, 
+	 * 	 					the party represented by the application.
+	 * @param successLevel the ConnectivitySuccessVerifier algorithm to use
+	 * @param timeOut the maximum amount of time we allow for the connection stage
+	 * @param enableNagle a flag indicating weather or not to use the Nagle optimization algorithm
+	 * @return true if the success function has succeeded and false otherwise
+	 */
+	public Map<InetSocketAddress, Channel> prepareForCommunication(List<Party> listOfParties,ConnectivitySuccessVerifier successLevel, 
+																	long timeOut, boolean enableNagle) {
+				
+		KeyExchangeProtocol keyExchange = new KeyExchangeProtocol();
+		return prepareForCommunication(listOfParties, keyExchange, successLevel, timeOut, enableNagle);
+	}
+	
+	/**
+	 * An application that wants to use the communication layer will call this function in order to prepare for communication after providing the required parameters. 
+	 * This function initiates the creation of the final actual socket connections between the parties. If this function succeeds, the 
+	 * application may use the send and receive functions of the created channels to pass messages.
+	 *  
+	 * @param listOfParties the original list of parties to connect to. As a convention, we will set the <B>first party</B> in the list to be the <B>requesting party</B>, that is, 
+	 * 	 					the party represented by the application.
+	 * @param successLevel the ConnectivitySuccessVerifier algorithm to use
+	 * @param timeOut the maximum amount of time we allow for the connection stage
+	 * @return true if the success function has succeeded and false otherwise
+	 */
+	public Map<InetSocketAddress, Channel> prepareForCommunication(List<Party> listOfParties,ConnectivitySuccessVerifier successLevel, long timeOut){
+		KeyExchangeProtocol keyExchange = new KeyExchangeProtocol();
+		return prepareForCommunication(listOfParties, keyExchange, successLevel, timeOut);
+	}
 
 	/**
 	 * 

@@ -39,7 +39,8 @@
 package edu.biu.scapi.comm;
 
 /**
- * @author LabTest
+ * For future implementation.
+ * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University
  *
  */
 public interface Role {

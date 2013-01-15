@@ -39,8 +39,9 @@ package edu.biu.scapi.comm;
 
 import java.io.IOException;
 
-/**
- * @author LabTest
+/*
+ * Abstract class that holds data and functionality common to different types of concrete channels.
+ * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Meital Ley)
  *
  */
 public abstract class PlainChannel implements Channel {

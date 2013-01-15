@@ -42,7 +42,7 @@ public interface ConnectivitySuccessVerifier {
 	 * This function gets the information about the established connections as input and the original list of parties, then it runs a certain algorithm 
 	 * (determined by the implementing class), and it returns true or false according to the level of connectivity checked by the implementing algorithm.
 	 *  
- 	 * @param estCon these connections are the actual connections that were established. 
+ 	 * @param estCon the actual established connections
 	 * @param originalListOfParties the original list of parties to connect to
 	 * @return true if the level of connectivity was reached (depends on implementing algorithm) and false otherwise.
 	 */

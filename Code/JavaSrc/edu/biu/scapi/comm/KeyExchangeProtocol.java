@@ -38,9 +38,12 @@ package edu.biu.scapi.comm;
 
 
 /** 
-* @author LabTest
+ * For future implementation. 
+ * This class represents a key exchange protocol to be run if encryption key and/or authentication keys need to be exchanged by the parties upon establishing the connection and before 
+ * starting the actual communication.  
+ * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University
  */
-public class KeyExchangeProtocol implements Protocol{
+class KeyExchangeProtocol implements Protocol{
 
 	
 	/**

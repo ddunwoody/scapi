@@ -39,10 +39,11 @@
 package edu.biu.scapi.comm;
 
 /**
+ * For future use.
  * @author LabTest
  *
  */
-public enum SecurityLevel {
+enum SecurityLevel {
 
 	PLAIN,
 	ENCRYPTED,

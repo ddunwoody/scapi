@@ -41,10 +41,11 @@ package edu.biu.scapi.comm;
 import java.security.Key;
 
 /**
+ * For future implementation. 
  * @author LabTest
  *
  */
-public class KeyExchangeOutput implements ProtocolOutput {
+class KeyExchangeOutput implements ProtocolOutput {
 
 	private Key encKey;
 	private Key macKey;

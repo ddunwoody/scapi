@@ -30,7 +30,8 @@ package edu.biu.scapi.comm;
 import java.util.List;
 
 /** 
- * @author LabTest
+ * For future implementation.
+ * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University
  */
 public class CliqueSuccess implements ConnectivitySuccessVerifier {
 	
@@ -42,19 +43,18 @@ public class CliqueSuccess implements ConnectivitySuccessVerifier {
 	}
 	
 	/** 
+	 * <B>This function is for future implementation.</B><p> 
 	 * 
-	 * •	Check if connected to all parties in original list.
-	 * •	Ask every party if they are connected to all parties in their list.
-	 * •	If all answers are true, return true,
-	 * •	Else, return false.
-	 * 
-	 * @param estCon the EstablishedConnections object that includes the actual connections formed
-	 * @param originalListOfParties the original list of parties
-	 * 
-	 * 
+	 * <ul>
+	 * <li> Check if connected to all parties in original list.
+	 * <li> Ask every party if they are connected to all parties in their list.
+	 * <li>	If all answers are true, return true,
+	 * <li>	Else, return false.
+	 * </ul>
+	 * @param estCon the actual established connections
+	 * @param originalListOfParties the original list of parties to connect to
 	 */
-	public boolean hasSucceded(EstablishedConnections estCon,
-			List<Party> originalListOfParties) {
+	public boolean hasSucceded(EstablishedConnections estCon, List<Party> originalListOfParties) {
 		// begin-user-code
 		// TODO Auto-generated method stub
 		return false;
