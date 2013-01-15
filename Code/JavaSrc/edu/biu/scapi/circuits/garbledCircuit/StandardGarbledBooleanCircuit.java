@@ -44,7 +44,7 @@ import edu.biu.scapi.circuits.encryption.PlaintextTooLongException;
 import edu.biu.scapi.circuits.encryption.TweakNotSetException;
 
 /**
- * The {@StandardGarbledBooleanCircuit} class is a Garbled
+ * The {@code StandardGarbledBooleanCircuit} class is a Garbled
  * Boolean Circuit without optimizations (e.g. the Free XOR technique and row
  * reduction technique etc. are not used)
  * 
