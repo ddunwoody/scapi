@@ -1,0 +1,247 @@
+﻿Build started 17/01/2013 11:26:18.
+     1>Project "C:\work\LAST_Project\SDK\Code\ExternalLibraries\Miracl\miraclLibrary\miraclLibrary.vcxproj" on node 2 (rebuild target(s)).
+     1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\Microsoft.CppBuild.targets(298,5): warning MSB8004: Intermediate Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Intermediate Directory.
+     1>InitializeBuildStatus:
+         Creating "Release\Win32\intermmidiate\miraclLibrary.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /IC:\work\LAST_Project\SDK\Code\ExternalLibraries\Miracl\v_5.2\include /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D WIN32 /D NDEBUG /D _LIB /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Yc"StdAfx.h" /Fp"Release\Win32\intermmidiate\miraclLibrary.pch" /Fo"Release\Win32\intermmidiate\\" /Fd"Release\Win32\intermmidiate\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt stdafx.cpp
+         stdafx.cpp
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /IC:\work\LAST_Project\SDK\Code\ExternalLibraries\Miracl\v_5.2\include /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D WIN32 /D NDEBUG /D _LIB /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\Win32\intermmidiate\\" /Fd"Release\Win32\intermmidiate\vc100.pdb" /Gd /TC /analyze- /errorReport:prompt ..\v_5.2\source\mr87f.c ..\v_5.2\source\mr87v.c ..\v_5.2\source\mraes.c ..\v_5.2\source\mralloc.c ..\v_5.2\source\mrarth0.c ..\v_5.2\source\mrarth1.c ..\v_5.2\source\mrarth2.c ..\v_5.2\source\mrarth3.c ..\v_5.2\source\mrbits.c ..\v_5.2\source\mrbrick.c ..\v_5.2\source\mrbuild.c ..\v_5.2\source\mrc.c ..\v_5.2\source\mrc2.c ..\v_5.2\source\mrc3.c ..\v_5.2\source\mrc4.c ..\v_5.2\source\mrcore.c ..\v_5.2\source\mrcrt.c ..\v_5.2\source\mrcurve.c ..\v_5.2\source\mrdouble.c ..\v_5.2\source\mrebrick.c ..\v_5.2\source\mrebrick2.c ..\v_5.2\source\mrec2m.c ..\v_5.2\source\mrecn2.c ..\v_5.2\source\mrfast.c ..\v_5.2\source\mrflash.c ..\v_5.2\source\mrflsh1.c ..\v_5.2\source\mrflsh2.c ..\v_5.2\source\mrflsh3.c ..\v_5.2\source\mrflsh4.c ..\v_5.2\source\mrfrnd.c ..\v_5.2\source\mrgcd.c ..\v_5.2\source\mrgcm.c ..\v_5.2\source\mrgf2m.c ..\v_5.2\source\mrio1.c ..\v_5.2\source\mrio2.c ..\v_5.2\source\mrjack.c ..\v_5.2\source\mrk.c ..\v_5.2\source\mrlucas.c ..\v_5.2\source\mrmonty.c ..\v_5.2\source\mrmuldv.c ..\v_5.2\source\mrpi.c ..\v_5.2\source\mrpower.c ..\v_5.2\source\mrprime.c ..\v_5.2\source\mrrand.c ..\v_5.2\source\mrround.c ..\v_5.2\source\mrscrt.c ..\v_5.2\source\mrshs.c ..\v_5.2\source\mrshs256.c ..\v_5.2\source\mrshs512.c ..\v_5.2\source\mrsmall.c ..\v_5.2\source\mrsroot.c ..\v_5.2\source\mrstrong.c ..\v_5.2\source\mrxgcd.c ..\v_5.2\source\mrzzn2.c ..\v_5.2\source\mrzzn2b.c ..\v_5.2\source\mrzzn3.c
+         mr87f.c
+         mr87v.c
+         mraes.c
+         mralloc.c
+         mrarth0.c
+         mrarth1.c
+         mrarth2.c
+         mrarth3.c
+         mrbits.c
+         mrbrick.c
+         mrbuild.c
+         mrc.c
+         mrc2.c
+         mrc3.c
+         mrc4.c
+         mrcore.c
+     1>..\v_5.2\source\mrcore.c(683): warning C4244: '/=' : conversion from 'mr_small' to 'unsigned int', possible loss of data
+     1>..\v_5.2\source\mrcore.c(804): warning C4244: '/=' : conversion from 'mr_small' to 'unsigned long', possible loss of data
+         mrcrt.c
+         mrcurve.c
+         mrdouble.c
+         mrebrick.c
+         Compiling...
+         mrebrick2.c
+     1>..\v_5.2\source\mrebrick2.c(126): warning C4101: 'i' : unreferenced local variable
+         mrec2m.c
+         mrecn2.c
+         mrfast.c
+         mrflash.c
+         mrflsh1.c
+         mrflsh2.c
+         mrflsh3.c
+         mrflsh4.c
+         mrfrnd.c
+         mrgcd.c
+         mrgcm.c
+         mrgf2m.c
+     1>..\v_5.2\source\mrgf2m.c(350): warning C4101: 'k' : unreferenced local variable
+         mrio1.c
+         mrio2.c
+         mrjack.c
+         mrk.c
+         mrlucas.c
+         mrmonty.c
+         mrmuldv.c
+         Compiling...
+         mrpi.c
+         mrpower.c
+         mrprime.c
+         mrrand.c
+         mrround.c
+         mrscrt.c
+         mrshs.c
+         mrshs256.c
+         mrshs512.c
+     1>..\v_5.2\source\mrshs512.c(81): warning C4305: 'initializing' : truncation from '__int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(81): warning C4305: 'initializing' : truncation from '__int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(81): warning C4305: 'initializing' : truncation from 'unsigned __int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(81): warning C4305: 'initializing' : truncation from 'unsigned __int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(82): warning C4305: 'initializing' : truncation from '__int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(82): warning C4305: 'initializing' : truncation from '__int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(82): warning C4305: 'initializing' : truncation from 'unsigned __int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(82): warning C4305: 'initializing' : truncation from 'unsigned __int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(83): warning C4305: 'initializing' : truncation from 'unsigned __int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(83): warning C4305: 'initializing' : truncation from '__int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(83): warning C4305: 'initializing' : truncation from '__int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(83): warning C4305: 'initializing' : truncation from '__int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(84): warning C4305: 'initializing' : truncation from '__int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(84): warning C4305: 'initializing' : truncation from 'unsigned __int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(84): warning C4305: 'initializing' : truncation from 'unsigned __int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(84): warning C4305: 'initializing' : truncation from 'unsigned __int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(85): warning C4305: 'initializing' : truncation from 'unsigned __int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(85): warning C4305: 'initializing' : truncation from 'unsigned __int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(85): warning C4305: 'initializing' : truncation from '__int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(85): warning C4305: 'initializing' : truncation from '__int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(86): warning C4305: 'initializing' : truncation from '__int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(86): warning C4305: 'initializing' : truncation from '__int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(86): warning C4305: 'initializing' : truncation from '__int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(86): warning C4305: 'initializing' : truncation from '__int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(87): warning C4305: 'initializing' : truncation from 'unsigned __int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(87): warning C4305: 'initializing' : truncation from 'unsigned __int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(87): warning C4305: 'initializing' : truncation from 'unsigned __int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(87): warning C4305: 'initializing' : truncation from 'unsigned __int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(88): warning C4305: 'initializing' : truncation from 'unsigned __int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(88): warning C4305: 'initializing' : truncation from 'unsigned __int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(88): warning C4305: 'initializing' : truncation from '__int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(88): warning C4305: 'initializing' : truncation from '__int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(89): warning C4305: 'initializing' : truncation from '__int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(89): warning C4305: 'initializing' : truncation from '__int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(89): warning C4305: 'initializing' : truncation from '__int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(89): warning C4305: 'initializing' : truncation from '__int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(90): warning C4305: 'initializing' : truncation from '__int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(90): warning C4305: 'initializing' : truncation from '__int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(90): warning C4305: 'initializing' : truncation from 'unsigned __int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(90): warning C4305: 'initializing' : truncation from 'unsigned __int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(91): warning C4305: 'initializing' : truncation from 'unsigned __int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(91): warning C4305: 'initializing' : truncation from 'unsigned __int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(91): warning C4305: 'initializing' : truncation from 'unsigned __int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(91): warning C4305: 'initializing' : truncation from 'unsigned __int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(92): warning C4305: 'initializing' : truncation from 'unsigned __int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(92): warning C4305: 'initializing' : truncation from 'unsigned __int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(92): warning C4305: 'initializing' : truncation from 'unsigned __int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(92): warning C4305: 'initializing' : truncation from '__int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(93): warning C4305: 'initializing' : truncation from '__int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(93): warning C4305: 'initializing' : truncation from '__int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(93): warning C4305: 'initializing' : truncation from '__int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(93): warning C4305: 'initializing' : truncation from '__int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(94): warning C4305: 'initializing' : truncation from '__int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(94): warning C4305: 'initializing' : truncation from '__int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(94): warning C4305: 'initializing' : truncation from '__int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(94): warning C4305: 'initializing' : truncation from '__int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(95): warning C4305: 'initializing' : truncation from '__int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(95): warning C4305: 'initializing' : truncation from '__int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(95): warning C4305: 'initializing' : truncation from 'unsigned __int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(95): warning C4305: 'initializing' : truncation from 'unsigned __int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(96): warning C4305: 'initializing' : truncation from 'unsigned __int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(96): warning C4305: 'initializing' : truncation from 'unsigned __int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(96): warning C4305: 'initializing' : truncation from 'unsigned __int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(96): warning C4305: 'initializing' : truncation from 'unsigned __int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(97): warning C4305: 'initializing' : truncation from 'unsigned __int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(97): warning C4305: 'initializing' : truncation from 'unsigned __int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(97): warning C4305: 'initializing' : truncation from 'unsigned __int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(97): warning C4305: 'initializing' : truncation from 'unsigned __int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(98): warning C4305: 'initializing' : truncation from '__int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(98): warning C4305: 'initializing' : truncation from '__int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(98): warning C4305: 'initializing' : truncation from '__int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(98): warning C4305: 'initializing' : truncation from '__int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(99): warning C4305: 'initializing' : truncation from '__int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(99): warning C4305: 'initializing' : truncation from '__int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(99): warning C4305: 'initializing' : truncation from '__int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(99): warning C4305: 'initializing' : truncation from '__int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(100): warning C4305: 'initializing' : truncation from '__int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(100): warning C4305: 'initializing' : truncation from '__int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(100): warning C4305: 'initializing' : truncation from '__int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(100): warning C4305: 'initializing' : truncation from '__int64' to 'const unsigned long'
+     1>..\v_5.2\source\mrshs512.c(123): warning C4293: '<<' : shift count negative or too big, undefined behavior
+     1>..\v_5.2\source\mrshs512.c(123): warning C4293: '>>' : shift count negative or too big, undefined behavior
+     1>..\v_5.2\source\mrshs512.c(123): warning C4293: '<<' : shift count negative or too big, undefined behavior
+     1>..\v_5.2\source\mrshs512.c(123): warning C4293: '<<' : shift count negative or too big, undefined behavior
+     1>..\v_5.2\source\mrshs512.c(130): warning C4293: '<<' : shift count negative or too big, undefined behavior
+     1>..\v_5.2\source\mrshs512.c(130): warning C4293: '<<' : shift count negative or too big, undefined behavior
+     1>..\v_5.2\source\mrshs512.c(130): warning C4293: '>>' : shift count negative or too big, undefined behavior
+     1>..\v_5.2\source\mrshs512.c(131): warning C4293: '<<' : shift count negative or too big, undefined behavior
+     1>..\v_5.2\source\mrshs512.c(131): warning C4293: '>>' : shift count negative or too big, undefined behavior
+     1>..\v_5.2\source\mrshs512.c(131): warning C4293: '>>' : shift count negative or too big, undefined behavior
+     1>..\v_5.2\source\mrshs512.c(148): warning C4305: '=' : truncation from '__int64' to 'unsigned long'
+     1>..\v_5.2\source\mrshs512.c(149): warning C4305: '=' : truncation from 'unsigned __int64' to 'unsigned long'
+     1>..\v_5.2\source\mrshs512.c(150): warning C4305: '=' : truncation from '__int64' to 'unsigned long'
+     1>..\v_5.2\source\mrshs512.c(151): warning C4305: '=' : truncation from 'unsigned __int64' to 'unsigned long'
+     1>..\v_5.2\source\mrshs512.c(152): warning C4305: '=' : truncation from '__int64' to 'unsigned long'
+     1>..\v_5.2\source\mrshs512.c(153): warning C4305: '=' : truncation from 'unsigned __int64' to 'unsigned long'
+     1>..\v_5.2\source\mrshs512.c(154): warning C4305: '=' : truncation from '__int64' to 'unsigned long'
+     1>..\v_5.2\source\mrshs512.c(155): warning C4305: '=' : truncation from '__int64' to 'unsigned long'
+     1>..\v_5.2\source\mrshs512.c(163): warning C4305: '=' : truncation from 'unsigned __int64' to 'unsigned long'
+     1>..\v_5.2\source\mrshs512.c(164): warning C4305: '=' : truncation from '__int64' to 'unsigned long'
+     1>..\v_5.2\source\mrshs512.c(165): warning C4305: '=' : truncation from 'unsigned __int64' to 'unsigned long'
+     1>..\v_5.2\source\mrshs512.c(166): warning C4305: '=' : truncation from '__int64' to 'unsigned long'
+     1>..\v_5.2\source\mrshs512.c(167): warning C4305: '=' : truncation from '__int64' to 'unsigned long'
+     1>..\v_5.2\source\mrshs512.c(168): warning C4305: '=' : truncation from 'unsigned __int64' to 'unsigned long'
+     1>..\v_5.2\source\mrshs512.c(169): warning C4305: '=' : truncation from 'unsigned __int64' to 'unsigned long'
+     1>..\v_5.2\source\mrshs512.c(170): warning C4305: '=' : truncation from '__int64' to 'unsigned long'
+         mrsmall.c
+         mrsroot.c
+         mrstrong.c
+         mrxgcd.c
+         mrzzn2.c
+         mrzzn2b.c
+         mrzzn3.c
+       Lib:
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\Lib.exe /OUT:"C:\work\LAST_Project\SDK\Code\ExternalLibraries\Miracl\miraclLibrary\Release\Win32\miraclLibrary.lib" /NOLOGO /LTCG Release\Win32\intermmidiate\mr87f.obj
+         Release\Win32\intermmidiate\mr87v.obj
+         Release\Win32\intermmidiate\mraes.obj
+         Release\Win32\intermmidiate\mralloc.obj
+         Release\Win32\intermmidiate\mrarth0.obj
+         Release\Win32\intermmidiate\mrarth1.obj
+         Release\Win32\intermmidiate\mrarth2.obj
+         Release\Win32\intermmidiate\mrarth3.obj
+         Release\Win32\intermmidiate\mrbits.obj
+         Release\Win32\intermmidiate\mrbrick.obj
+         Release\Win32\intermmidiate\mrbuild.obj
+         Release\Win32\intermmidiate\mrc.obj
+         Release\Win32\intermmidiate\mrc2.obj
+         Release\Win32\intermmidiate\mrc3.obj
+         Release\Win32\intermmidiate\mrc4.obj
+         Release\Win32\intermmidiate\mrcore.obj
+         Release\Win32\intermmidiate\mrcrt.obj
+         Release\Win32\intermmidiate\mrcurve.obj
+         Release\Win32\intermmidiate\mrdouble.obj
+         Release\Win32\intermmidiate\mrebrick.obj
+         Release\Win32\intermmidiate\mrebrick2.obj
+         Release\Win32\intermmidiate\mrec2m.obj
+         Release\Win32\intermmidiate\mrecn2.obj
+         Release\Win32\intermmidiate\mrfast.obj
+         Release\Win32\intermmidiate\mrflash.obj
+         Release\Win32\intermmidiate\mrflsh1.obj
+         Release\Win32\intermmidiate\mrflsh2.obj
+         Release\Win32\intermmidiate\mrflsh3.obj
+         Release\Win32\intermmidiate\mrflsh4.obj
+         Release\Win32\intermmidiate\mrfrnd.obj
+         Release\Win32\intermmidiate\mrgcd.obj
+         Release\Win32\intermmidiate\mrgcm.obj
+         Release\Win32\intermmidiate\mrgf2m.obj
+         Release\Win32\intermmidiate\mrio1.obj
+         Release\Win32\intermmidiate\mrio2.obj
+         Release\Win32\intermmidiate\mrjack.obj
+         Release\Win32\intermmidiate\mrk.obj
+         Release\Win32\intermmidiate\mrlucas.obj
+         Release\Win32\intermmidiate\mrmonty.obj
+         Release\Win32\intermmidiate\mrmuldv.obj
+         Release\Win32\intermmidiate\mrpi.obj
+         Release\Win32\intermmidiate\mrpower.obj
+         Release\Win32\intermmidiate\mrprime.obj
+         Release\Win32\intermmidiate\mrrand.obj
+         Release\Win32\intermmidiate\mrround.obj
+         Release\Win32\intermmidiate\mrscrt.obj
+         Release\Win32\intermmidiate\mrshs.obj
+         Release\Win32\intermmidiate\mrshs256.obj
+         Release\Win32\intermmidiate\mrshs512.obj
+         Release\Win32\intermmidiate\mrsmall.obj
+         Release\Win32\intermmidiate\mrsroot.obj
+         Release\Win32\intermmidiate\mrstrong.obj
+         Release\Win32\intermmidiate\mrxgcd.obj
+         Release\Win32\intermmidiate\mrzzn2.obj
+         Release\Win32\intermmidiate\mrzzn2b.obj
+         Release\Win32\intermmidiate\mrzzn3.obj
+         Release\Win32\intermmidiate\stdafx.obj
+     1>mrebrick.obj : warning LNK4006: _mul_brick already defined in mrebrick2.obj; second definition ignored
+     1>mrebrick.obj : warning LNK4006: _ebrick_end already defined in mrebrick2.obj; second definition ignored
+     1>mrebrick.obj : warning LNK4006: _ebrick_init already defined in mrebrick2.obj; second definition ignored
+         miraclLibrary.vcxproj -> C:\work\LAST_Project\SDK\Code\ExternalLibraries\Miracl\miraclLibrary\Release\Win32\miraclLibrary.lib
+       FinalizeBuildStatus:
+         Deleting file "Release\Win32\intermmidiate\miraclLibrary.unsuccessfulbuild".
+         Touching "Release\Win32\intermmidiate\miraclLibrary.lastbuildstate".
+     1>Done Building Project "C:\work\LAST_Project\SDK\Code\ExternalLibraries\Miracl\miraclLibrary\miraclLibrary.vcxproj" (rebuild target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:02.17
