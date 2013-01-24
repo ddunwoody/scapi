@@ -28,6 +28,7 @@ package edu.biu.scapi.primitives.dlog.bc;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.Properties;
 
 import org.bouncycastle.math.ec.ECCurve;
@@ -257,6 +258,5 @@ public class BcDlogECF2m extends BcAdapterDlogEC implements DlogECF2m, DDH{
 		//If we ever decide to change the implementation there will only one place to change it.
 		return util.mapAnyGroupElementToByteArray(point.getX(), point.getY());
 	}
-
 
 }
