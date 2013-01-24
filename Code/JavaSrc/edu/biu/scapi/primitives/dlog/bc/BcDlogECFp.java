@@ -28,6 +28,7 @@ package edu.biu.scapi.primitives.dlog.bc;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.Properties;
 
 import org.bouncycastle.math.ec.ECCurve;
@@ -42,6 +43,7 @@ import edu.biu.scapi.primitives.dlog.groupParams.ECFpGroupParams;
 import edu.biu.scapi.primitives.dlog.groupParams.GroupParams;
 import edu.biu.scapi.primitives.dlog.miracl.ECFpPointMiracl;
 import edu.biu.scapi.securityLevel.DDH;
+
 
 /**
  * This class implements an Elliptic curve Dlog group over Fp utilizing Bouncy Castle's implementation. 
@@ -214,9 +216,11 @@ public class BcDlogECFp extends BcAdapterDlogEC implements DlogECFp, DDH {
 			throw new IllegalArgumentException("element type doesn't match the group type");
 		}
 		ECFpPointBc point = (ECFpPointBc) groupElement;
-		byte[] b1 = util.getKLeastSignBytes(point.getX(), k +1);
-		byte[] b2 = new byte[b1.length -1];
-		System.arraycopy(b1, 1, b2, 0, b2.length);
+		byte[] xByteArray = point.getX().toByteArray();
+		byte bOriginalSize = xByteArray[xByteArray.length -1];
+		
+		byte[] b2 = new byte[bOriginalSize];
+		System.arraycopy(xByteArray,xByteArray.length -1  -  bOriginalSize, b2, 0, bOriginalSize);
 		return b2;
 	}
 
@@ -239,6 +243,4 @@ public class BcDlogECFp extends BcAdapterDlogEC implements DlogECFp, DDH {
 		return util.mapAnyGroupElementToByteArray(point.getX(), point.getY());
 	}
 
-
-	
 }
