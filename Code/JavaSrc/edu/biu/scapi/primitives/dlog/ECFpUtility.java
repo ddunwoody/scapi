@@ -157,7 +157,7 @@ public class ECFpUtility {
 
           Choose a random byte array r of length L – k – 2 bytes 
 
-          Prepare a byte array beginning with r, followed by 01x, followed by the input binaryString
+          Prepare a string newString of the following form: r || binaryString || binaryString.length (where || denotes concatenation) (i.e., the least significant byte of newString is the length of binaryString in bytes)
 
           Convert the result to a BigInteger (bIString)
 
@@ -188,12 +188,11 @@ public class ECFpUtility {
 		do{
 			rand.nextBytes(randomArray);
 			System.arraycopy(randomArray, 0, newString, 0, randomArray.length);
-			newString[randomArray.length] = 1;
-			System.arraycopy(binaryString, 0, newString, randomArray.length + 1, binaryString.length);
+			System.arraycopy(binaryString, 0, newString, randomArray.length , binaryString.length);
+			newString[newString.length-1] = (byte) binaryString.length;
 			//Convert the result to a BigInteger (bIString)
 			x = new BigInteger(newString);
-			if(x.compareTo(BigInteger.ZERO) < 0){
-				//System.out.println("The x obtained is negative: " + x);			
+			if(x.compareTo(BigInteger.ZERO) < 0){	
 				byte[] temp = x.toByteArray();
 				byte t0 = temp[0];
 				temp[0] = (byte) -t0;
@@ -315,7 +314,13 @@ public class ECFpUtility {
 	 */
 	public int calcK(BigInteger p){
 		int bitsInp = p.bitLength();
-		return (int) Math.floor((0.4 * bitsInp)/8) - 1;
+		int k =(int) Math.floor((0.4 * bitsInp)/8) - 1;
+		//For technical reasons of how we chose to do the padding for encoding and decoding (the least significant byte of the encoded string contains the size of the 
+		//the original binary string sent for encoding, which is used to remove the padding when decoding) k has to be <= 255 bytes so that the size can be encoded in the padding.
+		if( k > 255){
+			k = 255;
+		}
+		return k;
 	}
 
 	/**
