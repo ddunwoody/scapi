@@ -325,11 +325,10 @@ public class MiraclDlogECFp extends MiraclAdapterDlogEC implements DlogECFp, DDH
 			throw new IllegalArgumentException("element type doesn't match the group type");
 		}
 		ECFpPointMiracl point = (ECFpPointMiracl) groupElement;
-		//The actual work is implemented in ECFpUtility since it is independent of the underlying library (BC, Miracl, or other)
-		//If we ever decide to change the implementation there will only be one place to change it.
-		byte[] b1 = util.getKLeastSignBytes(point.getX(), k +1);
-		byte[] b2 = new byte[b1.length -1];
-		System.arraycopy(b1, 1, b2, 0, b2.length);
+		byte[] xByteArray = point.getX().toByteArray();
+		byte bOriginalSize = xByteArray[xByteArray.length -1];
+		byte[] b2 = new byte[bOriginalSize];
+		System.arraycopy(xByteArray,xByteArray.length -1  -  bOriginalSize, b2, 0, bOriginalSize);
 		return b2;
 	}
 	
