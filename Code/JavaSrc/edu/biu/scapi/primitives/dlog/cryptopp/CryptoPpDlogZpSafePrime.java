@@ -161,6 +161,11 @@ public class CryptoPpDlogZpSafePrime extends DlogGroupAbs implements DlogZpSafeP
 		//and at decoding we will remove that extra byte. This way, even if the original string translates to a negative BigInteger the encode and decode functions
 		//always work with positive numbers. The encoding will be responsible for padding and the decoding will be responsible for removing the pad.
 		k--; 
+		//For technical reasons of how we chose to do the padding for encoding and decoding (the least significant byte of the encoded string contains the size of the 
+		//the original binary string sent for encoding, which is used to remove the padding when decoding) k has to be <= 255 bytes so that the size can be encoded in the padding.
+		if( k > 255){
+			k = 255;
+		}
 		return k;
 	}
 	
