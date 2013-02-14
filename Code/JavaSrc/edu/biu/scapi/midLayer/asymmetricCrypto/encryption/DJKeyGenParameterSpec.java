@@ -29,8 +29,8 @@ package edu.biu.scapi.midLayer.asymmetricCrypto.encryption;
 import java.security.spec.AlgorithmParameterSpec;
 
 /**
- * Parameters for DamgardJurik key generation.
- * 
+ * Parameters for DamgardJurik key generation based on RSA modulus.<p>
+ * These parameters will be used to generate a Key Pair for Damgard Jurik based on RSA modulus n such that n = p*q of length k bits.
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
@@ -39,6 +39,20 @@ public class DJKeyGenParameterSpec implements AlgorithmParameterSpec {
 	private int modulusLength;
 	private int certainty;
 	
+	/**
+	 * Default constructor. The values of the RSA modulus length and the certainty are chosen by SCAPI
+	 */
+	public DJKeyGenParameterSpec(){
+		this.modulusLength = 128;
+		this.certainty = 40;
+	}
+	
+	/**
+	 * Constructor that lets you set the length of the RSA modulus and the certainty required regarding the primeness of p and q.
+	 * 
+	 * @param modulusLength
+	 * @param certainty
+	 */
 	public DJKeyGenParameterSpec(int modulusLength, int certainty){
 		this.modulusLength = modulusLength;
 		this.certainty = certainty;
