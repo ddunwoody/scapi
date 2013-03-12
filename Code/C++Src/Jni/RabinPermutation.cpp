@@ -29,6 +29,7 @@
 #include "Utils.h"
 #include "osrng.h"
 #include <iostream>
+#include "nbtheory.h"
 
 using namespace std;
 using namespace CryptoPP;
@@ -80,7 +81,7 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_trapdoorPermutation_crypto
 	  Utils utils;
 	  Integer m_n, m_r, m_s;
 
-	   /* get the Integers values for the Rabin permutation */
+	  // get the Integers values for the Rabin permutation
 	  m_n=utils.jbyteArrayToCryptoPPInteger(env, n);
 	  m_r=utils.jbyteArrayToCryptoPPInteger(env, r);
 	  m_s=utils.jbyteArrayToCryptoPPInteger(env, s);
@@ -239,25 +240,27 @@ JNIEXPORT jbyteArray JNICALL Java_edu_biu_scapi_primitives_trapdoorPermutation_c
  */
 JNIEXPORT jboolean JNICALL Java_edu_biu_scapi_primitives_trapdoorPermutation_cryptopp_CryptoPpRabinPermutation_checkRabinValidity
   (JNIEnv *env, jobject, jlong pValue, jlong tpPtr) {
-	  Utils utils;
-	  Integer value, mod, p, q, square;
+	Utils utils;
+	Integer value, mod, p, q, square;
+	
+	//get the Integer value of the element
+	value = *((Integer*) pValue);
 
-	  //get the Integer value of the element
-	  value = *((Integer*) pValue);
-
-	  //get mod(N), p, q
-	  mod = ((RabinFunction *) tpPtr) -> GetModulus();
-	  p = ((InvertibleRabinFunction *) tpPtr) -> GetPrime1();
-	  q = ((InvertibleRabinFunction *) tpPtr) -> GetPrime2();
+	//get mod(N), p, q
+	mod = ((RabinFunction *) tpPtr) -> GetModulus();
+	p = ((InvertibleRabinFunction *) tpPtr) -> GetPrime1();
+	q = ((InvertibleRabinFunction *) tpPtr) -> GetPrime2();
 	 
-	  bool valid = false;
+	//check validity
+	if ((Jacobi(value%p, p) == 1) && (Jacobi(value%q, q) == 1))
+	return true;
+	  
+	return false;
 
-	  //check if the element is in the right range
-	  if ((value < mod) && (value > 0)) {
-		  //get a square root
-		  valid = utils.HasSquareRoot(value, p, q);
-	  }
-	  return valid;
+
+
+
+	
 }
 
 /*
@@ -273,8 +276,12 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_trapdoorPermutation_crypto
 	  //get the Integer value for the computation
 	  Integer x = *(Integer*) element;
 
-	  //operate the compute
-	  Integer result = ((RabinFunction *) tpPtr)-> ApplyFunction(*(Integer*) element);
+	  Integer mod = ((RabinFunction *) tpPtr) -> GetModulus();
+	  
+	  ((RabinFunction *) tpPtr) -> DoQuickSanityCheck();
+
+	  //compute
+	  Integer result = x.Squared()%mod;
 
 	  //return the result as jbyteArray
 	  return (jlong) utils.getPointerToInteger(result);
@@ -294,11 +301,53 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_trapdoorPermutation_crypto
 	  //get the Integer value to invert
 	  Integer x = *(Integer*) element;
 
-	  //operate the invert
-	  Integer result = ((InvertibleRabinFunction *) tpPtr) -> CalculateInverse(rng, *(Integer*) element);
+	
+	  //invert
+	  ((InvertibleRabinFunction *) tpPtr) ->DoQuickSanityCheck();
+	  Integer mod = ((InvertibleRabinFunction *) tpPtr) -> GetModulus();
+	  ModularArithmetic modn(mod);
+	  Integer p = ((InvertibleRabinFunction *) tpPtr)->GetPrime1();
+	  Integer q = ((InvertibleRabinFunction *) tpPtr)->GetPrime2();
+	  Integer cp=x % p;
+	  Integer cq=x % q;
+	  cp = ModularSquareRoot(cp, p);
+	  cq = ModularSquareRoot(cq, q);
 
-	  //return the result as jbyteArray
-	  return (jlong) utils.getPointerToInteger(result);
+	  Integer v =p.InverseMod(q);
+      Integer u = ((InvertibleRabinFunction *) tpPtr)->GetMultiplicativeInverseOfPrime2ModPrime1();
+
+	  Integer onep = modn.Multiply(u,q);
+ 
+	  Integer oneq = modn.Multiply(v,p);
+	  
+ 	  Integer outp1 = modn.Multiply(onep,cp);
+      Integer outp2 = modn.Multiply(onep,p-cp);
+      Integer outq1 = modn.Multiply(oneq,cq);
+ 
+	  Integer outq2 = modn.Multiply(oneq,q-cq);
+ 
+	  Integer out = (outp1 + outq1)% mod;
+      if ((Jacobi(out%p, p) == 1) && (Jacobi(out%q, q) == 1)){
+ 
+		return (jlong) utils.getPointerToInteger(out);
+	  }
+	  
+	  out = (outp1 + outq2)%mod;
+      if ((Jacobi(out%p, p) == 1) && (Jacobi(out%q, q) == 1))
+ 		return (jlong) utils.getPointerToInteger(out);
+	  
+	  out = (outp2 + outq1)%mod;
+	  if ((Jacobi(out%p, p) == 1) && (Jacobi(out%q, q) == 1))
+		  return (jlong) utils.getPointerToInteger(out);
+	  
+	  out = (outp2 + outq2)%mod;
+	  if ((Jacobi(out%p, p) == 1) && (Jacobi(out%q, q) == 1))
+		  return (jlong) utils.getPointerToInteger(out);
+ 
+	  //If none of the above cases are true then retun a pointer to the Integer 0.
+	  out = 0;
+	  return (jlong) utils.getPointerToInteger(out);	
+
 }
 
 /*
