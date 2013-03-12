@@ -28,9 +28,11 @@
 #include <iostream>
 #include "Integer.h"
 #include "osrng.h"
+#include "cryptlib.h"
+#include "modarith.h"
 
 using namespace std;
-
+using namespace CryptoPP;
 /*
  * function getPointerToElement		: This function accept an jbyteArray, convert it to Integer and return pointer to it.
  * param element					: The Integer
@@ -95,26 +97,31 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_trapdoorPermutation_crypto
 }
 
 /*
- * function getPointerToRandomRabinElement	: This function create a random Rabin element
+ * function getPointerToRandomRabinElement	: This function creates a random Rabin element
  * param modN								: mod (N)
  * return jlong								: pointer to the random element
  */
 JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_trapdoorPermutation_cryptopp_CryptoPpRabinElement_getPointerToRandomRabinElement
   (JNIEnv *env, jobject, jbyteArray modN) {
 	  
-	   //Random Number Generator
-	  AutoSeededRandomPool rng;
 	  Utils utils;
-	  Integer randNumber;
+	  Integer N = utils.jbyteArrayToCryptoPPInteger(env, modN);
+	  ModularArithmetic modn(N);
+	  AutoSeededRandomPool rng;
+	  Integer *r;
+	  int count = 1;
+	  //The sampled number r also has to be such that GCD(r,N) = 1, tries again until it finds.
+	  for(int i = 0; ; i++){
+		  r = new Integer(rng, Integer::One(), N - Integer::One());
+		  if(Integer::Gcd(*r, N) == 1){
+			  break;
+		  }
+		  delete r;
+	  }
+	  
 
-	  //get the Integer value of mod(N)
-	  Integer mod = utils.jbyteArrayToCryptoPPInteger(env, modN);
-	  
-	  //get a random value in the required range
-	  randNumber.Randomize(rng, 1, mod-1);
-	  //get the power of the random element
-	  Integer pow = randNumber.Times(randNumber).Modulo(mod);
-	  
-	  //return pointer to the power element
-	  return (jlong) utils.getPointerToInteger(pow);
+	  Integer result = modn.Square(*r);
+	  delete r;	
+	  //return pointer to the random Rabin element
+	  return (jlong) utils.getPointerToInteger(result);
 }
