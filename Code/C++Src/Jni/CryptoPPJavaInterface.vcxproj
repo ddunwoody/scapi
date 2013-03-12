@@ -65,16 +65,16 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>.\Release\</OutDir>
-    <IntDir>.\Release\</IntDir>
+    <OutDir>$(SolutionDir)$(Configuration)\$(Platform)\</OutDir>
+    <IntDir>$(SolutionDir)$(Configuration)\$(Platform)\intermmidiate</IntDir>
     <LinkIncremental>true</LinkIncremental>
     <LibraryPath>C:\work\LAST_Project\SDK\Code\C++Src\Jni\cryptlib\Win32;$(LibraryPath)</LibraryPath>
     <IncludePath>C:\work\LAST_Project\SDK\Code\C++Src\Jni;C:\Program Files\CryptoPP\cryptopp561;C:\Program Files %28x86%29\Java\jdk1.6.0_10\include\win32;C:\Program Files %28x86%29\Java\jdk1.6.0_10\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>.\Release64</OutDir>
-    <IntDir>.\Release64</IntDir>
-    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)\$(Configuration)\$(Platform)\</OutDir>
+    <IntDir>$(SolutionDir)\$(Configuration)\$(Platform)\intermmidiate</IntDir>
+    <LinkIncremental>true</LinkIncremental>
     <LibraryPath>C:\work\LAST_Project\SDK\Code\C++Src\Jni\cryptlib\x64;$(LibraryPath)</LibraryPath>
     <IncludePath>C:\work\LAST_Project\SDK\Code\C++Src\Jni;C:\Program Files\CryptoPP\cryptopp561;C:\Program Files %28x86%29\Java\jdk1.6.0_10\include;C:\Program Files %28x86%29\Java\jdk1.6.0_10\include\win32;$(IncludePath)</IncludePath>
   </PropertyGroup>
@@ -102,17 +102,17 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;CRYPTOPPJAVAINTERFACE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AssemblerListingLocation>.\Release\</AssemblerListingLocation>
-      <PrecompiledHeaderOutputFile>.\Release\CryptoPPJavaInterface.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(SolutionDir)$(Configuration)\$(Platform)\</AssemblerListingLocation>
+      <PrecompiledHeaderOutputFile>$(SolutionDir)$(Configuration)\$(Platform)\CryptoPPJavaInterface.pch</PrecompiledHeaderOutputFile>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <ObjectFileName>.\Release\</ObjectFileName>
-      <ProgramDataBaseFileName>.\Release\</ProgramDataBaseFileName>
+      <ObjectFileName>$(SolutionDir)$(Configuration)\$(Platform)\</ObjectFileName>
+      <ProgramDataBaseFileName>$(SolutionDir)$(Configuration)\$(Platform)\</ProgramDataBaseFileName>
     </ClCompile>
     <Midl>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <TypeLibraryName>.\Release\JavaInterface.tlb</TypeLibraryName>
+      <TypeLibraryName>$(SolutionDir)$(Configuration)\$(Platform)\JavaInterface.tlb</TypeLibraryName>
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <TargetEnvironment>Win32</TargetEnvironment>
     </Midl>
@@ -122,38 +122,41 @@
     </ResourceCompile>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>.\Release\CryptoPPJavaInterface.bsc</OutputFile>
+      <OutputFile>$(SolutionDir)$(Configuration)\$(Platform)\CryptoPPJavaInterface.bsc</OutputFile>
     </Bscmake>
     <Link>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <LinkDLL>true</LinkDLL>
       <SubSystem>Console</SubSystem>
-      <OutputFile>.\Release\CryptoPPJavaInterface.dll</OutputFile>
-      <ImportLibrary>.\Release\CryptoPPJavaInterface.lib</ImportLibrary>
+      <OutputFile>$(SolutionDir)$(Configuration)\$(Platform)\CryptoPPJavaInterface.dll</OutputFile>
+      <ImportLibrary>$(SolutionDir)$(Configuration)\$(Platform)\CryptoPPJavaInterface.lib</ImportLibrary>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;cryptlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <TargetMachine>MachineX86</TargetMachine>
+      <ShowProgress>NotSet</ShowProgress>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <StringPooling>true</StringPooling>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <Optimization>MaxSpeed</Optimization>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;CRYPTOPPJAVAINTERFACE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AssemblerListingLocation>.\Release\</AssemblerListingLocation>
-      <PrecompiledHeaderOutputFile>.\Release\CryptoPPJavaInterface.pch</PrecompiledHeaderOutputFile>
+      <PreprocessorDefinitions>WIN64;NDEBUG;_WINDOWS;_USRDLL;CRYPTOPPJAVAINTERFACE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AssemblerListingLocation>$(SolutionDir)$(Configuration)\$(Platform)\</AssemblerListingLocation>
+      <PrecompiledHeaderOutputFile>$(SolutionDir)$(Configuration)\$(Platform)\CryptoPPJavaInterface.pch</PrecompiledHeaderOutputFile>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <ObjectFileName>.\Release\</ObjectFileName>
-      <ProgramDataBaseFileName>.\Release\</ProgramDataBaseFileName>
+      <ObjectFileName>$(SolutionDir)$(Configuration)\$(Platform)\</ObjectFileName>
+      <ProgramDataBaseFileName>$(SolutionDir)$(Configuration)\$(Platform)\</ProgramDataBaseFileName>
+      <TreatWarningAsError>false</TreatWarningAsError>
     </ClCompile>
     <Midl>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <TypeLibraryName>.\Release\JavaInterface.tlb</TypeLibraryName>
+      <TypeLibraryName>.$(SolutionDir)$(Configuration)\$(Platform)\JavaInterface.tlb</TypeLibraryName>
       <MkTypLibCompatible>true</MkTypLibCompatible>
     </Midl>
     <ResourceCompile>
@@ -162,20 +165,23 @@
     </ResourceCompile>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>.\Release\CryptoPPJavaInterface.bsc</OutputFile>
+      <OutputFile>$(SolutionDir)$(Configuration)\$(Platform)\CryptoPPJavaInterface.bsc</OutputFile>
     </Bscmake>
     <Link>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <LinkDLL>true</LinkDLL>
       <SubSystem>Console</SubSystem>
-      <OutputFile>.\Release64\CryptoPPJavaInterface.dll</OutputFile>
-      <ImportLibrary>.\Release64\CryptoPPJavaInterface.lib</ImportLibrary>
-      <AdditionalDependencies>cryptlib.lib;odbc32.lib;odbccp32.lib</AdditionalDependencies>
-      <ShowProgress>NotSet</ShowProgress>
-      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
-      <LinkStatus>true</LinkStatus>
+      <OutputFile>$(SolutionDir)$(Configuration)\$(Platform)\CryptoPPJavaInterface.dll</OutputFile>
+      <ImportLibrary>$(SolutionDir)$(Configuration)\$(Platform)\CryptoPPJavaInterface.lib</ImportLibrary>
+      <AdditionalDependencies>C:\work\LAST_Project\SDK\Code\C++Src\Jni\cryptlib\x64\cryptlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ShowProgress>LinkVerboseLib</ShowProgress>
+      <IgnoreAllDefaultLibraries>
+      </IgnoreAllDefaultLibraries>
+      <LinkStatus>
+      </LinkStatus>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
+      <AdditionalLibraryDirectories>C:\work\LAST_Project\SDK\Code\C++Src\Jni\cryptlib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
