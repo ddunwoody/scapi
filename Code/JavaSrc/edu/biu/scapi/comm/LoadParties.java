@@ -26,16 +26,7 @@
 
 
 
-/**
- * Project: scapi.
- * Package: edu.biu.scapi.comm.
- * File: LoadParties.java.
- * Creation date Feb 20, 2011
- * Created by LabTest
- *
- *
- * This file TODO
- */
+
 package edu.biu.scapi.comm.test;
 
 import java.io.FileInputStream;
@@ -47,7 +38,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
-import edu.biu.scapi.comm.Party;
 
 /**
  * Utility class for reading a list of parties from some file. You can create your own list using other tools.
