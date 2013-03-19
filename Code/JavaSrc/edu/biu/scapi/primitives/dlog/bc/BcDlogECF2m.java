@@ -205,9 +205,9 @@ public class BcDlogECF2m extends BcAdapterDlogEC implements DlogECF2m, DDH{
 	
 	/**
 	 * Encode a byte array to an ECF2mPointBc. Some constraints on the byte array are necessary so that it maps into an element of this group.
-	 * Currently we don't support this conversion. It will be implemented in the future.Meanwhile we return null
+	 * <B>Currently we don't support this conversion.</B> It will be implemented in the future.Meanwhile we return null.
 	 * @param binaryString the byte array to convert
-	 * @return the created group Element
+	 * @return null
 	 */
 	public GroupElement encodeByteArrayToGroupElement(byte[] binaryString){
 		//currently we don't support this conversion. 
@@ -217,7 +217,7 @@ public class BcDlogECF2m extends BcAdapterDlogEC implements DlogECF2m, DDH{
 	
 	/**
 	 * Decode an ECF2mPointBc that was obtained through the encodeByteArrayToGroupElement function to the original byte array.
-	 * Currently we don't support this conversion. It will be implemented in the future.Meanwhile we return null.
+	 * <B>Currently we don't support this conversion.</B> It will be implemented in the future.Meanwhile we return null.
 	 * @param groupElement the element to convert
 	 * @return the created byte array
 	 */
@@ -233,7 +233,8 @@ public class BcDlogECF2m extends BcAdapterDlogEC implements DlogECF2m, DDH{
 	/**
 	 * This function returns the value k which is the maximum length of a string to be converted to a Group Element of this group.<p>
 	 * If a string exceeds the k length it cannot be converted
-	 * Currently we do not have a proper algorithm for this therefore we return 0.
+	 * <B>Currently we do not have a proper algorithm for this therefore we return 0.</B>
+	 * 
 	 * @return k the maximum length of a string to be converted to a Group Element of this group
 	 */
 	public int getMaxLengthOfByteArrayForEncoding() {
@@ -243,7 +244,8 @@ public class BcDlogECF2m extends BcAdapterDlogEC implements DlogECF2m, DDH{
 	}
 
 	/**
-	 * This is 1-1 mapping of any element of this group to a byte array representation.
+	 * This function maps a group element of this dlog group to a byte array.<p>
+	 * This function does not have an inverse function, that is, it is not possible to re-construct the original group element from the resulting byte array. 
 	 * @param groupElement the element to convert
 	 * @return the byte array representation
 	 */
