@@ -344,7 +344,7 @@ public class MiraclDlogECF2m extends MiraclAdapterDlogEC implements DlogECF2m, D
 
 	/**
 	 * Encode a byte array to an ECF2mPointBc. Some constraints on the byte array are necessary so that it maps into an element of this group.
-	 * Currently we don't support this conversion. It will be implemented in the future.Meanwhile we return null.
+	 * <B>Currently we don't support this conversion.</B> It will be implemented in the future.Meanwhile we return null.
 	 * @param binaryString the byte array to convert
 	 * @return the created group Element
 	 */
@@ -356,7 +356,7 @@ public class MiraclDlogECF2m extends MiraclAdapterDlogEC implements DlogECF2m, D
 
 	/**
 	 * Decode an ECF2mPointBc that was obtained through the encodeByteArrayToGroupElement function to the original byte array.
-	 * Currently we don't support this conversion. It will be implemented in the future.Meanwhile we return null.
+	 * <B>Currently we don't support this conversion.</B> It will be implemented in the future.Meanwhile we return null.
 	 * @param groupElement the element to convert
 	 * @return the created byte array
 	 */
@@ -371,7 +371,8 @@ public class MiraclDlogECF2m extends MiraclAdapterDlogEC implements DlogECF2m, D
 
 
 	/**
-	 * This is 1-1 mapping of any element of this group to a byte array representation.
+	 * This function maps a group element of this dlog group to a byte array.<p>
+	 * This function does not have an inverse function, that is, it is not possible to re-construct the original group element from the resulting byte array. 
 	 * @param groupElement the element to convert
 	 * @return the byte array representation
 	 */
