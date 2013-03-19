@@ -26,7 +26,7 @@
 
 package edu.biu.scapi.paddings;
 
-public class NoPadding implements PaddingScheme {
+public final class NoPadding implements PaddingScheme {
 
 	@Override
 	public byte[] pad(byte[] padInput, int padSize) {

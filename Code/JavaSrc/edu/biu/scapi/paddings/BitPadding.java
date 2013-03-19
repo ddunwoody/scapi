@@ -35,7 +35,7 @@ package edu.biu.scapi.paddings;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class BitPadding implements PaddingScheme {
+public final class BitPadding implements PaddingScheme {
 
 	/**
 	 * Default constructor

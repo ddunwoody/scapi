@@ -42,7 +42,7 @@ package edu.biu.scapi.paddings;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class PKCS7Padding implements PaddingScheme {
+public final class PKCS7Padding implements PaddingScheme {
 
 	/**
 	 * Default constructor
