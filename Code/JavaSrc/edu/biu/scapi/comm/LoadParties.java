@@ -22,12 +22,8 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
+package edu.biu.scapi.comm;
 
-
-
-
-
-package edu.biu.scapi.comm.test;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -56,7 +52,6 @@ public class LoadParties {
         parties = new Properties();
         
         try {
-        	
         	parties.load(new FileInputStream(nameOfFile));
 		} catch (FileNotFoundException e1) {
 			// TODO Auto-generated catch block
