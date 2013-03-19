@@ -73,7 +73,10 @@ public class BigIntegerPlainText implements Plaintext, PlaintextSendableData {
 	}
 	
 	/**
-	 * @see edu.biu.scapi.midLayer.plaintext.Plaintext#generateSendableData()
+	 * This function is used when a Plaintext needs to be sent via a edu.biu.scapi.comm.Channel or any other means of sending data (including serialization). 
+	 * It retrieves all the data needed to reconstruct this Plaintext at a later time and/or in a different VM. It puts all the data in an instance of the 
+	 * relevant class that implements the PlaintextSendableData interface.
+	 * In order to deserialize this into a BigIntegerPlainText all you need to do is cast the serialized object with (BigIntegerPlainText)
 	 */
 	@Override
 	public PlaintextSendableData generateSendableData() {
@@ -82,4 +85,11 @@ public class BigIntegerPlainText implements Plaintext, PlaintextSendableData {
 		//generate sendable data, but just return this object.
 		return this;
 	}
+
+	@Override
+	public String toString() {
+		return "BigIntegerPlainText [x=" + x + "]";
+	}
+	
+	
 }
