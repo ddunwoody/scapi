@@ -60,7 +60,7 @@ public class LoadParties {
 	private Properties parties; 
 	
 	
-	LoadParties(String nameOfFile){
+	public LoadParties(String nameOfFile){
 		
 		//create the properties and get the config file
         parties = new Properties();
@@ -79,7 +79,7 @@ public class LoadParties {
 	}
 	
 	
-	List<Party> getPartiesList(){
+	public List<Party> getPartiesList(){
 		
 		List<Party> listOfParties = new LinkedList<Party>();
 		Party party;
@@ -103,7 +103,7 @@ public class LoadParties {
 				e.printStackTrace();
 			}
 			
-			party = new Party("", ip, null, port, null);
+			party = new Party(ip, port);
 			
 			listOfParties.add(party);
 		}
