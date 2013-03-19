@@ -37,7 +37,18 @@ import edu.biu.scapi.primitives.dlog.groupParams.GroupParams;
 * group G and a random element h in G, find the (unique) integer x such that 
 * g^x = h.<p> 
 * In cryptography, we are interested in groups for which the discrete logarithm problem (Dlog for short) is assumed to be hard.<p> 
-* The two most common classes are the group Zp* for a large p, and some Elliptic curve groups.
+* The two most common classes are the group Zp* for a large p, and some Elliptic curve groups.<p>
+*  
+* Another issue pertaining elliptic curves is the need to find a suitable mapping that will convert an arbitrary message (that is some binary string) to an element of the group and vice-versa.<p> 
+* Only a subset of the messages can be effectively mapped to a group element in such a way that there is a one-to-one injection that converts the string to a group element and vice-versa.<p> 
+* On the other hand, any group element can be mapped to some string.<p> 
+* In this case, the operation is not invertible. This functionality is implemented by the functions:<p>
+*  - {@code encodeByteArrayToGroupElement(byte[] binaryString) : GroupElement}<p>
+*  - {@code decodeGroupElementToByteArray(GroupElement element) : byte[]}<p>
+*  - {@code mapAnyGroupElementToByteArray(GroupElement element) : byte[]}<p>
+*  
+*  The first two work as a pair and decodeGroupElementToByteArray is the inverse of encodeByteArrayToGroupElement, whereas the last one works alone and does not have an inverse. 
+
 * 
 * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
 
@@ -197,29 +208,42 @@ public interface DlogGroup {
 	/**
 	 * This function cleans up any resources used by exponentiateWithPreComputedValues for the requested base.
 	 * It is recommended to call it whenever an application does not need to continue calculating exponentiations for this specific base.   
+	 * 
 	 * @param base
 	 */
 	public void endExponentiateWithPreComputedValues(GroupElement base);
 	
 	/**
-	 * Converts a byte array to a GroupElement.
-	 * @param binaryString the byte array to convert
-	 * @return the created group Element or null if element could not be created
+	 * This function takes any string of length up to k bytes and encodes it to a Group Element. 
+	 * k can be obtained by calling getMaxLengthOfByteArrayForEncoding() and it is calculated upon construction of this group; it depends on the length in bits of p.<p>
+	 * The encoding-decoding functionality is not a bijection, that is, it is a 1-1 function but is not onto. 
+	 * Therefore, any string of length in bytes up to k can be encoded to a group element but not every group element can be decoded to a binary string in the group of binary strings of length up to 2^k.<p>
+	 * Thus, the right way to use this functionality is first to encode a byte array and then to decode it, and not the opposite.
+	 * 
+	 * @param binaryString the byte array to encode
+	 * @return the encoded group Element <B> or null </B>if element could not be encoded
 	 */
 	public GroupElement encodeByteArrayToGroupElement(byte[] binaryString);
 	
 	/**
-	 * Convert a GroupElement to a byte array.
-	 * @param groupElement the element to convert
-	 * @return the created byte array
+	 * This function decodes a group element to a byte array. This function is guaranteed to work properly ONLY if the group element was obtained as a result of 
+	 * encoding a binary string of length in bytes up to k.<p>
+	 * This is because the encoding-decoding functionality is not a bijection, that is, it is a 1-1 function but is not onto. 
+	 * Therefore, any string of length in bytes up to k can be encoded to a group element but not any group element can be decoded 
+	 * to a binary sting in the group of binary strings of length up to 2^k.
+	 * 
+	 * @param groupElement the element to decode
+	 * @return the decoded byte array
 	 */
 	public byte[] decodeGroupElementToByteArray(GroupElement groupElement);
 	
 	
 	/**
-	 * This function returns the value k which is the maximum length of a string to be converted to a Group Element of this group.<p>
-	 * If a string exceeds the k length it cannot be converted
-	 * @return k the maximum length of a string to be converted to a Group Element of this group. k can be zero if there is no maximum.
+	 * This function returns the value <I>k</I> which is the maximum length of a string to be encoded to a Group Element of this group.<p>
+	 * Any string of length <I>k</I> has a numeric value that is less than (p-1)/2 – 1.
+	 * <I>k</I> is the maximum length a binary string is allowed to be in order to encode the said binary string to a group element and vice-versa.<p>
+	 * If a string exceeds the <I>k</I> length it cannot be encoded.
+	 * @return k the maximum length of a string to be encoded to a Group Element of this group. k can be zero if there is no maximum.
 	 */
 	public int getMaxLengthOfByteArrayForEncoding();
 	
