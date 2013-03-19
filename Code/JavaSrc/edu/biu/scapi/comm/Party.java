@@ -54,13 +54,26 @@ public class Party {
 	 * A constructor which sets all the data of a Party.
 	 * @param ipAdress 
 	 * @param port
+	 * @deprecated You should use the constructor that receives only the party's IP address and port
 	 */
-	public Party(String name, InetAddress ipAdress, Key key, int port, Role role){
+	@Deprecated public Party(String name, InetAddress ipAdress, Key key, int port, Role role){
 		
 		this.ipAddress = ipAdress;
 		this.port = port;
 		
 	}
+	/**
+	 * A constructor which sets all the data of a Party.
+	 * @param ipAdress 
+	 * @param port
+	 */
+	public Party(InetAddress ipAdress, int port){
+		
+		this.ipAddress = ipAdress;
+		this.port = port;
+		
+	}
+	
 	/**
 	 * Compares two parties.
 	 * @param otherParty the other party to compare to
