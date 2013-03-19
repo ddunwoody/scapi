@@ -26,6 +26,7 @@
 
 package edu.biu.scapi.midLayer.plaintext;
 
+import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
 
@@ -43,6 +44,9 @@ public class GroupElementPlaintext implements Plaintext {
 		element = el;
 	}
 	
+	public GroupElementPlaintext(GroupElementPlaintextSendableData data, DlogGroup dlog){
+		this(dlog.generateElement(false, data.getGroupElement()));
+	}
 	public GroupElement getElement(){
 		return element;
 	}
@@ -76,7 +80,7 @@ public class GroupElementPlaintext implements Plaintext {
 		return new GroupElementPlaintextSendableData(element.generateSendableData());
 	}
 	
-	
+	//Nested class that holds the sendable data of the outer class
 	static public class GroupElementPlaintextSendableData implements PlaintextSendableData {
 
 		private static final long serialVersionUID = -5267306672307327063L;
