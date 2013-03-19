@@ -302,7 +302,12 @@ public class MiraclDlogECFp extends MiraclAdapterDlogEC implements DlogECFp, DDH
 
 
 	/**
-	 * Converts a byte array to an ECFpPointMiracl.
+	 * This function takes any string of length up to k bytes and encodes it to a Group Element. 
+	 * k can be obtained by calling getMaxLengthOfByteArrayForEncoding() and it is calculated upon construction of this group; it depends on the length in bits of p.<p>
+	 * The encoding-decoding functionality is not a bijection, that is, it is a 1-1 function but is not onto. 
+	 * Therefore, any string of length in bytes up to k can be encoded to a group element but not every group element can be decoded to a binary string in the group of binary strings of length up to 2^k.<p>
+	 * Thus, the right way to use this functionality is first to encode a byte array and then to decode it, and not the opposite.
+	 * 
 	 * @param binaryString the byte array to convert
 	 * @throws IndexOutOfBoundsException if the length of the binary array to encode is longer than k
 	 * @return the created group Element
@@ -316,7 +321,12 @@ public class MiraclDlogECFp extends MiraclAdapterDlogEC implements DlogECFp, DDH
 	}
 	
 	/**
-	 * Convert a ECFpPointMiracl to a byte array.
+	 * This function decodes a group element to a byte array. This function is guaranteed to work properly ONLY if the group element was obtained as a result of 
+	 * encoding a binary string of length in bytes up to k.<p>
+	 * This is because the encoding-decoding functionality is not a bijection, that is, it is a 1-1 function but is not onto. 
+	 * Therefore, any string of length in bytes up to k can be encoded to a group element but not any group element can be decoded 
+	 * to a binary sting in the group of binary strings of length up to 2^k.
+	 * 
 	 * @param groupElement the element to convert
 	 * @return the created byte array
 	 */
