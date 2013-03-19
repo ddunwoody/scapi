@@ -53,6 +53,16 @@ public abstract class CramerShoupCiphertext implements AsymmetricCiphertext{
 		return v;
 	}
 	
+	
+	
+	@Override
+	public String toString() {
+		return "CramerShoupCiphertext [u1=" + u1 + ", u2=" + u2 + ", v=" + v
+				+ "]";
+	}
+
+
+	//Nested class that holds the sendable data of the outer class
 	static public abstract class CramerShoupCiphertextSendableData implements AsymmetricCiphertextSendableData {
 
 		private static final long serialVersionUID = -6925856352814870257L;

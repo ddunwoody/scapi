@@ -26,6 +26,7 @@
 
 package edu.biu.scapi.midLayer.ciphertext;
 
+import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
 
@@ -42,7 +43,12 @@ public class CramerShoupOnGroupElementCiphertext extends CramerShoupCiphertext {
 		super(u1, u2, v);
 		this.e = e;
 	}
-
+	
+	//This constructor needs the Dlog Group so that it can reconstruct the group elements from the sendable data.
+	public CramerShoupOnGroupElementCiphertext(CrShOnGroupElSendableData data, DlogGroup dlog){
+		this(dlog.generateElement(false, data.getU1()), dlog.generateElement(false, data.getU2()), dlog.generateElement(false, data.getE()), dlog.generateElement(false, data.getV()));
+	}
+	
 	public GroupElement getE() {
 		return e;
 	}
@@ -50,6 +56,14 @@ public class CramerShoupOnGroupElementCiphertext extends CramerShoupCiphertext {
 		return new CrShOnGroupElSendableData(getU1().generateSendableData(), getU2().generateSendableData(), getV().generateSendableData(), e.generateSendableData());
 	}
 	
+	
+	@Override
+	public String toString() {
+		String s = super.toString() + "[e=" + e + "]";
+		return s;
+	}
+
+	//Nested class that holds the sendable data of the outer class
 	static public class CrShOnGroupElSendableData extends CramerShoupCiphertextSendableData {
 
 		

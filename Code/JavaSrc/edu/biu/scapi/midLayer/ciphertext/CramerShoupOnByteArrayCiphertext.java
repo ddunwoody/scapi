@@ -26,6 +26,9 @@
 
 package edu.biu.scapi.midLayer.ciphertext;
 
+import java.util.Arrays;
+
+import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
 
@@ -39,6 +42,10 @@ public class CramerShoupOnByteArrayCiphertext extends CramerShoupCiphertext{
 		
 	}
 
+	public CramerShoupOnByteArrayCiphertext(CrShOnByteArraySendableData data, DlogGroup dlog){
+		this(dlog.generateElement(false, data.getU1()), dlog.generateElement(false, data.getU2()), data.getE(), dlog.generateElement(false, data.getV()));
+
+	}
 	public byte[] getE() {
 		return e;
 	}
@@ -47,6 +54,18 @@ public class CramerShoupOnByteArrayCiphertext extends CramerShoupCiphertext{
 		return new CrShOnByteArraySendableData(getU1().generateSendableData(), getU2().generateSendableData(), getV().generateSendableData(), e);
 	}
 	
+	
+	
+	
+	@Override
+	public String toString() {
+		String s = super.toString() + "[e=" + Arrays.toString(e) + "]";
+		return s;
+	}
+
+
+
+	//Nested class that holds the sendable data of the outer class
 	static public class CrShOnByteArraySendableData extends CramerShoupCiphertextSendableData {
 
 		private static final long serialVersionUID = 8318304796976977262L;

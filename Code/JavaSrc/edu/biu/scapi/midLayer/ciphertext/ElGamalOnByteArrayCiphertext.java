@@ -26,11 +26,16 @@
 
 package edu.biu.scapi.midLayer.ciphertext;
 
+import java.util.Arrays;
+
+import edu.biu.scapi.midLayer.ciphertext.ElGamalOnGroupElementCiphertext.ElGamalOnGrElSendableData;
+import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
 
 public class ElGamalOnByteArrayCiphertext implements AsymmetricCiphertext{
 
+	
 	//First part of the ciphertext.
 	private GroupElement cipher1;
 	//Second part of the ciphertext.
@@ -44,6 +49,10 @@ public class ElGamalOnByteArrayCiphertext implements AsymmetricCiphertext{
 	public ElGamalOnByteArrayCiphertext(GroupElement c1, byte[] c2){
 		this.cipher1 = c1;
 		this.cipher2 = c2;
+	}
+	
+	public ElGamalOnByteArrayCiphertext(ElGamalOnByteArraySendableData data, DlogGroup dlog){
+		this(dlog.generateElement(false, data.getCipher1()),data.getCipher2());
 	}
 	
 	/**
@@ -70,6 +79,14 @@ public class ElGamalOnByteArrayCiphertext implements AsymmetricCiphertext{
 		return new ElGamalOnByteArraySendableData(cipher1.generateSendableData(), cipher2);
 	}
 	
+	@Override
+	public String toString() {
+		return "ElGamalOnByteArrayCiphertext [cipher1=" + cipher1
+				+ ", cipher2=" + Arrays.toString(cipher2) + "]";
+	}
+	
+	
+	//Nested class that holds the sendable data of the outer class
 	static public class ElGamalOnByteArraySendableData implements AsymmetricCiphertextSendableData {
 
 		private static final long serialVersionUID = -4094624693278838188L;

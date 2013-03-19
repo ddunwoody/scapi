@@ -48,7 +48,11 @@ public class BigIntegerCiphertext implements AsymmetricCiphertext, AsymmetricCip
 	}
 
 	/**
-	 * @see edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertext#generateSendableData()
+	 * This function is used when an asymmetric ciphertext needs to be sent via a edu.biu.scapi.comm.Channel or any other means of sending data (including serialization). 
+	 * It retrieves all the data needed to reconstruct this ciphertext at a later time and/or in a different VM. It puts all the data in an instance of the relevant class 
+	 * that implements the AsymmetricCiphertextSendableData interface.<p>
+	 * In order to deserialize this into a BigIntegerCiphertext all you need to do is cast the serialized object with (BigIntegerCiphertext)
+	 * 
 	 */
 	@Override
 	public AsymmetricCiphertextSendableData generateSendableData() {
@@ -57,5 +61,12 @@ public class BigIntegerCiphertext implements AsymmetricCiphertext, AsymmetricCip
 		//generate sendable data, but just return this object.
 		return this;
 	}
+
+	@Override
+	public String toString() {
+		return "BigIntegerCiphertext [cipher=" + cipher + "]";
+	}
+	
+	
 	
 }

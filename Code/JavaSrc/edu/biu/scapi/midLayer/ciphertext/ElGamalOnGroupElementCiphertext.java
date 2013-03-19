@@ -26,6 +26,7 @@
 
 package edu.biu.scapi.midLayer.ciphertext;
 
+import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
 
@@ -48,6 +49,10 @@ public class ElGamalOnGroupElementCiphertext implements AsymmetricCiphertext {
 	public ElGamalOnGroupElementCiphertext(GroupElement c1, GroupElement c2){
 		this.cipher1 = c1;
 		this.cipher2 = c2;
+	}
+	
+	public ElGamalOnGroupElementCiphertext(ElGamalOnGrElSendableData data, DlogGroup dlog){
+		this(dlog.generateElement(false, data.getCipher1()), dlog.generateElement(false, data.getCipher2()));
 	}
 	
 	/**
@@ -74,6 +79,19 @@ public class ElGamalOnGroupElementCiphertext implements AsymmetricCiphertext {
 		return new ElGamalOnGrElSendableData(cipher1.generateSendableData(), cipher2.generateSendableData());
 	}
 	
+	
+	
+	
+	@Override
+	public String toString() {
+		return "ElGamalOnGroupElementCiphertext [cipher1=" + cipher1
+				+ ", cipher2=" + cipher2 + "]";
+	}
+
+
+
+
+	//Nested class that holds the sendable data of the outer class
 	static public class ElGamalOnGrElSendableData implements AsymmetricCiphertextSendableData {
 
 
