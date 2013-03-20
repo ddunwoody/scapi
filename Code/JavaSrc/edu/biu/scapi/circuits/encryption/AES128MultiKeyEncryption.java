@@ -22,8 +22,6 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-
-
 package edu.biu.scapi.circuits.encryption;
 
 import java.security.InvalidKeyException;
@@ -33,8 +31,10 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.SecretKey;
 
 import edu.biu.scapi.circuits.garbledCircuit.MinimizeAESSetKeyGarbledBooleanCircuit;
-import edu.biu.scapi.midLayer.ciphertext.ByteArraySymCiphertext;
-import edu.biu.scapi.midLayer.plaintext.ByteArrayPlaintext;
+import edu.biu.scapi.exceptions.CiphertextTooLongException;
+import edu.biu.scapi.exceptions.KeyNotSetException;
+import edu.biu.scapi.exceptions.PlaintextTooLongException;
+import edu.biu.scapi.exceptions.TweakNotSetException;
 import edu.biu.scapi.primitives.prf.PseudorandomFunction;
 import edu.biu.scapi.primitives.prf.cryptopp.CryptoPpAES;
 
@@ -63,6 +63,10 @@ import edu.biu.scapi.primitives.prf.cryptopp.CryptoPpAES;
  */
 public class AES128MultiKeyEncryption implements MultiKeyEncryptionScheme {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7955510990507430705L;
 	/**
 	 * Key size in bits
 	 */
@@ -101,7 +105,7 @@ public class AES128MultiKeyEncryption implements MultiKeyEncryptionScheme {
 	}
 
 	@Override
-	public ByteArraySymCiphertext encrypt(ByteArrayPlaintext plaintext) throws KeyNotSetException, TweakNotSetException, InvalidKeyException, IllegalBlockSizeException, PlaintextTooLongException {
+	public byte[] encrypt(byte[] plaintext) throws KeyNotSetException, TweakNotSetException, InvalidKeyException, IllegalBlockSizeException, PlaintextTooLongException {
 		if (!isKeySet) {
 			throw new KeyNotSetException();
 		}
@@ -112,7 +116,7 @@ public class AES128MultiKeyEncryption implements MultiKeyEncryptionScheme {
 		 * divide by 8 since the key size is specified in bits and we are using a
 		 * byte array
 		 */
-		if (plaintext.getText().length > KEY_SIZE / 8) {
+		if (plaintext.length > KEY_SIZE / 8) {
 			throw new PlaintextTooLongException();
 		}
 		int numberOfKeys = key.numberOfKeys();
@@ -136,16 +140,16 @@ public class AES128MultiKeyEncryption implements MultiKeyEncryptionScheme {
 				outBytes[currentByte] ^= temp[currentByte];
 			}
 		}
-		byte[] plaintextBytes = plaintext.getText();
+		
 		for (int currentByte = 0; currentByte < outBytes.length; currentByte++) {
-			outBytes[currentByte] ^= plaintextBytes[currentByte];
+			outBytes[currentByte] ^= plaintext[currentByte];
 		}
-		return new ByteArraySymCiphertext(outBytes);
+		return outBytes;
 
 	}
 
 	@Override
-	public ByteArrayPlaintext decrypt(ByteArraySymCiphertext ciphertext) throws CiphertextTooLongException, KeyNotSetException, TweakNotSetException, InvalidKeyException, IllegalBlockSizeException {
+	public byte[] decrypt(byte[] ciphertext) throws CiphertextTooLongException, KeyNotSetException, TweakNotSetException, InvalidKeyException, IllegalBlockSizeException {
 		if (!isKeySet) {
 			throw new KeyNotSetException();
 		}
@@ -156,7 +160,7 @@ public class AES128MultiKeyEncryption implements MultiKeyEncryptionScheme {
 		 * divide by 8 since the key size is specified in bits and we are using a
 		 * byte array
 		 */
-		if (ciphertext.getBytes().length > KEY_SIZE / 8) {
+		if (ciphertext.length > KEY_SIZE / 8) {
 			throw new CiphertextTooLongException();
 		}
 		int numberOfKeys = key.numberOfKeys();
@@ -179,11 +183,10 @@ public class AES128MultiKeyEncryption implements MultiKeyEncryptionScheme {
 			}
 		}
 		// we now XOR outbytes to the ciphertext to get the plaintext
-		byte[] ciphertextBytes = ciphertext.getBytes();
 		for (int currentByte = 0; currentByte < outBytes.length; currentByte++) {
-			outBytes[currentByte] ^= ciphertextBytes[currentByte];
+			outBytes[currentByte] ^= ciphertext[currentByte];
 		}
-		return new ByteArrayPlaintext(outBytes);
+		return outBytes;
 	}
 
 	@Override
@@ -195,6 +198,16 @@ public class AES128MultiKeyEncryption implements MultiKeyEncryptionScheme {
 	public void setTweak(byte[] tweak) {
 		this.tweak = tweak;
 		isTweakSet = true;
+	}
+
+	
+	/**
+	 * return the block size of aes
+	 */
+	@Override
+	public int getCipherSize() {
+		
+		return aes.getBlockSize(); 
 	}
 
 }

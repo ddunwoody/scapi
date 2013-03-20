@@ -22,18 +22,20 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-
-
 package edu.biu.scapi.circuits.encryption;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.security.SecureRandom;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import edu.biu.scapi.exceptions.CiphertextTooLongException;
 import edu.biu.scapi.exceptions.FactoriesException;
-import edu.biu.scapi.midLayer.ciphertext.ByteArraySymCiphertext;
-import edu.biu.scapi.midLayer.plaintext.ByteArrayPlaintext;
+import edu.biu.scapi.exceptions.InvalidKeySizeException;
+import edu.biu.scapi.exceptions.KeyNotSetException;
+import edu.biu.scapi.exceptions.PlaintextTooLongException;
 import edu.biu.scapi.primitives.hash.CryptographicHash;
 import edu.biu.scapi.tools.Factories.CryptographicHashFactory;
 
@@ -49,6 +51,11 @@ import edu.biu.scapi.tools.Factories.CryptographicHashFactory;
  * 
  */
 public class HashingMultiKeyEncryption implements MultiKeyEncryptionScheme {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3026420970664946138L;
 
 	/**
 	 * Key size in bits. This is the size of the individual keys. One or more
@@ -72,7 +79,7 @@ public class HashingMultiKeyEncryption implements MultiKeyEncryptionScheme {
 	/**
 	 * 
 	 */
-	CryptographicHash hash;
+	private transient CryptographicHash hash;
 
 	/**
 	 * @throws FactoriesException
@@ -83,22 +90,32 @@ public class HashingMultiKeyEncryption implements MultiKeyEncryptionScheme {
 			throw new InvalidKeySizeException();
 		}
 		this.keySize = keySize;
-		hash = CryptographicHashFactory.getInstance().getObject("SHA-1");
+		hash = CryptographicHashFactory.getInstance().getObject("SHA-1","CryptoPP");
 		random = new SecureRandom();
 		isKeySet = false;
 	}
 
 	/**
+	 * @throws FactoriesException 
 	 * 
 	 */
-	public HashingMultiKeyEncryption() {
-		// TODO Auto-generated constructor stub
+	public HashingMultiKeyEncryption() throws FactoriesException {
+		
+		hash = CryptographicHashFactory.getInstance().getObject("SHA-1","CryptoPP");
 	}
 
 	@Override
-	public ByteArraySymCiphertext encrypt(ByteArrayPlaintext plaintext)
+	public byte[] encrypt(byte[] plaintext)
 			throws KeyNotSetException, PlaintextTooLongException {
-		byte[] ptBytes = plaintext.getText();
+		
+		//CryptographicHash hash = null;
+		/*try {
+			hash = CryptographicHashFactory.getInstance().getObject("SHA-1");
+		} catch (FactoriesException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
+		
 		if (!isKeySet) {
 			throw new KeyNotSetException();
 		}
@@ -112,7 +129,7 @@ public class HashingMultiKeyEncryption implements MultiKeyEncryptionScheme {
 		}
 		byte[] output = new byte[20];
 		hash.hashFinal(output, 0);
-		int offset = output.length - ptBytes.length;
+		int offset = output.length - plaintext.length;
 		if (offset < 0) {
 			/*
 			 * the plaintext is longer than the output of the hashed and cannot be
@@ -126,46 +143,48 @@ public class HashingMultiKeyEncryption implements MultiKeyEncryptionScheme {
 			 * last n bytes where n is the size of the plaintext
 			 */
 
-			byte[] temp = new byte[ptBytes.length];
+			byte[] temp = new byte[plaintext.length];
 			for (int i = 0; i < temp.length; i++) {
 				temp[i] = output[i + offset];
 			}
 			output = temp;
 		}
 		for (int i = 0; i < output.length; i++) {
-			output[i] ^= ptBytes[i];
+			output[i] ^= plaintext[i];
 		}
-		return new ByteArraySymCiphertext(output);
+		return output;
 	}
 
 	@Override
-	public ByteArrayPlaintext decrypt(ByteArraySymCiphertext ciphertext)
+	public byte[] decrypt(byte[] ciphertext)
 			throws KeyNotSetException, CiphertextTooLongException {
+		
+		
+		
 		if (!isKeySet()) {
 			throw new KeyNotSetException();
 		}
 		// see comments to encrypt method to understand the encryption/decryption
-		byte[] ctBytes = ciphertext.getBytes();
 		for (SecretKey k : key.getKeys()) {
 			hash.update(k.getEncoded(), 0, keySize / 8);
 		}
 		byte[] output = new byte[20];
 		hash.hashFinal(output, 0);
-		int offset = output.length - ctBytes.length;
+		int offset = output.length - ciphertext.length;
 		if (offset < 0) {
 			throw new CiphertextTooLongException();
 		}
 		if (offset > 0) {
-			byte[] temp = new byte[ctBytes.length];
+			byte[] temp = new byte[ciphertext.length];
 			for (int i = 0; i < temp.length; i++) {
 				temp[i] = output[i + offset];
 			}
 			output = temp;
 		}
 		for (int i = 0; i < output.length; i++) {
-			output[i] ^= ctBytes[i];
+			output[i] ^= ciphertext[i];
 		}
-		return new ByteArrayPlaintext(output);
+		return output;
 	}
 
 	@Override
@@ -199,4 +218,21 @@ public class HashingMultiKeyEncryption implements MultiKeyEncryptionScheme {
 	public void setTweak(byte[] tweak) {
 		// this encryption scheme ignores the tweak
 	}
+	
+	
+	private void readObject(ObjectInputStream inputStream)
+            throws IOException, ClassNotFoundException, FactoriesException
+    {
+		inputStream.defaultReadObject();
+		hash = CryptographicHashFactory.getInstance().getObject("SHA-1", "CryptoPP");
+    }
+
+	@Override
+	/**
+	 * Returns the size of the ciphertext
+	 */
+	public int getCipherSize() {
+
+		return keySize/8;
+	}  
 }

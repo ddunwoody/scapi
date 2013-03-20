@@ -22,10 +22,10 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-
-
 package edu.biu.scapi.circuits.encryption;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.security.InvalidKeyException;
 
 import javax.crypto.IllegalBlockSizeException;
@@ -33,6 +33,8 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import edu.biu.scapi.exceptions.FactoriesException;
+import edu.biu.scapi.exceptions.KeyNotSetException;
+import edu.biu.scapi.exceptions.TweakNotSetException;
 import edu.biu.scapi.midLayer.ciphertext.ByteArraySymCiphertext;
 import edu.biu.scapi.midLayer.plaintext.ByteArrayPlaintext;
 import edu.biu.scapi.primitives.prf.PseudorandomFunction;
@@ -55,6 +57,10 @@ import edu.biu.scapi.primitives.prf.cryptopp.CryptoPpAES;
 public class AESFixedKeyMultiKeyEncryption implements MultiKeyEncryptionScheme {
 
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8996246613462171590L;
+	/**
 	 * The number of bits in the key. It is currently set to 128, and the
 	 * {@code FIXED_KEY} field is this size
 	 */
@@ -64,7 +70,8 @@ public class AESFixedKeyMultiKeyEncryption implements MultiKeyEncryptionScheme {
 	 */
 	static final SecretKey FIXED_KEY = new SecretKeySpec(new byte[] { -13, 29,
 			-20, 98, -96, -51, -86, -82, 9, 49, -26, 92, -22, 50, -100, 36 }, "");
-	PseudorandomFunction aes;
+	
+	transient PseudorandomFunction aes;
 	/**
 	 * The key here is not the key to the AES, but rather the key to this
 	 * encryption scheme. See Mihir Bellare, Viet Tung Hoang, and Phillip Rogaway
@@ -90,7 +97,7 @@ public class AESFixedKeyMultiKeyEncryption implements MultiKeyEncryptionScheme {
 	boolean isTweakSet = false;
 
 	public AESFixedKeyMultiKeyEncryption() throws FactoriesException, InvalidKeyException {
-		// aes = new BcAES();
+		//aes = new BcAES();
 		aes = new CryptoPpAES();
 		aes.setKey(FIXED_KEY);
 	}
@@ -113,7 +120,7 @@ public class AESFixedKeyMultiKeyEncryption implements MultiKeyEncryptionScheme {
 	}
 
 	@Override
-	public ByteArraySymCiphertext encrypt(ByteArrayPlaintext plaintext) throws KeyNotSetException, TweakNotSetException, IllegalBlockSizeException {
+	public byte[] encrypt(byte[] plaintext) throws KeyNotSetException, TweakNotSetException, IllegalBlockSizeException {
 		if (!isKeySet) {
 			throw new KeyNotSetException();
 		}
@@ -140,21 +147,20 @@ public class AESFixedKeyMultiKeyEncryption implements MultiKeyEncryptionScheme {
 		 * "Garbling Schemes" by Bellare, Hoang and Rogaway
 		 */
 		aes.computeBlock(inBytes, 0, outBytes, 0);
-		byte[] plaintextBytes = plaintext.getText();
 		/*
 		 * We now XOR the output of the AES again with inBytes(i.e. K in the above
 		 * cited paper) and then with the plaintext to obtain the ciphertext
 		 */
 		for (int byteNumber = 0; byteNumber < outBytes.length; byteNumber++) {
 			outBytes[byteNumber] ^= inBytes[byteNumber];
-			outBytes[byteNumber] ^= plaintextBytes[byteNumber];
+			outBytes[byteNumber] ^= plaintext[byteNumber];
 		}
 
-		return new ByteArraySymCiphertext(outBytes);
+		return outBytes;
 	}
 
 	@Override
-	public ByteArrayPlaintext decrypt(ByteArraySymCiphertext ciphertext) throws KeyNotSetException, TweakNotSetException, IllegalBlockSizeException {
+	public byte[] decrypt(byte[] ciphertext) throws KeyNotSetException, TweakNotSetException, IllegalBlockSizeException {
 		if (!isKeySet) {
 			throw new KeyNotSetException();
 		}
@@ -185,9 +191,9 @@ public class AESFixedKeyMultiKeyEncryption implements MultiKeyEncryptionScheme {
 		 */
 		for (int byteNumber = 0; byteNumber < outBytes.length; byteNumber++) {
 			outBytes[byteNumber] ^= inBytes[byteNumber];
-			outBytes[byteNumber] ^= ciphertext.getBytes()[byteNumber];
+			outBytes[byteNumber] ^= ciphertext[byteNumber];
 		}
-		return new ByteArrayPlaintext(outBytes);
+		return outBytes;
 	}
 
 	@Override
@@ -200,4 +206,21 @@ public class AESFixedKeyMultiKeyEncryption implements MultiKeyEncryptionScheme {
 		this.tweak = tweak;
 		isTweakSet = true;
 	}
+	
+	private void readObject(ObjectInputStream inputStream)
+            throws IOException, ClassNotFoundException, FactoriesException, InvalidKeyException
+    {
+		inputStream.defaultReadObject();
+		aes = new CryptoPpAES();
+		aes.setKey(FIXED_KEY);
+    }
+	
+	/**
+	 *  Return the block size of aes
+	 */
+	@Override
+	public int getCipherSize() {
+		
+		return aes.getBlockSize();
+	} 
 }

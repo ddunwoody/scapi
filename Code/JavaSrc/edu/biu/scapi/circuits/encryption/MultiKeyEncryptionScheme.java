@@ -22,17 +22,18 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-
-
 package edu.biu.scapi.circuits.encryption;
 
+import java.io.Serializable;
 import java.security.InvalidKeyException;
 
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.SecretKey;
 
-import edu.biu.scapi.midLayer.ciphertext.ByteArraySymCiphertext;
-import edu.biu.scapi.midLayer.plaintext.ByteArrayPlaintext;
+import edu.biu.scapi.exceptions.CiphertextTooLongException;
+import edu.biu.scapi.exceptions.KeyNotSetException;
+import edu.biu.scapi.exceptions.PlaintextTooLongException;
+import edu.biu.scapi.exceptions.TweakNotSetException;
 
 /**
  * A general interface for creating multiple key encryption schemes. When
@@ -50,7 +51,7 @@ import edu.biu.scapi.midLayer.plaintext.ByteArrayPlaintext;
  * @author Steven Goldfeder
  * 
  */
-public interface MultiKeyEncryptionScheme {
+public interface MultiKeyEncryptionScheme  extends Serializable{
 
 	/**
 	 * This method generates a <b>single</b> {@codeSecretKey} NOT a
@@ -124,7 +125,7 @@ public interface MultiKeyEncryptionScheme {
 	 * @throws PlaintextTooLongException
 	 */
 
-	ByteArraySymCiphertext encrypt(ByteArrayPlaintext plaintext)
+	byte[] encrypt(byte[] plaintext)
 			throws KeyNotSetException, TweakNotSetException, InvalidKeyException,
 			IllegalBlockSizeException, PlaintextTooLongException;
 
@@ -140,7 +141,7 @@ public interface MultiKeyEncryptionScheme {
 	 * @throws IllegalBlockSizeException
 	 */
 
-	ByteArrayPlaintext decrypt(ByteArraySymCiphertext ciphertext)
+	byte[] decrypt(byte[] ciphertext)
 			throws CiphertextTooLongException, KeyNotSetException,
 			TweakNotSetException, InvalidKeyException, IllegalBlockSizeException;
 
@@ -166,5 +167,10 @@ public interface MultiKeyEncryptionScheme {
 	 *          The tweak to be used for this encryption scheme
 	 */
 	public void setTweak(byte[] tweak);
+	
+	/**
+	 * Returns the size of the ciphertext
+	 */
+	public int getCipherSize();
 
 }
