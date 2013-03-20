@@ -22,10 +22,9 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-
-
 package edu.biu.scapi.circuits.garbledCircuit;
 
+import java.io.Serializable;
 import java.security.InvalidKeyException;
 import java.util.Map;
 
@@ -33,9 +32,9 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.SecretKey;
 
 import edu.biu.scapi.circuits.circuit.Gate;
-import edu.biu.scapi.circuits.encryption.CiphertextTooLongException;
-import edu.biu.scapi.circuits.encryption.KeyNotSetException;
-import edu.biu.scapi.circuits.encryption.TweakNotSetException;
+import edu.biu.scapi.exceptions.CiphertextTooLongException;
+import edu.biu.scapi.exceptions.KeyNotSetException;
+import edu.biu.scapi.exceptions.TweakNotSetException;
 
 /**
  * An interface that {@link StandardGarbledGate}'s and any specialized or
@@ -49,7 +48,7 @@ import edu.biu.scapi.circuits.encryption.TweakNotSetException;
  * @author Steven Goldfeder
  * 
  */
-public interface GarbledGate {
+public interface GarbledGate extends Serializable{
   /**
    * The compute method computes the output of this gate and sets the output
    * wire(s) to that value
