@@ -22,8 +22,6 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-
-
 package edu.biu.scapi.circuits.garbledCircuit;
 
 /**
@@ -36,7 +34,9 @@ package edu.biu.scapi.circuits.garbledCircuit;
  * 
  */
 public abstract class AbstractGarbledGate implements GarbledGate {
-  /**
+
+	private static final long serialVersionUID = -2772012685011270828L;
+/**
    * An array containing the integer labels of the input Wire Labels to this
    * gate. The order of the {@code GarbledWire}s in this array is significant as
    * not all functions are symmetric.
