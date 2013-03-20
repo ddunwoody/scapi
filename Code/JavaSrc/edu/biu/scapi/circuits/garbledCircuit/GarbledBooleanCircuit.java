@@ -22,61 +22,30 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-
-
 package edu.biu.scapi.circuits.garbledCircuit;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.security.InvalidKeyException;
 import java.util.Map;
 
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.SecretKey;
-
-import edu.biu.scapi.circuits.circuit.BooleanCircuit;
 import edu.biu.scapi.circuits.circuit.Wire;
-import edu.biu.scapi.circuits.encryption.CiphertextTooLongException;
-import edu.biu.scapi.circuits.encryption.KeyNotSetException;
-import edu.biu.scapi.circuits.encryption.PlaintextTooLongException;
-import edu.biu.scapi.circuits.encryption.TweakNotSetException;
 
 /**
  * {@code GarbledBooleanCircuit} is a general interface implemented by all
- * garbled circuits--optimized or not. All garbled circuits have four main
- * functions. The construct function which is provided by the constructor of the
- * implementing classes. The {@link #compute()} function computes a result on a
- * garbled circuit that's input has been set. The {@link #translate(Map)} method
- * translates the garbled output from {@link #compute()} into meaningful
- * output. The {@link #verify(BooleanCircuit, Map)} method is used in the case
- * of a malicious adversary to verify that the garbled circuit created is an
- * honest garbling of the agreed upon non garbled) circuit. The constructing
- * party constructs many garbled circuits and the second party chooses all but
- * one of them to verify and test the honesty of the constructing party.
+ * garbled circuits--optimized or not. 
+ * The difference between a sub circuit and a circuit is that a sub circuit does not have the 
+ * ability to translate the output of compute into a result using some kind of translation from 
+ * keys to 0/1 output since the translation table simply does not exist. The reason is that 
+ * letting a party compute the result on several steps on the way to the final result may 
+ * leak some information and thus not possible. A circuit, on the other way must have the 
+ * functionality of translating the computed result into a 0/1 result which is the output
+ * of the function we wish to compute. The circuit interface add the functionality of translate.
+ * All garbled circuits have the added function {@link #translate(Map)} that  
+ * translates the garbled output from {@link #compute()} into meaningful output.
  * 
  * @author Steven Goldfeder
  * 
  */
-public interface GarbledBooleanCircuit {
-  /**
-   * This method computes the circuit if input has been set. If input has not
-   * been set it throws an exception. It returns a {@code Map} containing the
-   * garbled output. This output can be translated via the
-   * {@link #translate(Map)} method.
-   * 
-   * @return returns a {@code Map} that maps the label of the output wire to the garbled value of the wire
-   * @throws InvalidKeyException
-   * @throws IllegalBlockSizeException
-   * @throws CiphertextTooLongException
-   * @throws KeyNotSetException
-   * @throws InputNotSetException
-   * @throws TweakNotSetExceptioncomputed
-   *           {@code GarbledWire}
-   */
-
-  public Map<Integer, GarbledWire> compute() throws InvalidKeyException,
-      IllegalBlockSizeException, CiphertextTooLongException,
-      KeyNotSetException, TweakNotSetException, InputNotSetException;
+public interface GarbledBooleanCircuit extends GarbledBooleanSubCircuit{
+  
 
   /**
    * Translates the garbled output obtained from the {@link #compute()} function
@@ -90,64 +59,22 @@ public interface GarbledBooleanCircuit {
    */
   public Map<Integer, Wire> translate(Map<Integer, GarbledWire> garbledOutput);
 
+  
   /**
-   * The verify method is used in the case of malicious adversaries. Alice
-   * constructs n circuits and Bob can verify n-1 of them(of his choosing) to
-   * confirm that they are indeed garblings of the agreed upon non garbled
-   * circuit. In order to verify, Alice has to give Bob both garbled values for
-   * each of the input wires.
+   * Returns the translation table of the circuit. This is necessary since the conrtructor of the circuit may want to pass the
+   * translation table to other party. Usually, this will be used when the other party (not the constructor of the circuit) 
+   * sets the garbled tables and needs the translation table as well to complete the construction of the circuit
    * 
-   * @param ungarbledCircuit
-   *          the circuit that this {@code GarbledBooleanCircuit} is supposed to
-   *          be a garbling of. This is the circuit that Alice and Bob agreed
-   *          upon in Yao's protocol. We are verifying that this
-   *          {@code GarbledBooleanCircuit} is indeed a garbling of the agreed
-   *          upon ungarbled circuit
-   * @param allInputWireValues
-   *          a {@Map} containing both garbled values for each input wire.
-   *          For each input wire label, the map contains an array of two
-   *          values. The value in the 0 position is the 0 encoding, and the
-   *          value in the 1 position is the 1 encoding.
-   * @return {@code true} if this {@code GarbledBooleanCircuit} is a garbling of
-   *         the ungarbledCircuit, {@code false} if it is not
-   * @throws InvalidKeyException
-   * @throws IllegalBlockSizeException
-   * @throws KeyNotSetException
-   * @throws TweakNotSetException
-   * @throws PlaintextTooLongException
-   * @throws CiphertextTooLongException
+   * @return The translation table of the circuit.  
+   *           
    */
-  public boolean verify(BooleanCircuit ungarbledCircuit,
-      Map<Integer, SecretKey[]> allInputWireValues) throws InvalidKeyException,
-      IllegalBlockSizeException, KeyNotSetException, TweakNotSetException,
-      PlaintextTooLongException, CiphertextTooLongException;
-
-  /**
-   * This method sets the input. It takes as a parameter a {@code Map} that maps
-   * the input Wire labels to a garbled wire containing the appropriate garbled
-   * value. See {@link #setGarbledInputFromUngarbledFile(File, Map)} for an
-   * alternate way of setting the input.
-   * 
-   * @param presetInputWires
-   *          a {@code Map} containing the input wires that have been preset
-   *          with their values
-   */
-  public void setInputs(Map<Integer, GarbledWire> presetInputWires);
-
-  /**
-   * This method takes in a file containing the number of inputs followed by the
-   * {@code GarbledWire} label and <b> non garbled</b> value for each wire. This
-   * method than performs the lookup on the accompanying allInputWireValues
-   * {@code Map} and sets the inputs to the corresponding garbled outputs.
-   * 
-   * @param f
-   *          the file containing the number of input wire followed by a list of
-   *          input wire labels and their garbled values
-   * @param allInputWireValues
-   *          the map containing both garbled values for each input wire
-   * @throws FileNotFoundException
-   */
-  public void setGarbledInputFromUngarbledFile(File f,
-      Map<Integer, SecretKey[]> allInputWireValues)
-      throws FileNotFoundException;
+  public Map<Integer, Integer> getTranslationTable();
+  
+  
+/**
+ * Sets the translation table of the circuit. This is necessary when the garbled tables where set and we would like to 
+ * compute the circuit later on. 
+ * @param translationTable
+ */
+  public void setTranslationTable(Map<Integer, Integer> translationTable);
 }

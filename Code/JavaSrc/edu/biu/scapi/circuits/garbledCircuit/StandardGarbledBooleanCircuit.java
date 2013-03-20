@@ -22,154 +22,84 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-
-
 package edu.biu.scapi.circuits.garbledCircuit;
 
-import java.io.Serializable;
 import java.security.InvalidKeyException;
-import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 
 import edu.biu.scapi.circuits.circuit.BooleanCircuit;
-import edu.biu.scapi.circuits.circuit.Gate;
-import edu.biu.scapi.circuits.encryption.KeyNotSetException;
+import edu.biu.scapi.circuits.circuit.Wire;
 import edu.biu.scapi.circuits.encryption.MultiKeyEncryptionScheme;
-import edu.biu.scapi.circuits.encryption.PlaintextTooLongException;
-import edu.biu.scapi.circuits.encryption.TweakNotSetException;
+import edu.biu.scapi.exceptions.CannotBeGarbledExcpetion;
+import edu.biu.scapi.exceptions.CiphertextTooLongException;
+import edu.biu.scapi.exceptions.KeyNotSetException;
+import edu.biu.scapi.exceptions.NoSuchPartyException;
+import edu.biu.scapi.exceptions.PlaintextTooLongException;
+import edu.biu.scapi.exceptions.TweakNotSetException;
 
 /**
- * The {@code StandardGarbledBooleanCircuit} class is a Garbled
- * Boolean Circuit without optimizations (e.g. the Free XOR technique and row
- * reduction technique etc. are not used)
- * 
- * @author Steven Goldfeder
- * 
+ * @author Meital
+ *
  */
+public class StandardGarbledBooleanCircuit extends
+		StandardGarbledBooleanSubCircuit implements GarbledBooleanCircuit {
 
-public class StandardGarbledBooleanCircuit extends AbstractGarbledBooleanCircuit
-implements Serializable {
+	
+	private static final long serialVersionUID = -5179605492121748782L;
 
-	private static final long serialVersionUID = 1L;
+	
+	/**
+	   * The translation table stores the signal bit for the output wires. Thus, it
+	   * just tells you whether the wire coming out is a 0 or 1 but nothing about
+	   * the plaintext of the wires is revealed. This is good since it is possible
+	   * that a circuit output wire is also an input wire to a different gate, and
+	   * thus if the translation table contained the plaintext of both possible
+	   * values of the output Wire, the constructing party could change the value of
+	   * the wire when it is input into a gate, and privacy and/or correctness will
+	   * not be preserved. Therefore, we only reveal the signal bit, and the other
+	   * possible value for the wire is not stored on the translation table.
+	   */
+	  private Map<Integer, Integer> translationTable;
 
+	
 	/**
 	 * @param ungarbledCircuit
-	 *          the circuit that we will garble
 	 * @param mes
-	 *          The MultiKeyEncryptionScheme that will be used to garble and
-	 *          compute this circuit.
 	 * @param allInputWireValues
-	 *          a map that is passed as a parameter. It should be blank when
-	 *          passed as a parameter and the constructor will add to it the 0 and
-	 *          1 SecretKey values for each input Wire. The reason that this is
-	 *          passed as a parameter and not created here or stored as a field is
-	 *          because we need the constructing and only the constructing
-	 *          party(from hereon in Alice) to have access to this. The second
-	 *          party--i.e. the one that will compute on the circuit(from hereon
-	 *          in Bob) should not know which input wire value is 0 and which is 1
-	 *          nor should Bob have access to both the 0 and 1 values. Rather, Bob
-	 *          is given access to only a single value for each input wire, and he
-	 *          does not know what this value encodes. Alice gives Bob the
-	 *          appropriate garbled values for her inputs, and Bob gets the value
-	 *          for his input from Alice via oblivious transfer. Thus, we have
-	 *          designed this class so that only Alice will have access to the map
-	 *          with both values of each input wire.
-	 *          <p>
-	 *          Note that there is one case in which Alice will give this map to
-	 *          Bob: In the case of a malicious adversary, Alice will construct
-	 *          multiple circuits and Bob will ask Alice to uncover some of them
-	 *          to verify them(using our verify method. The way that Alice
-	 *          uncovers these is by giving Bob access to the allInputWireValues
-	 *          map. Bob calls the verify method and passes this map as well as
-	 *          the agreed upon(ungarbled) circuit to the verify method to test
-	 *          that Alice constructed the circuit correctly.
-	 *          </p>
-	 *          <p>
-	 *          See <i>Secure Multiparty Computation for Privacy-Preserving Data
-	 *          Mining</i> by Yehuda Lindell and Benny Pinkas Section 3 for an
-	 *          overview of Yao's protocol, and a more in depth explanation of all
-	 *          that is discussed here.
-	 *          </p>
-	 * @throws PlaintextTooLongException 
-	 * @throws TweakNotSetException 
-	 * @throws KeyNotSetException 
-	 * @throws IllegalBlockSizeException 
-	 * @throws InvalidKeyException 
+	 * @param inputTranslationTable
+	 * @param allOutputWireValues
+	 * @param translationTable
+	 * 
+	 * @throws InvalidKeyException
+	 * @throws IllegalBlockSizeException
+	 * @throws KeyNotSetException
+	 * @throws TweakNotSetException
+	 * @throws PlaintextTooLongException
+	 * @throws CannotBeGarbledExcpetion
+	 * @throws NoSuchPartyException
 	 */
 	public StandardGarbledBooleanCircuit(BooleanCircuit ungarbledCircuit,
 			MultiKeyEncryptionScheme mes,
-			Map<Integer, SecretKey[]> allInputWireValues) throws InvalidKeyException, IllegalBlockSizeException, KeyNotSetException, TweakNotSetException, PlaintextTooLongException {
-		this.mes = mes;
+			Map<Integer, SecretKey[]> allInputWireValues,
+			Map<Integer, Integer> inputTranslationTable) throws InvalidKeyException,
+			IllegalBlockSizeException, KeyNotSetException,
+			TweakNotSetException, PlaintextTooLongException,
+			CannotBeGarbledExcpetion, NoSuchPartyException {
+		
+		
+		//set the signal bits to pass on to the sub circuit creator. This is not saved in the class for security reasons
 		translationTable = new HashMap<Integer, Integer>();
-		outputWireLabels = ungarbledCircuit.getOutputWireLabels();
-		inputWireLabels = ungarbledCircuit.getInputWireLabels();
-		Gate[] ungarbledGates = ungarbledCircuit.getGates();
-		numberOfWires = ungarbledCircuit.getNumberOfWires();
-		gates = new StandardGarbledGate[ungarbledGates.length];
+			
 		Map<Integer, SecretKey[]> allWireValues = new HashMap<Integer, SecretKey[]>();
 		Map<Integer, Integer> signalBits = new HashMap<Integer, Integer>();
-		SecureRandom random = new SecureRandom();
-
-		for (int currentWire = 0; currentWire < numberOfWires; currentWire++) {
-			/*
-			 * assign a 0-encoded value and a 1-encoded value for each GarbledWire.
-			 * These are the two possible values that the given GarbledWire can be set
-			 * to.
-			 */
-			SecretKey zeroValue = mes.generateKey();
-			SecretKey oneValue = mes.generateKey();
-			// Assigns a 0 or 1 as the signal bit for the current wire
-			int signalBit = random.nextInt(2);
-			signalBits.put(currentWire, signalBit);
-			// put the signal bits on the wires
-			int signalOnZeroValue = signalBit ^ 0;
-
-			if (signalOnZeroValue == 0) {
-				// set the signal bit on the 0-value for the wire. This is the last bit
-				// of the wire's 0 value(key)
-				byte[] value = zeroValue.getEncoded();
-				value[value.length - 1] &= 254;
-				zeroValue = new SecretKeySpec(value, "");
-				// set the signal bit on the 1-value for the wire. This is the last bit
-				// of the wire's 1 value(key)
-				value = oneValue.getEncoded();
-				value[value.length - 1] |= 1;
-				oneValue = new SecretKeySpec(value, "");
-			} else if (signalOnZeroValue == 1) {
-				// // set 0-value signal bit. This is the last bit of the wire's 0
-				// value(key)
-				byte[] value = zeroValue.getEncoded();
-				value[value.length - 1] |= 1;
-				zeroValue = new SecretKeySpec(value, "");
-				// set the 1-value signal bit. This is the last bit of the wire's 1
-				// value(key)
-				value = oneValue.getEncoded();
-				value[value.length - 1] &= 254;
-				oneValue = new SecretKeySpec(value, "");
-			}
-			// put the 0-value and the 1-value on the allWireValuesMap
-			allWireValues.put(currentWire, new SecretKey[] { zeroValue, oneValue });
-		}
-		/*
-		 * add both values of input wire labels to the addInputWireLabels Map that
-		 * was passed as a parameter. See the comments on the parameter to
-		 * understand the necessity of maintaining this map.
-		 */
-		for (int w : inputWireLabels) {
-			allInputWireValues.put(w, allWireValues.get(w));
-		}
-		// now that all wires have garbled values, we create the individual garbled
-		// gates
-		for (int i = 0; i < gates.length; i++) {
-
-			gates[i] = new StandardGarbledGate(mes, ungarbledGates[i], allWireValues,
-					signalBits);
-		}
+		
+		
+		subCircuitCreator(ungarbledCircuit, mes, allInputWireValues,
+				inputTranslationTable, allWireValues, signalBits);
 		/*
 		 * add the output wire labels' signal bits to the translation table. For a
 		 * full understanding on why we chose to implement the translation table
@@ -178,6 +108,108 @@ implements Serializable {
 		 */
 		for (int n : outputWireLabels) {
 			translationTable.put(n, signalBits.get(n));
+			
 		}
+		
+	}
+
+	
+	/**
+	 * @param ungarbledCircuit
+	 * @param mes
+	 * @param allInputWireValues
+	 * @param inputTranslationTable
+	 * @param allOutputWireValues
+	 * @param translationTable
+	 * 
+	 * @throws InvalidKeyException
+	 * @throws IllegalBlockSizeException
+	 * @throws KeyNotSetException
+	 * @throws TweakNotSetException
+	 * @throws PlaintextTooLongException
+	 * @throws CannotBeGarbledExcpetion
+	 * @throws NoSuchPartyException
+	 */
+	public StandardGarbledBooleanCircuit(BooleanCircuit ungarbledCircuit,
+			MultiKeyEncryptionScheme mes,
+			Map<Integer, SecretKey[]> allInputWireValues) throws InvalidKeyException,
+			IllegalBlockSizeException, KeyNotSetException,
+			TweakNotSetException, PlaintextTooLongException,
+			CannotBeGarbledExcpetion, NoSuchPartyException {
+		
+		
+		//call the other constrcutor with an empty translation table 
+		this(ungarbledCircuit, mes, allInputWireValues, new HashMap<Integer, Integer>());
+		
+	}
+	
+	/**
+	 * Does the translation from the resulting garbled wires to wires. This is done through the utility class.
+	 */
+	public Map<Integer, Wire> translate(Map<Integer, GarbledWire> garbledOutput) {
+
+		CircuitUtil util = new CircuitUtil();
+		
+		return util.translate(garbledOutput, translationTable, outputWireLabels);
+		
+		
+	}
+	/**
+	 * Does the verification that has to do with the translation table after calling the super class verification.
+	 * 
+	 * @param ungarbledCircuit the boolean circuit
+	 * @param allInputWireValues both wire keys of the input wires keys 
+	 * @param allWireValues keys of all wires
+	 * @return
+	 * @throws InvalidKeyException
+	 * @throws IllegalBlockSizeException
+	 * @throws CiphertextTooLongException
+	 * @throws KeyNotSetException
+	 * @throws TweakNotSetException
+	 */
+	 public boolean verify(BooleanCircuit ungarbledCircuit,
+	      Map<Integer, SecretKey[]> allInputWireValues,
+	      Map<Integer, SecretKey[]> allWireValues) throws InvalidKeyException,
+	      IllegalBlockSizeException, CiphertextTooLongException,
+	      KeyNotSetException, TweakNotSetException {
+		  
+	    if( verifySubCircuit(ungarbledCircuit, allInputWireValues, allWireValues)==true){
+	    	
+	    	CircuitUtil util = new CircuitUtil();
+	    	
+	    	return util.verifyCircuitTranslation(translationTable, outputWireLabels, allWireValues); 
+	    }
+	    
+	    return false;
+	    
+	    
+	 }
+
+
+    /**
+    * Returns the translation table of the circuit. This is necessary since the conrtructor of the circuit may want to pass the
+    * translation table to other party. Usually, this will be used when the other party (not the constructor of the circuit) 
+    * sets the garbled tables and needs the translation table as well to complete the construction of the circuit
+    * 
+    * @return The translation table of the circuit.  
+    *           
+    */
+	@Override
+	public Map<Integer, Integer> getTranslationTable() {
+		
+		return translationTable;
+	}
+
+
+	/**
+	 * Sets the translation table of the circuit. This is necessary when the garbled tables where set and we would like to 
+	 * compute the circuit later on. 
+	 * @param translationTable
+	 */
+	@Override
+	public void setTranslationTable(Map<Integer, Integer> translationTable) {
+		
+		this.translationTable = translationTable;
+		
 	}
 }
