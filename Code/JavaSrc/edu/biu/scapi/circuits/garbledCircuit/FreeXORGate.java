@@ -22,8 +22,6 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-
-
 package edu.biu.scapi.circuits.garbledCircuit;
 
 import java.util.BitSet;
@@ -60,8 +58,9 @@ import edu.biu.scapi.circuits.circuit.Gate;
 public class FreeXORGate extends AbstractGarbledGate{
 
     
+	private static final long serialVersionUID = 3749393621892017604L;
 
-  /**
+/**
    * @param ungarbledGate
    *          The ungarbled Gate that is to be Garbled. Since this is an XOR
    *          Gate using the Free XOR technique, no encryption is required for
