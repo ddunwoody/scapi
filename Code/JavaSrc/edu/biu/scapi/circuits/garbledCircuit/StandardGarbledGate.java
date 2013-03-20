@@ -22,12 +22,11 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-
-
 package edu.biu.scapi.circuits.garbledCircuit;
 
 import java.nio.ByteBuffer;
 import java.security.InvalidKeyException;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Map;
 
@@ -36,13 +35,11 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import edu.biu.scapi.circuits.circuit.Gate;
-import edu.biu.scapi.circuits.encryption.CiphertextTooLongException;
-import edu.biu.scapi.circuits.encryption.KeyNotSetException;
 import edu.biu.scapi.circuits.encryption.MultiKeyEncryptionScheme;
-import edu.biu.scapi.circuits.encryption.PlaintextTooLongException;
-import edu.biu.scapi.circuits.encryption.TweakNotSetException;
-import edu.biu.scapi.midLayer.ciphertext.ByteArraySymCiphertext;
-import edu.biu.scapi.midLayer.plaintext.ByteArrayPlaintext;
+import edu.biu.scapi.exceptions.CiphertextTooLongException;
+import edu.biu.scapi.exceptions.KeyNotSetException;
+import edu.biu.scapi.exceptions.PlaintextTooLongException;
+import edu.biu.scapi.exceptions.TweakNotSetException;
 
 /**
  * This is a standard Garbled Gate. By standard we mean that it is not
@@ -57,18 +54,22 @@ import edu.biu.scapi.midLayer.plaintext.ByteArrayPlaintext;
  */
 public class StandardGarbledGate extends AbstractGarbledGate {
   /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6883263530344158239L;
+/**
    * The {@code MultiKeyEncryptionScheme} that will be used to garbled and
    * compute this Gate
    */
   MultiKeyEncryptionScheme mes;
-  /**
-   * This is a garbled truth table. Its entries are ciphertext and the order
-   * does not follow the general(binary number) ordering of truth tables.
-   * Instead, its order is permuted as dictated by the signal bits of its input
-   * wires.
-   */
-  private ByteArraySymCiphertext[] truthTable;
 
+  
+  /**
+   * This is the garbled circuit associated with this gate. We need a reference to the garbled circuit since the garbled table
+   * is stored in the circuit and not in the gate. This is done since we would like to send only the garbled tables and not the entire 
+   * circuit that contains all the gates and other information that can be retrieved from the related boolean circuit.
+   */
+  GarbledBooleanSubCircuit gbc;
   /**
    * Constructs a garbled circuit from an ungarbled circuit using the
    * {@code MultiKeyEncryptionScheme} that is passes as a parameter.
@@ -91,12 +92,14 @@ public class StandardGarbledGate extends AbstractGarbledGate {
    * @throws TweakNotSetException
    * @throws PlaintextTooLongException
    */
-  public StandardGarbledGate(MultiKeyEncryptionScheme mes, Gate ungarbledGate,
+  public StandardGarbledGate(GarbledBooleanSubCircuit gbc, Gate ungarbledGate,
       Map<Integer, SecretKey[]> allWireValues, Map<Integer, Integer> signalBits)
       throws InvalidKeyException, IllegalBlockSizeException,
       KeyNotSetException, TweakNotSetException, PlaintextTooLongException {
 
-    this.mes = mes;
+    this.mes = gbc.getMultiKeyEncryptionScheme();
+    this.gbc = gbc;
+    
     inputWireLabels = ungarbledGate.getInputWireLabels();
     outputWireLabels = ungarbledGate.getOutputWireLabels();
     gateNumber = ungarbledGate.getGateNumber();
@@ -106,7 +109,10 @@ public class StandardGarbledGate extends AbstractGarbledGate {
      * The number of rows truth table is 2^(number of inputs)
      */
     int numberOfRows = (int) Math.pow(2, numberOfInputs);
-    truthTable = new ByteArraySymCiphertext[numberOfRows];
+    byte[] truthTable = new byte[numberOfRows * mes.getCipherSize()];
+    
+    //put the garbled table into the array of tables stored in the circuit. This will be filled later on.
+    gbc.getGarbledTables()[gateNumber] = truthTable;
 
     for (int rowOfTruthTable = 0; rowOfTruthTable < numberOfRows; rowOfTruthTable++) {
       ByteBuffer tweak = ByteBuffer.allocate(16);
@@ -143,9 +149,11 @@ public class StandardGarbledGate extends AbstractGarbledGate {
       mes.setKey(mes.generateMultiKey(keysToEncryptOn));
       mes.setTweak(tweak.array());
       int value = (ungarbledGate.getTruthTable().get(rowOfTruthTable) == true) ? 1: 0;
-      truthTable[permutedPosition] = mes.encrypt(new ByteArrayPlaintext(
-          allWireValues.get(outputWireLabels[0])[value] 
-              .getEncoded()));
+      
+      System.arraycopy( mes.encrypt(allWireValues.get(outputWireLabels[0])[value].getEncoded()) , 0, truthTable, permutedPosition*mes.getCipherSize(), mes.getCipherSize());
+      //truthTable[permutedPosition] = mes.encrypt(new ByteArrayPlaintext(
+        //  allWireValues.get(outputWireLabels[0])[value] 
+          //    .getEncoded()));
     }
 
   }
@@ -173,9 +181,9 @@ for (int i = 0; i < numberOfInputs; i++) {
 }
 mes.setTweak(tweak.array());
 
+byte[] truthTable = gbc.getGarbledTables()[gateNumber];
 SecretKey wireValue = new SecretKeySpec(
-    ((ByteArrayPlaintext) mes.decrypt(truthTable[truthTableIndex]))
-        .getText(),
+     mes.decrypt(Arrays.copyOfRange(truthTable, truthTableIndex * mes.getCipherSize(), (truthTableIndex +1)*mes.getCipherSize())),
     "");
 
 for (int i = 0; i < numberOfOutputs; i++) {
@@ -301,7 +309,8 @@ for (int rowOfTruthTable = 0; rowOfTruthTable < Math.pow(2, numberOfInputs); row
   }
   mes.setKey(mes.generateMultiKey(keysToDecryptOn));
   mes.setTweak(tweak.array());
-  ByteArrayPlaintext pt = mes.decrypt(truthTable[permutedPosition]);
+  byte[] truthTable = gbc.getGarbledTables()[gateNumber];
+  byte[] pt = mes.decrypt(Arrays.copyOfRange(truthTable, permutedPosition * mes.getCipherSize(), (permutedPosition + 1) *mes.getCipherSize()));
   /*
    * we now check to see that rows of the truth table with the same
    * ungarbled value have the same garbled value as well
@@ -309,7 +318,7 @@ for (int rowOfTruthTable = 0; rowOfTruthTable < Math.pow(2, numberOfInputs); row
   if (ungarbledTruthTable.get(rowOfTruthTable) == true) {// i.e this bit is
                                                          // set
     if (outputOneValue != null) {
-      byte[] ptBytes = pt.getText();
+      byte[] ptBytes = pt;
       byte[] oneValueBytes = outputOneValue.getEncoded();
       for (int byteArrayIndex = 0; byteArrayIndex < ptBytes.length; byteArrayIndex++) {
         if (ptBytes[byteArrayIndex] != oneValueBytes[byteArrayIndex]) {
@@ -317,17 +326,16 @@ for (int rowOfTruthTable = 0; rowOfTruthTable < Math.pow(2, numberOfInputs); row
         }
       }
     } else {
-      outputOneValue = new SecretKeySpec(pt.getText(), "");
+      outputOneValue = new SecretKeySpec(pt, "");
     }
   } else { // i.e if(ungarbledTruthTable.get(rowOfTruthTable)==false)
                                                     //bit is not set
     if (outputZeroValue == null) {
-      outputZeroValue = new SecretKeySpec(pt.getText(), "");
+      outputZeroValue = new SecretKeySpec(pt, "");
     } else {
-      byte[] ptBytes = pt.getText();
       byte[] zeroValueBytes = outputZeroValue.getEncoded();
-      for (int byteArrayIndex = 0; byteArrayIndex < ptBytes.length; byteArrayIndex++) {
-        if (ptBytes[byteArrayIndex] != zeroValueBytes[byteArrayIndex]) {
+      for (int byteArrayIndex = 0; byteArrayIndex < pt.length; byteArrayIndex++) {
+        if (pt[byteArrayIndex] != zeroValueBytes[byteArrayIndex]) {
           return false;
         }
       }
