@@ -72,7 +72,7 @@ public class ZpGroupParams extends GroupParams implements Serializable{
 
 	@Override
 	public String toString() {
-		return "ZpGroupParams [p=" + p + ", xG=" + xG + "]";
+		return "ZpGroupParams [p=" + p + ", g=" + xG + ", q=" + q + "]";
 	}
 	
 }
