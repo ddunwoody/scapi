@@ -41,8 +41,10 @@ import java.util.Vector;
 import org.bouncycastle.util.BigIntegers;
 
 import edu.biu.scapi.exceptions.NoMaxException;
+import edu.biu.scapi.midLayer.asymmetricCrypto.keys.CramerShoupPrivateKey;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.DamgardJurikPrivateKey;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.DamgardJurikPublicKey;
+import edu.biu.scapi.midLayer.asymmetricCrypto.keys.KeySendableData;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScDamgardJurikPrivateKey;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScDamgardJurikPublicKey;
 import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertext;
@@ -227,7 +229,7 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 	/** 
 	 * This function performs the encryption of he given plain text
 	 * @param plainText MUST be an instance of BigIntegerPlainText.
-	 * @return an object of type DJCiphertext holding the encryption of the plaintext.
+	 * @return an object of type BigIntegerCiphertext holding the encryption of the plaintext.
 	 * @throws IllegalStateException if no public key was set.
 	 * @throws IllegalArgumentException in the following cases:
 	 * 		1. If the given plaintext is not instance of BigIntegerPlainText.
@@ -274,15 +276,15 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 		BigInteger mult2 = r.modPow(N, Ntag);
 		BigInteger c = (mult1.multiply(mult2)).mod(Ntag);
 
-		//Wraps the BigInteger c with DJCiphertext and returns it.
+		//Wraps the BigInteger c with BigIntegerCiphertext and returns it.
 		return new BigIntegerCiphertext(c);
 	}
 
 	/**
 	 * Decrypts the given ciphertext using DamgardJurik encryption scheme.
-	 * @param cipher has to be an instance of DJCiphertext.
+	 * @param cipher has to be an instance of BigIntegerCiphertext.
 	 * @throws KeyException if the Private Key has not been set for this object.
-	 * @throws IllegalArgumentException if cipher is not an instance of DJCiphertext.
+	 * @throws IllegalArgumentException if cipher is not an instance of BigIntegerCiphertext.
 	 */
 	@Override
 	public Plaintext decrypt(AsymmetricCiphertext cipher) throws KeyException{
@@ -317,7 +319,7 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 		}
 		//Ciphertext should be Damgard-Jurik ciphertext.
 		if (!(cipher instanceof BigIntegerCiphertext)){
-			throw new IllegalArgumentException("cipher should be instance of DJCiphertext");
+			throw new IllegalArgumentException("cipher should be instance of BigIntegerCiphertext");
 		}
 		
 		BigIntegerCiphertext djCipher = (BigIntegerCiphertext) cipher;
@@ -390,7 +392,7 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 	 * The given ciphertext have to has been generated with the same public key as this encryption's public key.
 	 * @throws IllegalStateException if no public key was set.
 	 * @throws IllegalArgumentException in the following cases:
-	 * 		1. If cipher is not an instance of DJCiphertext.
+	 * 		1. If cipher is not an instance of BigIntegerCiphertext.
 	 * 		2. If the BigInteger number in the given cipher is not in ZN'.
 	 */
 	@Override
@@ -402,7 +404,7 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 		
 		//Ciphertext should be Damgard-Jurik ciphertext.
 		if (!(cipher instanceof BigIntegerCiphertext)){
-			throw new IllegalArgumentException("cipher should be instance of DJCiphertext");
+			throw new IllegalArgumentException("cipher should be instance of BigIntegerCiphertext");
 		}
 		
 		BigIntegerCiphertext djCipher = (BigIntegerCiphertext) cipher;
@@ -433,7 +435,7 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 	 * Both ciphertext have to have been generated with the same public key as this encryption's public key.
 	 * @throws IllegalStateException if no public key was set.
 	 * @throws IllegalArgumentException in the following cases:
-	 * 		1. If one or more of the given ciphertexts is not an instance of DJCiphertext.
+	 * 		1. If one or more of the given ciphertexts is not an instance of BigIntegerCiphertext.
 	 * 		2. If the sizes of ciphertexts do not match.
 	 * 		3. If one or more of the BigInteger numbers in the given ciphertexts is not in ZN'.
 	 */
@@ -445,8 +447,8 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 		}
 		
 		//Ciphertexts should be Damgard-Jurik ciphertexts.
-		if (!(cipher1 instanceof BigIntegerCiphertext) || !(cipher1 instanceof BigIntegerCiphertext)){
-			throw new IllegalArgumentException("cipher should be instance of DJCiphertext");
+		if (!(cipher1 instanceof BigIntegerCiphertext) || !(cipher2 instanceof BigIntegerCiphertext)){
+			throw new IllegalArgumentException("cipher should be instance of BigIntegerCiphertext");
 		}
 		BigIntegerCiphertext djCipher1 = (BigIntegerCiphertext) cipher1;
 		BigIntegerCiphertext djCipher2 = (BigIntegerCiphertext) cipher2;
@@ -491,7 +493,7 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 	 * @param constNumber the constant number by which to multiply the cipher.
 	 * @throws IllegalStateException if no public key was set.
 	 * @throws IllegalArgumentException in the following cases:
-	 * 		1. If the given cipher is not an instance of DJCiphertext.
+	 * 		1. If the given cipher is not an instance of BigIntegerCiphertext.
 	 * 		2. If the BigInteger numbers in the given ciphertext is not in ZN'.
 	 * 		3. If the constant number is not in ZN.
 	 */
@@ -504,7 +506,7 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 		
 		//Ciphertext should be Damgard-Jurik ciphertext.
 		if (!(cipher instanceof BigIntegerCiphertext)){
-			throw new IllegalArgumentException("cipher should be instance of DJCiphertext");
+			throw new IllegalArgumentException("cipher should be instance of BigIntegerCiphertext");
 		}
 		
 		BigIntegerCiphertext djCipher = (BigIntegerCiphertext) cipher;
@@ -554,11 +556,43 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 	 * @see edu.biu.scapi.midLayer.asymmetricCrypto.encryption.AsymmetricEnc#generateCiphertext(edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertextSendableData)
 	 */
 	@Override
-	public AsymmetricCiphertext generateCiphertext(	AsymmetricCiphertextSendableData data) {
+	@Deprecated public AsymmetricCiphertext generateCiphertext(AsymmetricCiphertextSendableData data) {
 		if(! (data instanceof BigIntegerCiphertext))
 			throw new IllegalArgumentException("The input data has to be of type BigIntegerCiphertext");
 
 		return (BigIntegerCiphertext) data;
 	}
+	
+	/**
+	 * @see edu.biu.scapi.midLayer.asymmetricCrypto.encryption.AsymmetricEnc#reconstructCiphertext(edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertextSendableData)
+	 */
+	@Override
+	public AsymmetricCiphertext reconstructCiphertext(AsymmetricCiphertextSendableData data) {
+		if(! (data instanceof BigIntegerCiphertext))
+			throw new IllegalArgumentException("The input data has to be of type BigIntegerCiphertext");
+
+		return (BigIntegerCiphertext) data;
+	}
+
+	/* (non-Javadoc)
+	 * @see edu.biu.scapi.midLayer.asymmetricCrypto.encryption.AsymmetricEnc#reconstructPublicKey(edu.biu.scapi.midLayer.asymmetricCrypto.keys.KeySendableData)
+	 */
+	@Override
+	public PublicKey reconstructPublicKey(KeySendableData data) {
+		if(! (data instanceof DamgardJurikPublicKey))
+			throw new IllegalArgumentException("To generate the key from sendable data, the data has to be of type DamgardJurikPublicKey");
+	return (DamgardJurikPublicKey)data;
+	}
+
+	/* (non-Javadoc)
+	 * @see edu.biu.scapi.midLayer.asymmetricCrypto.encryption.AsymmetricEnc#reconstructPrivateKey(edu.biu.scapi.midLayer.asymmetricCrypto.keys.KeySendableData)
+	 */
+	@Override
+	public PrivateKey reconstructPrivateKey(KeySendableData data) {
+		if(! (data instanceof DamgardJurikPrivateKey))
+			throw new IllegalArgumentException("To generate the key from sendable data, the data has to be of type DamgardJurikPrivateKey");
+	return (DamgardJurikPrivateKey)data;
+	}
+	
 }
 
