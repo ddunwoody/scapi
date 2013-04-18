@@ -31,21 +31,29 @@ import java.util.Arrays;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
-
+/**
+ * This class is a container that encapsulates the cipher data resulting from applying the CramerShoupDDHOnByteArray encryption.
+ * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
+ *
+ */
 public class CramerShoupOnByteArrayCiphertext extends CramerShoupCiphertext{
 
 	private byte[] e;
 	
+	/**
+	 * This constructor is used by the Encryption Scheme as a result of a call to function encrypt. 
+	 * @param u1
+	 * @param u2
+	 * @param e
+	 * @param v
+	 */
 	public CramerShoupOnByteArrayCiphertext(GroupElement u1, GroupElement u2, byte[] e, GroupElement v) {
 		super(u1, u2, v);
 		this.e = e;
 		
 	}
+	
 
-	public CramerShoupOnByteArrayCiphertext(CrShOnByteArraySendableData data, DlogGroup dlog){
-		this(dlog.generateElement(false, data.getU1()), dlog.generateElement(false, data.getU2()), data.getE(), dlog.generateElement(false, data.getV()));
-
-	}
 	public byte[] getE() {
 		return e;
 	}
