@@ -36,6 +36,8 @@ import java.io.ObjectOutputStream;
 import java.math.BigInteger;
 
 /**
+ * This class represents a Private Key suitable for the Cramer Shoup Encryption Scheme. Although the constructor is public, it should only be instantiated by the 
+ * Encryption Scheme itself via the generateKey function. 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
@@ -117,15 +119,28 @@ public class ScCramerShoupPrivateKey implements CramerShoupPrivateKey, KeySendab
 
 
 
-	/* (non-Javadoc)
-	 * @see edu.biu.scapi.midLayer.asymmetricCrypto.keys.CramerShoupPrivateKey#generateSendableData()
+	/**
+	 * This function is used when an Cramer Shoup Private Key needs to be sent via a {@link edu.biu.scapi.comm.Channel} or any other means of sending data (including serialization).
+	 * It retrieves all the data needed to reconstruct this Private Key at a later time and/or in a different VM.
+	 * It puts all the data in an instance of the relevant class that implements the KeySendableData interface.
+	 * In order to deserialize this into a CramerShoupPrivateKey all you need to do is cast the serialized object with (CramerShoupPrivateKey)
+	 * @return the KeySendableData object
 	 */
+
 	@Override
 	public KeySendableData generateSendableData() {
 		//Since ScCramerShoupPrivateKey is both a PrivateKey and a KeySendableData, on the one hand it has to implement
 		//the generateSendableData() function, but on the other hand it is in itself an KeySendableData, so we do not really
 		//generate sendable data, but just return this object.
 		return this;
+	}
+
+
+
+	@Override
+	public String toString() {
+		return "ScCramerShoupPrivateKey [x1=" + x1 + ", x2=" + x2 + ", y1="
+				+ y1 + ", y2=" + y2 + ", z=" + z + "]";
 	}
 
 	
