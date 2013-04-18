@@ -174,7 +174,15 @@ public interface TrapdoorPermutation {
 	 * Creates a TPElement from data that was probably obtained via the serialization mechanism. See explanation in {@link TPElementSendableData}
 	 * @param data 
 	 * @return TPElement
+	 * @deprecated As of SCAPI-V1-0-2-2 use reconstructTPElement(TPElementSendableData data)
 	 */
-	public TPElement generateTPElement(TPElementSendableData data);
+	@Deprecated public TPElement generateTPElement(TPElementSendableData data);
+	
+	/**
+	 * Creates a TPElement from data that was probably obtained via the serialization mechanism. See explanation in {@link TPElementSendableData}
+	 * @param data necessary to reconstruct a given TPElement
+	 * @return the reconstructed TPElement
+	 */
+	public TPElement reconstructTPElement(TPElementSendableData data);
 	
 }
