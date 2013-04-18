@@ -179,7 +179,22 @@ public interface DlogGroup {
 	 */
 	public GroupElement generateElement(boolean bCheckMembership, BigInteger...values) throws IllegalArgumentException;
 	
-	public GroupElement generateElement(boolean bCheckMembership, GroupElementSendableData data);
+	/**
+	 * @deprecated The name of this function was changed.As of SCAPI-V1-0-2-2 use {@link reconstructElement(boolean bCheckMembership, GroupElementSendableData data)} instead.
+	 * @param bCheckMembership
+	 * @param data
+	 * @return
+	 */
+	@Deprecated public GroupElement generateElement(boolean bCheckMembership, GroupElementSendableData data);
+	
+	/**
+	 * Reconstructs a GroupElement given the GroupElementSendableData data, which might have been received through a Channel open between the party holding this DlogGroup and 
+	 * some other party. 
+	 * @param bCheckMembership whether to check that the data provided can actually reconstruct an element of this DlogGroup. Since this action is expensive it should be used only if necessary. 
+	 * @param data the GroupElementSendableData from which we wish to "reconstruct" an element of this DlogGroup 
+	 * @return the reconstructed GroupElement
+	 */
+	public GroupElement reconstructElement(boolean bCheckMembership, GroupElementSendableData data);
 	
 	/**
 	 * Computes the product of several exponentiations with distinct bases 
