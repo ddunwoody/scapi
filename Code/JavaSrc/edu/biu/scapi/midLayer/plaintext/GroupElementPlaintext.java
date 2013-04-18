@@ -44,9 +44,6 @@ public class GroupElementPlaintext implements Plaintext {
 		element = el;
 	}
 	
-	public GroupElementPlaintext(GroupElementPlaintextSendableData data, DlogGroup dlog){
-		this(dlog.generateElement(false, data.getGroupElement()));
-	}
 	public GroupElement getElement(){
 		return element;
 	}
