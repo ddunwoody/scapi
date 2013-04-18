@@ -34,18 +34,18 @@ import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
 
 /**
+ * This class represents a Public Key suitable for the Cramer Shoup Encryption Scheme. Although the constructor is public, it should only be instantiated by the 
+ * Encryption Scheme itself via the generateKey function. 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
 public class ScCramerShoupPublicKey implements CramerShoupPublicKey {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -5021534858851154694L;
 	
 	private GroupElement c;
@@ -54,7 +54,14 @@ public class ScCramerShoupPublicKey implements CramerShoupPublicKey {
 	private GroupElement g1;
 	private GroupElement g2;
 
-	
+	/**
+	 * This constructor is used by the Encryption Scheme as a result of a call to function generateKey. 
+	 * @param c
+	 * @param d
+	 * @param h
+	 * @param g1
+	 * @param g2
+	 */
 	public ScCramerShoupPublicKey(GroupElement c, GroupElement d, GroupElement h, GroupElement g1, GroupElement g2) {
 		super();
 		this.c = c;
@@ -63,7 +70,9 @@ public class ScCramerShoupPublicKey implements CramerShoupPublicKey {
 		this.g1 = g1;
 		this.g2 = g2;
 	}
-
+	
+	
+	
 	/* (non-Javadoc)
 	 * @see java.security.Key#getAlgorithm()
 	 */
@@ -116,6 +125,13 @@ public class ScCramerShoupPublicKey implements CramerShoupPublicKey {
 	}
 	
 	
+	@Override
+	public String toString() {
+		return "ScCramerShoupPublicKey [c=" + c + ", d=" + d + ", h=" + h
+				+ ", g1=" + g1 + ", g2=" + g2 + "]";
+	}
+
+	//Nested class that holds the sendable data of the outer class
 	static public class ScCramerShoupPublicKeySendableData implements KeySendableData {
 
 
