@@ -145,7 +145,7 @@ public class ScRabinKeyFactory extends KeyFactorySpi{
 			throw new InvalidKeyException("Key must not be null");
 		}
 		//if the key is not rabin key - throws exception
-		if (key.getAlgorithm() != "Rabin"){
+		if (key.getAlgorithm().compareTo("Rabin") != 0){
 			throw new InvalidKeyException("Key must be instance of Rabin key");
 		}
 		//key is RabinPublicKey - creates a ScRabinPublicKey
