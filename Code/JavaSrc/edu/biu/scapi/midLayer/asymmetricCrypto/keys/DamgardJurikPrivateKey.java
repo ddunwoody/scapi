@@ -24,9 +24,6 @@
 */
 
 
-/**
- * 
- */
 package edu.biu.scapi.midLayer.asymmetricCrypto.keys;
 
 import java.math.BigInteger;
@@ -41,6 +38,11 @@ public interface DamgardJurikPrivateKey extends PrivateKey {
 	BigInteger getT();
 
 	BigInteger getDForS1();
-	
+	/**
+	 * This function is used when a Damgard Jurik Private Key needs to be sent via a {@link edu.biu.scapi.comm.Channel} or any other means of sending data (including serialization).
+	 * It retrieves all the data needed to reconstruct this Private Key at a later time and/or in a different VM.
+	 * It puts all the data in an instance of the relevant class that implements the KeySendableData interface.
+	 * @return the KeySendableData object
+	 */
 	KeySendableData generateSendableData();
 }
