@@ -34,5 +34,11 @@ public interface DSAPublicKey extends PublicKey {
 
 	public GroupElement getY();
 	
+	/**
+	 * This function is used when a DSA Public Key needs to be sent via a {@link edu.biu.scapi.comm.Channel} or any other means of sending data (including serialization).
+	 * It retrieves all the data needed to reconstruct this Public Key at a later time and/or in a different VM.
+	 * It puts all the data in an instance of the relevant class that implements the KeySendableData interface.
+	 * @return the KeySendableData object
+	 */
 	KeySendableData generateSendableData();
 }
