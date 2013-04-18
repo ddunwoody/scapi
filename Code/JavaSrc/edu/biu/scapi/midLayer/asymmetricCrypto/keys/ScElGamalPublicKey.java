@@ -30,6 +30,12 @@ import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScCramerShoupPublicKey.ScCra
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
 
+/**
+ * This class represents a Public Key suitable for the El Gamal Encryption Scheme. Although the constructor is public, it should only be instantiated by the 
+ * Encryption Scheme itself via the generateKey function. 
+ * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
+ *
+ */
 public class ScElGamalPublicKey implements ElGamalPublicKey {
 
 	private static final long serialVersionUID = 8645777933993577969L;

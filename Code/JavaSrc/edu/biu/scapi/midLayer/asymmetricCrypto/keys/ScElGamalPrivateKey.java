@@ -27,7 +27,12 @@
 package edu.biu.scapi.midLayer.asymmetricCrypto.keys;
 
 import java.math.BigInteger;
-
+/**
+ * This class represents a Private Key suitable for the El Gamal Encryption Scheme. Although the constructor is public, it should only be instantiated by the 
+ * Encryption Scheme itself via the generateKey function. 
+ * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
+ *
+ */
 public class ScElGamalPrivateKey implements ElGamalPrivateKey, KeySendableData {
 
 	private static final long serialVersionUID = -5215891366473399087L;
