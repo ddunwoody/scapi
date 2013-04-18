@@ -32,5 +32,11 @@ import java.security.PrivateKey;
 public interface DSAPrivateKey extends PrivateKey {
 
 	public BigInteger getX();
+	/**
+	 * This function is used when a DSA Private Key needs to be sent via a {@link edu.biu.scapi.comm.Channel} or any other means of sending data (including serialization).
+	 * It retrieves all the data needed to reconstruct this Private Key at a later time and/or in a different VM.
+	 * It puts all the data in an instance of the relevant class that implements the KeySendableData interface.
+	 * @return the KeySendableData object
+	 */
 	KeySendableData generateSendableData();
 }
