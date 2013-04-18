@@ -343,16 +343,27 @@ public class CryptoPpDlogZpSafePrime extends DlogGroupAbs implements DlogZpSafeP
 		
 	}
 	
-	/* (non-Javadoc)
+	/**
 	 * @see edu.biu.scapi.primitives.dlog.DlogGroup#generateElement(boolean, edu.biu.scapi.primitives.dlog.GroupElementSendableData)
+	 * @deprecated The name of this function was changed.As of SCAPI-V1-0-2-2 use {@link reconstructElement(boolean bCheckMembership, GroupElementSendableData data)} instead.
 	 */
 	@Override
-	public GroupElement generateElement(boolean bCheckMembership, GroupElementSendableData data) {
+	@Deprecated public GroupElement generateElement(boolean bCheckMembership, GroupElementSendableData data) {
 		if (!(data instanceof ZpElementSendableData))
 			throw new IllegalArgumentException("data type doesn't match the group type");
 		return generateElement(bCheckMembership, ((ZpElementSendableData)data).getX());
 	}
 
+	/**
+	 * @see edu.biu.scapi.primitives.dlog.DlogGroup#reconstructElement(boolean, edu.biu.scapi.primitives.dlog.GroupElementSendableData)
+	 */
+	@Override
+	public GroupElement reconstructElement(boolean bCheckMembership, GroupElementSendableData data) {
+		if (!(data instanceof ZpElementSendableData))
+			throw new IllegalArgumentException("data type doesn't match the group type");
+		return generateElement(bCheckMembership, ((ZpElementSendableData)data).getX());
+	}
+	
 	/**
 	 * deletes the related Dlog group object
 	 */
