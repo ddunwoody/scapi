@@ -248,13 +248,27 @@ public class ScElGamalOnByteArray extends ElGamalAbs{
 	
 	/** 
 	 * @see edu.biu.scapi.midLayer.asymmetricCrypto.encryption.AsymmetricEnc#generateCiphertext(edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertextSendableData)
+	 * @deprecated As of SCAPI-V1-0-2-2 use reconstructCiphertext(AsymmetricCiphertextSendableData data)
 	 */
 	@Override
-	public AsymmetricCiphertext generateCiphertext(AsymmetricCiphertextSendableData data) {
+	@Deprecated public AsymmetricCiphertext generateCiphertext(AsymmetricCiphertextSendableData data) {
 		if(! (data instanceof ElGamalOnByteArraySendableData))
 				throw new IllegalArgumentException("The input data has to be of type ElGamalOnByteArraySendableData");
 		ElGamalOnByteArraySendableData data1 = (ElGamalOnByteArraySendableData)data;
 		GroupElement cipher1 = dlog.generateElement(true, data1.getCipher1());
+			
+		return new ElGamalOnByteArrayCiphertext(cipher1, data1.getCipher2());
+	}
+	
+	/** 
+	 * @see edu.biu.scapi.midLayer.asymmetricCrypto.encryption.AsymmetricEnc#reconstructCiphertext(edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertextSendableData)
+	 */
+	@Override
+	public AsymmetricCiphertext reconstructCiphertext(AsymmetricCiphertextSendableData data) {
+		if(! (data instanceof ElGamalOnByteArraySendableData))
+				throw new IllegalArgumentException("The input data has to be of type ElGamalOnByteArraySendableData");
+		ElGamalOnByteArraySendableData data1 = (ElGamalOnByteArraySendableData)data;
+		GroupElement cipher1 = dlog.reconstructElement(true, data1.getCipher1());
 			
 		return new ElGamalOnByteArrayCiphertext(cipher1, data1.getCipher2());
 	}
