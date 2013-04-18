@@ -31,7 +31,7 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
 
 /**
- * This class is a container that encapsulates the cipher data resulting from applying the El Gamal encryption.
+ * This class is a container that encapsulates the cipher data resulting from applying the ElGamalOnGroupElement encryption.
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
@@ -42,7 +42,8 @@ public class ElGamalOnGroupElementCiphertext implements AsymmetricCiphertext {
 	private GroupElement cipher2;
 	
 	/**
-	 * Create an instance of this container class 
+	 * Create an instance of this container class.
+	 * This constructor is used by the Encryption Scheme as a result of a call to function encrypt. 
 	 * @param c1 the first part of the cihertext
 	 * @param c2 the second part of the ciphertext
 	 */
@@ -51,10 +52,7 @@ public class ElGamalOnGroupElementCiphertext implements AsymmetricCiphertext {
 		this.cipher2 = c2;
 	}
 	
-	public ElGamalOnGroupElementCiphertext(ElGamalOnGrElSendableData data, DlogGroup dlog){
-		this(dlog.generateElement(false, data.getCipher1()), dlog.generateElement(false, data.getCipher2()));
-	}
-	
+		
 	/**
 	 * 
 	 * @return the first part of the ciphertext
