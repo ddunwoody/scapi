@@ -32,7 +32,11 @@ import edu.biu.scapi.midLayer.ciphertext.ElGamalOnGroupElementCiphertext.ElGamal
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
-
+/**
+ * This class is a container that encapsulates the cipher data resulting from applying the ElGamalOnByteArray encryption.
+ * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
+ *
+ */
 public class ElGamalOnByteArrayCiphertext implements AsymmetricCiphertext{
 
 	
@@ -42,7 +46,8 @@ public class ElGamalOnByteArrayCiphertext implements AsymmetricCiphertext{
 	private byte[] cipher2;
 	
 	/**
-	 * Create an instance of this container class 
+	 * Create an instance of this container class.
+	 * This constructor is used by the Encryption Scheme as a result of a call to function encrypt. 
 	 * @param c1 the first part of the cihertext
 	 * @param c2 the second part of the ciphertext
 	 */
@@ -50,11 +55,7 @@ public class ElGamalOnByteArrayCiphertext implements AsymmetricCiphertext{
 		this.cipher1 = c1;
 		this.cipher2 = c2;
 	}
-	
-	public ElGamalOnByteArrayCiphertext(ElGamalOnByteArraySendableData data, DlogGroup dlog){
-		this(dlog.generateElement(false, data.getCipher1()),data.getCipher2());
-	}
-	
+
 	/**
 	 * 
 	 * @return the first part of the ciphertext
