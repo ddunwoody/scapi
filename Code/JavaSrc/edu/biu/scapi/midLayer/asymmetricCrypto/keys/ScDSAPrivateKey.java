@@ -28,6 +28,12 @@ package edu.biu.scapi.midLayer.asymmetricCrypto.keys;
 
 import java.math.BigInteger;
 
+/**
+* This class represents a Private Key suitable for the Digital Signature Algorithm. Although the constructor is public, it should only be instantiated by the 
+* Digital Signature itself via the generateKey function. 
+* @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
+*
+*/
 public class ScDSAPrivateKey implements DSAPrivateKey, KeySendableData{
 
 	private static final long serialVersionUID = -8583117475560439512L;
@@ -60,8 +66,12 @@ public class ScDSAPrivateKey implements DSAPrivateKey, KeySendableData{
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.biu.scapi.midLayer.asymmetricCrypto.keys.CramerShoupPrivateKey#generateSendableData()
+	/**
+	 * This function is used when an DSA Private Key needs to be sent via a {@link edu.biu.scapi.comm.Channel} or any other means of sending data (including serialization).
+	 * It retrieves all the data needed to reconstruct this Private Key at a later time and/or in a different VM.
+	 * It puts all the data in an instance of the relevant class that implements the KeySendableData interface.
+	 * In order to deserialize this into a DSAPrivateKey all you need to do is cast the serialized object with (DSAPrivateKey)
+	 * @return the KeySendableData object
 	 */
 	@Override
 	public KeySendableData generateSendableData() {
