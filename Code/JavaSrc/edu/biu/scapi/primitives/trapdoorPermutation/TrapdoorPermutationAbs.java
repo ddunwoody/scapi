@@ -137,9 +137,16 @@ public abstract class TrapdoorPermutationAbs implements TrapdoorPermutation {
 
 	/** 
 	 * @see edu.biu.scapi.primitives.trapdoorPermutation.TrapdoorPermutation#generateTPElement(edu.biu.scapi.primitives.trapdoorPermutation.TPElementSendableData)
+	 * @deprecated As of SCAPI-V1-0-2-2 use reconstructTPElement(TPElementSendableData data)
 	 */
-	public TPElement generateTPElement(TPElementSendableData data){
+	@Deprecated public TPElement generateTPElement(TPElementSendableData data){
 		return generateTPElement(data.getX());
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	public TPElement reconstructTPElement(TPElementSendableData data){
+		return generateTPElement(data.getX());
+	}
 }
