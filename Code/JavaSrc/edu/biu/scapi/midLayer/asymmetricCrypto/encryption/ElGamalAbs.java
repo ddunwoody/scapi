@@ -42,8 +42,10 @@ import org.bouncycastle.util.BigIntegers;
 import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ElGamalPrivateKey;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ElGamalPublicKey;
+import edu.biu.scapi.midLayer.asymmetricCrypto.keys.KeySendableData;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScElGamalPrivateKey;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScElGamalPublicKey;
+import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScElGamalPublicKey.ScElGamalPublicKeySendableData;
 import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertext;
 import edu.biu.scapi.midLayer.plaintext.Plaintext;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
@@ -233,6 +235,29 @@ public abstract class ElGamalAbs implements ElGamalEnc{
 	public KeyPair generateKey(AlgorithmParameterSpec keyParams) throws InvalidParameterSpecException {
 		//No need for parameters to generate an El Gamal key pair. 
 		throw new UnsupportedOperationException("To Generate ElGamal keys use the generateKey() function");
+	}
+	
+	
+	/* (non-Javadoc)
+	 * @see edu.biu.scapi.midLayer.asymmetricCrypto.encryption.AsymmetricEnc#reconstructPublicKey(edu.biu.scapi.midLayer.asymmetricCrypto.keys.KeySendableData)
+	 */
+	@Override
+	public PublicKey reconstructPublicKey(KeySendableData data) {
+		if(! (data instanceof ScElGamalPublicKeySendableData))
+			throw new IllegalArgumentException("To generate the key from sendable data, the data has to be of type ScElGamalPublicKeySendableData");
+		ScElGamalPublicKeySendableData data1 = (ScElGamalPublicKeySendableData)data;
+		GroupElement h = dlog.reconstructElement(true, data1.getC());
+		return new ScElGamalPublicKey(h);
+	}
+
+	/* (non-Javadoc)
+	 * @see edu.biu.scapi.midLayer.asymmetricCrypto.encryption.AsymmetricEnc#reconstructPrivateKey(edu.biu.scapi.midLayer.asymmetricCrypto.keys.KeySendableData)
+	 */
+	@Override
+	public PrivateKey reconstructPrivateKey(KeySendableData data) {
+		if(! (data instanceof ElGamalPrivateKey))
+			throw new IllegalArgumentException("To generate the key from sendable data, the data has to be of type ElGamalPrivateKey");
+	return (ElGamalPrivateKey)data;
 	}
 	
 	/**
