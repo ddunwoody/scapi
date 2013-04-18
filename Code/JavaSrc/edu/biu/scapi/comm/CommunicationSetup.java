@@ -104,18 +104,17 @@ public class CommunicationSetup implements TimeoutObserver{
 		
 	}
 	
-	/** 
-	 * An application that wants to use the communication layer will call this function in order to prepare for communication after providing the required parameters. 
-	 * This function initiates the creation of the final actual socket connections between the parties. If this function succeeds, the 
-	 * application may use the send and receive functions of the created channels to pass messages.
+	/**  
 	 * This function is package private and is called by the public prepareFunctions. It requests a KeyExchangeProtocol that has not been implemented yet.
+	 * It initiates the creation of the final actual socket connections between the parties. If this function succeeds, the 
+	 * application may use the send and receive functions of the created channels to pass messages.
 	 * 
 	 * @param listOfParties the original list of parties to connect to. As a convention, we will set the <B>first party</B> in the list to be the <B>requesting party</B>, that is, 
 	 * 	 					the party represented by the application.
 	 * @param keyExchange the key exchange algorithm protocol to use after a channel is connected
 	 * @param successLevel the ConnectivitySuccessVerifier algorithm to use
 	 * @param timeOut the maximum amount of time we allow for the connection stage
-	 * @return true if the success function has succeeded and false otherwise
+	 * @return a set of connected and ready channels to be used by the parties to send and receive data, it may be null if none succeeded
 	 */
 	Map<InetSocketAddress, Channel> prepareForCommunication(List<Party> listOfParties, KeyExchangeProtocol keyExchange,	ConnectivitySuccessVerifier successLevel, long timeOut) {		
 		//set parameters
@@ -170,12 +169,11 @@ public class CommunicationSetup implements TimeoutObserver{
 	}
 	
 	/**
-	 * 
-	 * Does the same as the other prepareForCommunication function only sets the flag of enableNagle first.
 	 * This function is package private and is called by the public prepareFunctions. It requests a KeyExchangeProtocol that has not been implemented yet.
+	 * Does the same as the above prepareForCommunication function only sets the flag of enableNagle first.
 	 * 
 	 * @param enableNagle a flag indicating weather or not to use the Nagle optimization algorithm 
-	 * @return
+	 * @return a set of connected and ready channels to be used by the parties to send and receive data, it may be null if none succeeded
 	 */
 	Map<InetSocketAddress, Channel> prepareForCommunication(List<Party> listOfParties, KeyExchangeProtocol keyExchange, ConnectivitySuccessVerifier successLevel, 
 															long timeOut, boolean enableNagle) {
@@ -195,7 +193,7 @@ public class CommunicationSetup implements TimeoutObserver{
 	 * @param successLevel the ConnectivitySuccessVerifier algorithm to use
 	 * @param timeOut the maximum amount of time we allow for the connection stage
 	 * @param enableNagle a flag indicating weather or not to use the Nagle optimization algorithm
-	 * @return true if the success function has succeeded and false otherwise
+	 * @return a set of connected and ready channels to be used by the parties to send and receive data, it may be null if none succeeded
 	 */
 	public Map<InetSocketAddress, Channel> prepareForCommunication(List<Party> listOfParties,ConnectivitySuccessVerifier successLevel, 
 																	long timeOut, boolean enableNagle) {
@@ -213,7 +211,7 @@ public class CommunicationSetup implements TimeoutObserver{
 	 * 	 					the party represented by the application.
 	 * @param successLevel the ConnectivitySuccessVerifier algorithm to use
 	 * @param timeOut the maximum amount of time we allow for the connection stage
-	 * @return true if the success function has succeeded and false otherwise
+	 * @return a set of connected and ready channels to be used by the parties to send and receive data, it may be null if none succeeded
 	 */
 	public Map<InetSocketAddress, Channel> prepareForCommunication(List<Party> listOfParties,ConnectivitySuccessVerifier successLevel, long timeOut){
 		KeyExchangeProtocol keyExchange = new KeyExchangeProtocol();
