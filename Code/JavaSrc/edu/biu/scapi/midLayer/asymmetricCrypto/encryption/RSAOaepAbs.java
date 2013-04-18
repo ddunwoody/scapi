@@ -30,13 +30,16 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
+import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.InvalidParameterSpecException;
 import java.security.spec.RSAKeyGenParameterSpec;
 
+import edu.biu.scapi.midLayer.asymmetricCrypto.keys.KeySendableData;
 import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertext;
 import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertextSendableData;
 import edu.biu.scapi.midLayer.ciphertext.ByteArrayAsymCiphertext;
@@ -155,14 +158,48 @@ public abstract class RSAOaepAbs implements RSAOaepEnc {
 		return null;
 	}
 	
-	/* (non-Javadoc)
+	/** (non-Javadoc)
 	 * @see edu.biu.scapi.midLayer.asymmetricCrypto.encryption.AsymmetricEnc#generateCiphertext(edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertextSendableData)
+	 * @deprecated As of SCAPI-V1-0-2-2 use reconstructCiphertext(AsymmetricCiphertextSendableData data)
 	 */
 	@Override
-	public AsymmetricCiphertext generateCiphertext(	AsymmetricCiphertextSendableData data) {
+	@Deprecated public AsymmetricCiphertext generateCiphertext(	AsymmetricCiphertextSendableData data) {
 		if(! (data instanceof ByteArrayAsymCiphertext))
 			throw new IllegalArgumentException("The input data has to be of type ByteArrayAsymCiphertext");
 
 		return (ByteArrayAsymCiphertext) data;
 	}
+	
+	/* (non-Javadoc)
+	 * @see edu.biu.scapi.midLayer.asymmetricCrypto.encryption.AsymmetricEnc#reconstructCiphertext(edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertextSendableData)
+	 */
+	@Override
+	public AsymmetricCiphertext reconstructCiphertext(	AsymmetricCiphertextSendableData data) {
+		if(! (data instanceof ByteArrayAsymCiphertext))
+			throw new IllegalArgumentException("The input data has to be of type ByteArrayAsymCiphertext");
+
+		return (ByteArrayAsymCiphertext) data;
+	}
+	
+	
+	/* (non-Javadoc)
+	 * @see edu.biu.scapi.midLayer.asymmetricCrypto.encryption.AsymmetricEnc#reconstructPrivateKey(edu.biu.scapi.midLayer.asymmetricCrypto.keys.KeySendableData)
+	 */
+	@Override
+	public PrivateKey reconstructPrivateKey(KeySendableData data) {
+		if(! (data instanceof RSAPrivateKey))
+			throw new IllegalArgumentException("To generate the key from sendable data, the data has to be of type RSAPrivateKey");
+	return (RSAPrivateKey)data;
+	}
+	
+	/* (non-Javadoc)
+	 * @see edu.biu.scapi.midLayer.asymmetricCrypto.encryption.AsymmetricEnc#reconstructPublicKey(edu.biu.scapi.midLayer.asymmetricCrypto.keys.KeySendableData)
+	 */
+	@Override
+	public PublicKey reconstructPublicKey(KeySendableData data) {
+		if(! (data instanceof RSAPublicKey))
+			throw new IllegalArgumentException("To generate the key from sendable data, the data has to be of type RSAPublicKey");
+	return (RSAPublicKey)data;
+	}
+
 }
