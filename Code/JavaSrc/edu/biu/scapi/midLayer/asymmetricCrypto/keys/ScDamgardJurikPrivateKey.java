@@ -32,6 +32,8 @@ package edu.biu.scapi.midLayer.asymmetricCrypto.keys;
 import java.math.BigInteger;
 
 /**
+ * This class represents a Private Key suitable for the Damgard-Jurik Encryption Scheme. Although the constructor is  public, it should only be instantiated by the 
+ * Encryption Scheme itself via the generateKey function. 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
@@ -84,8 +86,11 @@ public class ScDamgardJurikPrivateKey implements DamgardJurikPrivateKey, KeySend
 		return dForS1;
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.biu.scapi.midLayer.asymmetricCrypto.keys.CramerShoupPrivateKey#generateSendableData()
+	/** 
+	 * This function is used when an Damgard Jurik Private Key needs to be sent via a {@link edu.biu.scapi.comm.Channel} or any other means of sending data (including serialization).
+	 * It retrieves all the data needed to reconstruct this Private Key at a later time and/or in a different VM.
+	 * It puts all the data in an instance of the relevant class that implements the KeySendableData interface.
+	 * In order to deserialize this into a DamgardJurikPrivateKey all you need to do is cast the serialized object with (DamgardJurikPrivateKey)
 	 */
 	@Override
 	public KeySendableData generateSendableData() {
