@@ -244,22 +244,36 @@ public abstract class CramerShoupAbs implements CramerShoupDDHEnc{
 	
 	
 	/**
+	 * 
 	 * This function does NOT create a new private key. It reconstructs a private key that has been previously serialized.
 	 * @param data
 	 * @return
+	 * @deprecated As of SCAPI-V1-0-2-2 use reconstructPrivateKey(KeySendableData data)
 	 */
-	public CramerShoupPrivateKey generatePrivateKey(KeySendableData data){
+	@Deprecated public CramerShoupPrivateKey generatePrivateKey(KeySendableData data){
 		if(! (data instanceof CramerShoupPrivateKey))
 				throw new IllegalArgumentException("To generate the key from sendable data, the data has to be of type CramerShoupPrivateKey");
 		return (CramerShoupPrivateKey)data;
 	}
+
+	/**
+	 * 
+	 * @data The KeySendableData object has to be of type CramerShoupPrivateKey
+	 */
+	public CramerShoupPrivateKey reconstructPrivateKey(KeySendableData data){
+		if(! (data instanceof CramerShoupPrivateKey))
+				throw new IllegalArgumentException("To generate the key from sendable data, the data has to be of type CramerShoupPrivateKey");
+		return (CramerShoupPrivateKey)data;
+	}
+
 	
 	/**
 	 * This function does NOT create a new public key. It reconstructs a public key that has been previously serialized.
 	 * @param data
 	 * @return
+	 * @deprecated As of SCAPI-V1-0-2-2 use reconstructPublicKey(KeySendableData data)
 	 */
-	public CramerShoupPublicKey generatePublicKey(KeySendableData data){
+	@Deprecated public CramerShoupPublicKey generatePublicKey(KeySendableData data){
 		if(! (data instanceof ScCramerShoupPublicKeySendableData))
 				throw new IllegalArgumentException("To generate the key from sendable data, the data has to be of type ScCramerShoupPublicKeySendableData");
 		ScCramerShoupPublicKeySendableData data1 = (ScCramerShoupPublicKeySendableData)data;
@@ -272,7 +286,29 @@ public abstract class CramerShoupAbs implements CramerShoupDDHEnc{
 		return new ScCramerShoupPublicKey(c,d,h,g1,g2);
 	}
 	
-	public KeyPair generateKeyPair(KeySendableData publicKeyData, KeySendableData privateKeyData){
+	/**
+	 * @data The KeySendableData object has to be of type ScCramerShoupPublicKeySendableData
+	 */
+	public CramerShoupPublicKey reconstructPublicKey(KeySendableData data){
+		if(! (data instanceof ScCramerShoupPublicKeySendableData))
+				throw new IllegalArgumentException("To generate the key from sendable data, the data has to be of type ScCramerShoupPublicKeySendableData");
+		ScCramerShoupPublicKeySendableData data1 = (ScCramerShoupPublicKeySendableData)data;
+		GroupElement c = dlogGroup.reconstructElement(true, data1.getC());
+		GroupElement d = dlogGroup.reconstructElement(true, data1.getD());
+		GroupElement h = dlogGroup.reconstructElement(true, data1.getH());
+		GroupElement g1 = dlogGroup.reconstructElement(true, data1.getG1());
+		GroupElement g2 = dlogGroup.reconstructElement(true, data1.getG2());
+		
+		return new ScCramerShoupPublicKey(c,d,h,g1,g2);
+	}
+	
+	/**
+	 * @deprecated Instead use reconstructPublicKey and reconstructPrivateKey. 
+	 * @param publicKeyData
+	 * @param privateKeyData
+	 * @return
+	 */
+	@Deprecated public KeyPair generateKeyPair(KeySendableData publicKeyData, KeySendableData privateKeyData){
 		if(! (publicKeyData instanceof ScCramerShoupPublicKeySendableData) || (! (privateKeyData instanceof ScCramerShoupPrivateKey)))
 			throw new IllegalArgumentException("wrong type of KeySendableData");
 		
@@ -286,7 +322,7 @@ public abstract class CramerShoupAbs implements CramerShoupDDHEnc{
 	
 	/**
 	 * Returns the PublicKey of this CramerShoup encryption scheme.
-	 * This function should not be use to check if the key has been set. 
+	 * This function should not be used to check if the key has been set. 
 	 * To check if the key has been set use isKeySet function.
 	 * @return the CramerShoupPublicKey
 	 * @throws IllegalStateException if no public key was set.
