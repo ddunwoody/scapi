@@ -169,12 +169,21 @@ public abstract class DlogGroupEC extends DlogGroupAbs implements DlogEllipticCu
 	
 	/* (non-Javadoc)
 	 * @see edu.biu.scapi.primitives.dlog.DlogGroup#generateElement(boolean, edu.biu.scapi.primitives.dlog.GroupElementSendableData)
+	 * @deprecated
 	 */
 	@Override
-	public GroupElement generateElement(boolean bCheckMembership, GroupElementSendableData data) {
+	@Deprecated public GroupElement generateElement(boolean bCheckMembership, GroupElementSendableData data) {
 		if (!(data instanceof ECElementSendableData))
 			throw new IllegalArgumentException("data type doesn't match the group type");
 		return generateElement(bCheckMembership, ((ECElementSendableData)data).getX(), ((ECElementSendableData)data).getY());
 	}
-	
+	/**
+	 * @see edu.biu.scapi.primitives.dlog.DlogGroup#reconstructElement(boolean, edu.biu.scapi.primitives.dlog.GroupElementSendableData)
+	 */
+	@Override
+	public GroupElement reconstructElement(boolean bCheckMembership, GroupElementSendableData data) {
+		if (!(data instanceof ECElementSendableData))
+			throw new IllegalArgumentException("data type doesn't match the group type");
+		return generateElement(bCheckMembership, ((ECElementSendableData)data).getX(), ((ECElementSendableData)data).getY());
+	}
 }
