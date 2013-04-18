@@ -269,9 +269,10 @@ public class ScCramerShoupDDHOnGroupElement extends CramerShoupAbs {
 
 	/** 
 	 * @see edu.biu.scapi.midLayer.asymmetricCrypto.encryption.AsymmetricEnc#generateCiphertext(edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertextSendableData)
+	 * @deprecated  As of SCAPI-V1-0-2-2 use reconstructCiphertext(AsymmetricCiphertextSendableData data)
 	 */
 	@Override
-	public AsymmetricCiphertext generateCiphertext(AsymmetricCiphertextSendableData data) {
+	@Deprecated public AsymmetricCiphertext generateCiphertext(AsymmetricCiphertextSendableData data) {
 		if(! (data instanceof CrShOnGroupElSendableData))
 				throw new IllegalArgumentException("The input data has to be of type CrShOnGroupElSendableData");
 		CrShOnGroupElSendableData data1 = (CrShOnGroupElSendableData)data;
@@ -279,6 +280,22 @@ public class ScCramerShoupDDHOnGroupElement extends CramerShoupAbs {
 		GroupElement u2 = dlogGroup.generateElement(true, data1.getU2());
 		GroupElement v = dlogGroup.generateElement(true, data1.getV());
 		GroupElement e = dlogGroup.generateElement(true, data1.getE());
+	
+		return new CramerShoupOnGroupElementCiphertext(u1, u2, v, e);
+	}
+	
+	/** 
+	 * @see edu.biu.scapi.midLayer.asymmetricCrypto.encryption.AsymmetricEnc#reconstructCiphertext(edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertextSendableData)
+	 */
+	@Override
+	public AsymmetricCiphertext reconstructCiphertext(AsymmetricCiphertextSendableData data) {
+		if(! (data instanceof CrShOnGroupElSendableData))
+				throw new IllegalArgumentException("The input data has to be of type CrShOnGroupElSendableData");
+		CrShOnGroupElSendableData data1 = (CrShOnGroupElSendableData)data;
+		GroupElement u1 = dlogGroup.reconstructElement(true, data1.getU1());
+		GroupElement u2 = dlogGroup.reconstructElement(true, data1.getU2());
+		GroupElement v = dlogGroup.reconstructElement(true, data1.getV());
+		GroupElement e = dlogGroup.reconstructElement(true, data1.getE());
 	
 		return new CramerShoupOnGroupElementCiphertext(u1, u2, v, e);
 	}
