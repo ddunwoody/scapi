@@ -29,7 +29,7 @@ package edu.biu.scapi.midLayer.asymmetricCrypto.keys;
 import java.io.Serializable;
 
 /**
- * This is a marker interface. It allows the generation of a Key that may contain GroupElements at an abstract level without knowing the actual type of Dlog Group.
+ * This is a marker interface. It allows the reconstruction of a Key that may contain GroupElements at an abstract level without knowing the actual type of Dlog Group.
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
