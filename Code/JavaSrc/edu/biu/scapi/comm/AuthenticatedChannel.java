@@ -66,7 +66,7 @@ public class AuthenticatedChannel extends ChannelDecorator {
 	 */
 	AuthenticatedChannel(InetAddress ipAddress, int port, Mac mac) throws SecurityLevelException{
 		super(new PlainTCPChannel(ipAddress,  port));
-		doConstruct(macAlg);
+		doConstruct(mac);
 	}
 	
 	/**
@@ -77,7 +77,7 @@ public class AuthenticatedChannel extends ChannelDecorator {
 	 */
 	AuthenticatedChannel(InetSocketAddress socketAddress, Mac mac) throws SecurityLevelException{
 		super(new PlainTCPChannel(socketAddress));
-		doConstruct(macAlg);
+		doConstruct(mac);
 	}
 	
 	
@@ -92,7 +92,7 @@ public class AuthenticatedChannel extends ChannelDecorator {
 	 */
 	public AuthenticatedChannel(Channel channel, Mac mac) throws SecurityLevelException {
 		super(channel);	
-		doConstruct(macAlg);
+		doConstruct(mac);
 	}
 	
 	//This function checks that the MAC algorithm passed is UnlimitedTimes-secure. If so, it continues constructing the object, otherwise it throws exception.
