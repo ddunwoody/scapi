@@ -30,13 +30,20 @@ import java.math.BigInteger;
 import java.security.KeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.SecureRandom;
 
 import org.bouncycastle.util.BigIntegers;
 
 import edu.biu.scapi.exceptions.FactoriesException;
+import edu.biu.scapi.midLayer.asymmetricCrypto.keys.DamgardJurikPrivateKey;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ElGamalPrivateKey;
+import edu.biu.scapi.midLayer.asymmetricCrypto.keys.KeySendableData;
+import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScCramerShoupPublicKey;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScElGamalPrivateKey;
+import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScCramerShoupPublicKey.ScCramerShoupPublicKeySendableData;
+import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScElGamalPublicKey;
+import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScElGamalPublicKey.ScElGamalPublicKeySendableData;
 import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertext;
 import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertextSendableData;
 import edu.biu.scapi.midLayer.ciphertext.ElGamalOnByteArrayCiphertext;
@@ -285,14 +292,28 @@ public class ScElGamalOnGroupElement extends ElGamalAbs implements AsymMultiplic
 	
 	/** 
 	 * @see edu.biu.scapi.midLayer.asymmetricCrypto.encryption.AsymmetricEnc#generateCiphertext(edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertextSendableData)
+	 * @deprecated  As of SCAPI-V1-0-2-2 use reconstructCiphertext(AsymmetricCiphertextSendableData data)
 	 */
 	@Override
-	public AsymmetricCiphertext generateCiphertext(AsymmetricCiphertextSendableData data) {
+	@Deprecated public AsymmetricCiphertext generateCiphertext(AsymmetricCiphertextSendableData data) {
 		if(! (data instanceof ElGamalOnGrElSendableData))
 				throw new IllegalArgumentException("The input data has to be of type ElGamalOnGrElSendableData");
 		ElGamalOnGrElSendableData data1 = (ElGamalOnGrElSendableData)data;
 		GroupElement cipher1 = dlog.generateElement(true, data1.getCipher1());
 		GroupElement cipher2 = dlog.generateElement(true, data1.getCipher2());	
+		return new ElGamalOnGroupElementCiphertext(cipher1, cipher2);
+	}
+	
+	/** 
+	 * @see edu.biu.scapi.midLayer.asymmetricCrypto.encryption.AsymmetricEnc#reconstructCiphertext(edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertextSendableData)
+	 */
+	@Override
+	public AsymmetricCiphertext reconstructCiphertext(AsymmetricCiphertextSendableData data) {
+		if(! (data instanceof ElGamalOnGrElSendableData))
+				throw new IllegalArgumentException("The input data has to be of type ElGamalOnGrElSendableData");
+		ElGamalOnGrElSendableData data1 = (ElGamalOnGrElSendableData)data;
+		GroupElement cipher1 = dlog.reconstructElement(true, data1.getCipher1());
+		GroupElement cipher2 = dlog.reconstructElement(true, data1.getCipher2());	
 		return new ElGamalOnGroupElementCiphertext(cipher1, cipher2);
 	}
 
