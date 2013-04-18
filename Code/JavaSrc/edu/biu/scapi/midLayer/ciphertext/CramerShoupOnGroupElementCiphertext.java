@@ -31,7 +31,7 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
 
 /**
- * This class is a container that encapsulates the cipher data resulting from applying the CramerShoupDDH encryption.
+ * This class is a container that encapsulates the cipher data resulting from applying the CramerShoupDDHOnGroupElement encryption.
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
@@ -39,14 +39,16 @@ public class CramerShoupOnGroupElementCiphertext extends CramerShoupCiphertext {
 	
 	private GroupElement e;
 	
+	/**
+	 * This constructor is used by the Encryption Scheme as a result of a call to function encrypt.
+	 * @param u1
+	 * @param u2
+	 * @param e
+	 * @param v
+	 */
 	public CramerShoupOnGroupElementCiphertext(GroupElement u1, GroupElement u2, GroupElement e, GroupElement v) {
 		super(u1, u2, v);
 		this.e = e;
-	}
-	
-	//This constructor needs the Dlog Group so that it can reconstruct the group elements from the sendable data.
-	public CramerShoupOnGroupElementCiphertext(CrShOnGroupElSendableData data, DlogGroup dlog){
-		this(dlog.generateElement(false, data.getU1()), dlog.generateElement(false, data.getU2()), dlog.generateElement(false, data.getE()), dlog.generateElement(false, data.getV()));
 	}
 	
 	public GroupElement getE() {
