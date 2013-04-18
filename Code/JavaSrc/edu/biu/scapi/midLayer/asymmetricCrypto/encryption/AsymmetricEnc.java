@@ -35,6 +35,7 @@ import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.InvalidParameterSpecException;
 
 import edu.biu.scapi.exceptions.NoMaxException;
+import edu.biu.scapi.midLayer.asymmetricCrypto.keys.KeySendableData;
 import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertext;
 import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertextSendableData;
 import edu.biu.scapi.midLayer.plaintext.Plaintext;
@@ -109,7 +110,10 @@ public interface AsymmetricEnc extends Cpa, Indistinguishable{
 	public int getMaxLengthOfByteArrayForPlaintext() throws NoMaxException;
 	
 	/**
-	 * Generates a Plaintext suitable to this encryption scheme from the given message.
+	 * Generates a Plaintext suitable for this encryption scheme from the given message.<p>
+	 * A Plaintext object is needed in order to use the encrypt function. Each encryption scheme might generate a different type of Plaintext
+	 * according to what it needs for encryption. The encryption function receives as argument an object of type Plaintext in order to allow a protocol
+	 * holding the encryption scheme to be oblivious to the exact type of data that needs to be passed for encryption.  
 	 * @param text byte array to convert to a Plaintext object.
 	 * @throws IllegalArgumentException if the given message's length is greater than the maximum. 
 	 */
@@ -121,9 +125,18 @@ public interface AsymmetricEnc extends Cpa, Indistinguishable{
 	 * We emphasize that this is NOT in any way an encryption function, it just receives ENCRYPTED DATA and places it in a ciphertext object. 
 	 * @param data contains all the necessary information to construct a suitable ciphertext.  
 	 * @return the AsymmetricCiphertext that corresponds to the implementing encryption scheme, for ex: CramerShoupCiphertext
+	 * @deprecated As of SCAPI-V1-0-2-2 use reconstructCiphertext(AsymmetricCiphertextSendableData data)
 	 */
-	public AsymmetricCiphertext generateCiphertext(AsymmetricCiphertextSendableData data);
+	@Deprecated public AsymmetricCiphertext generateCiphertext(AsymmetricCiphertextSendableData data);
 	
+	/**
+	 * Reconstructs a suitable AsymmetricCiphertext from data that was probably obtained via a Channel or any other means of sending data (including serialization).<p>
+	 * We emphasize that this is NOT in any way an encryption function, it just receives ENCRYPTED DATA and places it in a ciphertext object. 
+	 * @param data contains all the necessary information to construct a suitable ciphertext.  
+	 * @return the AsymmetricCiphertext that corresponds to the implementing encryption scheme, for ex: CramerShoupCiphertext
+	 */
+	public AsymmetricCiphertext reconstructCiphertext(AsymmetricCiphertextSendableData data);
+
 	/**
 	 * Encrypts the given plaintext using this asymmetric encryption scheme.
 	 * @param plainText message to encrypt
@@ -164,5 +177,21 @@ public interface AsymmetricEnc extends Cpa, Indistinguishable{
 	 * @return KeyPair holding the public and private keys
 	 */
 	public KeyPair generateKey();
+	
+	/**
+ 	 * Reconstructs a suitable PublicKey from data that was probably obtained via a Channel or any other means of sending data (including serialization).<p>
+	 * We emphasize that this function does NOT in any way generate a key, it just receives data and recreates a PublicKey object. 
+ 	 * @param data a KeySendableData object needed to recreate the original key. The actual type of KeySendableData has to be suitable to the actual encryption scheme used, otherwise it throws an IllegalArgumentException
+	 * @return a new PublicKey with the data obtained as argument  
+	 */
+	public PublicKey reconstructPublicKey(KeySendableData data);
+	
+	/**
+ 	 * Reconstructs a suitable PrivateKey from data that was probably obtained via a Channel or any other means of sending data (including serialization).<p>
+	 * We emphasize that this function does NOT in any way generate a key, it just receives data and recreates a PrivateKey object. 
+ 	 * @param data a KeySendableData object needed to recreate the original key. The actual type of KeySendableData has to be suitable to the actual encryption scheme used, otherwise it throws an IllegalArgumentException
+	 * @return a new PrivateKey with the data obtained as argument  
+	 */
+	public PrivateKey reconstructPrivateKey(KeySendableData data);
 		
 }
