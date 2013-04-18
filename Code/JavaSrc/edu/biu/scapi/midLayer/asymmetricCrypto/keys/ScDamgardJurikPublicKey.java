@@ -32,9 +32,11 @@ package edu.biu.scapi.midLayer.asymmetricCrypto.keys;
 import java.math.BigInteger;
 
 /**
- * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
- *
- */
+* This class represents a Public Key suitable for the Damgard-Jurik Encryption Scheme. Although the constructor is public, it should only be instantiated by the 
+* Encryption Scheme itself via the generateKey function. 
+* @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
+*
+*/
 public class ScDamgardJurikPublicKey implements DamgardJurikPublicKey, KeySendableData {
 
 	private static final long serialVersionUID = -2189628744318571245L;
@@ -78,12 +80,16 @@ public class ScDamgardJurikPublicKey implements DamgardJurikPublicKey, KeySendab
 		return modulus;
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.biu.scapi.midLayer.asymmetricCrypto.keys.CramerShoupPrivateKey#generateSendableData()
+	/**
+	 * This function is used when an Damgard Jurik Public Key needs to be sent via a {@link edu.biu.scapi.comm.Channel} or any other means of sending data (including serialization).
+	 * It retrieves all the data needed to reconstruct this Public Key at a later time and/or in a different VM.
+	 * It puts all the data in an instance of the relevant class that implements the KeySendableData interface.
+ 	 * In order to deserialize this into a DamgardJurikPublicKey all you need to do is cast the serialized object with (DamgardJurikPublicKey)
+	 * @return the KeySendableData object
 	 */
 	@Override
 	public KeySendableData generateSendableData() {
-		//Since ScDamgardJurikPublicKey is both a PrivateKey and a KeySendableData, on the one hand it has to implement
+		//Since ScDamgardJurikPublicKey is both a PublicKey and a KeySendableData, on the one hand it has to implement
 		//the generateSendableData() function, but on the other hand it is in itself an KeySendableData, so we do not really
 		//generate sendable data, but just return this object.
 		return this;
