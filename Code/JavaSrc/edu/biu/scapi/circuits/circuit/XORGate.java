@@ -22,8 +22,6 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-
-
 package edu.biu.scapi.circuits.circuit;
 
 import java.util.BitSet;
@@ -39,10 +37,7 @@ import java.util.BitSet;
 
 public class XORGate extends Gate {
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -3654074567718944607L;
 
 /**
    * Constructs an XOR Gate
@@ -61,7 +56,7 @@ public class XORGate extends Gate {
    *          multiple {@code Wire}s
    */
 
-  XORGate(int gateNumber, int[] inputWireLabels, int[] outputWireLabels) {
+  public XORGate(int gateNumber, int[] inputWireLabels, int[] outputWireLabels) {
     super(gateNumber, createXORTruthTable(), inputWireLabels, outputWireLabels);
   }
 
