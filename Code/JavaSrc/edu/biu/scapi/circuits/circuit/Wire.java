@@ -22,8 +22,6 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-
-
 package edu.biu.scapi.circuits.circuit;
 
 /**
@@ -69,7 +67,7 @@ public class Wire {
    * 
    * @return the value (0 or 1) that this {@code Wire} is set to
    */
-  int getValue() {
+  public int getValue() {
     return value;
   }
 }
