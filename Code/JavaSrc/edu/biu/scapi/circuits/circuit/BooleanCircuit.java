@@ -22,17 +22,21 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-
-
 package edu.biu.scapi.circuits.circuit;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
+
+import edu.biu.scapi.exceptions.CircuitFileFormatException;
+import edu.biu.scapi.exceptions.InvalidInputException;
+import edu.biu.scapi.exceptions.NoSuchPartyException;
+import edu.biu.scapi.exceptions.NotAllInputsSetException;
 
 /**
  * A software representation of a boolean circuit. The circuit is constructed
@@ -43,24 +47,23 @@ import java.util.Scanner;
  * @author Steven Goldfeder
  * 
  */
+
 public class BooleanCircuit implements Serializable {
 
-  /**
-     * 
-     */
-  private static final long serialVersionUID = 1L;
-  /**
-   * A boolean flag set to {@code true} if the input has been set and
-   * {@code false}otherwise
+	private static final long serialVersionUID = -4658751288524308910L;
+
+/**
+   * An array of boolean flags set to {@code true} if and only if the input has been set for the indexed party or the indexed party has no inputs
    */
-  private boolean isInputSet = false;
+  private boolean[] isInputSet;
+  
   /**
-   * A {@code Map} tat maps the integer label of a {@code Wire} to the
+   * A {@code Map} that maps the integer label of a {@code Wire} to the
    * previously set {@code Wire}. Only {@code Wire}s whose value has been set
    * will be on this map.
    * 
    */
-  Map<Integer, Wire> computedWires;
+  Map<Integer, Wire> computedWires = new HashMap<Integer,Wire>();
   /**
    * An array of the {@code Gate}s of this {@code BooleanCircuit} sorted
    * topologically.
@@ -75,17 +78,22 @@ public class BooleanCircuit implements Serializable {
    * The total number of {@code Wire}s in the circuit
    */
   private int numberOfWires;
+  
   /**
-   * An array containing the integer labels if the input {@code Wire}s of this
-   * {@code BooleanCircuit}
+   * The number of parties that are interacting(i.e. receiving input and/or output) with this circuit
    */
-  private int[] inputWireLabels;
+  private int numberOfParties;  
+  /**
+   * An arrayList containing the integer labels of the input {@code Wire}s of this
+   * {@code BooleanCircuit} indexed by the party number.
+   */
+  private ArrayList<ArrayList<Integer>> eachPartysInputWires = new ArrayList<ArrayList<Integer>>();
 
   // Integer.parseInt(s.next()) is significantly faster than s.nextInt() so I
   // use the former
   /**
    * Constructs a BooleanCircuit from a File. The File first lists the number of
-   * {@code Gate}s, then the number of {@code Wire}s,. number of input Wires and
+   * {@code Gate}s, then the number of {@code Wire}s, number of input Wires and
    * following this is the integer label of each of these input {@code Wire}
    * s.Next it lists the number of output {@code Wire}s followed by the integer
    * label of each of these {@code Wires}. Then for each gate, we have the
@@ -101,24 +109,32 @@ public class BooleanCircuit implements Serializable {
    *          the {@link File} from which the circuit is read.
    * @throws FileNotFoundException
    *           if f is not found in the specified directory.
+   * @throws CircuitFileFormatException 
    */
-  BooleanCircuit(File f) throws FileNotFoundException {
+  public BooleanCircuit(File f) throws FileNotFoundException, CircuitFileFormatException {
     Scanner s = new Scanner(f);
     int numberOfGates = Integer.parseInt(s.next());
     gates = new Gate[numberOfGates];
     numberOfWires = Integer.parseInt(s.next());
-    int numberOfInputs = Integer.parseInt(s.next());
-    inputWireLabels = new int[numberOfInputs];
-    /*
-     * The file does not differentiate between inputs from both parties. This
-     * information is no longer important at this point. Once, the evaluating
-     * party has obtained all the input values, s/he can combine the inputs and
-     * not distinguish whose they are.
-     */
-    for (int i = 0; i < numberOfInputs; i++) {
-      inputWireLabels[i] = Integer.parseInt(s.next());
+    numberOfParties =  Integer.parseInt(s.next());
+    isInputSet = new boolean[numberOfParties];
+    for (int i = 0; i < numberOfParties; i++) {
+      if (Integer.parseInt(s.next()) != i+1) {//add 1 since parties are indexed from 1, not 0
+        throw new CircuitFileFormatException();
+      }
+      int numberOfInputsForCurrentParty = Integer.parseInt(s.next());
+      if(numberOfInputsForCurrentParty < 0){
+        throw new CircuitFileFormatException();
+      }
+      boolean isThisPartyInputSet = numberOfInputsForCurrentParty ==0? true : false;
+      isInputSet[i]=isThisPartyInputSet;
+      ArrayList<Integer> currentPartyInput = new ArrayList<Integer>();
+      eachPartysInputWires.add(currentPartyInput);
+      for (int j = 0; j < numberOfInputsForCurrentParty; j++) {
+        currentPartyInput.add(Integer.parseInt(s.next()));
+      }
     }
-    /*
+ /*
      * The ouputWireLabels are the outputs from this circuit. However, this
      * circuit may actually be a single layer of a larger layered circuit. So
      * this output can be part of the input to another layer of the circuit.
@@ -175,44 +191,25 @@ public class BooleanCircuit implements Serializable {
    *          an array containing the labels of the wires that will be ouput of
    *          the {@code BooleanCircuit}
    */
-  BooleanCircuit(Gate[] gates, int[] outputWireLabels) {
+  public BooleanCircuit(Gate[] gates, int[] outputWireLabels) {
     this.gates = gates;
     this.outputWireLabels = outputWireLabels;
   }
 
-  /**
-   * Constructs a {code Booleancircuit} from an array of gates and also sets
-   * input {@link Wire}s. Each gates keeps an array of the labels of its inpout
-   * and ouput wires. The constructor is provided with a list of which
-   * {@link Wire}s are output {@link Wire}s of the {@code BooleanCircuit}.
-   * 
-   * @param gates
-   *          an array of {@link Gate}s to create from which to construct the
-   *          {@code BooleanCircuit}
-   * @param outputWireLabels
-   *          an array containing the labels of the wires that will be ouput of
-   *          the {@code BooleanCircuit}
-   * @param setInputWires
-   *          the previously set {@link Wire}s which are input to the
-   *          {@code BooleanCircuit}
-   */
-  BooleanCircuit(Gate[] gates, int[] outputWireLabels,
-      Map<Integer, Wire> setInputWires) {
-    this.gates = gates;
-    this.outputWireLabels = outputWireLabels;
-    setInputs(setInputWires);
-  }
-
-  /**
-   * Sets the input to the circuit from a map containing constructed and set
-   * {@link Wire}s. Once the input is set, the circuit is ready to be computed.
+    /**
+   * Sets the specified party's input to the circuit from a map containing constructed and set
+   * {@link Wire}s. It updates that this party's input has been set. Once the input is set for all parties that have input, the circuit is ready to be computed.
    * 
    * @param presetInputWires
    *          the circuit's input Wires whose values have been previously set
+     * @throws NoSuchPartyException 
    */
-  void setInputs(Map<Integer, Wire> presetInputWires) {
-    computedWires = presetInputWires;
-    isInputSet = true;
+  void setInputs(Map<Integer, Wire> presetInputWires,int partyNumber) throws NoSuchPartyException {
+    if(partyNumber < 1 || partyNumber > numberOfParties){
+      throw new NoSuchPartyException();
+    }
+    computedWires.putAll(presetInputWires);
+    isInputSet[partyNumber-1]=true;
   }
 
   /**
@@ -224,16 +221,25 @@ public class BooleanCircuit implements Serializable {
    *          the {@link File} containing the representation of the circuit's
    *          input
    * @throws FileNotFoundException
+   * @throws InvalidInputException 
+   * @throws NoSuchPartyException 
    */
-  void setInputs(File inputWires) throws FileNotFoundException {
+  public void setInputs(File inputWires, int partyNumber) throws FileNotFoundException, InvalidInputException, NoSuchPartyException {
+    if(partyNumber < 1 || partyNumber > numberOfParties){
+      throw new NoSuchPartyException();
+    }
     Scanner s = new Scanner(inputWires);
     int numberOfInputWires = s.nextInt();
+    if(numberOfInputWires != getNumberOfInputs(partyNumber)){
+      throw new InvalidInputException();
+    }
     Map<Integer, Wire> presetInputWires = new HashMap<Integer, Wire>();
+    //could include error checking here to make sure the wires are correct, but would slow down setInput considerably
     for (int i = 0; i < numberOfInputWires; i++) {
       int wireLabel = s.nextInt();
       presetInputWires.put(wireLabel, new Wire(s.nextInt()));
     }
-    setInputs(presetInputWires);
+    setInputs(presetInputWires,partyNumber);
   }
 
   /**
@@ -241,13 +247,15 @@ public class BooleanCircuit implements Serializable {
    * 
    * @return a {@link Map} that maps the output {@link Wire} label to the
    *         computed {@link Wire}
+   * @throws NotAllInputsSetException 
    */
-  public Map<Integer, Wire> compute() {
-    if (!isInputSet) {
-      throw new RuntimeException(
-          "The circuit cannot be computed since its input values have not been set!");
+  public Map<Integer, Wire> compute() throws NotAllInputsSetException {
+    for (int i = 0; i < numberOfParties; i++) {
+      if (!isInputSet[i]) {
+        throw new NotAllInputsSetException();
+      }
     }
-  /*   computes each Gate. Since the Gates are provided in topological order, by
+      /*   computes each Gate. Since the Gates are provided in topological order, by
      the time the compute function on a given Gate is called, its input Wires
      will have already been assigned values*/
     for (Gate g : getGates()) {
@@ -320,9 +328,35 @@ public class BooleanCircuit implements Serializable {
   }
 
   /**
-   * @return an array of the input {@link Wire} labels
+   * @param partyNumber the number of the party whose input wires will be returned
+   * @return an ArrayList containing the input {@link Wire} labels of the specified party
+   * @throws NoSuchPartyException 
    */
-  public int[] getInputWireLabels() {
-    return inputWireLabels;
+  
+  public ArrayList<Integer> getInputWireLabels(int partyNumber) throws NoSuchPartyException {
+    if(partyNumber < 1 || partyNumber > numberOfParties){
+      throw new NoSuchPartyException();
+    }
+    //we subtract one from the party number since the parties are indexed beginning from one, but the ArrayList is indexed from 0
+    return eachPartysInputWires.get(partyNumber-1);
   }
-}
+  
+  /**
+   * @param partyNumber the number of the party whose number of input wires will be returned
+   * @return the number of input wires for the specified party
+   * @throws NoSuchPartyException 
+   */
+  public int getNumberOfInputs(int partyNumber) throws NoSuchPartyException{
+    if(partyNumber < 1 || partyNumber > numberOfParties){
+      throw new NoSuchPartyException();
+    }
+    //we subtract one from the party number since the parties are indexed beginning from one, but the ArrayList is indexed from 0
+    return eachPartysInputWires.get(partyNumber-1).size();
+  }
+
+  public int getNumberOfParties() {
+    return numberOfParties;
+  }
+  }
+
+
