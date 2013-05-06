@@ -22,8 +22,6 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-
-
 package edu.biu.scapi.circuits.circuit;
 
 import java.io.Serializable;
@@ -41,12 +39,9 @@ import java.util.Map;
 
 public class Gate implements Serializable {
 
-  /**
-   * 
-   */
-  private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 7457072076170596400L;
 
-  /* We coded the truthTable as an integer as I thought it would be more
+/* We coded the truthTable as an integer as I thought it would be more
    efficient, but we did not see improvement. Actually, it took longer to
    create the circuit from a file with this approach, so I reverted to a
    BitSet.*/
@@ -160,7 +155,7 @@ public class Gate implements Serializable {
    * @return Returns {@code true} if the gates are equivalent and {@code false}
    *         otherwise
    */
-  boolean verify(Gate g) {
+  public boolean verify(Gate g) {
     // first we verify that the gates' integer labels are the same
     if (gateNumber != g.getGateNumber()) {
       return false;
