@@ -22,8 +22,6 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-
-
 package edu.biu.scapi.circuits.circuit;
 
 import java.util.BitSet;
@@ -38,10 +36,8 @@ import java.util.BitSet;
  */
 
 public class NOTGate extends Gate {
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+
+	private static final long serialVersionUID = 5960890254258310472L;
 
 /**
    * Constructs a NOT Gate
@@ -59,7 +55,7 @@ public class NOTGate extends Gate {
    *          left the option for treating this as multiple {@code Wire}s
    */
 
-  NOTGate(int gateNumber, int inputWireLabel, int[] outputWireLabels) {
+  public NOTGate(int gateNumber, int inputWireLabel, int[] outputWireLabels) {
     super(gateNumber, createNOTTruthTable(), new int[] { inputWireLabel },
         outputWireLabels);
   }
