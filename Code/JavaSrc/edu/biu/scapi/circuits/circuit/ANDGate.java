@@ -23,7 +23,6 @@
 * 
 */
 
-
 package edu.biu.scapi.circuits.circuit;
 
 import java.util.BitSet;
@@ -37,10 +36,8 @@ import java.util.BitSet;
  */
 public class ANDGate extends Gate {
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+  
+	private static final long serialVersionUID = 4119651009853440628L;
 
 /**
    * Constructs an AND Gate
@@ -55,7 +52,7 @@ public class ANDGate extends Gate {
    *          in instances in which fan-out of the output {@code Wire} is >1, we
    *          left the option for treating this as multiple {@code Wire}s
    */
-  ANDGate(int gateNumber, int[] inputWireLabels, int[] outputWireLabels) {
+  public ANDGate(int gateNumber, int[] inputWireLabels, int[] outputWireLabels) {
     super(gateNumber, createANDTruthTable(), inputWireLabels, outputWireLabels);
   }
 
