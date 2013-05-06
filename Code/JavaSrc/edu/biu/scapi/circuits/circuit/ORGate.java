@@ -22,8 +22,6 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-
-
 package edu.biu.scapi.circuits.circuit;
 
 import java.util.BitSet;
@@ -38,10 +36,7 @@ import java.util.BitSet;
 
 public class ORGate extends Gate {
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2472392417502495079L;
 
 /**
    * Constructs an OR Gate
@@ -56,7 +51,7 @@ public class ORGate extends Gate {
    *          in instances in which fan-out of the output {@code Wire} is >1, we
    *          left the option for treating this as multiple {@code Wire}s
    */
-  ORGate(int gateNumber, int[] inputWireLabels, int[] outputWireLabels) {
+  public ORGate(int gateNumber, int[] inputWireLabels, int[] outputWireLabels) {
     super(gateNumber, createORTruthTable(), inputWireLabels, outputWireLabels);
   }
 
