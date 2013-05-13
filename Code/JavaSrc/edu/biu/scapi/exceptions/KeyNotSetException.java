@@ -22,9 +22,7 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-
-
-package edu.biu.scapi.circuits.encryption;
+package edu.biu.scapi.exceptions;
 
 public class KeyNotSetException extends Exception {
 

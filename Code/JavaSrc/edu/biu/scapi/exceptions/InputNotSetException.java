@@ -24,7 +24,7 @@
 */
 
 
-package edu.biu.scapi.circuits.garbledCircuit;
+package edu.biu.scapi.exceptions;
 
 public class InputNotSetException extends Exception {
   /**

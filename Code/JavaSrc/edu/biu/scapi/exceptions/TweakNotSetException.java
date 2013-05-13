@@ -22,9 +22,7 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-
-
-package edu.biu.scapi.circuits.encryption;
+package edu.biu.scapi.exceptions;
 
 public class TweakNotSetException extends Exception {
   /**
