@@ -27,7 +27,7 @@
 package edu.biu.scapi.paddings;
 
 /**
- * Concrete padding class implements the BitPadding padding scheme, but instead of add 10...0 bit, we add 10...0 bytes. <p>
+ * Concrete padding class that implements the BitPadding padding scheme, but instead of adding 10...0 bits, it adds 10...0 bytes. <p>
  * Padding is performed as follows: a single "1" byte is appended to the array, 
  * and then "0" bytes are appended so that the length in bytes of
  * the padded message becomes the requested length.
@@ -45,8 +45,8 @@ public final class BitPadding implements PaddingScheme {
 	}
 	
 	/**
-	 * Pads the given byte array with padSize bytes according to BitPadding padding scheme, but instead of add 10...0 bit, we add 10...0 bytes. <p>
-	 * The value of the first added byte is 1 and the values if the nest added bytes are 0.
+	 * Pads the given byte array with padSize bytes according to the BitPadding padding scheme, but instead of adding 10...0 bit, it adds 10...0 bytes. <p>
+	 * The value of the first added byte is 1 and the values of the rest added bytes are 0.
 	 * @param padInput array to pad
 	 * @param padSize number of bytes to add to padInput array
 	 * @return the padded array
