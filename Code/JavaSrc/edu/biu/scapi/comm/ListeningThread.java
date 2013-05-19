@@ -40,6 +40,7 @@ import java.util.Vector;
 import java.util.logging.Level;
 
 import edu.biu.scapi.exceptions.InvalidChannel;
+import edu.biu.scapi.exceptions.InvalidChannelException;
 import edu.biu.scapi.generals.Logging;
 
 /** 
@@ -203,8 +204,8 @@ class ListeningThread extends Thread{
 	        			scThread.start();
 	        		} else
 						
-						//all the channels must be plian. Should not be 
-						throw new InvalidChannel("All channels must be plain");
+						//all the channels must be plain.
+						throw new InvalidChannelException("All channels must be plain");
 						
 	        		
 	        	}
