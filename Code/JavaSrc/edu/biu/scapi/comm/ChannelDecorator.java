@@ -27,6 +27,8 @@
 
 package edu.biu.scapi.comm;
 
+import edu.biu.scapi.exceptions.InvalidChannelException;
+
 
 /** 
  * We use the Decorator Pattern in order to add features to the basic Channel. This class is the Decorator component of the pattern.
@@ -41,6 +43,8 @@ public abstract class ChannelDecorator implements Channel {
 	 * @param channel 
 	 */
 	public ChannelDecorator(Channel channel){
+		if(((PlainChannel)channel).getState()!= PlainChannel.State.READY)
+			throw new InvalidChannelException("The basic channel has to be in READY state.");
 		this.channel = channel;
 	}
 	
