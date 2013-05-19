@@ -29,28 +29,18 @@ package edu.biu.scapi.comm;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.security.InvalidKeyException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Vector;
 import java.util.logging.Level;
-
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.exec.TimeoutObserver;
 import org.apache.commons.exec.Watchdog;
 
 import edu.biu.scapi.exceptions.DuplicatePartyException;
-import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.generals.Logging;
-import edu.biu.scapi.midLayer.symmetricCrypto.encryption.SymmetricEnc;
-import edu.biu.scapi.midLayer.symmetricCrypto.mac.Mac;
-import edu.biu.scapi.tools.Factories.MacFactory;
-import edu.biu.scapi.tools.Factories.SymmetricEncFactory;
 
 
 
@@ -151,6 +141,11 @@ public class CommunicationSetup implements TimeoutObserver{
 		//run success function
 		if(!runSuccessAlgo()){
 			//remove connections from the list of established connections
+			//Eventually, when different ConnectivitySuccessVerifiers are implemented there might be an impact what happens to the connections that did succeed.
+			//For example, assume that only 80% of the connections requested were established but the ConnectivitySuccessVerifier specified requires 100%. Then, obviously
+			//the function didn't succeed and null should be returned. However, it would be a pity to let go (delete and remove) the 80% of connections that did succeed.
+			//It may be possible (and this will depend on the requirements of the ConnectivitySuccessVerifier) to keep the already established connections and only try 
+			//to establish what is missing. In some other cases it will be necessary to start everything over form the beginning. As a conclusion, this is left for future implementation.
 			return null;
 		}
 		
@@ -221,7 +216,7 @@ public class CommunicationSetup implements TimeoutObserver{
 	/**
 	 * 
 	 * Using the SecuringConnectionThread and the ListeningThread we connect the parties via sockets.
-	 * 								   We either connect by initiating a connection or by listening to incoming connection requests.
+	 * We either connect by initiating a connection or by listening to incoming connection requests.
 	 * @throws DuplicatePartyException This exception is for the case where there are two parties in the list of parties with the same ip+port
 	 */
 	private void establishAndSecureConnections() throws DuplicatePartyException {
@@ -233,7 +228,7 @@ public class CommunicationSetup implements TimeoutObserver{
 		int numOfIncomingConnections = 0;
 		
 		//temp map
-		Map<InetAddress, Vector<SecuringConnectionThread>> ListeningThreadMap = new HashMap<InetAddress, Vector<SecuringConnectionThread>>();
+		Map<InetAddress, Vector<SecuringConnectionThread>> listeningThreadMap = new HashMap<InetAddress, Vector<SecuringConnectionThread>>();
 		
 		//the first party is me. Other parties identity will be compared with this party
 		if(itr.hasNext()){
@@ -276,15 +271,15 @@ public class CommunicationSetup implements TimeoutObserver{
 			else{ //DOWN connection
 				
 				numOfIncomingConnections = downConnection(party,
-						numOfIncomingConnections, ListeningThreadMap,
+						numOfIncomingConnections, listeningThreadMap,
 						channel, keyExchangeOutput);
 				
 			}
 		}
 		
-		if(ListeningThreadMap.size()>0){//there are down connections need to listen to connections using the listeningThread
+		if(listeningThreadMap.size()>0){//there are down connections need to listen to connections using the listeningThread
 			//send information to the listening thread
-			listeningThread = new ListeningThread(ListeningThreadMap, firstParty.getPort(), numOfIncomingConnections);
+			listeningThread = new ListeningThread(listeningThreadMap, firstParty.getPort(), numOfIncomingConnections);
 			listeningThread.start();
 		}
 		
@@ -383,9 +378,8 @@ public class CommunicationSetup implements TimeoutObserver{
 	/** 
 	 * 
 	 * Runs the success algorithm. 
-	 * @return true if the connections in the connections in the establishedConnections and possibly connections of the other parties 
-	 * 			 has succeeded in terms of the success algorithm. Otherwise, false. If the success has failed all the connections of the 
-	 * 			 establishedConnections are removed
+	 * @return true if the level of connectivity specified by the {@link ConnectivitySuccessVerifier} was reached 
+	 * 		   false otherwise
 	 */
 	private boolean runSuccessAlgo() {
 
