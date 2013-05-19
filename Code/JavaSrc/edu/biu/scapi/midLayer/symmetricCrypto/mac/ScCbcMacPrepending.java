@@ -189,7 +189,7 @@ public class ScCbcMacPrepending implements CbcMac {
 	}
 	
 	/**
-	 * Pre-pends the length if the message to the message. 
+	 * Pre-pends the length of the message to the message. 
 	 * As a result, the mac will be calculated on [msgLength||msg].
 	 * @param msgLength the length of the message in bytes.
 	 * @throws IllegalStateException if no secret key was set.
@@ -226,8 +226,8 @@ public class ScCbcMacPrepending implements CbcMac {
 	}
 
 	/**
-	 * Computes the CBC-Mac operation on the given msg and return the calculated tag.
-	 * @param msg the message to operate the mac on.
+	 * Computes the CBC-Mac operation on the given msg and returns the calculated tag.
+	 * @param msg the message to calculate the mac on.
 	 * @param offset the offset within the message array to take the bytes from.
 	 * @param msgLen the length of the message in bytes.
 	 * @return byte[] the return tag from the mac operation.
