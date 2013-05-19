@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.logging.Level;
 
 import edu.biu.scapi.exceptions.InvalidChannel;
+import edu.biu.scapi.exceptions.InvalidChannelException;
 import edu.biu.scapi.generals.Logging;
 
 
@@ -139,7 +140,7 @@ class EstablishedConnections {
 	 * @param state the state of the channel to update to.
 	 * @throws InvalidChannel 
 	 */
-	void updateConnectionState(InetSocketAddress address, PlainChannel.State state) throws InvalidChannel {
+	void updateConnectionState(InetSocketAddress address, PlainChannel.State state) throws InvalidChannelException {
 
 		//get the channel from the map
 		Channel channel = connectionsMap.get(address);
@@ -150,7 +151,7 @@ class EstablishedConnections {
 			plainChannel.setState(state);
 		}
 		else
-			throw new InvalidChannel("The related channel must be a plain channel");
+			throw new InvalidChannelException("The related channel must be a plain channel");
 	}
 	
 	/**
