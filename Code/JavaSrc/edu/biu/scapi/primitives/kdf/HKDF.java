@@ -183,8 +183,8 @@ public final class HKDF implements KeyDerivationFunction {
 
 	
 	/**
-	 * This function derivates a new key from the source key material key.
-	 * The pseudocode of this function is as follows:
+	 * This function derives a new key from the source key material key.
+	 * The pseudo-code of this function is as follows:
 	 * 
 	 *   COMPUTE PRK = HMAC(XTS, SKM) [key=XTS, data=SKM]
 	 *   Let t be the smallest number so that t * |H|>L where |H| is the HMAC output length
