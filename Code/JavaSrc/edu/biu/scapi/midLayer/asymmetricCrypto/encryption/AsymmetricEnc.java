@@ -94,7 +94,7 @@ public interface AsymmetricEnc extends Cpa, Indistinguishable{
 	public String getAlgorithmName();
 	
 	/**
-	 * There are some encryption schemes that have a limit of the byte array that can be passes to the generatePlaintext.
+	 * There are some encryption schemes that have a limit of the byte array that can be passed to the generatePlaintext.
 	 * This function indicates whether or not there is a limit. 
 	 * Its helps the user know if he needs to pass an array with specific length or not.
 	 * @return true if this encryption scheme has a maximum byte array length to generate a plaintext from; false, otherwise. 
