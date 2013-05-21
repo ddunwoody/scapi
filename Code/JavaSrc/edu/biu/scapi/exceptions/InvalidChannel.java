@@ -32,9 +32,9 @@ package edu.biu.scapi.exceptions;
 
 /**
  * @author LabTest
- *
+ * @deprecated This class was renamed InvalidChannelException.
  */
-public class InvalidChannel extends RuntimeException{
+@Deprecated public class InvalidChannel extends RuntimeException{
 
 
 	private static final long serialVersionUID = -9060767436209580708L;
