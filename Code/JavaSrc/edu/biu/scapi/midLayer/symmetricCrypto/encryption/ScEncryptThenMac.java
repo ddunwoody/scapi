@@ -33,7 +33,6 @@ import java.security.spec.InvalidParameterSpecException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.SecretKey;
 
-import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.midLayer.ciphertext.EncMacCiphertext;
 import edu.biu.scapi.midLayer.ciphertext.SymmetricCiphertext;
 import edu.biu.scapi.midLayer.plaintext.Plaintext;
@@ -43,8 +42,6 @@ import edu.biu.scapi.midLayer.symmetricCrypto.mac.Mac;
 import edu.biu.scapi.midLayer.symmetricCrypto.mac.ScCbcMacPrepending;
 import edu.biu.scapi.primitives.prf.bc.BcAES;
 import edu.biu.scapi.primitives.prf.bc.BcTripleDES;
-import edu.biu.scapi.tools.Factories.MacFactory;
-import edu.biu.scapi.tools.Factories.SymmetricEncFactory;
 
 /**
  * This class implements a type of authenticated encryption: encrypt then mac.<p>
@@ -66,30 +63,6 @@ public class ScEncryptThenMac implements AuthenticatedEnc {
 	 */
 	public ScEncryptThenMac(){
 		this(new ScCTREncRandomIV( new BcAES()), new ScCbcMacPrepending(new BcTripleDES()));
-	}
-	
-	/**
-	 * Constructor that gets an Encryption-Scheme name and a Mac name, creates and sets the underlying respective encryption and mac.
-	 * It can also pass the name of a PRNG to obtain SecureRandom for encryption and/or mac.
-	 * Example of transformation for encName: "CTREncRandomIV(AES, SHA1PRNG)". <p>
-	 * Example of transformation for macName: "CBCMacPrepending(TripleDes)". 
-	 * @param encName the name of the symmetric encryption algorithm
-	 * @param macName the name of the mac 
-	 * @throws FactoriesException if the creation of the underlying encryption or mac failed.
-	 * @throws IllegalArgumentException if the given encName is a name of an authenticated encryption.
-	 */
-	public ScEncryptThenMac(String encName, String macName) throws FactoriesException {
-		//Creates and set the underlying encryption
-		SymmetricEnc enc = SymmetricEncFactory.getInstance().getObject(encName);
-		//We need to make sure that the encryption scheme requested is not an authenticated encryption scheme as well,
-		//so that we do not enter a loop.
-		if(enc instanceof AuthenticatedEnc) {
-			throw new IllegalArgumentException("A symmetric encryption that is not of type AuthenticatedEnc is needed");
-		}
-		this.encryptor = enc;
-		//Creates and set the underlying mac
-		Mac mac = MacFactory.getInstance().getObject(macName);
-		this.mac = mac;
 	}
 	
 	/**
