@@ -135,7 +135,7 @@ public class FreeXORGarbledBooleanSubCircuit extends AbstractGarbledBooleanSubCi
 	public FreeXORGarbledBooleanSubCircuit(BooleanCircuit ungarbledCircuit,
 			MultiKeyEncryptionScheme mes, 
 			Map<Integer, SecretKey[]> allInputWireValues, 
-			Map<Integer, SecretKey[]> allOutputWireValues, Map<Integer, Integer> translationTable)
+			Map<Integer, SecretKey[]> allOutputWireValues)
 					throws InvalidKeyException, IllegalBlockSizeException,
 					KeyNotSetException, TweakNotSetException, PlaintextTooLongException, NoSuchPartyException, CannotBeGarbledExcpetion {
 		
@@ -145,9 +145,8 @@ public class FreeXORGarbledBooleanSubCircuit extends AbstractGarbledBooleanSubCi
 		subCircuitCreator(ungarbledCircuit, mes, allInputWireValues, allWireValues, signalBits);
 		
 
-		//fill the translation table and the output wire values to be used in the following sub circuit
+		//fill the the output wire values to be used in the following sub circuit
 		for (int n : outputWireLabels) {
-			translationTable.put(n, signalBits.get(n));
 			
 			//add both values of output wire labels to the allOutputWireLabels Map that
 			//was passed as a parameter
@@ -262,7 +261,7 @@ public class FreeXORGarbledBooleanSubCircuit extends AbstractGarbledBooleanSubCi
 
 		
 		//copy the input wire values from the map that holds all the wire values to return to the circuit builder
-		setInputWireValuesIfEmpty(allInputWireValues, allWireValues);		
+		//setInputWireValuesIfEmpty(allInputWireValues, allWireValues);		
 	}
 	
 	
@@ -333,11 +332,16 @@ public class FreeXORGarbledBooleanSubCircuit extends AbstractGarbledBooleanSubCi
 		if(allInputWireValues.isEmpty()){//we need to create the secret keys
 			
 			for (int w : partyOneInputWireLabels) {
-				fillInputsData(mes, allWireValues, signalBits, globalKeyOffset,
-						w);
+				fillInputsData(mes, allWireValues, signalBits, globalKeyOffset,	w);
+				
+				//add to the input keys map
+				allInputWireValues.put(w, allWireValues.get(w));
 			}
 			for (int w : partyTwoInputWireLabels) {
 	          fillInputsData(mes, allWireValues, signalBits, globalKeyOffset, w);
+	          
+	        //add to the input keys map
+	          allInputWireValues.put(w, allWireValues.get(w));
 	      }
 		}
 		else{
@@ -369,13 +373,19 @@ public class FreeXORGarbledBooleanSubCircuit extends AbstractGarbledBooleanSubCi
 			Map<Integer, Integer> signalBits, byte[] globalKeyOffset)
 			throws InvalidKeyException, IllegalBlockSizeException,
 			KeyNotSetException, TweakNotSetException, PlaintextTooLongException {
-		// create the XOR truth table to be used to test against for equality
+		// create the XOR and XORNOT truth table to be used to test against for equality
 		BitSet XORTruthTable = new BitSet();
+		BitSet XORNOTTruthTable = new BitSet();
 
 		XORTruthTable = new BitSet();
 		XORTruthTable.set(1);
 		XORTruthTable.set(2);
 
+		XORNOTTruthTable = new BitSet();
+		XORNOTTruthTable.set(0);
+		XORNOTTruthTable.set(3);
+		
+		
 		for (int gate = 0; gate < ungarbledGates.length; gate++) {
 			SecretKey zeroValue;
 			SecretKey oneValue;
@@ -395,8 +405,8 @@ public class FreeXORGarbledBooleanSubCircuit extends AbstractGarbledBooleanSubCi
 				}
 				int signalBit = (zeroValueBytes[zeroValueBytes.length - 1] & 1) == 0 ? 0
 						: 1;
-				signalBits
-				.put(ungarbledGates[gate].getOutputWireLabels()[0], signalBit);
+				
+				signalBits.put(ungarbledGates[gate].getOutputWireLabels()[0], signalBit);
 				zeroValue = new SecretKeySpec(zeroValueBytes, "");
 				oneValue = new SecretKeySpec(oneValueBytes, "");
 
@@ -405,8 +415,41 @@ public class FreeXORGarbledBooleanSubCircuit extends AbstractGarbledBooleanSubCi
 
 				gates[gate] = new FreeXORGateSlim(ungarbledGates[gate]);
 				
-				//for non XOR gates
-			} else {
+				
+			} 
+			//XOR NOT gate
+			else if (ungarbledGates[gate].getTruthTable().equals(XORNOTTruthTable)) {
+				byte[] zeroValueBytes = allWireValues.get(ungarbledGates[gate]
+						.getInputWireLabels()[0])[0].getEncoded();// bytes of first input
+				
+				byte[] oneOutputBytes = new byte[zeroValueBytes.length];
+				
+				for (int i = 1; i < ungarbledGates[gate].getInputWireLabels().length; i++) {
+					byte[] nextInput = allWireValues.get(ungarbledGates[gate]
+							.getInputWireLabels()[i])[0].getEncoded();
+					for (int currentByte = 0; currentByte < zeroValueBytes.length; currentByte++) {
+						oneOutputBytes[currentByte] = (byte) (zeroValueBytes[currentByte] ^ nextInput[currentByte]);
+					}
+				}
+				byte[] zeroOutputBytes = new byte[oneOutputBytes.length];
+				for (int i = 0; i < zeroValueBytes.length; i++) {
+					zeroOutputBytes[i] = (byte) (oneOutputBytes[i] ^ globalKeyOffset[i]);
+				}
+				int signalBit = (zeroOutputBytes[zeroOutputBytes.length - 1] & 1) == 0 ? 0
+						: 1;
+				
+				signalBits.put(ungarbledGates[gate].getOutputWireLabels()[0], signalBit);
+				zeroValue = new SecretKeySpec(zeroOutputBytes, "");
+				oneValue = new SecretKeySpec(oneOutputBytes, "");
+
+				allWireValues.put(ungarbledGates[gate].getOutputWireLabels()[0],
+						new SecretKey[] { zeroValue, oneValue });
+
+				gates[gate] = new FreeXORNOTGate(ungarbledGates[gate]);
+				
+			}
+			
+			else {
 				zeroValue = mes.generateKey();
 				byte[] zeroValueBytes = zeroValue.getEncoded();
 				byte[] oneValueBytes = new byte[zeroValueBytes.length];
