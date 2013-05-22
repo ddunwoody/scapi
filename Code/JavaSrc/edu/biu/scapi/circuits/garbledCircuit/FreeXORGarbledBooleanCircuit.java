@@ -109,6 +109,54 @@ public class FreeXORGarbledBooleanCircuit extends
 		
 	}
 
+	
+	/**
+	 * Calls the super class construction to fill all data but the translations table. The translation table which does not exist in
+	 * the super class sub circuit is filled in this constructor
+	 * 
+	 * @param ungarbledCircuit the base boolean circuit
+	 * @param mes multi encryption scheme
+	 * @param allInputWireValues a map to hold the 0 and 1 keys of the input. Can either be empty and be fill by the super class, or 
+	 * 						     can already hold the keys in which case the super class uses these values for the encryptions.
+	 * 
+	 * @throws InvalidKeyException
+	 * @throws IllegalBlockSizeException
+	 * @throws KeyNotSetException
+	 * @throws TweakNotSetException
+	 * @throws PlaintextTooLongException
+	 * @throws NoSuchPartyException
+	 * @throws CannotBeGarbledExcpetion
+	 */
+	public FreeXORGarbledBooleanCircuit(BooleanCircuit ungarbledCircuit,
+			MultiKeyEncryptionScheme mes, 
+			Map<Integer, SecretKey[]> allInputWireValues, Map<Integer, SecretKey[]> allOutputWireValues)
+					throws InvalidKeyException, IllegalBlockSizeException,
+					KeyNotSetException, TweakNotSetException, PlaintextTooLongException, NoSuchPartyException, CannotBeGarbledExcpetion {
+
+		
+		//set the signal bits to pass on to the sub circuit creator. This is not saved in the class for security reasons
+		translationTable = new HashMap<Integer, Integer>();
+				
+		Map<Integer, Integer> signalBits = new HashMap<Integer, Integer>();//the signal bits for every wire in the circuit
+		Map<Integer, SecretKey[]> allWireValues = new HashMap<Integer, SecretKey[]>();
+		
+		//create the sub circuit
+		subCircuitCreator(ungarbledCircuit, mes, allInputWireValues,  allWireValues, signalBits);
+		
+		
+		//fill the translation table 
+		for (int n : outputWireLabels) {
+			translationTable.put(n, signalBits.get(n));
+			
+			//add both values of output wire labels to the allOutputWireLabels Map that
+			//was passed as a parameter
+			allOutputWireValues.put(n, allWireValues.get(n));
+			
+		}		
+		
+	}
+	
+	
 
 	/**
 	 * Does the translation from the resulting garbled wires to wires. This is done through the utility class.
