@@ -128,7 +128,7 @@ implements Serializable {
 		 * add the output wire labels' signal bits to the translation table. For a
 		 * full understanding on why we chose to implement the translation table
 		 * this way, see the documentation to the translationTable field of
-		 * AbstractGarbledBooleanCircuit
+		 * AbstractGarbledBooleanSubCircuit
 		 */
 		for (int n : outputWireLabels) {
 			translationTable.put(n, signalBits.get(n));
