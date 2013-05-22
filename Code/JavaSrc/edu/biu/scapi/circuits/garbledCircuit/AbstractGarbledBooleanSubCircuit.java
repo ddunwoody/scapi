@@ -77,7 +77,7 @@ public abstract class AbstractGarbledBooleanSubCircuit implements GarbledBoolean
   /**
    * The garbled gates of this garbled circuit
    */
-  GarbledGate[] gates;
+  protected GarbledGate[] gates;
   
   /**
    * The garbled tables of this garbled circuit. This is stored in the garbled circuit and not in the gates. 
@@ -88,7 +88,7 @@ public abstract class AbstractGarbledBooleanSubCircuit implements GarbledBoolean
    * If a single garbled table is an array of ciphertext that holds a byte array the space stored by java is big. The main array holds references for
    * each item (4 bytes). Each array in java has an overhead of 12 bytes. Thus the garbled table with ciphertexts has at least (12+4)*number of rows.
    * If we store the array as one dimensional array we only have 12 bytes overhead for the entire table and thus this is the way we store the
-   * garbled tables. A two dimensional array, the first dimention for each gate and the other dimension for the encryptions
+   * garbled tables. A two dimensional array, the first dimension for each gate and the other dimension for the encryptions
    * 
    * 
    */
@@ -96,7 +96,7 @@ public abstract class AbstractGarbledBooleanSubCircuit implements GarbledBoolean
   /**
    * A map that is used during computation to map a {@code GarbledWire}'s label to the computed and set {@code GarbledWire}
    */
-  Map<Integer, GarbledWire> computedWires = new HashMap<Integer,GarbledWire>();
+  private Map<Integer, GarbledWire> computedWires = new HashMap<Integer,GarbledWire>();
   /**
    * The encryption scheme that will use to garble,compute, and verify this circuit
    */
@@ -170,7 +170,7 @@ public abstract class AbstractGarbledBooleanSubCircuit implements GarbledBoolean
     
   }
 
-protected boolean verifySubCircuit(BooleanCircuit ungarbledCircuit,
+  public boolean verifySubCircuit(BooleanCircuit ungarbledCircuit,
 		Map<Integer, SecretKey[]> allInputWireValues,
 		Map<Integer, SecretKey[]> allWireValues)
 		throws InvalidKeyException, IllegalBlockSizeException,
