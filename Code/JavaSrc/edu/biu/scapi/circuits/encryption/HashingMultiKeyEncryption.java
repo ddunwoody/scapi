@@ -108,13 +108,6 @@ public class HashingMultiKeyEncryption implements MultiKeyEncryptionScheme {
 	public byte[] encrypt(byte[] plaintext)
 			throws KeyNotSetException, PlaintextTooLongException {
 		
-		//CryptographicHash hash = null;
-		/*try {
-			hash = CryptographicHashFactory.getInstance().getObject("SHA-1");
-		} catch (FactoriesException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}*/
 		
 		if (!isKeySet) {
 			throw new KeyNotSetException();
