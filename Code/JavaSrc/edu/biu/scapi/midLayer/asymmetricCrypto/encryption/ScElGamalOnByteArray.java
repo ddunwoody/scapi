@@ -63,7 +63,7 @@ public class ScElGamalOnByteArray extends ElGamalAbs{
 	private KeyDerivationFunction kdf; 	// The underlying KDF to use in the encryption.
 	
 	/**
-	 * Default constructor. Uses the default implementations of DlogGroup, CryptographicHash and SecureRandom.
+	 * Default constructor. Uses the default implementations of DlogGroup and SecureRandom.
 	 */
 	public ScElGamalOnByteArray(){
 		super();
@@ -126,10 +126,8 @@ public class ScElGamalOnByteArray extends ElGamalAbs{
 	
 
 	/**
-	 * ElGamal decrypt function can be optimized if, instead of using the x value in the private key as is, 
-	 * we change it to be q-x, while q is the dlog group order.
-	 * This function computes this changing and saves the new private value as the private key member.
-	 * @param privateKey to change.
+	 * Sets the private key.
+	 * @param privateKey.
 	 */
 	protected void initPrivateKey(PrivateKey privateKey){
 		//Sets the given PrivateKey.
