@@ -27,6 +27,8 @@
 
 package edu.biu.scapi.comm;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -34,6 +36,7 @@ import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.Arrays;
 import java.util.logging.Level;
 
 import edu.biu.scapi.generals.Logging;
@@ -49,10 +52,36 @@ import edu.biu.scapi.generals.Logging;
  */
 public class PlainTCPChannel extends PlainChannel{
 	
+	
+	/**
+	 * 
+	 * A nested class to use in the send and receive functions. 
+	 */
+	public static class Message implements Serializable{
+		
+		private static final long serialVersionUID = 4996749071831550038L;
+		private byte[] data = null;
+		
+		public Message(byte[] data) {
+			this.data = data;
+		}
+		public void setData(byte[] data) {
+			this.data = data;
+		}
+		public byte[] getData() {
+			return data;
+		}
+			
+	}
+	
 	private Socket socket = new Socket();
 	private ObjectOutputStream outStream;
 	private ObjectInputStream inStream;
 	private InetSocketAddress socketAddress;
+	private Message intermediate;
+	private Message msgObj;
+	byte[] msgBytes;
+
 
 	
 	/**
@@ -83,7 +112,25 @@ public class PlainTCPChannel extends PlainChannel{
 	 * @throws IOException Any of the usual Input/Output related exceptions.  
 	 */
 	public void send(Serializable msg) throws IOException {
-		outStream.writeObject(msg);
+		//For some reason it turns out that writing complex objects first to a byte array message is faster than using the stream
+		//of the socket to write the object. Thus we create here a Message object and translate it back to the actual object in the receive method
+		//The use of a local stream that does the writeObject is faster than the writeObject of outStream member variable of this class
+				
+		ByteArrayOutputStream bOut = new ByteArrayOutputStream();  
+	    ObjectOutputStream oOut  = new ObjectOutputStream(bOut);
+		oOut.writeObject(msg);  
+		oOut.close();
+		
+		msgBytes = bOut.toByteArray();
+		msgObj = new Message(null);
+		msgObj.setData(msgBytes);
+		
+		outStream.writeObject(msgObj);
+		
+		outStream.reset();
+		//System.out.println("Sending " + msg.getClass().getName());
+		
+		//outStream.writeObject(msg);
 	}
 
 	/** 
@@ -94,7 +141,17 @@ public class PlainTCPChannel extends PlainChannel{
 	 */
 	public Serializable receive() throws ClassNotFoundException, IOException {
 		
-		return (Serializable) inStream.readObject();
+
+
+		//We actually received a message of class Message. We translate it back to the original object that was sent by the user and return this object. 
+		intermediate =   (Message) inStream.readObject();
+		ByteArrayInputStream iInput = new ByteArrayInputStream(intermediate.getData());
+		ObjectInputStream ois = new ObjectInputStream(iInput);
+		
+		return (Serializable) ois.readObject();
+		
+		
+		//return (Serializable) inStream.readObject();
 	}
 
 	/**
