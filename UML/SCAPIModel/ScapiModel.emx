@@ -813,7 +813,7 @@
                         <children xmi:type="notation:BasicDecorationNode" xmi:id="_X8ltcPzXEeGwT8kQweCHfg" type="Name"/>
                         <layoutConstraint xmi:type="notation:Bounds" xmi:id="_X8lGYvzXEeGwT8kQweCHfg" y="-186"/>
                       </children>
-                      <element xmi:type="uml:Realization" href="primitives.efx#_jor1IEJvEeG0dbTetM-eaA?SCAPI%20Model/edu/biu/scapi/primitives/hash/bc/%3CRealization%3E?"/>
+                      <element xmi:type="uml:Realization" href="primitives.efx#_jor1IEJvEeG0dbTetM-eaA?SCAPI%20Model/edu/biu/scapi/primitives/hash/bc/%3CRealization%3E(Supplier-CryptographicHash)?"/>
                       <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_X8lGYPzXEeGwT8kQweCHfg" points="[-28, -613, -1174, 3960]$[-28, -1537, -1174, 3036]"/>
                       <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_YCnc8PzXEeGwT8kQweCHfg" id="(0.5000584028177113,0.9698622273249137)"/>
                       <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_YCoEAPzXEeGwT8kQweCHfg" id="(0.6666664794781478,0.0)"/>
