@@ -181,13 +181,14 @@ public class CommunicationSetup implements TimeoutObserver{
 	/** 
 	 * An application that wants to use the communication layer will call this function in order to prepare for communication after providing the required parameters. 
 	 * This function initiates the creation of the final actual socket connections between the parties. If this function succeeds, the 
-	 * application may use the send and receive functions of the created channels to pass messages. Note that using this function you can choose to use or not to use the Nagle algorithm.
+	 * application may use the send and receive functions of the created channels to pass messages.<p> 
+	 * Note that using this function you can choose to use or not to use the Nagle algorithm.
 	 * 
 	 * @param listOfParties the original list of parties to connect to. As a convention, we will set the <B>first party</B> in the list to be the <B>requesting party</B>, that is, 
 	 * 	 					the party represented by the application.
 	 * @param successLevel the ConnectivitySuccessVerifier algorithm to use
 	 * @param timeOut the maximum amount of time we allow for the connection stage
-	 * @param enableNagle a flag indicating weather or not to use the Nagle optimization algorithm
+	 * @param enableNagle a flag indicating weather or not to use the Nagle optimization algorithm. For Cryptographic algorithms is better to have it disabled
 	 * @return a set of connected and ready channels to be used by the parties to send and receive data, it may be null if none succeeded
 	 */
 	public Map<InetSocketAddress, Channel> prepareForCommunication(List<Party> listOfParties,ConnectivitySuccessVerifier successLevel, 
@@ -200,7 +201,8 @@ public class CommunicationSetup implements TimeoutObserver{
 	/**
 	 * An application that wants to use the communication layer will call this function in order to prepare for communication after providing the required parameters. 
 	 * This function initiates the creation of the final actual socket connections between the parties. If this function succeeds, the 
-	 * application may use the send and receive functions of the created channels to pass messages.
+	 * application may use the send and receive functions of the created channels to pass messages.<p> 
+	 * In this function, Nagle’s algorithm is disabled; for cryptographic protocols this is typically much better.
 	 *  
 	 * @param listOfParties the original list of parties to connect to. As a convention, we will set the <B>first party</B> in the list to be the <B>requesting party</B>, that is, 
 	 * 	 					the party represented by the application.
