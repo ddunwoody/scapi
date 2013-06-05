@@ -1,0 +1,3 @@
+Copying UML elements from RSM to Word Doc
+
+In IBM's RSM, if the functions of an interface or a class are marked as abstract then they won't appear when copying the said interface or class to a document. In order to be able to see the functions in the document you need to unmark the abstract property of the function.
