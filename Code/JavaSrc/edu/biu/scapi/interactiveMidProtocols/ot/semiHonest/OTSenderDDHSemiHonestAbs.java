@@ -25,6 +25,7 @@
 package edu.biu.scapi.interactiveMidProtocols.ot.semiHonest;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
@@ -69,6 +70,7 @@ public abstract class OTSenderDDHSemiHonestAbs implements OTSender{
 	private Channel channel;
 	protected DlogGroup dlog;
 	private SecureRandom random;
+	private BigInteger qMinusOne;
 	
 	//Values required for the tuple calculation:
 	protected GroupElement u;	
@@ -114,13 +116,15 @@ public abstract class OTSenderDDHSemiHonestAbs implements OTSender{
 		this.channel = channel;
 		this.dlog = dlog;
 		this.random = random;
-		
+		qMinusOne =  dlog.getOrder().subtract(BigInteger.ONE);
 	}
 	
 	/**
 	 * Runs the part of the protocol where the sender input is not yet necessary.
+	 * @throws IOException if failed to receive a message.
+	 * @throws ClassNotFoundException if failed to receive a message.
 	 */
-	public void preProcess(){
+	public void preProcess() throws ClassNotFoundException, IOException{
 		/* Runs the following part of the protocol:
 				WAIT for message (h0,h1) from R
 				SAMPLE a random value r in  [0, . . . , q-1] 
@@ -136,8 +140,9 @@ public abstract class OTSenderDDHSemiHonestAbs implements OTSender{
 
 	/**
 	 * Runs the part of the protocol where the sender input is necessary.
+	 * @throws IOException if failed to send the message.
 	 */
-	public void transfer(){
+	public void transfer() throws IOException{
 		/* Runs the following part of the protocol:
 				COMPUTE: in the byte array scenario
 					•	v0 = x0 XOR KDF(|x0|,k0) 
@@ -148,26 +153,37 @@ public abstract class OTSenderDDHSemiHonestAbs implements OTSender{
 				SEND (u,v0,v1) to R
 				OUTPUT nothing
 		*/
-		OTSMessage message = computeTuple();
-		sendTupleToReceiver(message);
+		try{
+			
+			OTSMessage message = computeTuple();
+			sendTupleToReceiver(message);
+		
+		}catch(NullPointerException e){
+			throw new IllegalStateException("preProcess function should be called before transfer atleast once");
+		}
+		
 	}
 
 	/**
 	 * Runs the following line from the protocol:
 	 * "WAIT for message (h0,h1) from R"
 	 * @return the received message.
+	 * @throws ClassNotFoundException if failed to receive a message.
+	 * @throws IOException if failed to receive a message.
 	 */
-	private OTRSemiHonestMessage waitForMessageFromReceiver(){
+	private OTRSemiHonestMessage waitForMessageFromReceiver() throws ClassNotFoundException, IOException{
+		Serializable message = null;
 		try {
-			return (OTRSemiHonestMessage) channel.receive();
+			message = channel.receive();
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new ClassNotFoundException("failed to receive message. The thrown message is: " + e.getMessage());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new IOException("failed to receive message. The thrown message is: " + e.getMessage());
 		}
-		return null;
+		if (!(message instanceof OTRSemiHonestMessage)){
+			throw new IllegalArgumentException("the given message should be an instance of OTSMessage");
+		}
+		return (OTRSemiHonestMessage) message;
 	}
 	
 	/**
@@ -176,7 +192,6 @@ public abstract class OTSenderDDHSemiHonestAbs implements OTSender{
 	 * @return the chosen BigInteger.
 	 */
 	private BigInteger sampleRandomValues() {
-		BigInteger qMinusOne =  dlog.getOrder().subtract(BigInteger.ONE);
 		BigInteger r = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
 		return r;
 	}
@@ -223,15 +238,15 @@ public abstract class OTSenderDDHSemiHonestAbs implements OTSender{
 	 * Runs the following lines from the protocol:
 	 * "SEND (u,v0,v1) to R"
 	 * @param message to send to the receiver
+	 * @throws IOException if failed to send the message.
 	 */
-	private void sendTupleToReceiver(OTSMessage message) {
+	private void sendTupleToReceiver(OTSMessage message) throws IOException {
 		
 		try {
 			//Send the message by the channel.
 			channel.send(message);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new IOException("failed to send the message. The thrown message is: " + e.getMessage());
 		}	
 	}
 }
