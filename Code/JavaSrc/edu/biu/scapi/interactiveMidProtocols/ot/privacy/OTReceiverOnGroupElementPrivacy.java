@@ -34,6 +34,7 @@ import edu.biu.scapi.interactiveMidProtocols.ot.OTROutput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
+import edu.biu.scapi.securityLevel.PrivacyOnly;
 
 /**
  * Concrete class for OT Privacy assuming DDH receiver ON GROUP ELEMENT.
@@ -43,7 +44,7 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTReceiverOnGroupElementPrivacy extends OTReceiverDDHPrivacyAbs{
+public class OTReceiverOnGroupElementPrivacy extends OTReceiverDDHPrivacyAbs implements PrivacyOnly{
 
 	private GroupElement c0, c1;
 	/**
@@ -67,7 +68,7 @@ public class OTReceiverOnGroupElementPrivacy extends OTReceiverDDHPrivacyAbs{
 	/**
 	 * Run the following line from the protocol:
 	 * "IF  NOT 
-	 *		•	w0, w1, c0, c1 in the DlogGroup
+	 *		1. w0, w1, c0, c1 in the DlogGroup
 	 *	REPORT ERROR"
 	 * @param message received from the sender. must be OTSOnGroupElementPrivacyMessage.
 	 * @throws CheatAttemptException if there was a cheat attempt during the execution of the protocol.
@@ -104,9 +105,9 @@ public class OTReceiverOnGroupElementPrivacy extends OTReceiverDDHPrivacyAbs{
 
 	/**
 	 * Run the following lines from the protocol:
-	 * "COMPUTE (kσ)^(-1) = (wσ)^(-beta)
-	 *	OUTPUT  xσ = cσ * (kσ)^(-1)"
-	 * @return OTROutput contains Xֿƒ
+	 * "COMPUTE (kSigma)^(-1) = (wSigma)^(-beta)
+	 *	OUTPUT  xSigma = cSigma * (kSigma)^(-1)"
+	 * @return OTROutput contains xSigma
 	 */
 	protected OTROutput computeFinalXSigma() {
 		
@@ -114,13 +115,13 @@ public class OTReceiverOnGroupElementPrivacy extends OTReceiverDDHPrivacyAbs{
 		GroupElement cSigma = null;
 		BigInteger minusBeta = dlog.getOrder().subtract(beta);
 		
-		//If σ = 0, compute w0^beta and set cσ to c0.
+		//If sigma = 0, compute w0^beta and set cSigma to c0.
 		if (sigma == 0){
 			kSigma = dlog.exponentiate(w0, minusBeta);
 			cSigma = c0;
 		} 
 		
-		//If σ = 0, compute w1^beta and set cσ to c1.
+		//If sigma = 0, compute w1^beta and set cSigma to c1.
 		if (sigma == 1) {
 			kSigma = dlog.exponentiate(w1, minusBeta);
 			cSigma = c1;
@@ -128,7 +129,7 @@ public class OTReceiverOnGroupElementPrivacy extends OTReceiverDDHPrivacyAbs{
 		
 		GroupElement xSigma = dlog.multiplyGroupElements(cSigma, kSigma);
 		
-		//Create and return the output containing xσ
+		//Create and return the output containing xSigma
 		return new OTROnGroupElementOutput(xSigma);
 	}
 

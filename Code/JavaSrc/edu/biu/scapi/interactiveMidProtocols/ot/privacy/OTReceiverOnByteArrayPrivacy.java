@@ -34,6 +34,7 @@ import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
+import edu.biu.scapi.securityLevel.PrivacyOnly;
 
 /**
  * Concrete class for OT Privacy assuming DDH receiver ON BYTE ARRAY.
@@ -43,7 +44,7 @@ import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTReceiverOnByteArrayPrivacy extends OTReceiverDDHPrivacyAbs{
+public class OTReceiverOnByteArrayPrivacy extends OTReceiverDDHPrivacyAbs implements PrivacyOnly{
 	
 	private KeyDerivationFunction kdf; //Used in the calculation.
 	private byte[] c0, c1;
@@ -71,8 +72,8 @@ public class OTReceiverOnByteArrayPrivacy extends OTReceiverDDHPrivacyAbs{
 	/**
 	 * Run the following line from the protocol:
 	 * "IF NOT 
-	 *		•	w0, w1 in the DlogGroup, AND
-	 *		•	c0, c1 are binary strings of the same length
+	 *		1. w0, w1 in the DlogGroup, AND
+	 *		2. c0, c1 are binary strings of the same length
 	 *	   REPORT ERROR"
 	 * @param message received from the sender. must be OTSOnByteArrayPrivacyMessage.
 	 * @throws CheatAttemptException if there was a cheat attempt during the execution of the protocol.
@@ -107,22 +108,22 @@ public class OTReceiverOnByteArrayPrivacy extends OTReceiverDDHPrivacyAbs{
 
 	/**
 	 * Run the following lines from the protocol:
-	 * "COMPUTE kσ = (wσ)^beta
-	 *	OUTPUT  xσ = cσ XOR KDF(|cσ|,kσ)"
-	 * @return OTROutput contains Xֿƒ
+	 * "COMPUTE kSigma = (wSigma)^beta
+	 *	OUTPUT  xSigma = cSigma XOR KDF(|cSigma|,kSigma)"
+	 * @return OTROutput contains xSigma
 	 */
 	protected OTROutput computeFinalXSigma() {
 		
 		GroupElement kSigma = null;
 		byte[] cSigma = null;
 		
-		//If σ = 0, compute w0^beta and set cσ to c0.
+		//If sigma = 0, compute w0^beta and set cSigma to c0.
 		if (sigma == 0){
 			kSigma = dlog.exponentiate(w0, beta);
 			cSigma = c0;
 		} 
 		
-		//If σ = 0, compute w1^beta and set cσ to c1.
+		//If sigma = 0, compute w1^beta and set cSigma to c1.
 		if (sigma == 1) {
 			kSigma = dlog.exponentiate(w1, beta);
 			cSigma = c1;
@@ -138,7 +139,7 @@ public class OTReceiverOnByteArrayPrivacy extends OTReceiverDDHPrivacyAbs{
 			xSigma[i] = (byte) (cSigma[i] ^ xSigma[i]);
 		}
 		
-		//Create and return the output containing xσ
+		//Create and return the output containing xSigma
 		return new OTROnByteArrayOutput(xSigma);
 	}
 
