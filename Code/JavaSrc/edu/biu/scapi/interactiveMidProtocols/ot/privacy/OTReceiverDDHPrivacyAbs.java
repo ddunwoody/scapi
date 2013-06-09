@@ -25,6 +25,7 @@
 package edu.biu.scapi.interactiveMidProtocols.ot.privacy;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
@@ -58,29 +59,30 @@ public abstract class OTReceiverDDHPrivacyAbs implements OTReceiver{
 	 	This class runs the following protocol:
 			SAMPLE random values alpha, beta, gamma in {0, . . . , q-1} 
 			COMPUTE a as follows:
-			1.	If σ = 0 then a = (g^alpha, g^beta, g^(alpha*beta), g^gamma)
-			2.	If σ = 1 then a = (g^alpha, g^beta, g^gamma, g^(alpha*beta))
+			1.	If sigma = 0 then a = (g^alpha, g^beta, g^(alpha*beta), g^gamma)
+			2.	If sigma = 1 then a = (g^alpha, g^beta, g^gamma, g^(alpha*beta))
 			SEND a to S
 			WAIT for message pairs (w0, c0) and (w1, c1)  from S
 			In ByteArray scenario:
 				IF  NOT 
-				•	w0, w1 in the DlogGroup, AND
-				•	c0, c1 are binary strings of the same length
+					1. w0, w1 in the DlogGroup, AND
+					2. c0, c1 are binary strings of the same length
 				   REPORT ERROR
-				COMPUTE kσ = (wσ)^beta
-				OUTPUT  xσ = cσ XOR KDF(|cσ|,kσ)
+				COMPUTE kSigma = (wSigma)^beta
+				OUTPUT  xSigma = cSigma XOR KDF(|cSigma|,kSigma)
 			In GroupElement scenario:
 				IF  NOT 
-				•	w0, w1, c0, c1 in the DlogGroup
+					1. w0, w1, c0, c1 in the DlogGroup
 				   REPORT ERROR
-				COMPUTE (kσ)^(-1) = (wσ)^(-beta)
-				OUTPUT  xσ = cσ * (kσ)^(-1)
+				COMPUTE (kSigma)^(-1) = (wSigma)^(-beta)
+				OUTPUT  xSigma = cSigma * (kSigma)^(-1)
 
 	*/	
 	
 	private Channel channel;
 	protected DlogGroup dlog;
 	private SecureRandom random;
+	private BigInteger qMinusOne; 
 	
 	//Values required for calculations:
 	protected short sigma;
@@ -118,16 +120,27 @@ public abstract class OTReceiverDDHPrivacyAbs implements OTReceiver{
 	 * @param channel
 	 * @param dlog must be DDH secure.
 	 * @param random
+	 * @throws IllegalArgumentException if the given dlog is not DDH secure or if it is not valid.
 	 */
 	private void setMembers(Channel channel, DlogGroup dlog, SecureRandom random) {
 		//The underlying dlog group must be DDH secure.
 		if (!(dlog instanceof DDH)){
 			throw new IllegalArgumentException("DlogGroup should have DDH security level");
 		}
+		//Check that the given dlog is valid.
+		// In Zp case, the check is done by Crypto++ library.
+		//In elliptic curves case, by default SCAPI uploads a file with NIST recommended curves, 
+		//and in this case we assume the parameters are always correct and the validateGroup function always return true.
+		//It is also possible to upload a user-defined configuration file. In this case,
+		//it is the user's responsibility to check the validity of the parameters by override the implementation of this function.
+		if (!(dlog.validateGroup())){
+			throw new IllegalArgumentException("the given DlogGroup is not valid");
+		}
 		
 		this.channel = channel;
 		this.dlog = dlog;
 		this.random = random;
+		qMinusOne =  dlog.getOrder().subtract(BigInteger.ONE);
 		
 	}
 	
@@ -170,43 +183,52 @@ public abstract class OTReceiverDDHPrivacyAbs implements OTReceiver{
 	 * Runs the part of the protocol where the receiver input is necessary.
 	 * @return OTROutput, the output of the protocol.
 	 * @throws CheatAttemptException if there was a cheat attempt during the execution of the protocol.
+	 * @throws IOException if the send or receive functions failed.
+	 * @throws ClassNotFoundException if the receive failed.
 	 */
-	public OTROutput transfer() throws CheatAttemptException{
+	public OTROutput transfer() throws CheatAttemptException, IOException, ClassNotFoundException{
 		/* Run the following part of the protocol:
 				COMPUTE a as follows:
-				1.	If σ = 0 then a = (g^alpha, g^beta, g^(alpha*beta), g^gamma)
-				2.	If σ = 1 then a = (g^alpha, g^beta, g^gamma, g^(alpha*beta))
+				1.	If  sigma = 0 then a = (g^alpha, g^beta, g^(alpha*beta), g^gamma)
+				2.	If  sigma = 1 then a = (g^alpha, g^beta, g^gamma, g^(alpha*beta))
 				SEND a to S
 				WAIT for message pairs (w0, c0) and (w1, c1)  from S
 				In ByteArray scenario:
 					IF  NOT 
-					•	w0, w1 in the DlogGroup, AND
-					•	c0, c1 are binary strings of the same length
+						1. w0, w1 in the DlogGroup, AND
+						2. c0, c1 are binary strings of the same length
 					   REPORT ERROR
-					COMPUTE kσ = (wσ)^beta
-					OUTPUT  xσ = cσ XOR KDF(|cσ|,kσ)
+					COMPUTE kSigma = (wSigma)^beta
+					OUTPUT  xSigma = cSigma XOR KDF(|cSigma|,kSigma)
 				In GroupElement scenario:
 					IF  NOT 
-					•	w0, w1, c0, c1 in the DlogGroup
+						1. w0, w1, c0, c1 in the DlogGroup
 					   REPORT ERROR
-					COMPUTE (kσ)^(-1) = (wσ)^(-beta)
-					OUTPUT  xσ = cσ * (kσ)^(-1)
+					COMPUTE (kSigma)^(-1) = (wSigma)^(-beta)
+					OUTPUT  xSigma = cSigma * (kSigma)^(-1)
 
 		*/
-		//Compute tuple for sender.
-		OTRPrivacyMessage a = computeTuple();
 		
-		//Send tuple to sender.
-		sendTupleToSender(a);
+		try{
+			//Compute tuple for sender.
+			OTRPrivacyMessage a = computeTuple();
+			
+			//Send tuple to sender.
+			sendTupleToSender(a);
+			
+			//Wait for message from sender.
+			OTSMessage message = waitForMessageFromSender();
+			
+			//checked the received message.
+			checkReceivedTuple(message);
+			
+			//Compute the final calculations to get xSigma.
+			return computeFinalXSigma();
+			
+		}catch(NullPointerException e){
+			throw new IllegalStateException("preProcess function should be called before transfer atleast once");
+		}
 		
-		//Wait for message from sender.
-		OTSMessage message = waitForMessageFromSender();
-		
-		//checked the received message.
-		checkReceivedTuple(message);
-		
-		//Compute the final calculations to get xֿƒ.
-		return computeFinalXSigma();
 		
 	}
 
@@ -216,7 +238,6 @@ public abstract class OTReceiverDDHPrivacyAbs implements OTReceiver{
 	 */
 	private void sampleRandomValues() {
 		//Sample random values.
-		BigInteger qMinusOne =  dlog.getOrder().subtract(BigInteger.ONE);
 		
 		alpha = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
 		beta = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
@@ -240,8 +261,8 @@ public abstract class OTReceiverDDHPrivacyAbs implements OTReceiver{
 	/**
 	 * Runs the following lines from the protocol:
 	 * "COMPUTE a as follows:
-	 *			1.	If σ = 0 then a = (g^alpha, g^beta, g^(alpha*beta), g^gamma)
-				2.	If σ = 1 then a = (g^alpha, g^beta, g^gamma, g^(alpha*beta))"
+	 *			1.	If sigma = 0 then a = (g^alpha, g^beta, g^(alpha*beta), g^gamma)
+				2.	If sigma = 1 then a = (g^alpha, g^beta, g^gamma, g^(alpha*beta))"
 	 * @return OTRSemiHonestMessage contains the tuple (h0, h1).
 	 */
 	private OTRPrivacyMessage computeTuple() {
@@ -264,13 +285,13 @@ public abstract class OTReceiverDDHPrivacyAbs implements OTReceiver{
 	 * Runs the following line from the protocol:
 	 * "SEND a to S"
 	 * @param a the tuple to send to the sender.
+	 * @throws IOException 
 	 */
-	private void sendTupleToSender(OTRPrivacyMessage a) {
+	private void sendTupleToSender(OTRPrivacyMessage a) throws IOException {
 		try {
 			channel.send(a);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new IOException("failed to send the message. The thrown message is: " + e.getMessage());
 		}
 		
 	}
@@ -279,30 +300,34 @@ public abstract class OTReceiverDDHPrivacyAbs implements OTReceiver{
 	 * Runs the following line from the protocol:
 	 * "WAIT for message pairs (w0, c0) and (w1, c1)  from S"
 	 * @return OTSMessage contains (w0, c0, w1, c1)
+	 * @throws IOException if failed to receive.
+	 * @throws ClassNotFoundException if failed to receive.
 	 */
-	private OTSMessage waitForMessageFromSender() {
+	private OTSMessage waitForMessageFromSender() throws IOException, ClassNotFoundException {
+		Serializable message = null;
 		try {
-			return (OTSMessage) channel.receive();
+			message =  channel.receive();
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new ClassNotFoundException("failed to receive message. The thrown message is: " + e.getMessage());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new IOException("failed to receive message. The thrown message is: " + e.getMessage());
 		}
-		return null;
+		if (!(message instanceof OTSMessage)){
+			throw new IllegalArgumentException("the given message should be an instance of OTSMessage");
+		}
+		return (OTSMessage) message;
 	}
 	
 	/**
 	 * Runs the following line from the protocol:
 	 * "In ByteArray scenario:
 	 *		IF  NOT 
-	 *		•	w0, w1 in the DlogGroup, AND
-	 *		•	c0, c1 are binary strings of the same length
+	 *			1. w0, w1 in the DlogGroup, AND
+	 *			2. c0, c1 are binary strings of the same length
 	 *		   REPORT ERROR
 	 *	In GroupElement scenario:
 	 *		IF  NOT 
-	 *		•	w0, w1, c0, c1 in the DlogGroup
+	 *			1. w0, w1, c0, c1 in the DlogGroup
 	 *		   REPORT ERROR"		
 	 * @param message
 	 * @throws CheatAttemptException 
@@ -312,12 +337,12 @@ public abstract class OTReceiverDDHPrivacyAbs implements OTReceiver{
 	/**
 	 * Runs the following lines from the protocol:
 	 * "In ByteArray scenario:
-	 *		COMPUTE kσ = (wσ)^beta
-	 *		OUTPUT  xσ = cσ XOR KDF(|cσ|,kσ)
+	 *		COMPUTE kSigma = (wSigma)^beta
+	 *		OUTPUT  xSigma = cSigma XOR KDF(|cSigma|,kSigma)
 	 *	In GroupElement scenario:
-	 *		COMPUTE (kσ)^(-1) = (wσ)^(-beta)
-	 *		OUTPUT  xσ = cσ * (kσ)^(-1)"
-	 * @return OTROutput contains Xֿƒ
+	 *		COMPUTE (kSigma)^(-1) = (wSigma)^(-beta)
+	 *		OUTPUT  xSigma = cSigma * (kSigma)^(-1)"
+	 * @return OTROutput contains xSigma
 	 */
 	protected abstract OTROutput computeFinalXSigma();
 }
