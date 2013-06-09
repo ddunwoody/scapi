@@ -33,6 +33,7 @@ import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
+import edu.biu.scapi.securityLevel.SemiHonest;
 
 /**
  * Concrete class for Semi-Honest OT assuming DDH receiver ON BYTE ARRAY.
@@ -42,7 +43,7 @@ import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTReceiverOnByteArraySemiHonest extends OTReceiverDDHSemiHonestAbs{
+public class OTReceiverOnByteArraySemiHonest extends OTReceiverDDHSemiHonestAbs implements SemiHonest{
 	private KeyDerivationFunction kdf; //Used in the calculation.
 	
 	/**
@@ -67,10 +68,10 @@ public class OTReceiverOnByteArraySemiHonest extends OTReceiverDDHSemiHonestAbs{
 
 	/**
 	 * Runs the following lines from the protocol:
-	 * "COMPUTE kσ = (u)^alpha						
-	 *	OUTPUT  xσ = vσ XOR KDF(|cσ|,kσ)"	
+	 * "COMPUTE kSigma = (u)^alpha						
+	 *	OUTPUT  xSigma = vSigma XOR KDF(|cSigma|,kSigma)"	
 	 * @param message received from the sender. must be OTSOnByteArraySemiHonestMessage.
-	 * @return OTROutput contains Xσ
+	 * @return OTROutput contains xSigma
 	 */
 	protected OTROutput computeFinalXSigma(OTSMessage message) {
 		//If message is not instance of OTSOnByteArraySemiHonestMessage, throw Exception.
@@ -80,12 +81,12 @@ public class OTReceiverOnByteArraySemiHonest extends OTReceiverDDHSemiHonestAbs{
 		
 		OTSOnByteArraySemiHonestMessage msg = (OTSOnByteArraySemiHonestMessage)message;
 		
-		//Compute kσ:
+		//Compute kSigma:
 		GroupElement u = dlog.reconstructElement(true, msg.getU());
 		GroupElement kSigma = dlog.exponentiate(u, alpha);
 		byte[] kBytes = dlog.mapAnyGroupElementToByteArray(kSigma);
 		
-		//Get v0 or v1 according to σ
+		//Get v0 or v1 according to sigma.
 		byte[] vSigma = null;
 		if (sigma == 0){
 			vSigma = msg.getV0();
@@ -103,7 +104,7 @@ public class OTReceiverOnByteArraySemiHonest extends OTReceiverDDHSemiHonestAbs{
 			xSigma[i] = (byte) (vSigma[i] ^ xSigma[i]);
 		}
 		
-		//Create and return the output containing xσ
+		//Create and return the output containing xSigma
 		return new OTROnByteArrayOutput(xSigma);
 	}
 	

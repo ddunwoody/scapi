@@ -33,6 +33,7 @@ import edu.biu.scapi.interactiveMidProtocols.ot.OTROutput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
+import edu.biu.scapi.securityLevel.SemiHonest;
 
 /**
  * Concrete class for Semi-Honest OT assuming DDH receiver ON GROUP ELEMENT.
@@ -42,7 +43,7 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTReceiverOnGroupElementSemiHonest extends OTReceiverDDHSemiHonestAbs{
+public class OTReceiverOnGroupElementSemiHonest extends OTReceiverDDHSemiHonestAbs implements SemiHonest{
 	
 	/**
 	 * Constructor that gets the channel and choose default values of DlogGroup and SecureRandom.
@@ -64,10 +65,10 @@ public class OTReceiverOnGroupElementSemiHonest extends OTReceiverDDHSemiHonestA
 
 	/**
 	 * Runs the following lines from the protocol:
-	 * "COMPUTE (kσ)^(-1) = u^(-alpha)			
-	 *	OUTPUT  xσ = vσ * (kσ)^(-1)" 		
+	 * "COMPUTE (kSigma)^(-1) = u^(-alpha)			
+	 *	OUTPUT  xSigma = vSigma * (kSigma)^(-1)" 		
 	 * @param message received from the sender. must be OTSOnGroupElementSemiHonestMessage
-	 * @return OTROutput contains Xσ
+	 * @return OTROutput contains xSigma
 	 */
 	protected OTROutput computeFinalXSigma(OTSMessage message) {
 		//If message is not instance of OTSOnGroupElementSemiHonestMessage, throw Exception.
@@ -77,13 +78,13 @@ public class OTReceiverOnGroupElementSemiHonest extends OTReceiverDDHSemiHonestA
 		
 		OTSOnGroupElementSemiHonestMessage msg = (OTSOnGroupElementSemiHonestMessage)message;
 		
-		//Compute (kσ)^(-1) = u^(-alpha):
+		//Compute (kSigma)^(-1) = u^(-alpha):
 		GroupElement u = dlog.reconstructElement(true, msg.getU());	//Get u
 		BigInteger beta = dlog.getOrder().subtract(alpha);			//Get -alpha
 		GroupElement kSigma = dlog.exponentiate(u, beta);
 		
 		
-		//Get v0 or v1 according to σ
+		//Get v0 or v1 according to sigma.
 		GroupElement vSigma = null;
 		if (sigma == 0){
 			vSigma = dlog.reconstructElement(true, msg.getV0());
@@ -92,10 +93,10 @@ public class OTReceiverOnGroupElementSemiHonest extends OTReceiverDDHSemiHonestA
 			vSigma = dlog.reconstructElement(true, msg.getV1());
 		}
 		
-		//Compue xσ
+		//Compue xSigma
 		GroupElement xSigma = dlog.multiplyGroupElements(vSigma, kSigma);
 		
-		//Create and return the output containing xσ
+		//Create and return the output containing xSigma
 		return new OTROnGroupElementOutput(xSigma);
 	
 	}
