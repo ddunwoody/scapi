@@ -25,6 +25,7 @@
 package edu.biu.scapi.interactiveMidProtocols.ot.semiHonest;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
@@ -56,19 +57,20 @@ public abstract class OTReceiverDDHSemiHonestAbs implements OTReceiver{
 	 	This class runs the following protocol:
 		 	SAMPLE random values alpha in Zq and h in the DlogGroup 
 			COMPUTE h0,h1 as follows:
-				1.	If σ = 0 then h0 = g^alpha  and h1 = h
-				2.	If σ = 1 then h0 = h and h1 = g^alpha 
+				1.	If sigma = 0 then h0 = g^alpha  and h1 = h
+				2.	If sigma = 1 then h0 = h and h1 = g^alpha 
 			SEND (h0,h1) to S
 			WAIT for the message (u, v0,v1) from S
-			COMPUTE kσ = (u)^alpha					- in byte array scenario
-				 OR (kσ)^(-1) = u^(-alpha)			- in GroupElement scenario
-			OUTPUT  xσ = vσ XOR KDF(|cσ|,kσ)		- in byte array scenario
-				 OR xσ = vσ * (kσ)^(-1) 			- in GroupElement scenario
+			COMPUTE kSigma = (u)^alpha							- in byte array scenario
+				 OR (kSigma)^(-1) = u^(-alpha)					- in GroupElement scenario
+			OUTPUT  xSigma = vSigma XOR KDF(|cSigma|,kSigma)	- in byte array scenario
+				 OR xSigma = vSigma * (kSigma)^(-1) 			- in GroupElement scenario
 	*/	
 	
 	private Channel channel;
 	protected DlogGroup dlog;
 	private SecureRandom random;
+	private BigInteger qMinusOne;
 	
 	//Values required for calculations:
 	protected short sigma;
@@ -115,6 +117,7 @@ public abstract class OTReceiverDDHSemiHonestAbs implements OTReceiver{
 		this.channel = channel;
 		this.dlog = dlog;
 		this.random = random;
+		qMinusOne =  dlog.getOrder().subtract(BigInteger.ONE);
 		
 	}
 	
@@ -130,7 +133,7 @@ public abstract class OTReceiverDDHSemiHonestAbs implements OTReceiver{
 		//Sample random values.
 		sampleRandomValues();
 		
-		//Calculate g^σ.
+		//Calculate g^alpha.
 		GroupElement g = dlog.getGenerator();
 		gAlpha = dlog.exponentiate(g, alpha);
 	}
@@ -156,24 +159,30 @@ public abstract class OTReceiverDDHSemiHonestAbs implements OTReceiver{
 	/**
 	 * Runs the part of the protocol where the receiver input is necessary.
 	 * @return OTROutput, the output of the protocol.
+	 * @throws IOException if failed to send or receive a message.
+	 * @throws ClassNotFoundException if failed to receive a message.
 	 */
-	public OTROutput transfer(){
+	public OTROutput transfer() throws IOException, ClassNotFoundException{
 		/* Run the following part of the protocol:
 				COMPUTE h0,h1 as follows:
-					1.	If σ = 0 then h0 = g^alpha  and h1 = h
-					2.	If σ = 1 then h0 = h and h1 = g^alpha 
+					1.	If sigma = 0 then h0 = g^alpha  and h1 = h
+					2.	If sigma = 1 then h0 = h and h1 = g^alpha 
 				SEND (h0,h1) to S
 				WAIT for the message (u, v0,v1) from S
-				COMPUTE kσ = (u)^alpha					- in byte array scenario
-					OR (kσ)^(-1) = u^(-alpha)			- in GroupElement scenario
-				OUTPUT  xσ = vσ XOR KDF(|cσ|,kσ)		- in byte array scenario
-					 OR xσ = vσ * (kσ)^(-1) 			- in GroupElement scenario
+				COMPUTE kSigma = (u)^alpha							- in byte array scenario
+					OR (kSigma)^(-1) = u^(-alpha)					- in GroupElement scenario
+				OUTPUT  xSigma = vSigma XOR KDF(|cSigma|,kSigma)	- in byte array scenario
+					 OR xSigma = vSigma * (kSigma)^(-1) 			- in GroupElement scenario
 		*/
-		
-		OTRSemiHonestMessage tuple = computeTuple();
-		sendTupleToSender(tuple);
-		OTSMessage message = waitForMessageFromSender();
-		return computeFinalXSigma(message);
+		try{
+			OTRSemiHonestMessage tuple = computeTuple();
+			sendTupleToSender(tuple);
+			OTSMessage message = waitForMessageFromSender();
+			return computeFinalXSigma(message);
+			
+		}catch(NullPointerException e){
+			throw new IllegalStateException("preProcess function should be called before transfer atleast once");
+		}
 		
 	}
 	
@@ -183,7 +192,6 @@ public abstract class OTReceiverDDHSemiHonestAbs implements OTReceiver{
 	 */
 	private void sampleRandomValues() {
 		//Sample random alpha.
-		BigInteger qMinusOne =  dlog.getOrder().subtract(BigInteger.ONE);
 		alpha = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
 		
 		//Sample random h.
@@ -193,8 +201,8 @@ public abstract class OTReceiverDDHSemiHonestAbs implements OTReceiver{
 	/**
 	 * Runs the following lines from the protocol:
 	 * "COMPUTE h0,h1 as follows:
-	 *		1.	If σ = 0 then h0 = g^alpha  and h1 = h
-	 *		2.	If σ = 1 then h0 = h and h1 = g^alpha"
+	 *		1.	If sigma = 0 then h0 = g^alpha  and h1 = h
+	 *		2.	If sigma = 1 then h0 = h and h1 = g^alpha"
 	 * @return OTRSemiHonestMessage contains the tuple (h0, h1).
 	 */
 	private OTRSemiHonestMessage computeTuple() {
@@ -215,13 +223,13 @@ public abstract class OTReceiverDDHSemiHonestAbs implements OTReceiver{
 	 * Runs the following line from the protocol:
 	 * "SEND (h0,h1) to S"
 	 * @param tuple to send to the sender
+	 * @throws IOException if failed to send the message.
 	 */
-	private void sendTupleToSender(OTRSemiHonestMessage tuple) {
+	private void sendTupleToSender(OTRSemiHonestMessage tuple) throws IOException {
 		try {
 			channel.send(tuple);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new IOException("failed to send the message. The thrown message is: " + e.getMessage());
 		}
 		
 	}
@@ -230,18 +238,22 @@ public abstract class OTReceiverDDHSemiHonestAbs implements OTReceiver{
 	 * Runs the following line from the protocol:
 	 * "WAIT for the message (u, v0,v1) from S"
 	 * @return OTSMessage contains (u, v0,v1)
+	 * @throws ClassNotFoundException if failed to receive a message.
+	 * @throws IOException if failed to receive a message.
 	 */
-	private OTSMessage waitForMessageFromSender() {
+	private OTSMessage waitForMessageFromSender() throws ClassNotFoundException, IOException {
+		Serializable message;
 		try {
-			return (OTSMessage) channel.receive();
+			message = channel.receive();
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new ClassNotFoundException("failed to receive message. The thrown message is: " + e.getMessage());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new IOException("failed to receive message. The thrown message is: " + e.getMessage());
 		}
-		return null;
+		if (!(message instanceof OTSMessage)){
+			throw new IllegalArgumentException("the given message should be an instance of OTSMessage");
+		}
+		return (OTSMessage) message;
 	}
 	
 	/**
