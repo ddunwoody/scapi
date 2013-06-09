@@ -24,6 +24,8 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.ot;
 
+import java.io.IOException;
+
 import edu.biu.scapi.exceptions.CheatAttemptException;
 
 /**
@@ -53,6 +55,8 @@ public interface OTReceiver {
 	 * Run the part of the protocol where the receiver input is necessary.
 	 * @return OTROutput, the output of the protocol.
 	 * @throws CheatAttemptException if there was a cheat attempt during the execution of the protocol.
+	 * @throws IOException if the send or receive functions failed
+	 * @throws ClassNotFoundException if the receive function failed
 	 */
-	public OTROutput transfer() throws CheatAttemptException;
+	public OTROutput transfer() throws CheatAttemptException, IOException, ClassNotFoundException;
 }
