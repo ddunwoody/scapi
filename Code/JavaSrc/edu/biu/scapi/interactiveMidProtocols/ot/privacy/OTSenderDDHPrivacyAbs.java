@@ -25,6 +25,7 @@
 package edu.biu.scapi.interactiveMidProtocols.ot.privacy;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
@@ -78,6 +79,7 @@ public abstract class OTSenderDDHPrivacyAbs implements OTSender{
 	private Channel channel;
 	protected DlogGroup dlog;
 	private SecureRandom random;
+	private BigInteger qMinusOne;
 	
 	//will be given in the receiver's message.
 	private GroupElement x, y, z0, z1;
@@ -115,24 +117,32 @@ public abstract class OTSenderDDHPrivacyAbs implements OTSender{
 	 * @param channel
 	 * @param dlog must be DDH secure.
 	 * @param random
+	 * @throws IllegalArgumentException if the given dlog is not DDH secure or if it is not valid.
 	 */
 	private void setMembers(Channel channel, DlogGroup dlog, SecureRandom random) {
 		//The underlying dlog group must be DDH secure.
 		if (!(dlog instanceof DDH)){
 			throw new IllegalArgumentException("DlogGroup should have DDH security level");
 		}
+		//Check that the given dlog is valid.
+		if (!(dlog.validateGroup())){
+			throw new IllegalArgumentException("the given DlogGroup is not valid");
+		}
 		
 		this.channel = channel;
 		this.dlog = dlog;
 		this.random = random;
+		qMinusOne =  dlog.getOrder().subtract(BigInteger.ONE);
 		
 	}
 	
 	/**
 	 * Runs the part of the protocol where the sender input is not yet necessary.
 	 * @throws CheatAttemptException if there was a cheat attempt during the execution of the protocol.
+	 * @throws ClassNotFoundException if failed to receive a message.
+	 * @throws IOException if failed to receive a message.
 	 */
-	public void preProcess() throws CheatAttemptException{
+	public void preProcess() throws CheatAttemptException, IOException, ClassNotFoundException{
 		/* Runs the following part of the protocol:
 				WAIT for message a from R
 				DENOTE the tuple a received by S by (x, y, z0, z1)
@@ -155,8 +165,9 @@ public abstract class OTSenderDDHPrivacyAbs implements OTSender{
 
 	/**
 	 * Runs the part of the protocol where the sender input is necessary.
+	 * @throws IOException if failed to send the message.
 	 */
-	public void transfer(){
+	public void transfer() throws IOException{
 		/* Runs the following part of the protocol:
 				COMPUTE: in byteArray scenario:
 				•	c0 = x0 XOR KDF(|x0|,k0)
@@ -167,26 +178,35 @@ public abstract class OTSenderDDHPrivacyAbs implements OTSender{
 				SEND (w0, c0) and (w1, c1) to R
 				OUTPUT nothing
 		*/
-		OTSMessage message = computeTuple();
-		sendTupleToReceiver(message);
+		try{
+			
+			OTSMessage message = computeTuple();
+			sendTupleToReceiver(message);
+		}catch(NullPointerException e){
+			throw new IllegalStateException("preProcess function should be called before transfer atleast once");
+		}
 	}
 
 	/**
 	 * Runs the following line from the protocol:
 	 * "WAIT for message (h0,h1) from R"
 	 * @return the received message.
+	 * @throws IOException if failed to receive a message.
+	 * @throws ClassNotFoundException  if failed to receive a message.
 	 */
-	private OTRPrivacyMessage waitForMessageFromReceiver(){
+	private OTRPrivacyMessage waitForMessageFromReceiver() throws IOException, ClassNotFoundException{
+		Serializable message = null;
 		try {
-			return (OTRPrivacyMessage) channel.receive();
+			message = channel.receive();
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new ClassNotFoundException("failed to receive message. The thrown message is: " + e.getMessage());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new IOException("failed to receive message. The thrown message is: " + e.getMessage());
 		}
-		return null;
+		if (!(message instanceof OTRPrivacyMessage)){
+			throw new IllegalArgumentException("the given message should be an instance of OTRPrivacyMessage");
+		}
+		return (OTRPrivacyMessage) message;
 	}
 	
 	/**
@@ -229,7 +249,7 @@ public abstract class OTSenderDDHPrivacyAbs implements OTSender{
 	 * "SAMPLE random values u0,u1,v0,v1 in  {0, . . . , q-1} "
 	 */
 	private void sampleRandomValues() {
-		BigInteger qMinusOne =  dlog.getOrder().subtract(BigInteger.ONE);
+		
 		
 		//Save the random chosen values a s class members. 
 		u0 = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
@@ -278,15 +298,15 @@ public abstract class OTSenderDDHPrivacyAbs implements OTSender{
 	 * Runs the following lines from the protocol:
 	 * "SEND (w0, c0) and (w1, c1) to R"
 	 * @param message to send to the receiver
+	 * @throws IOException if failed to send the message.
 	 */
-	private void sendTupleToReceiver(OTSMessage message) {
+	private void sendTupleToReceiver(OTSMessage message) throws IOException {
 		
 		try {
 			//Send the message by the channel.
 			channel.send(message);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new IOException("failed to send the message. The thrown message is: " + e.getMessage());
 		}	
 	}
 }
