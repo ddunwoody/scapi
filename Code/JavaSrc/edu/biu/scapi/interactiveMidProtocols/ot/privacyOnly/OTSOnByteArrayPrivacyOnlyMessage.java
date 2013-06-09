@@ -22,7 +22,7 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-package edu.biu.scapi.interactiveMidProtocols.ot.privacy;
+package edu.biu.scapi.interactiveMidProtocols.ot.privacyOnly;
 
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
 import edu.biu.scapi.primitives.dlog.GroupElementSendableData;

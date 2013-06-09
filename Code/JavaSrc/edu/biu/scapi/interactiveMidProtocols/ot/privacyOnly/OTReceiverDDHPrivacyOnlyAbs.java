@@ -22,7 +22,7 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-package edu.biu.scapi.interactiveMidProtocols.ot.privacy;
+package edu.biu.scapi.interactiveMidProtocols.ot.privacyOnly;
 
 import java.io.IOException;
 import java.io.Serializable;
