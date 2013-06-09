@@ -32,6 +32,7 @@ import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnGroupElementInput;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
+import edu.biu.scapi.securityLevel.SemiHonest;
 
 /**
  * Concrete class for Semi-Honest OT assuming DDH sender ON GROUP ELEMENT.
@@ -41,7 +42,7 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTSenderOnGroupElementSemiHonest extends OTSenderDDHSemiHonestAbs{
+public class OTSenderOnGroupElementSemiHonest extends OTSenderDDHSemiHonestAbs implements SemiHonest{
 	//Protocol's inputs. GroupElements.
 	private GroupElement x0;
 	private GroupElement x1;
