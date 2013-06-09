@@ -24,6 +24,8 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.ot;
 
+import java.io.IOException;
+
 import edu.biu.scapi.exceptions.CheatAttemptException;
 
 /**
@@ -42,8 +44,10 @@ public interface OTSender {
 	/**
 	 * Run the part of the protocol where the sender input is not yet necessary.
 	 * @throws CheatAttemptException if there was a cheat attempt during the execution of the protocol.
+	 * @throws ClassNotFoundException if failed to receive a message.
+	 * @throws IOException if failed to receive a message.
 	 */
-	public void preProcess() throws CheatAttemptException;
+	public void preProcess() throws CheatAttemptException, IOException, ClassNotFoundException;
 	
 	/**
 	 * Sets the input for this OT sender.
@@ -53,6 +57,7 @@ public interface OTSender {
 	
 	/**
 	 * Run the part of the protocol where the sender input is necessary.
+	 * @throws IOException if failed to send the message.
 	 */
-	public void transfer();
+	public void transfer() throws IOException;
 }
