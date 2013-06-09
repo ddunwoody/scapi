@@ -32,6 +32,7 @@ import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnByteArrayInput;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
+import edu.biu.scapi.securityLevel.PrivacyOnly;
 
 /**
  * Concrete class for OT Privacy assuming DDH sender ON BYTE ARRAY.
@@ -41,7 +42,7 @@ import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTSenderOnByteArrayPrivacy extends OTSenderDDHPrivacyAbs{
+public class OTSenderOnByteArrayPrivacy extends OTSenderDDHPrivacyAbs implements PrivacyOnly{
 
 	private KeyDerivationFunction kdf; //Used in the calculation.
 	

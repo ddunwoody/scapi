@@ -32,6 +32,7 @@ import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnGroupElementInput;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
+import edu.biu.scapi.securityLevel.PrivacyOnly;
 
 /**
  * Concrete class for OT Privacy assuming DDH sender ON GroupElement.
@@ -41,7 +42,7 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTSenderOnGroupElementPrivacy extends OTSenderDDHPrivacyAbs{
+public class OTSenderOnGroupElementPrivacy extends OTSenderDDHPrivacyAbs implements PrivacyOnly{
 
 	//Protocol's inputs. GroupElements.
 	private GroupElement x0;
