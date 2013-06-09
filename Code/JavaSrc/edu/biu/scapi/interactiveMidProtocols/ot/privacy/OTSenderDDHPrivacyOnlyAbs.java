@@ -50,7 +50,7 @@ import edu.biu.scapi.securityLevel.DDH;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public abstract class OTSenderDDHPrivacyAbs implements OTSender{
+public abstract class OTSenderDDHPrivacyOnlyAbs implements OTSender{
 
 	/*	
 	  This class runs the following protocol:
@@ -91,7 +91,7 @@ public abstract class OTSenderDDHPrivacyAbs implements OTSender{
 	/**
 	 * Constructor that gets the channel and chooses default values of DlogGroup and SecureRandom.
 	 */
-	public OTSenderDDHPrivacyAbs(Channel channel){
+	public OTSenderDDHPrivacyOnlyAbs(Channel channel){
 		try {
 			//Uses Miracl Koblitz 233 Elliptic curve.
 			setMembers(channel, new MiraclDlogECF2m("K-233"), new SecureRandom());
@@ -107,7 +107,7 @@ public abstract class OTSenderDDHPrivacyAbs implements OTSender{
 	 * @param dlog must be DDH secure.
 	 * @param random
 	 */
-	public OTSenderDDHPrivacyAbs(Channel channel, DlogGroup dlog, SecureRandom random){
+	public OTSenderDDHPrivacyOnlyAbs(Channel channel, DlogGroup dlog, SecureRandom random){
 		
 		setMembers(channel, dlog, random);
 	}

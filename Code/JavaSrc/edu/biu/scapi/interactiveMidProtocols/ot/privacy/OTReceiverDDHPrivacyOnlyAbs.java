@@ -53,7 +53,7 @@ import edu.biu.scapi.securityLevel.DDH;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public abstract class OTReceiverDDHPrivacyAbs implements OTReceiver{
+public abstract class OTReceiverDDHPrivacyOnlyAbs implements OTReceiver{
 
 	/*	
 	 	This class runs the following protocol:
@@ -94,7 +94,7 @@ public abstract class OTReceiverDDHPrivacyAbs implements OTReceiver{
 	/**
 	 * Constructor that gets the channel and chooses default values of DlogGroup and SecureRandom.
 	 */
-	public OTReceiverDDHPrivacyAbs(Channel channel){
+	public OTReceiverDDHPrivacyOnlyAbs(Channel channel){
 		try {
 			//Uses Miracl Koblitz 233 Elliptic curve.
 			setMembers(channel, new MiraclDlogECF2m("K-233"), new SecureRandom());
@@ -110,7 +110,7 @@ public abstract class OTReceiverDDHPrivacyAbs implements OTReceiver{
 	 * @param dlog must be DDH secure.
 	 * @param random
 	 */
-	public OTReceiverDDHPrivacyAbs(Channel channel, DlogGroup dlog, SecureRandom random){
+	public OTReceiverDDHPrivacyOnlyAbs(Channel channel, DlogGroup dlog, SecureRandom random){
 		
 		setMembers(channel, dlog, random);
 	}

@@ -42,7 +42,7 @@ import edu.biu.scapi.securityLevel.PrivacyOnly;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTSenderOnGroupElementPrivacy extends OTSenderDDHPrivacyAbs implements PrivacyOnly{
+public class OTSenderOnGroupElementPrivacyOnly extends OTSenderDDHPrivacyOnlyAbs implements PrivacyOnly{
 
 	//Protocol's inputs. GroupElements.
 	private GroupElement x0;
@@ -51,7 +51,7 @@ public class OTSenderOnGroupElementPrivacy extends OTSenderDDHPrivacyAbs impleme
 	/**
 	 * Constructor that gets the channel and chooses default values of DlogGroup and SecureRandom.
 	 */
-	public OTSenderOnGroupElementPrivacy(Channel channel){
+	public OTSenderOnGroupElementPrivacyOnly(Channel channel){
 		super(channel);
 	}
 	
@@ -61,7 +61,7 @@ public class OTSenderOnGroupElementPrivacy extends OTSenderDDHPrivacyAbs impleme
 	 * @param dlog must be DDH secure.
 	 * @param random
 	 */
-	public OTSenderOnGroupElementPrivacy(Channel channel, DlogGroup dlog, SecureRandom random){
+	public OTSenderOnGroupElementPrivacyOnly(Channel channel, DlogGroup dlog, SecureRandom random){
 		super(channel, dlog, random);
 	}
 	

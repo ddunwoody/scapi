@@ -42,7 +42,7 @@ import edu.biu.scapi.securityLevel.PrivacyOnly;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTSenderOnByteArrayPrivacy extends OTSenderDDHPrivacyAbs implements PrivacyOnly{
+public class OTSenderOnByteArrayPrivacyOnly extends OTSenderDDHPrivacyOnlyAbs implements PrivacyOnly{
 
 	private KeyDerivationFunction kdf; //Used in the calculation.
 	
@@ -53,7 +53,7 @@ public class OTSenderOnByteArrayPrivacy extends OTSenderDDHPrivacyAbs implements
 	/**
 	 * Constructor that gets the channel and chooses default values of DlogGroup and SecureRandom.
 	 */
-	public OTSenderOnByteArrayPrivacy(Channel channel){
+	public OTSenderOnByteArrayPrivacyOnly(Channel channel){
 		super(channel);
 	}
 	
@@ -64,7 +64,7 @@ public class OTSenderOnByteArrayPrivacy extends OTSenderDDHPrivacyAbs implements
 	 * @param kdf
 	 * @param random
 	 */
-	public OTSenderOnByteArrayPrivacy(Channel channel, DlogGroup dlog, KeyDerivationFunction kdf, SecureRandom random){
+	public OTSenderOnByteArrayPrivacyOnly(Channel channel, DlogGroup dlog, KeyDerivationFunction kdf, SecureRandom random){
 		super(channel, dlog, random);
 		this.kdf = kdf;
 	}
