@@ -31,7 +31,7 @@ import edu.biu.scapi.exceptions.CheatAttemptException;
 /**
  * Marker interface. Every class that implements it is signed as Oblivious Transfer receiver.
  * 
- * Oblivious Transfer is the situation where a sender has n messages, and the receiver has an 
+ * Oblivious Transfer is is a type of protocol in which a sender has n messages, and the receiver has an 
  * index i. The receiver wishes to receive the i-th among the sender's messages, 
  * without the sender learning i, while the sender wants to ensure that the receiver receive 
  * only one of the n messages.
