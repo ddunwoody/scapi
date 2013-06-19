@@ -356,6 +356,7 @@ public class CryptoPpDlogZpSafePrime extends DlogGroupAbs implements DlogZpSafeP
 
 	/**
 	 * @see edu.biu.scapi.primitives.dlog.DlogGroup#reconstructElement(boolean, edu.biu.scapi.primitives.dlog.GroupElementSendableData)
+	 * @throws IllegalArgumentException if bCheckMembership is true and the data does not correspond to an illegal value of this group
 	 */
 	@Override
 	public GroupElement reconstructElement(boolean bCheckMembership, GroupElementSendableData data) {
