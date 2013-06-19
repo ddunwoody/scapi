@@ -34,7 +34,10 @@ import java.security.PrivateKey;
  *
  */
 public interface DamgardJurikPrivateKey extends PrivateKey {
-
+	/**
+	 * t is the lcm(p-1, q-1), where lcm is the least common multiple;  p and q are primes such that N = p*q and N is an RSA modulus
+	 * @return t
+	 */
 	BigInteger getT();
 
 	BigInteger getDForS1();
