@@ -136,8 +136,8 @@ public class PlainTCPChannel extends PlainChannel{
 	/** 
 	 * Receives the message sent by the other end-user of the channel. 
 	 * 
-	 * @throws ClassNotFoundException Class of a serialized object cannot be found. 
-	 * @throws IOException Any of the usual Input/Output related exceptions.
+	 * @throws ClassNotFoundException  The Class of the serialized object cannot be found
+	 * @throws IOException Any of the usual Input/Output related exceptions
 	 */
 	public Serializable receive() throws ClassNotFoundException, IOException {
 		
