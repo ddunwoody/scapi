@@ -112,10 +112,10 @@ public abstract class DlogGroupEC extends DlogGroupAbs implements DlogEllipticCu
 	}
 	
 	/**
-	 * Checks parameters of this group to see if they conform to the type this group is supposed to be. 
+	 * Checks parameters of this group to see if they conform to the type this group is supposed to be.<p> 
 	 * Parameters are uploaded from a configuration file upon construction of concrete instance of an Elliptic Curve Dlog group.
 	 * By default, SCAPI uploads a file with NIST recommended curves. In this case we assume the parameters are always correct.
-	 * It is also possible to upload a user-defined configuration file (with format specified in <link>ECparamsFormat</link>. In this case,<p>
+	 * It is also possible to upload a user-defined configuration file (with format specified in the "Elliptic Curves Parameters File Format" section of the FirstLevelSDK_SDD.docx file). In this case,
 	 * it is the user's responsibility to check the validity of the parameters.
 	 * In both ways, the parameters we set should be correct. Therefore, currently the function validateGroup does not perform any validity check and always returns true.
 	 * In the future we may add the validity checks.
