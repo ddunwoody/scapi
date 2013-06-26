@@ -34,11 +34,4 @@ import java.math.BigInteger;
  *
  */
 public interface DlogZp extends DlogGroup{
-	
-	/**
-	 * Creates an element with the given x value 
-	 * @param x
-	 * @return the created element
-	 */
-	public ZpElement generateElement (Boolean bCheckMembership, BigInteger x);
 }

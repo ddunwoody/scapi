@@ -68,26 +68,30 @@ public class ECF2mPointMiracl implements ECElement, ECF2mPoint{
 	private String fileName;
 	
 	private ECF2mUtility util = new ECF2mUtility();
+
 	/**
 	 * Constructor that accepts x,y values of a point. 
-	 * if the values are valid - set the point.
-	 * @param x
-	 * @param y
+	 * Miracl always checks validity of coordinates before creating the point.
+	 * If the values are valid - set the point, else throw IllegalArgumentException.
+	 * @param x the x coordinate of the candidate point
+	 * @param y the y coordinate of the candidate point
 	 * @param curve - DlogGroup
+	 * @throws IllegalArgumentException if the (x,y) coordinates do not represent a valid point on the curve
+	 * 
 	 */
 	ECF2mPointMiracl(BigInteger x, BigInteger y, MiraclDlogECF2m curve){
 		
 		mip = curve.getMip();
 		curveName = curve.getCurveName();
 		fileName = curve.getFileName();
-
-		boolean valid = util.checkCurveMembership((ECF2mGroupParams) curve.getGroupParams(), x, y);
-		// checks validity
-		if (valid == false) // if not valid, throws exception
-			throw new IllegalArgumentException("x, y values are not a point on this curve");
 		
-		//creates a point in the field with the given parameters
+		//Create a point in the field with the given parameters, done by Miracl's native code.
+		//Miracl always checks validity of (x,y).
 		point = createF2mPoint(mip, x.toByteArray(), y.toByteArray());
+		//If the validity check done by Miracl did not succeed, then createF2mPoint returns 0,
+		//indicating that this is not a valid point
+		if (point == 0)
+			throw new IllegalArgumentException("x, y values are not a point on this curve");
 		this.x = x;
 		this.y = y;
 	
@@ -134,26 +138,10 @@ public class ECF2mPointMiracl implements ECElement, ECF2mPoint{
 	}
 	
 	public BigInteger getX(){
-		/*
-		//in case of infinity, there is no coordinates and returns null
-		if (isInfinity()){
-			return null;
-		}
-		
-		return new BigInteger(getXValueF2mPoint(mip, point));
-		*/
 		return x;
 	}
 	
 	public BigInteger getY(){
-		/*
-		//in case of infinity, there is no coordinates and returns null
-		if (isInfinity()){
-			return null;
-		}
-		
-		return new BigInteger(getYValueF2mPoint(mip, point));
-		*/
 		return y;
 	}
 	

@@ -50,19 +50,46 @@ public class ECF2mPointBc extends ECPointBc implements ECF2mPoint {
 	private ECF2mUtility util = new ECF2mUtility();
 	
 	/**
-	 * Constructor that accepts x,y values of a point. 
-	 * if the values are valid - set the point.
-	 * @param x
-	 * @param y
-	 * @param curve - DlogGroup
+	 * Constructor that accepts x,y possible values of a point on the requested curve. 
+	 * If the values are valid - set the point. Else, throw IllegalArgumentException.<p>
+	 * This constructor is kept for backward compatibility, it is the same as calling 
+	 * ECF2mPointBc(BigInteger x, BigInteger y, BcDlogECFp curve, boolean bCheckMembership)
+	 * with bCheckMembership always set to true.
+	 * @param x coordinate of candidate point
+	 * @param y coordinate of candidate point
+	 * @param curve - DlogGroup for which we want to create the point
+	 * @throws IllegalArgumentException if the coordinates x and y do not represent a valid point in the curve
 	 */
-	ECF2mPointBc(BigInteger x, BigInteger y, BcDlogECF2m curve) throws IllegalArgumentException{
+	/*ECF2mPointBc(BigInteger x, BigInteger y, BcDlogECF2m curve) throws IllegalArgumentException{
 
 		boolean valid = util.checkCurveMembership((ECF2mGroupParams) curve.getGroupParams(), x, y);
 		// checks validity
 		if (valid == false) // if not valid, throws exception
 			throw new IllegalArgumentException("x, y values are not a point on this curve");
 
+		// create point with the given parameters
+		point = curve.createPoint(x, y);
+	}
+	*/
+
+	/**
+	 * Constructor that accepts x,y possible values of a point on the requested curve.
+	 * If bCheckMembership is set to true it checks if the values are valid and if so, sets the point. If not valid, throws IllegalArgumentException
+	 * If bCheckMembership is set to false it creates the point without checking.
+	 * @param x coordinate of candidate point
+	 * @param y coordinate of candidate point
+	 * @param curve - DlogGroup for which we want to create the point
+	 * @param bCheckMembership whether to check if (x,y) are a valid point on curve or not 
+	 * @throws IllegalArgumentException if bCheckMembership is set to true AND if the coordinates x and y do not represent a valid point in the curve
+	 */
+	ECF2mPointBc(BigInteger x, BigInteger y, BcDlogECF2m curve, boolean bCheckMembership) throws IllegalArgumentException{
+
+		if(bCheckMembership) {
+				boolean valid = util.checkCurveMembership((ECF2mGroupParams) curve.getGroupParams(), x, y);
+				// checks validity
+				if (valid == false) // if not valid, throws exception
+					throw new IllegalArgumentException("x, y values are not a point on this curve");
+		}
 		/* create point with the given parameters */
 		point = curve.createPoint(x, y);
 	}

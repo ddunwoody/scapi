@@ -46,7 +46,6 @@ import edu.biu.scapi.exceptions.UnInitializedException;
 public abstract class DlogGroupEC extends DlogGroupAbs implements DlogEllipticCurve{
 
 	private  Properties nistProperties; // properties object to hold nist parameters
-	//protected static final String NISTEC_PROPERTIES_FILE = System.getProperty("java.class.path").toString().split(";")[0]+"\\propertiesFiles\\NISTEC.properties";
 	protected static final String NISTEC_PROPERTIES_FILE =  "/propertiesFiles/NISTEC.properties";
 	protected String curveName;
 	protected String fileName;
@@ -149,24 +148,6 @@ public abstract class DlogGroupEC extends DlogGroupAbs implements DlogEllipticCu
 		return getInfinity();
 	}
 		
-	/* (non-Javadoc)
-	 * @see edu.biu.scapi.primitives.dlog.DlogGroup#generateElement(boolean, java.math.BigInteger[])
-	 */
-	//@Override
-	public GroupElement generateElement(boolean bCheckMembership, BigInteger... values) throws IllegalArgumentException {
-		if(values.length != 2){
-			throw new IllegalArgumentException("To generate an ECElement you should pass the x and y coordinates of the point");
-		}
-		//TODO For now we do not support generating an ECElement without checking so we disregard the value of bCheckMembership. In the future
-		//we should definitely add the possibility of generating without checking.
-		if (bCheckMembership){
-			return generateElement(values[0], values[1]);
-		}
-		//Even if bCheckMembership is false, try to generate the element checking. (This is to be reviewed in the future as it was explained above).
-		return generateElement(values[0], values[1]);
-		
-	}
-	
 	/* (non-Javadoc)
 	 * @see edu.biu.scapi.primitives.dlog.DlogGroup#generateElement(boolean, edu.biu.scapi.primitives.dlog.GroupElementSendableData)
 	 * @deprecated

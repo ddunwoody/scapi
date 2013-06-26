@@ -36,13 +36,12 @@ import java.math.BigInteger;
  */
 public interface DlogEllipticCurve extends DlogGroup {
 
+	
 	/**
-	 * Creates a point with the given x,y values 
-	 * @param x
-	 * @param y
-	 * @return the created ECPoint (x,y)
+	 *@deprecated
 	 */
-	public ECElement generateElement(BigInteger x, BigInteger y) throws IllegalArgumentException;
+	@Deprecated public ECElement generateElement(BigInteger x, BigInteger y) throws IllegalArgumentException;
+	
 	
 	/**
 	 * 

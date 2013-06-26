@@ -240,11 +240,9 @@ public class MiraclDlogECFp extends MiraclAdapterDlogEC implements DlogECFp, DDH
 
 	
 	/**
-	 * Creates a point in the Fp field with the given parameters
-	 * 
-	 * @return the created point
+	 *@deprecated
 	 */
-	public ECElement generateElement(BigInteger x, BigInteger y) throws IllegalArgumentException{
+	@Deprecated public ECElement generateElement(BigInteger x, BigInteger y) throws IllegalArgumentException{
 		//Creates element with the given values.
 		ECFpPointMiracl point =  new ECFpPointMiracl(x, y, this);
 		
@@ -258,6 +256,26 @@ public class MiraclDlogECFp extends MiraclAdapterDlogEC implements DlogECFp, DDH
 		}
 		
 		return point;
+	}
+	
+	
+	/**
+	 * This function generates a Group Element on this curve given the (x,y) values, if and only if the values are valid. Meaning that 
+	 * this function always checks validity since the actual creation of the point is performed by Miracl's native code and  
+	 * in the case of Miracle the validity of the (x, y) values is always checked. Therefore, even if this function is called
+	 * with bCheckMembership set to FALSE the validity check is performed.
+	 * @param bCheckMembership disregard this parameter, this function ALWAYS checks membership
+	 * @param values x and y coordinates of the requested point
+	 * @throws IllegalArgumentException if the number of elements of the values parameter is not 2 and/or
+	 * 								   if (x,y) do not represent a valid point on the curve 	
+	 * @see edu.biu.scapi.primitives.dlog.DlogGroup#generateElement(boolean, java.math.BigInteger[])
+	 */
+	@Override
+	public GroupElement generateElement(boolean bCheckMembership, BigInteger... values) throws IllegalArgumentException {
+		if(values.length != 2){
+			throw new IllegalArgumentException("To generate an ECElement you should pass the x and y coordinates of the point");
+		}
+		return new ECFpPointMiracl(values[0], values[1], this);
 	}
 
 	/**
@@ -310,13 +328,16 @@ public class MiraclDlogECFp extends MiraclAdapterDlogEC implements DlogECFp, DDH
 	 * 
 	 * @param binaryString the byte array to convert
 	 * @throws IndexOutOfBoundsException if the length of the binary array to encode is longer than k
-	 * @return the created group Element
+	 * @return the created group Element or null if could not find the encoding in reasonable time
 	 */
 	public GroupElement encodeByteArrayToGroupElement(byte[] binaryString) {
 		//The actual work is implemented in ECFpUtility since it is independent of the underlying library (BC, Miracl, or other)
 		//If we ever decide to change the implementation there will only be one place to change it.
 		ECFpUtility.FpPoint fpPoint = util.findPointRepresentedByByteArray((ECFpGroupParams) groupParams, binaryString, k); 
-		ECElement element = generateElement(fpPoint.getX(), fpPoint.getY());
+		if (fpPoint == null)
+			return null;
+		//When generating an element for an encoding always check that the (x,y) coordinates represent a point on the curve.
+		ECElement element = (ECElement) generateElement(true, fpPoint.getX(), fpPoint.getY());
 		return element;
 	}
 	

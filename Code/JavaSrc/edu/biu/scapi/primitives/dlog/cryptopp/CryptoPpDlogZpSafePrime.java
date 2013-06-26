@@ -321,15 +321,14 @@ public class CryptoPpDlogZpSafePrime extends DlogGroupAbs implements DlogZpSafeP
 	}
 
 	/**
-	 * Creates a Zp element with the given parameter
-	 * 
-	 * @return the created element
+	 * @deprecated
 	 */
-	public ZpElement generateElement(Boolean bCheckMembership, BigInteger x) {
+	
+	@Deprecated public ZpElement generateElement(Boolean bCheckMembership, BigInteger x) {
 
 		return new ZpSafePrimeElementCryptoPp(x, ((ZpGroupParams) groupParams).getP(), bCheckMembership);
 	}
-
+	
 	
 	/* (non-Javadoc)
 	 * @see edu.biu.scapi.primitives.dlog.DlogGroup#generateElement(boolean, java.math.BigInteger[])
@@ -339,7 +338,8 @@ public class CryptoPpDlogZpSafePrime extends DlogGroupAbs implements DlogZpSafeP
 		if(values.length != 1){
 			throw new IllegalArgumentException("To generate an ZpElement you should pass the x value of the point");
 		}
-		return generateElement(bCheckMembership, values[0] );
+				
+		return new ZpSafePrimeElementCryptoPp(values[0], ((ZpGroupParams) groupParams).getP(), bCheckMembership);
 		
 	}
 	

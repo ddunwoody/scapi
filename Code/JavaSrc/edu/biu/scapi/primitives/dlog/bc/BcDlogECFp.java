@@ -102,8 +102,10 @@ public class BcDlogECFp extends BcAdapterDlogEC implements DlogECFp, DDH {
 		ECFpGroupParams fpParams = (ECFpGroupParams)params;
 		// create the ECCurve
 		curve = new ECCurve.Fp(fpParams.getP(), fpParams.getA(), fpParams.getB());
-				
-		generator = new ECFpPointBc(fpParams.getXg(), fpParams.getYg(), this);
+
+		//Create the generator
+		//Assume that (x,y) are the coordinates of a point that is indeed a generator but check that (x,y) are the coordinates of a point.
+		generator = new ECFpPointBc(fpParams.getXg(), fpParams.getYg(), this, true);
 	}
 	
 	
@@ -148,13 +150,11 @@ public class BcDlogECFp extends BcAdapterDlogEC implements DlogECFp, DDH {
 	}
 	
 	/**
-	 * Creates a point over Fp field.
-	 * 
-	 * @return the created point
+	 * @deprecated
 	 */
-	public ECElement generateElement(BigInteger x, BigInteger y) throws IllegalArgumentException{
+	@Deprecated public ECElement generateElement(BigInteger x, BigInteger y) throws IllegalArgumentException{
 		//Creates element with the given values.
-		ECFpPointBc point =  new ECFpPointBc(x, y, this);
+		ECFpPointBc point =  new ECFpPointBc(x, y, this, true);
 		
 		//if the element was created, it is a point on the curve.
 		//checks if the point is in the sub-group, too.
@@ -167,6 +167,33 @@ public class BcDlogECFp extends BcAdapterDlogEC implements DlogECFp, DDH {
 		
 		return point;
 	}
+	
+	
+	
+	/* (non-Javadoc)
+	 * @see edu.biu.scapi.primitives.dlog.DlogGroup#generateElement(boolean, java.math.BigInteger[])
+	 */
+	@Override
+	public GroupElement generateElement(boolean bCheckMembership, BigInteger... values) throws IllegalArgumentException {
+		if(values.length != 2){
+			throw new IllegalArgumentException("To generate an ECElement you should pass the x and y coordinates of the point");
+		}
+		//Creates element with the given values.
+		ECFpPointBc point =  new ECFpPointBc(values[0], values[1], this, bCheckMembership);
+		
+		if(bCheckMembership) {
+			//if the element was created, it is a point on the curve.
+			//checks if the point is in the sub-group, too.
+			boolean valid = util.checkSubGroupMembership(this, point);
+			
+			//if the point is not in the sub-group, throw exception.
+			if (valid == false){
+				throw new IllegalArgumentException("Could not generate the element. The given (x, y) is not a point in this Dlog group");
+			}
+		}
+		return point;
+	}
+	
 	
 	/**
 	 * Creates ECPoint.Fp with the given parameters
@@ -203,11 +230,14 @@ public class BcDlogECFp extends BcAdapterDlogEC implements DlogECFp, DDH {
 	 * 
 	 * @param binaryString the byte array to convert
 	 * @throws IndexOutOfBoundsException if the length of the binary array to encode is longer than k
-	 * @return the created group Element
+	 * @return the created group Element or null if could not find the encoding in reasonable time
 	 */
 	public GroupElement encodeByteArrayToGroupElement(byte[] binaryString) {
 		ECFpUtility.FpPoint fpPoint = util.findPointRepresentedByByteArray((ECFpGroupParams) groupParams, binaryString, k); 
-		ECElement element = generateElement(fpPoint.getX(), fpPoint.getY());
+		if (fpPoint == null)
+			return null;
+		//When generating an element for an encoding always check that the (x,y) coordinates represent a point on the curve.
+		ECElement element = (ECElement) generateElement(true, fpPoint.getX(), fpPoint.getY());
 		return element;
 	}
 	

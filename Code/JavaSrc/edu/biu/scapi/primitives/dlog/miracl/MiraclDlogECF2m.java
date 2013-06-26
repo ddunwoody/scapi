@@ -285,11 +285,9 @@ public class MiraclDlogECF2m extends MiraclAdapterDlogEC implements DlogECF2m, D
 
 	
 	/**
-	 * Creates a point in the F2m field with the given parameters
-	 * 
-	 * @return the element
+	 * @deprecated
 	 */
-	public ECElement generateElement(BigInteger x, BigInteger y) throws IllegalArgumentException{
+	@Deprecated public ECElement generateElement(BigInteger x, BigInteger y) throws IllegalArgumentException{
 		//Creates element with the given values.
 		ECF2mPointMiracl point =  new ECF2mPointMiracl(x, y, this);
 
@@ -304,7 +302,28 @@ public class MiraclDlogECF2m extends MiraclAdapterDlogEC implements DlogECF2m, D
 
 		return point;
 	}
+	
 
+	
+	/**
+	 * This function generates a Group Element on this curve given the (x,y) values, if and only if the values are valid. Meaning that 
+	 * this function always checks validity since the actual creation of the point is performed by Miracl's native code and  
+	 * in the case of Miracle the validity of the (x, y) values is always checked. Therefore, even if this function is called
+	 * with bCheckMembership set to FALSE the validity check is performed.
+	 * @param bCheckMembership disregard this parameter, this function ALWAYS checks membership
+	 * @param values x and y coordinates of the requested point
+	 * @throws IllegalArgumentException if the number of elements of the values parameter is not 2 and/or
+	 * 								   if (x,y) do not represent a valid point on the curve 	
+	 * @see edu.biu.scapi.primitives.dlog.DlogGroup#generateElement(boolean, java.math.BigInteger[])
+	 */
+	@Override
+	public GroupElement generateElement(boolean bCheckMembership, BigInteger... values) throws IllegalArgumentException {
+		if(values.length != 2){
+			throw new IllegalArgumentException("To generate an ECElement you should pass the x and y coordinates of the point");
+		}
+		return new ECF2mPointMiracl(values[0], values[1], this);
+	}
+	
 	/**
 	 * Check if the given element is member of this Dlog group
 	 * @param element
@@ -464,6 +483,7 @@ public class MiraclDlogECF2m extends MiraclAdapterDlogEC implements DlogECF2m, D
 		// build a ECF2mPointMiracl element from the result value
 		return new ECF2mPointMiracl(result, this);
 	}
+	
 	
 	
 }

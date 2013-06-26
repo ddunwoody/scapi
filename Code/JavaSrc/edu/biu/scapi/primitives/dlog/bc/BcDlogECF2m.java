@@ -110,9 +110,9 @@ public class BcDlogECF2m extends BcAdapterDlogEC implements DlogECF2m, DDH{
 			y = pentaParams.getYg();
 		}
 		
-		// create the generator
-		// here we assume that (x,y) are the coordinates of a point that is indeed a generator
-		generator = new ECF2mPointBc(x, y, this);
+		//Create the generator
+		//Assume that (x,y) are the coordinates of a point that is indeed a generator but check that (x,y) are the coordinates of a point.
+		generator = new ECF2mPointBc(x, y, this, true);
 	}
 	
 	/**
@@ -157,12 +157,11 @@ public class BcDlogECF2m extends BcAdapterDlogEC implements DlogECF2m, DDH{
 	}
 	
 	/**
-	 * Creates a point over F2m field with the given parameters
-	 * @return the created point
+	 * @deprecated 
 	 */
-	public ECElement generateElement(BigInteger x, BigInteger y) throws IllegalArgumentException{
+	@Deprecated public ECElement generateElement(BigInteger x, BigInteger y) throws IllegalArgumentException{
 		//Creates element with the given values.
-		ECF2mPointBc point =  new ECF2mPointBc(x, y, this);
+		ECF2mPointBc point =  new ECF2mPointBc(x, y, this,true);
 		
 		//if the element was created, it is a point on the curve.
 		//checks if the point is in the sub-group, too.
@@ -175,7 +174,33 @@ public class BcDlogECF2m extends BcAdapterDlogEC implements DlogECF2m, DDH{
 		
 		return point;
 	}
+	
+	
 
+	/* (non-Javadoc)
+	 * @see edu.biu.scapi.primitives.dlog.DlogGroup#generateElement(boolean, java.math.BigInteger[])
+	 */
+	@Override
+	public GroupElement generateElement(boolean bCheckMembership, BigInteger... values) throws IllegalArgumentException {
+		if(values.length != 2){
+			throw new IllegalArgumentException("To generate an ECElement you should pass the x and y coordinates of the point");
+		}
+		//Creates element with the given values.
+		ECF2mPointBc point =  new ECF2mPointBc(values[0], values[1], this, bCheckMembership);
+
+		if(bCheckMembership){
+			//if the element was created, it is a point on the curve.
+			//checks if the point is in the sub-group, too.
+			boolean valid = util.checkSubGroupMembership(this, point);
+	
+			//if the point is not in the sub-group, throw exception.
+			if (valid == false){
+				throw new IllegalArgumentException("Could not generate the element. The given (x, y) is not a point in this Dlog group");
+			}
+		}
+		return point;
+	}
+	
 		
 	/**
 	 * Creates ECPoint.F2m with the given parameters
