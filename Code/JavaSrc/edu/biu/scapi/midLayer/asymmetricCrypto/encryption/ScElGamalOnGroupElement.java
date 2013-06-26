@@ -36,6 +36,7 @@ import java.security.SecureRandom;
 import org.bouncycastle.util.BigIntegers;
 
 import edu.biu.scapi.exceptions.FactoriesException;
+import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.DamgardJurikPrivateKey;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ElGamalPrivateKey;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.KeySendableData;
@@ -69,8 +70,11 @@ public class ScElGamalOnGroupElement extends ElGamalAbs implements AsymMultiplic
 	
 	/**
 	 * Default constructor. Uses the default implementations of DlogGroup, CryptographicHash and SecureRandom.
+	 * @throws SecurityLevelException theoretically it might be thrown if the Dlog Group did not meet the required Security level. 
+	 * 								  Practically, it does not get thrown since SCAPI chooses elements that comply with the Security Level required.
+	 * @throws IllegalArgumentException 
 	 */
-	public ScElGamalOnGroupElement(){
+	public ScElGamalOnGroupElement() throws IllegalArgumentException, SecurityLevelException{
 		super();
 	}
 
@@ -78,18 +82,19 @@ public class ScElGamalOnGroupElement extends ElGamalAbs implements AsymMultiplic
 	 * Constructor that gets a DlogGroup and sets it to the underlying group.
 	 * It lets SCAPI choose and source of randomness.
 	 * @param dlogGroup must be DDH secure.
+	 * @throws SecurityLevelException 
 	 * @throws IllegalArgumentException if the given dlog group does not have DDH security level.
 	 */
-	public ScElGamalOnGroupElement(DlogGroup dlogGroup) {
+	public ScElGamalOnGroupElement(DlogGroup dlogGroup) throws SecurityLevelException {
 		super(dlogGroup, new SecureRandom());
 	}
 	/**
 	 * Constructor that gets a DlogGroup and source of randomness.
 	 * @param dlogGroup must be DDH secure.
 	 * @param random source of randomness.
-	 * @throws IllegalArgumentException if the given dlog group does not have DDH security level.
+	 * @throws SecurityLevelException if the given dlog group does not have DDH security level.
 	 */
-	public ScElGamalOnGroupElement(DlogGroup dlogGroup, SecureRandom random) {
+	public ScElGamalOnGroupElement(DlogGroup dlogGroup, SecureRandom random) throws SecurityLevelException {
 		super(dlogGroup, random);
 	}
 	
@@ -98,9 +103,9 @@ public class ScElGamalOnGroupElement extends ElGamalAbs implements AsymMultiplic
 	 * Uses default implementation of SecureRandom.
 	 * @param dlogName must be DDH secure.
 	 * @throws FactoriesException if the creation of the dlog failed.
-	 * @throws IllegalArgumentException if the given dlog group does not have DDH security level. 
+	 * @throws SecurityLevelException if the given dlog group does not have DDH security level. 
 	 */
-	public ScElGamalOnGroupElement(String dlogName) throws FactoriesException{
+	public ScElGamalOnGroupElement(String dlogName) throws FactoriesException, SecurityLevelException{
 		super(dlogName);
 	}
 	
@@ -110,9 +115,9 @@ public class ScElGamalOnGroupElement extends ElGamalAbs implements AsymMultiplic
 	 * @param dlogName must be DDH secure.
 	 * @throws FactoriesException if the creation of the dlog failed.
 	 * @throws NoSuchAlgorithmException if the given random number generator is not supported.
-	 * @throws IllegalArgumentException if the given dlog group does not have DDH security level.
+	 * @throws SecurityLevelException if the given dlog group does not have DDH security level.
 	 */
-	public ScElGamalOnGroupElement(String dlogName, String randNumGenAlg) throws FactoriesException, NoSuchAlgorithmException{
+	public ScElGamalOnGroupElement(String dlogName, String randNumGenAlg) throws FactoriesException, NoSuchAlgorithmException, SecurityLevelException{
 		super(dlogName, randNumGenAlg);
 	}
 	

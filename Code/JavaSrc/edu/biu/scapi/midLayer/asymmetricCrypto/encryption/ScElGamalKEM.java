@@ -35,6 +35,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.exceptions.NoMaxException;
+import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ElGamalPrivateKey;
 import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertext;
 import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertextSendableData;
@@ -70,8 +71,11 @@ public class ScElGamalKEM extends ElGamalAbs{
 	
 	/**
 	 * Default constructor. Uses the default implementations of DlogGroup, KDF, SymmetricEncryption and SecureRandom.
+	 * @throws SecurityLevelException theoretically it might be thrown if the Dlog Group and Encryption scheme chosen did not meet their respective requird Security level. 
+	 * 								  Practically, it does not get thrown since SCAPI chooses elements that comply with the Security Level required.
+	 * @throws IllegalArgumentException 
 	 */
-	public ScElGamalKEM(){
+	public ScElGamalKEM() throws IllegalArgumentException, SecurityLevelException{
 		super();
 		//Creates a default implementation of KDF and SymmetricEncryption.
 		setMembers(new HKDF(new BcHMAC()), new ScCTREncRandomIV(new BcAES()), 128);
@@ -82,12 +86,13 @@ public class ScElGamalKEM extends ElGamalAbs{
 	 * @param kdf
 	 * @param encryption MUST be CPA-secure.
 	 * @param symKeySize Size of the key to set the given symmetric encryption, in BITS.
+	 * @throws SecurityLevelException if encryption is not CPA-secure
 	 * @throws IllegalArgumentException if the given encryption is not CPA-secure.
 	 */
-	private void setMembers(KeyDerivationFunction kdf, SymmetricEnc encryption, int symKeySize){
+	private void setMembers(KeyDerivationFunction kdf, SymmetricEnc encryption, int symKeySize) throws SecurityLevelException{
 		//The underlying symmetric encryption should be CPA-secure.
 		if (!(encryption instanceof Cpa)){
-			throw new IllegalArgumentException("Symmetric encryption should have CPA security level"); 
+			throw new SecurityLevelException("Symmetric encryption should have CPA security level"); 
 		}
 		symEncryptor = encryption; 
 		this.kdf = kdf;
@@ -96,15 +101,15 @@ public class ScElGamalKEM extends ElGamalAbs{
 	
 	/**
 	 * Constructor that gets a DlogGroup, KDF and symmetric encryption and sets them.
-	 * It lets SCAPI choose and source of randomness.
+	 * It lets SCAPI choose the source of randomness.
 	 * @param dlogGroup must be DDH secure.
 	 * @param kdf
 	 * @param encryption MUST be CPA-secure.
 	 * @param symKeySize Size of the key to set the given symmetric encryption, in BITS.
-	 * @throws IllegalArgumentException if the given dlog group does not have DDH security level.
-	 * @throws IllegalArgumentException if the given encryption is not CPA-secure.
+	 * @throws SecurityLevelException if the given dlog group does not have DDH security level.
+	 * @throws SecurityLevelException if the given encryption is not CPA-secure.
 	 */
-	public ScElGamalKEM(DlogGroup dlogGroup, KeyDerivationFunction kdf, SymmetricEnc encryption, int symKeySize) {
+	public ScElGamalKEM(DlogGroup dlogGroup, KeyDerivationFunction kdf, SymmetricEnc encryption, int symKeySize) throws SecurityLevelException {
 		super(dlogGroup, new SecureRandom());
 		setMembers(kdf, encryption, symKeySize);
 	}
@@ -115,10 +120,10 @@ public class ScElGamalKEM extends ElGamalAbs{
 	 * @param kdf
 	 * @param encryption MUST be CPA-secure.
 	 * @param symKeySize Size of the key to set the given symmetric encryption, in BITS.
-	 * @throws IllegalArgumentException if the given dlog group does not have DDH security level.
-	 * @throws IllegalArgumentException if the given encryption is not CPA-secure.
+	 * @throws SecurityLevelException if the given dlog group does not have DDH security level.
+	 * @throws SecurityLevelException if the given encryption is not CPA-secure.
 	 */
-	public ScElGamalKEM(DlogGroup dlogGroup, KeyDerivationFunction kdf, SymmetricEnc encryption, int symKeySize, SecureRandom random) {
+	public ScElGamalKEM(DlogGroup dlogGroup, KeyDerivationFunction kdf, SymmetricEnc encryption, int symKeySize, SecureRandom random) throws SecurityLevelException {
 		super(dlogGroup, random);
 		//Sets the given KDF and symmetric encryption.
 		setMembers(kdf, encryption, symKeySize);
@@ -134,10 +139,10 @@ public class ScElGamalKEM extends ElGamalAbs{
 	 * @param encryption MUST be CPA-secure.
 	 * @param symKeySize Size of the key to set the given symmetric encryption, in BITS.
 	 * @throws FactoriesException if the creation of the dlog failed.
-	 * @throws IllegalArgumentException if the given dlog group does not have DDH security level.
-	 * @throws IllegalArgumentException if the given encryption is not CPA-secure.
+	 * @throws SecurityLevelException if the given dlog group does not have DDH security level.
+	 * @throws SecurityLevelException if the given encryption is not CPA-secure.
 	 */
-	public ScElGamalKEM(String dlogName, String kdfName, SymmetricEnc encryption, int symKeySize) throws FactoriesException{
+	public ScElGamalKEM(String dlogName, String kdfName, SymmetricEnc encryption, int symKeySize) throws FactoriesException, SecurityLevelException{
 		super(dlogName);
 		//Sets the given KDF and symmetric encryption.
 		setMembers(KdfFactory.getInstance().getObject(kdfName), encryption, symKeySize);
@@ -148,17 +153,17 @@ public class ScElGamalKEM extends ElGamalAbs{
 	 * Constructor that gets a DlogGroup name, kdf name and random number generator to use.
 	 * The constructor also gets the underlying SymmetricEncryption to use. 
 	 * It does not get the name of the encryption since there is no factory for the Symmetric encryption so it cannot be created by name.
-	 * @param dlogName must be DDH secure.
+	 * @param dlogName must be DDH-secure.
 	 * @param kdfName
 	 * @param encryption MUST be CPA-secure.
 	 * @param symKeySize Size of the key to set the given symmetric encryption, in BITS.
 	 * @param randNumGenAlg
 	 * @throws FactoriesException if the creation of the dlog failed.
 	 * @throws NoSuchAlgorithmException if the given random number generator is not supported.
-	 * @throws IllegalArgumentException if the given dlog group does not have DDH security level.
-	 * @throws IllegalArgumentException if the given encryption is not CPA-secure.
+	 * @throws SecurityLevelException if the given dlog group does not have DDH security level.
+	 * @throws SecurityLevelException if the given encryption is not CPA-secure.
 	 */
-	public ScElGamalKEM(String dlogName, String kdfName, SymmetricEnc encryption, int symKeySize, String randNumGenAlg) throws FactoriesException, NoSuchAlgorithmException{
+	public ScElGamalKEM(String dlogName, String kdfName, SymmetricEnc encryption, int symKeySize, String randNumGenAlg) throws FactoriesException, NoSuchAlgorithmException, SecurityLevelException{
 		super(dlogName, randNumGenAlg);
 		//Sets the given KDF and symmetric encryption.
 		setMembers(KdfFactory.getInstance().getObject(kdfName), encryption, symKeySize);

@@ -40,6 +40,7 @@ import org.bouncycastle.util.BigIntegers;
 
 import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.exceptions.ScapiRuntimeException;
+import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.CramerShoupPrivateKey;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.CramerShoupPublicKey;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.KeySendableData;
@@ -69,9 +70,11 @@ public abstract class CramerShoupAbs implements CramerShoupDDHEnc{
 	
 	/**
 	 * Default constructor. It uses a default Dlog group and CryptographicHash.
+	 * @throws SecurityLevelException theoretically it might be thrown if the Dlog Group and CryptographicHash chosen did not meet their respective required Security level. 
+	 * 								  Practically, it does not get thrown since SCAPI chooses default elements that comply with the Security Level required. 
 	 * @throws IllegalArgumentException if the given dlog group does not have DDH security level.
 	 */
-	public CramerShoupAbs() {
+	public CramerShoupAbs() throws SecurityLevelException {
 		this(new CryptoPpDlogZpSafePrime("1024"), new CryptoPpSHA1(), new SecureRandom());
 	}
 
@@ -79,9 +82,10 @@ public abstract class CramerShoupAbs implements CramerShoupDDHEnc{
 	 * Constructor that lets the user choose the underlying dlog and hash. Uses default implementation of SecureRandom as source of randomness.
 	 * @param dlogGroup underlying DlogGroup to use.
 	 * @param hash underlying hash to use.
+	 * @throws SecurityLevelException if the Dlog Group or the Hash function do not meet the required Security Level
 	 * @throws IllegalArgumentException if the given dlog group does not have DDH security level.
 	 */
-	public CramerShoupAbs(DlogGroup dlogGroup, CryptographicHash hash){
+	public CramerShoupAbs(DlogGroup dlogGroup, CryptographicHash hash) throws SecurityLevelException{
 		this(dlogGroup, hash, new SecureRandom());
 	}
 
@@ -92,17 +96,18 @@ public abstract class CramerShoupAbs implements CramerShoupDDHEnc{
 	 * @param dlogGroup underlying DlogGroup to use.
 	 * @param hash underlying hash to use.
 	 * @param random source of randomness.
+	 * @throws SecurityLevelException if the Dlog Group or the Hash function do not meet the required Security Level
 	 * @throws IllegalArgumentException if the given dlog group does not have DDH security level or if the hash function does not have CollisionResistant security level
 	 */
-	public CramerShoupAbs(DlogGroup dlogGroup, CryptographicHash hash, SecureRandom random){
+	public CramerShoupAbs(DlogGroup dlogGroup, CryptographicHash hash, SecureRandom random) throws SecurityLevelException{
 		//The Cramer-Shoup encryption scheme must work with a Dlog Group that has DDH security level
 		//and a Hash function that has CollisionResistant security level. If any of this conditions is not 
 		//met then cannot construct an object of type Cramer-Shoup encryption scheme; therefore throw exception.
 		if(!(dlogGroup instanceof DDH)){
-			throw new IllegalArgumentException("The Dlog group has to have DDH security level");
+			throw new SecurityLevelException("The Dlog group has to have DDH security level");
 		}
 		if(!(hash instanceof CollisionResistant)){
-			throw new IllegalArgumentException("The hash function has to have CollisionResistant security level");
+			throw new SecurityLevelException("The hash function has to have CollisionResistant security level");
 		}
 		// Everything is correct, then sets the member variables and creates object.
 		this.dlogGroup = dlogGroup;
@@ -116,9 +121,10 @@ public abstract class CramerShoupAbs implements CramerShoupDDHEnc{
 	 * @param dlogGroupName name of the underlying dlog group
 	 * @param hashName name of the underlying hash function
 	 * @throws FactoriesException if one of the algorithm's names is not supported
+	 * @throws SecurityLevelException if the Dlog Group or the Hash function do not meet the required Security Level
 	 * @throws IllegalArgumentException if the given dlog group does not have DDH security level.
 	 */
-	public CramerShoupAbs(String dlogGroupName, String hashName) throws FactoriesException{
+	public CramerShoupAbs(String dlogGroupName, String hashName) throws FactoriesException, SecurityLevelException{
 		// Creates a dlog group object and a cryptographic hash object with relevant factories, and then uses regular constructor.
 		this(DlogGroupFactory.getInstance().getObject(dlogGroupName), CryptographicHashFactory.getInstance().getObject(hashName));
 	}
@@ -128,9 +134,10 @@ public abstract class CramerShoupAbs implements CramerShoupDDHEnc{
 	 * @param dlogGroupName name of the underlying dlog group.
 	 * @param hashName name of the underlying hash function.
 	 * @param randNumGenAlg random number generation algorithm.
+	 * @throws SecurityLevelException if the Dlog Group or the Hash function do not meet the required Security Level
 	 * @throws IllegalArgumentException if the given dlog group does not have DDH security level.
 	 */
-	public CramerShoupAbs(String dlogGroupName, String hashName, String randNumGenAlg) throws FactoriesException, NoSuchAlgorithmException{
+	public CramerShoupAbs(String dlogGroupName, String hashName, String randNumGenAlg) throws FactoriesException, NoSuchAlgorithmException, SecurityLevelException{
 		//Creates a dlog group object and a cryptographic hash object with relevant factories.
 		//Creates a SecureRandom object that implements the specified Random Number Generator (RNG) algorithm.
 		//Then uses regular constructor.

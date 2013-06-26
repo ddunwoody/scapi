@@ -34,6 +34,7 @@ import java.security.SecureRandom;
 
 import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.exceptions.NoMaxException;
+import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.CramerShoupPrivateKey;
 import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertext;
 import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertextSendableData;
@@ -55,9 +56,11 @@ public class ScCramerShoupDDHOnByteArray extends CramerShoupAbs{
 	
 	/**
 	 * Default constructor. It uses a default Dlog group and CryptographicHash.
+	 * @throws SecurityLevelException theoretically it might be thrown if the Dlog Group and CryptographicHash chosen did not meet their respective required Security level. 
+	 * 								  Practically, it does not get thrown since SCAPI chooses elements that comply with the Security Level required. 
 	 * @throws IllegalArgumentException if the given dlog group does not have DDH security level.
 	 */
-	public ScCramerShoupDDHOnByteArray() {
+	public ScCramerShoupDDHOnByteArray() throws SecurityLevelException {
 		super();
 		//Creates a default implementation of KDF.
 		setKdf(new HKDF(new BcHMAC()));
@@ -69,11 +72,13 @@ public class ScCramerShoupDDHOnByteArray extends CramerShoupAbs{
 	
 	/**
 	 * Constructor that lets the user choose the underlying dlog and hash. Uses default implementation of SecureRandom as source of randomness.
-	 * @param dlogGroup underlying DlogGroup to use.
-	 * @param hash underlying hash to use.
+	 * 
+	 * @param dlogGroup underlying DlogGroup to use, it has to have DDH security level
+	 * @param hash underlying hash to use, has to have CollisionResistant security level
+	 * @throws SecurityLevelException if the Dlog Group or the Hash function do not meet the required Security Level
 	 * @throws IllegalArgumentException if the given dlog group does not have DDH security level.
 	 */
-	public ScCramerShoupDDHOnByteArray(DlogGroup dlogGroup, CryptographicHash hash, KeyDerivationFunction kdf){
+	public ScCramerShoupDDHOnByteArray(DlogGroup dlogGroup, CryptographicHash hash, KeyDerivationFunction kdf) throws SecurityLevelException{
 		super(dlogGroup, hash);
 		//Sets the given KDF.
 		setKdf(kdf);
@@ -81,12 +86,13 @@ public class ScCramerShoupDDHOnByteArray extends CramerShoupAbs{
 
 	/**
 	 * Constructor that lets the user choose the underlying dlog, hash and source of randomness.
-	 * @param dlogGroup underlying DlogGroup to use.
-	 * @param hash underlying hash to use.
+	 * @param dlogGroup underlying DlogGroup to use, it has to have DDH security level
+	 * @param hash underlying hash to use, has to have CollisionResistant security level
 	 * @param random source of randomness.
+	 * @throws SecurityLevelException if the Dlog Group or the Hash function do not meet the required Security Level
 	 * @throws IllegalArgumentException if the given dlog group does not have DDH security level.
 	 */
-	public ScCramerShoupDDHOnByteArray(DlogGroup dlogGroup, CryptographicHash hash, KeyDerivationFunction kdf, SecureRandom random){
+	public ScCramerShoupDDHOnByteArray(DlogGroup dlogGroup, CryptographicHash hash, KeyDerivationFunction kdf, SecureRandom random) throws SecurityLevelException{
 		super(dlogGroup, hash, random);
 		//Sets the given KDF.
 		setKdf(kdf);
@@ -94,12 +100,13 @@ public class ScCramerShoupDDHOnByteArray extends CramerShoupAbs{
 
 	/**
 	 * Constructor that lets the user choose the underlying dlog and hash. Uses default implementation of SecureRandom as source of randomness.
-	 * @param dlogGroupName name of the underlying dlog group
-	 * @param hashName name of the underlying hash function
+	 * @param dlogGroupName name of the underlying dlog group, it has to have DDH security level
+	 * @param hashName name of the underlying hash function, has to have CollisionResistant security level
 	 * @throws FactoriesException if one of the algorithm's names is not supported
+	 * @throws SecurityLevelException if the Dlog Group or the Hash function do not meet the required Security Level
 	 * @throws IllegalArgumentException if the given dlog group does not have DDH security level.
 	 */
-	public ScCramerShoupDDHOnByteArray(String dlogGroupName, String hashName, String kdfName) throws FactoriesException{
+	public ScCramerShoupDDHOnByteArray(String dlogGroupName, String hashName, String kdfName) throws FactoriesException, SecurityLevelException{
 		super(dlogGroupName, hashName);
 		//Sets the given KDF.
 		setKdf(KdfFactory.getInstance().getObject(kdfName));
@@ -107,12 +114,13 @@ public class ScCramerShoupDDHOnByteArray extends CramerShoupAbs{
 	
 	/**
 	 * Constructor that lets the user choose the underlying dlog, hash and source of randomness.
-	 * @param dlogGroupName name of the underlying dlog group.
-	 * @param hashName name of the underlying hash function.
+	 * @param dlogGroupName name of the underlying dlog group, it has to have DDH security level
+	 * @param hashName name of the underlying hash function, has to have CollisionResistant security level
 	 * @param randNumGenAlg random number generation algorithm.
+	 * @throws SecurityLevelException if the Dlog Group or the Hash function do not meet the required Security Level
 	 * @throws IllegalArgumentException if the given dlog group does not have DDH security level.
 	 */
-	public ScCramerShoupDDHOnByteArray(String dlogGroupName, String hashName, String kdfName, String randNumGenAlg) throws FactoriesException, NoSuchAlgorithmException{
+	public ScCramerShoupDDHOnByteArray(String dlogGroupName, String hashName, String kdfName, String randNumGenAlg) throws FactoriesException, NoSuchAlgorithmException, SecurityLevelException{
 		super(dlogGroupName, hashName, randNumGenAlg);
 		//Sets the given KDF.
 		setKdf(KdfFactory.getInstance().getObject(kdfName));

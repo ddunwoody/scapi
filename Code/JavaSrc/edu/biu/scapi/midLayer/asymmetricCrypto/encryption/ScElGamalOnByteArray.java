@@ -33,6 +33,7 @@ import java.security.SecureRandom;
 
 import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.exceptions.NoMaxException;
+import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ElGamalPrivateKey;
 import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertext;
 import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertextSendableData;
@@ -64,8 +65,11 @@ public class ScElGamalOnByteArray extends ElGamalAbs{
 	
 	/**
 	 * Default constructor. Uses the default implementations of DlogGroup and SecureRandom.
+	 * @throws SecurityLevelException theoretically it might be thrown if the Dlog Group did not meet the required Security level. 
+	 * 								  Practically, it does not get thrown since SCAPI chooses elements that comply with the Security Level required.
+	 * @throws IllegalArgumentException 
 	 */
-	public ScElGamalOnByteArray(){
+	public ScElGamalOnByteArray() throws IllegalArgumentException, SecurityLevelException{
 		super();
 		//Creates a default implementation of KDF.
 		setKdf(new HKDF(new BcHMAC()));
@@ -79,9 +83,9 @@ public class ScElGamalOnByteArray extends ElGamalAbs{
 	 * Constructor that gets a DlogGroup and sets it to the underlying group.
 	 * It lets SCAPI choose and source of randomness.
 	 * @param dlogGroup must be DDH secure.
-	 * @throws IllegalArgumentException if the given dlog group does not have DDH security level.
+	 * @throws SecurityLevelException if the given dlog group does not have DDH security level.
 	 */
-	public ScElGamalOnByteArray(DlogGroup dlogGroup, KeyDerivationFunction kdf) {
+	public ScElGamalOnByteArray(DlogGroup dlogGroup, KeyDerivationFunction kdf) throws SecurityLevelException {
 		super(dlogGroup, new SecureRandom());
 		setKdf(kdf);
 	}
@@ -89,9 +93,9 @@ public class ScElGamalOnByteArray extends ElGamalAbs{
 	 * Constructor that gets a DlogGroup and source of randomness.
 	 * @param dlogGroup must be DDH secure.
 	 * @param random source of randomness.
-	 * @throws IllegalArgumentException if the given dlog group does not have DDH security level.
+	 * @throws SecurityLevelException if the given dlog group does not have DDH security level.
 	 */
-	public ScElGamalOnByteArray(DlogGroup dlogGroup, KeyDerivationFunction kdf, SecureRandom random) {
+	public ScElGamalOnByteArray(DlogGroup dlogGroup, KeyDerivationFunction kdf, SecureRandom random) throws SecurityLevelException {
 		super(dlogGroup, random);
 		//Sets the given KDF.
 		setKdf(kdf);
@@ -101,10 +105,10 @@ public class ScElGamalOnByteArray extends ElGamalAbs{
 	 * Constructor that gets a DlogGroup name to create and sets it to the underlying group.
 	 * Uses default implementation of SecureRandom.
 	 * @param dlogName must be DDH secure.
-	 * @throws FactoriesException if the creation of the dlog failed.
-	 * @throws IllegalArgumentException if the given dlog group does not have DDH security level. 
+	 * @throws FactoriesException if the creation of the dlog failed. 
+	 * @throws SecurityLevelException if the given dlog group does not have DDH security level. 
 	 */
-	public ScElGamalOnByteArray(String dlogName, String kdfName) throws FactoriesException{
+	public ScElGamalOnByteArray(String dlogName, String kdfName) throws FactoriesException, SecurityLevelException{
 		super(dlogName);
 		//Sets the given KDF.
 		setKdf(KdfFactory.getInstance().getObject(kdfName));
@@ -116,9 +120,9 @@ public class ScElGamalOnByteArray extends ElGamalAbs{
 	 * @param dlogName must be DDH secure.
 	 * @throws FactoriesException if the creation of the dlog failed.
 	 * @throws NoSuchAlgorithmException if the given random number generator is not supported.
-	 * @throws IllegalArgumentException if the given dlog group does not have DDH security level.
+	 * @throws SecurityLevelException if the given dlog group does not have DDH security level.
 	 */
-	public ScElGamalOnByteArray(String dlogName, String kdfName, String randNumGenAlg) throws FactoriesException, NoSuchAlgorithmException{
+	public ScElGamalOnByteArray(String dlogName, String kdfName, String randNumGenAlg) throws FactoriesException, NoSuchAlgorithmException, SecurityLevelException{
 		super(dlogName, randNumGenAlg);
 		//Sets the given KDF.
 		setKdf(KdfFactory.getInstance().getObject(kdfName));

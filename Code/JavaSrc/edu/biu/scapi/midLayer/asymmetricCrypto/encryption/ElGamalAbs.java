@@ -40,6 +40,7 @@ import java.security.spec.InvalidParameterSpecException;
 import org.bouncycastle.util.BigIntegers;
 
 import edu.biu.scapi.exceptions.FactoriesException;
+import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ElGamalPrivateKey;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ElGamalPublicKey;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.KeySendableData;
@@ -73,8 +74,11 @@ public abstract class ElGamalAbs implements ElGamalEnc{
 	
 	/**
 	 * Default constructor. Uses the default implementations of DlogGroup, CryptographicHash and SecureRandom.
+	 * @throws SecurityLevelException theoretically it might be thrown if the Dlog Group chosen did not meet the required Security level. 
+	 * 								  Practically, it does not get thrown since SCAPI chooses default elements that comply with the Security Level required. 
+	 * @throws IllegalArgumentException 
 	 */
-	public ElGamalAbs(){
+	public ElGamalAbs() throws IllegalArgumentException, SecurityLevelException{
 		
 		try {
 			createMembers(new MiraclDlogECFp("P-192"), new SecureRandom());
@@ -86,10 +90,11 @@ public abstract class ElGamalAbs implements ElGamalEnc{
 	/**
 	 * Constructor that gets a DlogGroup and sets it to the underlying group.
 	 * It lets SCAPI choose and source of randomness.
-	 * @param dlogGroup must be DDH secure.
+	 * @param dlogGroup underlying DlogGroup to use, it has to have DDH security level
+	 * @throws SecurityLevelException if the Dlog Group is not DDH secure
 	 * @throws IllegalArgumentException if the given dlog group does not have DDH security level.
 	 */
-	public ElGamalAbs(DlogGroup dlogGroup) {
+	public ElGamalAbs(DlogGroup dlogGroup) throws SecurityLevelException {
 		this(dlogGroup, new SecureRandom());
 	}
 	
@@ -97,16 +102,17 @@ public abstract class ElGamalAbs implements ElGamalEnc{
 	 * Constructor that gets a DlogGroup and source of randomness.
 	 * @param dlogGroup must be DDH secure.
 	 * @param random source of randomness.
+	 * @throws SecurityLevelException  if the Dlog Group is not DDH secure
 	 * @throws IllegalArgumentException if the given dlog group does not have DDH security level.
 	 */
-	public ElGamalAbs(DlogGroup dlogGroup, SecureRandom random) {
+	public ElGamalAbs(DlogGroup dlogGroup, SecureRandom random) throws SecurityLevelException {
 		createMembers(dlogGroup, random);
 	}
 	
-	private void createMembers(DlogGroup dlogGroup, SecureRandom random){
+	private void createMembers(DlogGroup dlogGroup, SecureRandom random) throws SecurityLevelException{
 		//The underlying dlog group must be DDH secure.
 		if (!(dlogGroup instanceof DDH)){
-			throw new IllegalArgumentException("DlogGroup should have DDH security level");
+			throw new SecurityLevelException("DlogGroup should have DDH security level");
 		}
 		dlog = dlogGroup;
 		qMinusOne = dlog.getOrder().subtract(BigInteger.ONE);
@@ -118,9 +124,10 @@ public abstract class ElGamalAbs implements ElGamalEnc{
 	 * Uses default implementation of SecureRandom.
 	 * @param dlogName must be DDH secure.
 	 * @throws FactoriesException if the creation of the dlog failed.
+	 * @throws SecurityLevelException  if the Dlog Group is not DDH secure
 	 * @throws IllegalArgumentException if the given dlog group does not have DDH security level. 
 	 */
-	public ElGamalAbs(String dlogName) throws FactoriesException{
+	public ElGamalAbs(String dlogName) throws FactoriesException, SecurityLevelException{
 		//Create a dlog group object with relevant factory, and then use regular constructor.
 		this(DlogGroupFactory.getInstance().getObject(dlogName));
 	}
@@ -131,9 +138,10 @@ public abstract class ElGamalAbs implements ElGamalEnc{
 	 * @param dlogName must be DDH secure.
 	 * @throws FactoriesException if the creation of the dlog failed.
 	 * @throws NoSuchAlgorithmException if the given random number generator is not supported.
+	 * @throws SecurityLevelException  if the Dlog Group is not DDH secure
 	 * @throws IllegalArgumentException if the given dlog group does not have DDH security level.
 	 */
-	public ElGamalAbs(String dlogName, String randNumGenAlg) throws FactoriesException, NoSuchAlgorithmException{
+	public ElGamalAbs(String dlogName, String randNumGenAlg) throws FactoriesException, NoSuchAlgorithmException, SecurityLevelException{
 		//Creates a dlog group object with relevant factory.
 		//Creates a SecureRandom object that implements the specified Random Number Generator (RNG) algorithm.
 		//Then use regular constructor.
