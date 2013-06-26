@@ -47,10 +47,15 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_miracl_ECF2mPointMira
 	  big x = byteArrayToMiraclBig(env, mip, xVal);
 	  big y = byteArrayToMiraclBig(env, mip, yVal);
 
-	  epoint2_set(mip, x, y, 0, p);
-	  
+	  bool valid = epoint2_set(mip, x, y, 0, p);
+
 	  mirkill(x);
 	  mirkill(y);
+
+	  if (!valid) {
+		 epoint_free(p);
+		 return 0;
+	  }
 	  return (jlong) p; // return the point
 }
 
