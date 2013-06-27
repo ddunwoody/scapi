@@ -41,6 +41,11 @@ public interface DamgardJurikPrivateKey extends PrivateKey {
 	BigInteger getT();
 
 	BigInteger getDForS1();
+	
+	BigInteger getP();
+	
+	BigInteger getQ();
+	
 	/**
 	 * This function is used when a Damgard Jurik Private Key needs to be sent via a {@link edu.biu.scapi.comm.Channel} or any other means of sending data (including serialization).
 	 * It retrieves all the data needed to reconstruct this Private Key at a later time and/or in a different VM.

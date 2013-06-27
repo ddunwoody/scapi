@@ -30,6 +30,10 @@
 package edu.biu.scapi.midLayer.asymmetricCrypto.keys;
 
 import java.math.BigInteger;
+import java.util.Vector;
+
+import edu.biu.scapi.primitives.trapdoorPermutation.RSAModulus;
+import edu.biu.scapi.tools.math.MathAlgorithms;
 
 /**
  * This class represents a Private Key suitable for the Damgard-Jurik Encryption Scheme. Although the constructor is  public, it should only be instantiated by the 
@@ -43,11 +47,38 @@ public class ScDamgardJurikPrivateKey implements DamgardJurikPrivateKey, KeySend
 	
 	BigInteger t;
 	BigInteger dForS1; //Pre-calculated d in the case the s == 1
+	private BigInteger p;
+	private BigInteger q;
 	
-	public ScDamgardJurikPrivateKey(BigInteger t, BigInteger d){
-		this.t = t;
-		this.dForS1 = d;
+	public ScDamgardJurikPrivateKey(RSAModulus rsaMod){
+		
+		this.p = rsaMod.p;
+		this.q = rsaMod.q;
+		
+		//Computes t = lcm(p-1, q-1) where lcm is the least common multiple and can be computed as lcm(a,b) = a*b/gcd(a,b).
+		BigInteger pMinus1 = rsaMod.p.subtract(BigInteger.ONE);
+		BigInteger qMinus1 = rsaMod.q.subtract(BigInteger.ONE);
+		BigInteger gcdPMinus1QMinus1 = pMinus1.gcd(qMinus1);
+		t = (pMinus1.multiply(qMinus1)).divide(gcdPMinus1QMinus1);
+		
+		//Precalculate d for the case that s == 1
+		dForS1 = generateD(rsaMod.n, t); 
 	}
+	
+	/**
+	 * This function generates a value d such that d = 1 mod N and d = 0 mod t, using the Chinese Remainder Theorem.
+	 */
+	private BigInteger generateD(BigInteger N, BigInteger t){
+		Vector<BigInteger> congruences = new Vector<BigInteger>();
+		congruences.add(BigInteger.ONE);
+		congruences.add(BigInteger.ZERO);
+		Vector<BigInteger> moduli = new Vector<BigInteger>();
+		moduli.add(N);
+		moduli.add(t);
+		BigInteger d = MathAlgorithms.chineseRemainderTheorem(congruences, moduli);
+		return d;
+	}
+	
 	/* (non-Javadoc)
 	 * @see java.security.Key#getAlgorithm()
 	 */
@@ -84,6 +115,14 @@ public class ScDamgardJurikPrivateKey implements DamgardJurikPrivateKey, KeySend
 	
 	public BigInteger getDForS1(){
 		return dForS1;
+	}
+	
+	public BigInteger getP(){
+		return p;
+	}
+	
+	public BigInteger getQ(){
+		return q;
 	}
 
 	/** 
