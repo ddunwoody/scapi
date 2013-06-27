@@ -72,9 +72,8 @@ public class ScElGamalOnGroupElement extends ElGamalAbs implements AsymMultiplic
 	 * Default constructor. Uses the default implementations of DlogGroup, CryptographicHash and SecureRandom.
 	 * @throws SecurityLevelException theoretically it might be thrown if the Dlog Group did not meet the required Security level. 
 	 * 								  Practically, it does not get thrown since SCAPI chooses elements that comply with the Security Level required.
-	 * @throws IllegalArgumentException 
 	 */
-	public ScElGamalOnGroupElement() throws IllegalArgumentException, SecurityLevelException{
+	public ScElGamalOnGroupElement() throws SecurityLevelException{
 		super();
 	}
 
@@ -83,7 +82,6 @@ public class ScElGamalOnGroupElement extends ElGamalAbs implements AsymMultiplic
 	 * It lets SCAPI choose and source of randomness.
 	 * @param dlogGroup must be DDH secure.
 	 * @throws SecurityLevelException 
-	 * @throws IllegalArgumentException if the given dlog group does not have DDH security level.
 	 */
 	public ScElGamalOnGroupElement(DlogGroup dlogGroup) throws SecurityLevelException {
 		super(dlogGroup, new SecureRandom());

@@ -67,9 +67,8 @@ public class ScElGamalOnByteArray extends ElGamalAbs{
 	 * Default constructor. Uses the default implementations of DlogGroup and SecureRandom.
 	 * @throws SecurityLevelException theoretically it might be thrown if the Dlog Group did not meet the required Security level. 
 	 * 								  Practically, it does not get thrown since SCAPI chooses elements that comply with the Security Level required.
-	 * @throws IllegalArgumentException 
 	 */
-	public ScElGamalOnByteArray() throws IllegalArgumentException, SecurityLevelException{
+	public ScElGamalOnByteArray() throws SecurityLevelException{
 		super();
 		//Creates a default implementation of KDF.
 		setKdf(new HKDF(new BcHMAC()));

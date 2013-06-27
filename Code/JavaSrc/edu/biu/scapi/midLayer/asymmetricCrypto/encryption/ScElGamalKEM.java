@@ -73,9 +73,8 @@ public class ScElGamalKEM extends ElGamalAbs{
 	 * Default constructor. Uses the default implementations of DlogGroup, KDF, SymmetricEncryption and SecureRandom.
 	 * @throws SecurityLevelException theoretically it might be thrown if the Dlog Group and Encryption scheme chosen did not meet their respective requird Security level. 
 	 * 								  Practically, it does not get thrown since SCAPI chooses elements that comply with the Security Level required.
-	 * @throws IllegalArgumentException 
 	 */
-	public ScElGamalKEM() throws IllegalArgumentException, SecurityLevelException{
+	public ScElGamalKEM() throws SecurityLevelException{
 		super();
 		//Creates a default implementation of KDF and SymmetricEncryption.
 		setMembers(new HKDF(new BcHMAC()), new ScCTREncRandomIV(new BcAES()), 128);
@@ -87,7 +86,6 @@ public class ScElGamalKEM extends ElGamalAbs{
 	 * @param encryption MUST be CPA-secure.
 	 * @param symKeySize Size of the key to set the given symmetric encryption, in BITS.
 	 * @throws SecurityLevelException if encryption is not CPA-secure
-	 * @throws IllegalArgumentException if the given encryption is not CPA-secure.
 	 */
 	private void setMembers(KeyDerivationFunction kdf, SymmetricEnc encryption, int symKeySize) throws SecurityLevelException{
 		//The underlying symmetric encryption should be CPA-secure.
