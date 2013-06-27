@@ -33,6 +33,7 @@ import org.bouncycastle.util.BigIntegers;
 
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CheatAttemptException;
+import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSender;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
@@ -92,12 +93,17 @@ public abstract class OTSenderDDHPrivacyOnlyAbs implements OTSender{
 	 * Constructor that gets the channel and chooses default values of DlogGroup and SecureRandom.
 	 */
 	public OTSenderDDHPrivacyOnlyAbs(Channel channel){
-		try {
-			//Uses Miracl Koblitz 233 Elliptic curve.
-			setMembers(channel, new MiraclDlogECF2m("K-233"), new SecureRandom());
-		} catch (IOException e) {
-			//If there is a problem with the elliptic curves file, create Zp DlogGroup.
-			setMembers(channel, new CryptoPpDlogZpSafePrime(), new SecureRandom());
+		try{
+			
+			try {
+				//Uses Miracl Koblitz 233 Elliptic curve.
+				setMembers(channel, new MiraclDlogECF2m("K-233"), new SecureRandom());
+			} catch (IOException e) {
+				//If there is a problem with the elliptic curves file, create Zp DlogGroup.
+				setMembers(channel, new CryptoPpDlogZpSafePrime(), new SecureRandom());
+			}
+		} catch (SecurityLevelException e) {
+			// Can not occur since the DlogGroup is DDH secure
 		}
 	}
 	
@@ -106,8 +112,9 @@ public abstract class OTSenderDDHPrivacyOnlyAbs implements OTSender{
 	 * @param channel
 	 * @param dlog must be DDH secure.
 	 * @param random
+	 * @throws SecurityLevelException if the given dlog is not DDH secure
 	 */
-	public OTSenderDDHPrivacyOnlyAbs(Channel channel, DlogGroup dlog, SecureRandom random){
+	public OTSenderDDHPrivacyOnlyAbs(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException{
 		
 		setMembers(channel, dlog, random);
 	}
@@ -117,12 +124,13 @@ public abstract class OTSenderDDHPrivacyOnlyAbs implements OTSender{
 	 * @param channel
 	 * @param dlog must be DDH secure.
 	 * @param random
-	 * @throws IllegalArgumentException if the given dlog is not DDH secure or if it is not valid.
+	 * @throws SecurityLevelException if the given dlog is not DDH secure
+	 * @throws IllegalArgumentException if the given dlog is not valid.
 	 */
-	private void setMembers(Channel channel, DlogGroup dlog, SecureRandom random) {
+	private void setMembers(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException {
 		//The underlying dlog group must be DDH secure.
 		if (!(dlog instanceof DDH)){
-			throw new IllegalArgumentException("DlogGroup should have DDH security level");
+			throw new SecurityLevelException("DlogGroup should have DDH security level");
 		}
 		//Check that the given dlog is valid.
 		if (!(dlog.validateGroup())){
@@ -139,7 +147,7 @@ public abstract class OTSenderDDHPrivacyOnlyAbs implements OTSender{
 	/**
 	 * Runs the part of the protocol where the sender input is not yet necessary.
 	 * @throws CheatAttemptException if there was a cheat attempt during the execution of the protocol.
-	 * @throws ClassNotFoundException if failed to receive a message.
+	 * @throws ClassNotFoundException 
 	 * @throws IOException if failed to receive a message.
 	 */
 	public void preProcess() throws CheatAttemptException, IOException, ClassNotFoundException{
@@ -192,14 +200,12 @@ public abstract class OTSenderDDHPrivacyOnlyAbs implements OTSender{
 	 * "WAIT for message (h0,h1) from R"
 	 * @return the received message.
 	 * @throws IOException if failed to receive a message.
-	 * @throws ClassNotFoundException  if failed to receive a message.
+	 * @throws ClassNotFoundException 
 	 */
 	private OTRPrivacyMessage waitForMessageFromReceiver() throws IOException, ClassNotFoundException{
 		Serializable message = null;
 		try {
 			message = channel.receive();
-		} catch (ClassNotFoundException e) {
-			throw new ClassNotFoundException("failed to receive message. The thrown message is: " + e.getMessage());
 		} catch (IOException e) {
 			throw new IOException("failed to receive message. The thrown message is: " + e.getMessage());
 		}
