@@ -44,7 +44,7 @@ public interface OTSender {
 	/**
 	 * Run the part of the protocol where the sender input is not yet necessary.
 	 * @throws CheatAttemptException if there was a cheat attempt during the execution of the protocol.
-	 * @throws ClassNotFoundException if failed to receive a message.
+	 * @throws ClassNotFoundException
 	 * @throws IOException if failed to receive a message.
 	 */
 	public void preProcess() throws CheatAttemptException, IOException, ClassNotFoundException;
