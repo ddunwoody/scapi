@@ -41,7 +41,6 @@ import java.util.Vector;
 import org.bouncycastle.util.BigIntegers;
 
 import edu.biu.scapi.exceptions.NoMaxException;
-import edu.biu.scapi.midLayer.asymmetricCrypto.keys.CramerShoupPrivateKey;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.DamgardJurikPrivateKey;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.DamgardJurikPublicKey;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.KeySendableData;
@@ -50,7 +49,6 @@ import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScDamgardJurikPublicKey;
 import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertext;
 import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertextSendableData;
 import edu.biu.scapi.midLayer.ciphertext.BigIntegerCiphertext;
-import edu.biu.scapi.midLayer.ciphertext.ByteArrayAsymCiphertext;
 import edu.biu.scapi.midLayer.plaintext.BigIntegerPlainText;
 import edu.biu.scapi.midLayer.plaintext.Plaintext;
 import edu.biu.scapi.primitives.trapdoorPermutation.RSAModulus;
@@ -203,19 +201,12 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 		
 		DJKeyGenParameterSpec params = (DJKeyGenParameterSpec)keyParams;
 		//Chooses an RSA modulus n = p*q of length k bits.
-		//Computes t = lcm(p-1, q-1) where lcm is the least common multiple and can be computed as lcm(a,b) = a*b/gcd(a,b).
 		//Let n be the Public Key.
-		//Let t be the Private Key.
+		//Let rsaMod be the Private Key.
 		
 		RSAModulus rsaMod = ScRSAPermutation.generateRSAModulus(params.getModulusLength(), params.getCertainty(), random);
 		
-		BigInteger pMinus1 = rsaMod.p.subtract(BigInteger.ONE);
-		BigInteger qMinus1 = rsaMod.q.subtract(BigInteger.ONE);
-		BigInteger gcdPMinus1QMinus1 = pMinus1.gcd(qMinus1);
-		BigInteger t = (pMinus1.multiply(qMinus1)).divide(gcdPMinus1QMinus1);
-		BigInteger dForS1 = generateD(rsaMod.n, t); //Precalculate d for the case that s == 1
-		
-		return new KeyPair(new ScDamgardJurikPublicKey(rsaMod.n), new ScDamgardJurikPrivateKey(t, dForS1));
+		return new KeyPair(new ScDamgardJurikPublicKey(rsaMod.n), new ScDamgardJurikPrivateKey(rsaMod));
 	}
 
 	/**
