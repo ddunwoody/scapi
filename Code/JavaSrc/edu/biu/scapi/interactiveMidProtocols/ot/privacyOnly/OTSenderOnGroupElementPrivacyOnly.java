@@ -27,6 +27,7 @@ package edu.biu.scapi.interactiveMidProtocols.ot.privacyOnly;
 import java.security.SecureRandom;
 
 import edu.biu.scapi.comm.Channel;
+import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnGroupElementInput;
@@ -60,8 +61,9 @@ public class OTSenderOnGroupElementPrivacyOnly extends OTSenderDDHPrivacyOnlyAbs
 	 * @param channel
 	 * @param dlog must be DDH secure.
 	 * @param random
+	 * @throws SecurityLevelException if the given DlogGroup is not DDH secure.
 	 */
-	public OTSenderOnGroupElementPrivacyOnly(Channel channel, DlogGroup dlog, SecureRandom random){
+	public OTSenderOnGroupElementPrivacyOnly(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException{
 		super(channel, dlog, random);
 	}
 	
