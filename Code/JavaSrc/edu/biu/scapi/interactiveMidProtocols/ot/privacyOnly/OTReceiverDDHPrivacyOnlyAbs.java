@@ -33,6 +33,7 @@ import org.bouncycastle.util.BigIntegers;
 
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CheatAttemptException;
+import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTRBasicInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTRInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTROutput;
@@ -94,13 +95,18 @@ public abstract class OTReceiverDDHPrivacyOnlyAbs implements OTReceiver{
 	/**
 	 * Constructor that gets the channel and chooses default values of DlogGroup and SecureRandom.
 	 */
-	public OTReceiverDDHPrivacyOnlyAbs(Channel channel){
-		try {
-			//Uses Miracl Koblitz 233 Elliptic curve.
-			setMembers(channel, new MiraclDlogECF2m("K-233"), new SecureRandom());
-		} catch (IOException e) {
-			//If there is a problem with the elliptic curves file, create Zp DlogGroup.
-			setMembers(channel, new CryptoPpDlogZpSafePrime(), new SecureRandom());
+	public OTReceiverDDHPrivacyOnlyAbs(Channel channel) {
+		try{
+			try {
+				//Uses Miracl Koblitz 233 Elliptic curve.
+				setMembers(channel, new MiraclDlogECF2m("K-233"), new SecureRandom());
+			} catch (IOException e) {
+				//If there is a problem with the elliptic curves file, create Zp DlogGroup.
+				
+					setMembers(channel, new CryptoPpDlogZpSafePrime(), new SecureRandom());
+			}
+		} catch (SecurityLevelException e) {
+			// Can not occur since the DlogGroup is DDH secure
 		}
 	}
 	
@@ -109,8 +115,9 @@ public abstract class OTReceiverDDHPrivacyOnlyAbs implements OTReceiver{
 	 * @param channel
 	 * @param dlog must be DDH secure.
 	 * @param random
+	 * @throws SecurityLevelException if the given dlog is not DDH secure
 	 */
-	public OTReceiverDDHPrivacyOnlyAbs(Channel channel, DlogGroup dlog, SecureRandom random){
+	public OTReceiverDDHPrivacyOnlyAbs(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException{
 		
 		setMembers(channel, dlog, random);
 	}
@@ -120,12 +127,13 @@ public abstract class OTReceiverDDHPrivacyOnlyAbs implements OTReceiver{
 	 * @param channel
 	 * @param dlog must be DDH secure.
 	 * @param random
-	 * @throws IllegalArgumentException if the given dlog is not DDH secure or if it is not valid.
+	 * @throws SecurityLevelException if the given dlog is not DDH secure
+	 * @throws IllegalArgumentException  if the given dlog is not valid.
 	 */
-	private void setMembers(Channel channel, DlogGroup dlog, SecureRandom random) {
+	private void setMembers(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException {
 		//The underlying dlog group must be DDH secure.
 		if (!(dlog instanceof DDH)){
-			throw new IllegalArgumentException("DlogGroup should have DDH security level");
+			throw new SecurityLevelException("DlogGroup should have DDH security level");
 		}
 		//Check that the given dlog is valid.
 		// In Zp case, the check is done by Crypto++ library.
@@ -301,14 +309,12 @@ public abstract class OTReceiverDDHPrivacyOnlyAbs implements OTReceiver{
 	 * "WAIT for message pairs (w0, c0) and (w1, c1)  from S"
 	 * @return OTSMessage contains (w0, c0, w1, c1)
 	 * @throws IOException if failed to receive.
-	 * @throws ClassNotFoundException if failed to receive.
+	 * @throws ClassNotFoundException
 	 */
 	private OTSMessage waitForMessageFromSender() throws IOException, ClassNotFoundException {
 		Serializable message = null;
 		try {
 			message =  channel.receive();
-		} catch (ClassNotFoundException e) {
-			throw new ClassNotFoundException("failed to receive message. The thrown message is: " + e.getMessage());
 		} catch (IOException e) {
 			throw new IOException("failed to receive message. The thrown message is: " + e.getMessage());
 		}
