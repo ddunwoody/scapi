@@ -32,6 +32,7 @@ import java.security.SecureRandom;
 import org.bouncycastle.util.BigIntegers;
 
 import edu.biu.scapi.comm.Channel;
+import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSender;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
@@ -81,12 +82,17 @@ public abstract class OTSenderDDHSemiHonestAbs implements OTSender{
 	 * Constructor that gets the channel and chooses default values of DlogGroup and SecureRandom.
 	 */
 	public OTSenderDDHSemiHonestAbs(Channel channel){
-		try {
-			//Uses Miracl Koblitz 233 Elliptic curve.
-			setMembers(channel, new MiraclDlogECF2m("K-233"), new SecureRandom());
-		} catch (IOException e) {
-			//If there is a problem with the elliptic curves file, create Zp DlogGroup.
-			setMembers(channel, new CryptoPpDlogZpSafePrime(), new SecureRandom());
+		try{
+			
+			try {
+				//Uses Miracl Koblitz 233 Elliptic curve.
+				setMembers(channel, new MiraclDlogECF2m("K-233"), new SecureRandom());
+			} catch (IOException e) {
+				//If there is a problem with the elliptic curves file, create Zp DlogGroup.
+				setMembers(channel, new CryptoPpDlogZpSafePrime(), new SecureRandom());
+			}
+		} catch (SecurityLevelException e) {
+			// Can not occur since the DlogGroup is DDH secure
 		}
 	}
 	
@@ -95,8 +101,9 @@ public abstract class OTSenderDDHSemiHonestAbs implements OTSender{
 	 * @param channel
 	 * @param dlog must be DDH secure.
 	 * @param random
+	 * @throws SecurityLevelException if the given dlog is not DDH secure
 	 */
-	public OTSenderDDHSemiHonestAbs(Channel channel, DlogGroup dlog, SecureRandom random){
+	public OTSenderDDHSemiHonestAbs(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException{
 		
 		setMembers(channel, dlog, random);
 	}
@@ -106,11 +113,12 @@ public abstract class OTSenderDDHSemiHonestAbs implements OTSender{
 	 * @param channel
 	 * @param dlog must be DDH secure.
 	 * @param random
+	 * @throws SecurityLevelException if the given dlog is not DDH secure.
 	 */
-	private void setMembers(Channel channel, DlogGroup dlog, SecureRandom random) {
+	private void setMembers(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException {
 		//The underlying dlog group must be DDH secure.
 		if (!(dlog instanceof DDH)){
-			throw new IllegalArgumentException("DlogGroup should have DDH security level");
+			throw new SecurityLevelException("DlogGroup should have DDH security level");
 		}
 		
 		this.channel = channel;
@@ -122,7 +130,7 @@ public abstract class OTSenderDDHSemiHonestAbs implements OTSender{
 	/**
 	 * Runs the part of the protocol where the sender input is not yet necessary.
 	 * @throws IOException if failed to receive a message.
-	 * @throws ClassNotFoundException if failed to receive a message.
+	 * @throws ClassNotFoundException 
 	 */
 	public void preProcess() throws ClassNotFoundException, IOException{
 		/* Runs the following part of the protocol:
@@ -168,15 +176,13 @@ public abstract class OTSenderDDHSemiHonestAbs implements OTSender{
 	 * Runs the following line from the protocol:
 	 * "WAIT for message (h0,h1) from R"
 	 * @return the received message.
-	 * @throws ClassNotFoundException if failed to receive a message.
+	 * @throws ClassNotFoundException 
 	 * @throws IOException if failed to receive a message.
 	 */
 	private OTRSemiHonestMessage waitForMessageFromReceiver() throws ClassNotFoundException, IOException{
 		Serializable message = null;
 		try {
 			message = channel.receive();
-		} catch (ClassNotFoundException e) {
-			throw new ClassNotFoundException("failed to receive message. The thrown message is: " + e.getMessage());
 		} catch (IOException e) {
 			throw new IOException("failed to receive message. The thrown message is: " + e.getMessage());
 		}
