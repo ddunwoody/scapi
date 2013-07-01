@@ -1,0 +1,328 @@
+/**
+* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+* 
+* Copyright (c) 2012 - SCAPI (http://crypto.biu.ac.il/scapi)
+* This file is part of the SCAPI project.
+* DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+* 
+* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
+* to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+* and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+* 
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+* 
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+* FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+* 
+* We request that any publication and/or code referring to and/or based on SCAPI contain an appropriate citation to SCAPI, including a reference to
+* http://crypto.biu.ac.il/SCAPI.
+* 
+* SCAPI uses Crypto++, Miracl, NTL and Bouncy Castle. Please see these projects for any further licensing issues.
+* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+* 
+*/
+package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.orMultiple;
+
+import java.security.SecureRandom;
+import java.util.ArrayList;
+
+import edu.biu.scapi.exceptions.CheatAttemptException;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaProverComputation;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaSimulator;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaMultipleMsg;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaSimulatorOutput;
+
+/**
+ * Concrete implementation of Sigma Protocol prover computation.
+ * 
+ * This protocol is used for a prover to convince a verifier that at least k out of n statements is true, 
+ * where each statement can be proven by an associated Sigma protocol.
+ * 
+ * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
+ *
+ */
+public class SigmaORMultipleProver implements SigmaProverComputation{
+	
+	/*	
+	 * Let (ai,ei,zi) denote the steps of a Sigma protocol Sigmai for proving that xi is in LRi 
+	 * Let I denote the set of indices for which P has witnesses
+	  This class computes the following calculations:
+			For every j not in I, SAMPLE a random element ej <- GF[2^t]
+			For every j not in I, RUN the simulator on statement xj and challenge ej to get transcript (aj,ej,zj)
+			For every i in I, RUN the prover P on statement xi to get first message ai
+			SET a=(a1,…,an)
+			
+			INTERPOLATE the points (0,e) and {(j,ej)} for every j not in I to obtain a degree n-k polynomial Q (s.t. Q(0)=e and Q(j)=ej for every j not in I)
+			For every i in I, SET ei = Q(i)
+			For every i in I, COMPUTE the response zi to (ai, ei) in Sigmai using input (xi,wi)
+			The message is Q,e1,z1,…,en,zn (where by Q we mean its coefficients)
+	*/
+	
+	private ArrayList<SigmaProverComputation> provers;			// Underlying Sigma protocol's provers to the OR calculation.
+	private int len;											// number of underlying provers.
+	private int t;												// Soundness parameter.
+	private SecureRandom random;
+	private ArrayList<Integer> I;								// The indexes of the statements which the prover knows the witnesses.
+	
+	private SigmaORMultipleProverInput input;					// We save in setInput function to use in computeFirstMsg function
+	
+	private byte[][] challenges;								// Will hold the challenges to the underlying provers/simulators.
+																// Some will be calculate in sampleRandomValues function and some in compueSecondMsg. 
+	
+	private ArrayList<SigmaSimulatorOutput> simulatorsOutput;	// We save this because we calculate it in computeFirstMsg and using 
+																//it after that, in computeSecondMsg
+	
+	private long[] fieldElements;								//will hold pointers to the sampled field elements, 
+																//we save the pointers to save the creation of the elements again in computeSecondMsg function.
+	
+	//Initiaize the field GF2E with a random irreducible polynomial with degree t.
+	private native void initField(int t, int seed);
+	
+	//Creates random field elements to be the challenges.
+	private native byte[][] createRandomFieldElements(int numElements, long[] fieldElements);
+	
+	//Interpolate the points to get a polynoial.
+	private native long interpolate(byte[] e, long[] fieldElements, int[] indexes);
+	
+	//Calculate the challenges for the statements with the widnesses.
+	private native byte[][] getRestChallenges(long polynomial, int[] indexesInI);
+	
+	//return the byteArray of the polynomial coefficients.
+	private native byte[][] getPolynomialBytes(long polynomial);
+	
+	//delete the allocated memory of the polynomial and the field elements.
+	private native void deletePointers(long polynomial, long[] fieldElements);
+	
+	/**
+	 * Constructor that gets the underlying provers.
+	 * @param provers array of SigmaProverComputation, where each object represent a statement 
+	 * 		  and the prover wants to prove to the verify that the OR of all statements are true. 
+	 * @param t soundness parameter. t MUST be equal to all t values of the underlying provers object.
+	 * @throws IllegalArgumentException if the given t is not equal to all t values of the underlying provers object.
+	 */
+	public SigmaORMultipleProver(ArrayList<SigmaProverComputation> provers, int t, SecureRandom random) {
+		//If the given t is different from one of the underlying object's t values, throw exception.
+		for (int i = 0; i < provers.size(); i++){
+			if (t != provers.get(i).getSoundness()){
+				throw new IllegalArgumentException("the given t does not equal to one of the t values in the underlying provers objects.");
+			}
+		}
+		this.provers = provers;
+		len = provers.size();
+		this.t = t; 
+		this.random = random;
+		
+		initField(t, random.nextInt());
+	}
+
+	/**
+	 * Returns the soundness parameter for this Sigma protocol.
+	 * @return t soundness parameter
+	 */
+	public int getSoundness(){
+		return t;
+	}
+
+	/**
+	 * Sets the inputs for each one of the underlying prover.
+	 * @param input MUST be an instance of SigmaORMultipleInput.
+	 * @throws IllegalArgumentException if input is not an instance of SigmaORMultipleInput.
+	 * @throws IllegalArgumentException if the number of given inputs is different from the number of underlying provers.
+	 */
+	public void setInput(SigmaProtocolInput in) {
+		if (!(in instanceof SigmaORMultipleProverInput)){
+			throw new IllegalArgumentException("the given input must be an instance of SigmaORMultipleInput");
+		}
+		input = (SigmaORMultipleProverInput) in;
+		
+		ArrayList<SigmaProtocolInput> proversInput = input.getInputs();
+		int inputLen = proversInput.size();
+		
+		// If number of inputs is not equal to number of provers, throw exception.
+		if (inputLen != len) {
+			throw new IllegalArgumentException("number of inputs is different from number of underlying provers.");
+		}
+		
+		this.I = input.getI();
+		
+		//Sets the input to each underlying prover that the prover knows its witness. The other provers will not be in use so they don't need to set input.
+		for (int i = 0; i < len; i++){
+			if (I.contains(new Integer(i))){
+				provers.get(i).setInput(proversInput.get(i));
+			}
+		}
+		
+	}
+
+	/**
+	 * Samples random values for this protocol.
+	 */
+	public void sampleRandomValues() {
+		
+		//For every j in I, call the sampleRandomValues function.
+		for (int i = 0; i < len; i++){
+			//If i in I, call the underlying sampleRandomValues.
+			if (I.contains(new Integer(i))){
+				provers.get(i).sampleRandomValues();
+			} 
+		}
+		fieldElements = new long[len - I.size()];
+		//For every j not in I, SAMPLE a random element ej <- GF[2^t]. We sample the random elments at once.
+		byte[][] ejs = createRandomFieldElements(len - I.size(), fieldElements);
+		int index = 0;
+		challenges = new byte[len][];
+		
+		//Set the created challenges to the challenges array in the empty indexes.
+		for (int i=0; i<len; i++){
+			if (!(I.contains(new Integer(i)))){
+				//in case that the sample element's length is not t, add zeros to its beginning.
+				challenges[i] = alignToT(ejs[index]);
+				index++; //increase the index of the sampled challenges.
+			}
+		}
+	}
+
+	/**
+	 * Align the given array to t length. Adds zeros in the beginning.
+	 * @param array to align
+	 * @return the aligned array.
+	 */
+	private byte[] alignToT(byte[] array) {
+		byte[] alignArr = new byte[t/8];
+		int len = array.length;
+		if (len < t/8){
+			int diff = t/8 - len;
+			int index = 0;
+			for (int i=0; i<len; i++){
+				alignArr[index++] = array[i];
+			}
+			for (int i=0; i<diff; i++){
+				alignArr[index++] = 0;
+			}
+		} else{
+			alignArr = array;
+		}
+		return alignArr;
+		
+	}
+
+	/**
+	 * Computes the following lines from the protocol:
+	 * "For every j not in I, RUN the simulator on statement xj and challenge ej to get transcript (aj,ej,zj)
+		For every i in I, RUN the prover P on statement xi to get first message ai
+		SET a=(a1,…,an)". 
+	 * @return SigmaMultipleMsg contains a1, …, am.  
+	 */
+	public SigmaProtocolMsg computeFirstMsg() {
+		//Create an array to hold all messages.
+		ArrayList<SigmaProtocolMsg> firstMessages = new ArrayList<SigmaProtocolMsg>();
+		//Create an array to hold all simaultor's outputs.
+		simulatorsOutput = new ArrayList<SigmaSimulatorOutput>();
+		simulatorsOutput.ensureCapacity(len);
+		//Compute all first messages and add them to the array list.
+		for (int i = 0; i < len; i++){
+			//If i in I, call the underlying computeFirstMsg.
+			if (I.contains(new Integer(i))){
+				firstMessages.add(provers.get(i).computeFirstMsg());
+				simulatorsOutput.add(i, null);
+			//If i not in I, run the simulator for xi.
+			} else{
+				try {
+					SigmaSimulatorOutput output = provers.get(i).getSimulator().simulate(input.getInputs().get(i), challenges[i]);
+					firstMessages.add(output.getA());
+					simulatorsOutput.add(i, output);
+				} catch (CheatAttemptException e) {
+					// This exception will not be thrown because the length of the challenges is valid.
+				}
+			}
+		}
+		//Create a SigmaMultipleMsg with the messages array.
+		return new SigmaMultipleMsg(firstMessages);
+		
+	}
+
+	/**
+	 * Computes the following line from the protocol:
+	 * "INTERPOLATE the points (0,e) and {(j,ej)} for every j not in I to obtain a degree n-k polynomial Q (s.t. Q(0)=e and Q(j)=ej for every j not in I)
+			For every i in I, SET ei = Q(i)
+			For every i in I, COMPUTE the response zi to (ai, ei) in Sigmai using input (xi,wi)
+			The message is Q,e1,z1,…,en,zn (where by Q we mean its coefficients)".
+	 * @param challenge
+	 * @return SigmaMultipleMsg contains z1, …, zm.
+	 * @throws CheatAttemptException if the received challenge's length is not equal to the soundness parameter.
+	 */
+	public SigmaProtocolMsg computeSecondMsg(byte[] challenge) throws CheatAttemptException {
+		//Create two arrays. This arrays used for calculate the interpolated polynomial.
+		int[] indexesNotInI= new int[len - I.size()];
+		int[] indexesInI= new int[I.size()];
+		int indexNotInI = 0;
+		int indexInI = 0;
+		//Fill the arrays with the indexes.
+		for (int i = 0; i < len; i++){
+			//If i in I, call the underlying computeFirstMsg.
+			if (I.contains(new Integer(i))){
+				indexesInI[indexInI++] = i+1;
+			} else {
+				indexesNotInI[indexNotInI++] = i+1;
+			}
+		}
+		//Interpolate the points (0,e) and {(j,ej)} for every j NOT in I to obtain a degree n-k polynomial Q.
+		long polynomial = interpolate(challenge, fieldElements, indexesNotInI);
+		
+		//Get the rest of the challenges by computing for every i in I, ei = Q(i).
+		byte[][] jsInI = getRestChallenges(polynomial, indexesInI);
+		int index = 0;
+		for(int i=0; i<len; i++){
+			if (I.contains(new Integer(i))){
+				challenges[i] = alignToT(jsInI[index++]);
+			}
+		}
+		
+		//Create an array to hold all messages.
+		ArrayList<SigmaProtocolMsg> secondMessages = new ArrayList<SigmaProtocolMsg>();
+		
+		//Compute all second messages and add them to the array list.
+		for (int i = 0; i < len; i++){
+			//If i in I, call the underlying computeSecondMsg.
+			if (I.contains(new Integer(i))){
+				
+				secondMessages.add(provers.get(i).computeSecondMsg(challenges[i]));
+			//If i not in I, get z from the simulator output for xi.
+			} else{
+				secondMessages.add(simulatorsOutput.get(i).getZ());
+			}
+		}
+		
+		byte[][] polynomBytes = getPolynomialBytes(polynomial);
+		
+		//Delete the allocated memory of the polynomial and the field elements.
+		deletePointers(polynomial, fieldElements);
+		
+		//Create a SigmaANDMsg with the messages array.
+		return new SigmaORMultipleSecondMsg(polynomBytes, secondMessages, challenges);
+		
+	}
+	
+	/**
+	 * Returns the simulator that matches this sigma protocol prover.
+	 * @return SigmaProtocolANDSimulator
+	 */
+	public SigmaSimulator getSimulator(){
+		ArrayList<SigmaSimulator> simulators = new ArrayList<SigmaSimulator>();
+		for (int i=0; i < len; i++){
+			simulators.add(provers.get(i).getSimulator());
+		}
+		return new SigmaORMultipleSimulator(simulators, t, random);
+	}
+
+	
+	static {
+		 
+		 //load the NTL jni dll
+		 System.loadLibrary("NTLJavaInterface");
+	}
+
+}
