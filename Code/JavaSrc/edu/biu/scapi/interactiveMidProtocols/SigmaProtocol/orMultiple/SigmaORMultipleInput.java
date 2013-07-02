@@ -39,7 +39,7 @@ import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocol
 public class SigmaORMultipleInput implements SigmaProtocolInput{
 	
 	private ArrayList<SigmaProtocolInput> sigmaInputs;
-	int k; //number of statements that have a witness.
+	private int k; //number of statements that have a witness.
 	
 	public SigmaORMultipleInput(ArrayList<SigmaProtocolInput> input, int k){
 		sigmaInputs = input;
