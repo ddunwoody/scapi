@@ -36,17 +36,17 @@ import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaDHExtendedMsg implements SigmaProtocolMsg {
+class SigmaDHExtendedMsg implements SigmaProtocolMsg {
 
 	private static final long serialVersionUID = 3688239370237225167L;
 	
 	private ArrayList<GroupElementSendableData> aArray;
 	
-	public SigmaDHExtendedMsg(ArrayList<GroupElementSendableData> aArray){
+	SigmaDHExtendedMsg(ArrayList<GroupElementSendableData> aArray){
 		this.aArray = aArray;
 	}
 	
-	public ArrayList<GroupElementSendableData> getArray(){
+	ArrayList<GroupElementSendableData> getArray(){
 		return aArray;
 	} 
 
