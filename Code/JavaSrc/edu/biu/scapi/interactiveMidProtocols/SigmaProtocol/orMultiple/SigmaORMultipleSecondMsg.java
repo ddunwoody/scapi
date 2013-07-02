@@ -37,7 +37,7 @@ import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocol
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaORMultipleSecondMsg implements SigmaProtocolMsg {
+class SigmaORMultipleSecondMsg implements SigmaProtocolMsg {
 	
 	private static final long serialVersionUID = -348217363547929670L;
 	
@@ -45,21 +45,21 @@ public class SigmaORMultipleSecondMsg implements SigmaProtocolMsg {
 	private ArrayList<SigmaProtocolMsg> z;
 	private byte[][] challenges;
 	
-	public SigmaORMultipleSecondMsg(byte[][] polynomBytes, ArrayList<SigmaProtocolMsg> z, byte[][] challenges){
+	SigmaORMultipleSecondMsg(byte[][] polynomBytes, ArrayList<SigmaProtocolMsg> z, byte[][] challenges){
 		this.polynomial = polynomBytes;
 		this.z = z;
 		this.challenges = challenges;
 	}
 	
-	public byte[][] getPolynomial(){
+	byte[][] getPolynomial(){
 		return polynomial;
 	}
 	
-	public ArrayList<SigmaProtocolMsg> getMessages(){
+	ArrayList<SigmaProtocolMsg> getMessages(){
 		return z;
 	}
 	
-	public byte[][] getChallenges(){
+	byte[][] getChallenges(){
 		return challenges;
 	}
 	
