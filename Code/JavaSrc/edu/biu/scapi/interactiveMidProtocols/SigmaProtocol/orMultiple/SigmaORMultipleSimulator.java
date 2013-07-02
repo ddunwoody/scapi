@@ -121,7 +121,7 @@ public class SigmaORMultipleSimulator implements SigmaSimulator{
 		}
 		SigmaORMultipleInput orInput = (SigmaORMultipleInput) input;
 		
-		int nMinusK = len - orInput.k;
+		int nMinusK = len - orInput.getK();
 		long[] fieldElements = new long[nMinusK];
 		//For every j = 1 to n-k, SAMPLE a random element ej <- GF[2^t]. We sample the random elments at once.
 		byte[][] ejs = createRandomFieldElements(nMinusK, fieldElements);
@@ -135,13 +135,13 @@ public class SigmaORMultipleSimulator implements SigmaSimulator{
 		
 		//Create two arrays. This arrays used for calculate the interpolated polynomial.
 		int[] indexesNotInI= new int[nMinusK];
-		int[] indexesInI= new int[orInput.k];
+		int[] indexesInI= new int[orInput.getK()];
 		int indexNotInI = 0;
 		int indexInI = 0;
 		//Fill the arrays with the indexes.
 		for (int i = 0; i < len; i++){
 			//If i in I, call the underlying computeFirstMsg.
-			if (i<len-orInput.k){
+			if (i<len-orInput.getK()){
 				indexesNotInI[indexNotInI++] = i+1;
 			} else {
 				indexesInI[indexInI++] = i+1;
