@@ -34,23 +34,23 @@ import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocol
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaORTwoFirstMsg implements SigmaProtocolMsg{
+class SigmaORTwoFirstMsg implements SigmaProtocolMsg{
 
 	private static final long serialVersionUID = 5917636619476148404L;
 	
 	private SigmaProtocolMsg a0;
 	private SigmaProtocolMsg a1;
 	
-	public SigmaORTwoFirstMsg(SigmaProtocolMsg a0, SigmaProtocolMsg a1){
+	SigmaORTwoFirstMsg(SigmaProtocolMsg a0, SigmaProtocolMsg a1){
 		this.a0 = a0;
 		this.a1 = a1;
 	}
 	
-	public SigmaProtocolMsg getA0(){
+	SigmaProtocolMsg getA0(){
 		return a0;
 	}
 	
-	public SigmaProtocolMsg getA1(){
+	SigmaProtocolMsg getA1(){
 		return a1;
 	}
 }
