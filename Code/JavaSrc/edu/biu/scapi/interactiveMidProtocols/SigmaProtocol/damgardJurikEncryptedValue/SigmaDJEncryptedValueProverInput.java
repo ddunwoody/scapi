@@ -26,6 +26,7 @@ package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.damgardJurikEncrypte
 
 import java.math.BigInteger;
 
+import edu.biu.scapi.midLayer.asymmetricCrypto.keys.DamgardJurikPrivateKey;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.DamgardJurikPublicKey;
 import edu.biu.scapi.midLayer.ciphertext.BigIntegerCiphertext;
 import edu.biu.scapi.midLayer.plaintext.BigIntegerPlainText;
@@ -44,6 +45,25 @@ public class SigmaDJEncryptedValueProverInput extends SigmaDJEncryptedValueInput
 	public SigmaDJEncryptedValueProverInput(DamgardJurikPublicKey publicKey, BigIntegerCiphertext cipher, BigIntegerPlainText plaintext, BigInteger r){
 		super(publicKey, cipher, plaintext);
 		this.r = r;
+	}
+	
+	public SigmaDJEncryptedValueProverInput(DamgardJurikPublicKey publicKey, BigIntegerCiphertext cipher, BigIntegerPlainText plaintext, DamgardJurikPrivateKey privateKey){
+		super(publicKey, cipher, plaintext);
+		//This protocol assumes that the prover knows the randomness used to encrypt. 
+		//If the prover knows the secret key, then it can compute (once) the value m=n^(-1) mod phi(n)=n^(-1) mod (p-1)(q-1). 
+		//Then, it can recover the randomness r from c by computing c^m mod n (this equals r^(n/n) mod n = r). 
+		//Once given r, the prover can proceed with the above protocol.
+		BigInteger p = privateKey.getP();
+		BigInteger q = privateKey.getQ();
+		BigInteger pMinusOne = p.subtract(BigInteger.ONE);
+		BigInteger qMinusOne = q.subtract(BigInteger.ONE);
+		BigInteger n = p.multiply(q);
+		//(p-1)*(q-1)
+		BigInteger phiN = pMinusOne.multiply(qMinusOne);
+		//m = n^(-1) mod (p-1)(q-1).
+		BigInteger m = n.modInverse(phiN);
+		//r = c^m mod n
+		r = cipher.getCipher().modPow(m, n);
 	}
 	
 	public BigInteger getR(){
