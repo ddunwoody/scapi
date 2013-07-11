@@ -62,7 +62,7 @@ public class SigmaDHExtendedProver implements SigmaProverComputation, DlogBasedS
 	*/	
 	
 	private DlogGroup dlog;						// Underlying DlogGroup.
-	private int t; 								// soundness parameter in BITS.
+	private int t; 								// Soundness parameter in BITS.
 	protected SecureRandom random;
 	private SigmaDHExtendedProverInput input;	// Contains g and h arrays and w. 
 	private BigInteger r;						// The value chosen in the protocol.
@@ -75,7 +75,7 @@ public class SigmaDHExtendedProver implements SigmaProverComputation, DlogBasedS
 	 */
 	public SigmaDHExtendedProver(DlogGroup dlog, int t, SecureRandom random) {
 		
-		// Sets the parameters.
+		// Sets the given parameters.
 		setParameters(dlog, t, random);
 	}
 	
@@ -84,7 +84,7 @@ public class SigmaDHExtendedProver implements SigmaProverComputation, DlogBasedS
 	 */
 	public SigmaDHExtendedProver() {
 		try {
-			//Calls the other constructor with Miracl Koblitz 233 Elliptic curve.
+			//Create Miracl Koblitz 233 Elliptic curve and set default parameters.
 			setParameters(new MiraclDlogECF2m("K-233"), 80, new SecureRandom());
 		} catch (IOException e) {
 			//If there is a problem with the elliptic curves file, create Zp DlogGroup.
@@ -181,7 +181,7 @@ public class SigmaDHExtendedProver implements SigmaProverComputation, DlogBasedS
 		}
 		
 		
-		//Create and return SigmaGroupElementMsg with a.
+		//Create and return SigmaDHExtendedMsg with aArray.
 		return new SigmaDHExtendedMsg(aArray);
 	}
 
