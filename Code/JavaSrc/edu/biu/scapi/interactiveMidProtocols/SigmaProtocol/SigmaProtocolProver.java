@@ -59,15 +59,15 @@ public interface SigmaProtocolProver {
 	public void prove() throws CheatAttemptException, IOException, ClassNotFoundException;
 	
 	/**
-	 * Process the first step of the sigma protocol.
+	 * Processes the first step of the sigma protocol.
 	 * It computes the first message and sends it to the verifier.
 	 * @throws IOException if failed to send the message.
 	 */
 	public void processFirstMsg() throws IOException;
 	
 	/**
-	 * Process the second step of the sigma protocol.
-	 * It receive the challenge from the verifier, computes the second message and then sends it to the verifier.
+	 * Processes the second step of the sigma protocol.
+	 * It receives the challenge from the verifier, computes the second message and then sends it to the verifier.
 	 * This is a blocking function! 
 	 * @throws CheatAttemptException if the received challenge's length is not equal to the soundness parameter. 
 	 * @throws IOException if failed to send or receive a message.

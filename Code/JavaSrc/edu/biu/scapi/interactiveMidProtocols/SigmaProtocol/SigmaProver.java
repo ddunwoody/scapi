@@ -33,8 +33,8 @@ import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocol
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
 
 /**
- * This class manage the communication functionality of all the sigma protocol provers.
- * It sends the first message, receive the challenge from the prover and sends the second message.<p>
+ * This class manages the communication functionality of all the sigma protocol provers.
+ * It sends the first message, receives the challenge from the prover and sends the second message.<p>
  * It uses SigmaComputation instance of a concrete sigma protocol to compute the actual messages. 
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
@@ -88,15 +88,15 @@ public class SigmaProver implements SigmaProtocolProver{
 	 * @throws ClassNotFoundException 
 	 */
 	public void prove() throws CheatAttemptException, IOException, ClassNotFoundException{
-		//step one of the protocol.
+		//Step one of the protocol.
 		processFirstMsg();
 		
-		//step two of the protocol.
+		//Step two of the protocol.
 		processSecondMsg();
 	}
 	
 	/**
-	 * Process the first step of the sigma protocol:
+	 * Processes the first step of the sigma protocol:
 	 *  "SAMPLE a random values 
 	 * 	 COMPUTE first message
 	 * 	 SEND the computed message to the verifier".
@@ -119,7 +119,7 @@ public class SigmaProver implements SigmaProtocolProver{
 	}
 	
 	/**
-	 * Process the second step of the sigma protocol:
+	 * Processes the second step of the sigma protocol:
 	 * 	"RECEIVE challenge from verifier
 	 * 	 COMPUTE second message
 	 * 	 SEND the computed message to the verifier".
@@ -175,7 +175,7 @@ public class SigmaProver implements SigmaProtocolProver{
 			throw new IOException("failed to receive the challenge. The thrown exception is: " + e.getMessage());
 		}
 		if (!(challenge instanceof byte[])){
-			throw new IllegalArgumentException("the given message should be an instance of OTSMessage");
+			throw new IllegalArgumentException("the given challenge should be a byte[]");
 		}
 		return (byte[]) challenge;
 	}

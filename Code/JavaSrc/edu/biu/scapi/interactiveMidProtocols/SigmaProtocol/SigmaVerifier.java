@@ -32,9 +32,9 @@ import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocol
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
 
 /**
- * This class manage the communication functionality of all the sigma protocol verifiers, 
+ * This class manages the communication functionality of all the sigma protocol verifiers, 
  * such as send the challenge to the prover and receive the prover messages.
- * It uses SigmaComputation instance of a concrete sigma protocol to compute the actual calculations. 
+ * It uses SigmaVerifierComputation instance of a concrete sigma protocol to compute the actual calculations. 
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
@@ -42,7 +42,7 @@ import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocol
 public class SigmaVerifier implements SigmaProtocolVerifier{
 	
 	/*
-	 * This class manage the common functionality of all sigma verifiers:
+	 * This class manages the common functionality of all sigma verifiers:
 	 * 	Verifier challenge (e):	SAMPLE a random challenge e
 	 * 							RECEIVE first message from the prover
 	 * 							SEND challenge to prover
@@ -87,7 +87,7 @@ public class SigmaVerifier implements SigmaProtocolVerifier{
 	public boolean verify() throws ClassNotFoundException, IOException{
 		//Samples the challenge.
 		sampleChallenge();
-		//sends the challenge.
+		//Sends the challenge.
 		sendChallenge();
 		//Verifies the proof.
 		return processVerify();
@@ -172,7 +172,7 @@ public class SigmaVerifier implements SigmaProtocolVerifier{
 	}
 
 	/**
-	 * Wait for message from receiver and return it.
+	 * Waits for message from receiver and returns it.
 	 * @return the received message. MUST be an instance of SigmaProtocolMsg.
 	 * @throws ClassNotFoundException 
 	 * @throws IOException if failed to receive a message.

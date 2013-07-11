@@ -85,7 +85,7 @@ public interface SigmaProtocolVerifier {
 	
 	
 	/**
-	 * wait to the prover's second message and then verifies the proof.	
+	 * Waits to the prover's second message and then verifies the proof.	
 	 * This is a blocking function!
 	 * @return true if the proof has been verified; false, otherwise.
 	 * @throws IOException if failed to receive a message.

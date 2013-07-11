@@ -25,7 +25,7 @@
 package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol;
 
 /**
- * Marker interface. Every Sigma prover or verifier that consist of DamgardJurik should implement this interface.
+ * Marker interface. Every Sigma prover or verifier that consists of DamgardJurik should implement this interface.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
