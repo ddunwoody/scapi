@@ -78,7 +78,7 @@ public class SigmaDHExtendedSimulator implements SigmaSimulator{
 	 */
 	public SigmaDHExtendedSimulator() {
 		try {
-			//Calls the other constructor with Miracl Koblitz 233 Elliptic curve.
+			//Create Miracl Koblitz 233 Elliptic curve and set default parameters.
 			setParameters(new MiraclDlogECF2m("K-233"), 80, new SecureRandom());
 		} catch (IOException e) {
 			//If there is a problem with the elliptic curves file, create Zp DlogGroup.
@@ -171,12 +171,15 @@ public class SigmaDHExtendedSimulator implements SigmaSimulator{
 		BigInteger minusE = dlog.getOrder().subtract(e);
 		
 		ArrayList<GroupElementSendableData> aArray = new ArrayList<GroupElementSendableData>();
+		GroupElement gToZ;
+		GroupElement hToE;
+		GroupElement a;
 		//For every i=1,…,m, Compute ai = gi^z*hi^(-e) 
 		for (int i=0; i<size; i++){
 			
-			GroupElement gToZ = dlog.exponentiate(gArray.get(i), z);
-			GroupElement hToE = dlog.exponentiate(hArray.get(i), minusE);
-			GroupElement a = dlog.multiplyGroupElements(gToZ, hToE);
+			gToZ = dlog.exponentiate(gArray.get(i), z);
+			hToE = dlog.exponentiate(hArray.get(i), minusE);
+			a = dlog.multiplyGroupElements(gToZ, hToE);
 			aArray.add(a.generateSendableData());
 		}
 		
@@ -187,16 +190,16 @@ public class SigmaDHExtendedSimulator implements SigmaSimulator{
 	
 	/**
 	 * Computes the simulator computation.
-	 * @param input MUST be an instance of SigmaDlogInput.
+	 * @param input MUST be an instance of SigmaDHExtendedInput.
 	 * @return the output of the computation - (a, e, z).
-	 * @throws IllegalArgumentException if the given input is not an instance of SigmaDlogInput.
+	 * @throws IllegalArgumentException if the given input is not an instance of SigmaDHExtendedInput.
 	 */
 	public SigmaSimulatorOutput simulate(SigmaProtocolInput input){
 		//Create a new byte array of size t/8, to get the required byte size.
 		byte[] e = new byte[t/8];
 		//Fill the byte array with random values.
 		random.nextBytes(e);
-		//Call the other simulate function with the given input and the samples e.
+		//Call the other simulate function with the given input and the sampled e.
 		try {
 			return simulate(input, e);
 		} catch (CheatAttemptException e1) {
