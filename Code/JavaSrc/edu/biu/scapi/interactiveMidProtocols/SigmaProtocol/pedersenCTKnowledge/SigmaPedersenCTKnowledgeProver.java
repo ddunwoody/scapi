@@ -82,7 +82,7 @@ public class SigmaPedersenCTKnowledgeProver implements SigmaProverComputation, D
 	 */
 	public SigmaPedersenCTKnowledgeProver() {
 		try {
-			//Calls the other constructor with Miracl Koblitz 233 Elliptic curve.
+			//Create Miracl Koblitz 233 Elliptic curve and set default parameters.
 			setParameters(new MiraclDlogECF2m("K-233"), 80, new SecureRandom());
 		} catch (IOException e) {
 			//If there is a problem with the elliptic curves file, create Zp DlogGroup.
@@ -203,7 +203,7 @@ public class SigmaPedersenCTKnowledgeProver implements SigmaProverComputation, D
 		alpha = BigInteger.ZERO;
 		beta = BigInteger.ZERO;
 		
-		//Create and return SigmaBIMsg with z.
+		//Create and return SigmaPedersenCTKnowledgeMsg with z.
 		return new SigmaPedersenCTKnowledgeMsg(u, v);
 		
 	}

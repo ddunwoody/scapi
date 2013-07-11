@@ -30,7 +30,7 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**
  * Concrete implementation of SigmaProtocol input, used by the SigmaPedersenCTKnowledgeVerifier.
- * In SigmaPedersenCTKnowledge protocol, the verifier gets a GroupElement h and commitment message.
+ * In SigmaPedersenCTKnowledge protocol, the verifier gets a GroupElement h and a commitment message.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *

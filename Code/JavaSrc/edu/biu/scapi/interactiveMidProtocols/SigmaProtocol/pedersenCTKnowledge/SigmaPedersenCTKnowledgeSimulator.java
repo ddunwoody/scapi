@@ -42,7 +42,7 @@ import edu.biu.scapi.primitives.dlog.miracl.MiraclDlogECF2m;
 
 /**
  * Concrete implementation of Sigma Simulator.
- * This implementation simulates the case that the prover convince a verifier that that the value committed to in the commitment (h, c) is x..
+ * This implementation simulates the case that the prover convince a verifier that that the value committed to in the commitment (h, c) is x.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
@@ -76,7 +76,7 @@ public class SigmaPedersenCTKnowledgeSimulator implements SigmaSimulator{
 	 */
 	public SigmaPedersenCTKnowledgeSimulator() {
 		try {
-			//Calls the other constructor with Miracl Koblitz 233 Elliptic curve.
+			//Create Miracl Koblitz 233 Elliptic curve and set default parameters.
 			setParameters(new MiraclDlogECF2m("K-233"), 80, new SecureRandom());
 		} catch (IOException e) {
 			//If there is a problem with the elliptic curves file, create Zp DlogGroup.
@@ -178,16 +178,16 @@ public class SigmaPedersenCTKnowledgeSimulator implements SigmaSimulator{
 	
 	/**
 	 * Computes the simulator computation.
-	 * @param input MUST be an instance of SigmaDlogInput.
+	 * @param input MUST be an instance of SigmaPedersenCTKnowledgeInput.
 	 * @return the output of the computation - (a, e, z).
-	 * @throws IllegalArgumentException if the given input is not an instance of SigmaDlogInput.
+	 * @throws IllegalArgumentException if the given input is not an instance of SigmaPedersenCTKnowledgeInput.
 	 */
 	public SigmaSimulatorOutput simulate(SigmaProtocolInput input){
 		//Create a new byte array of size t/8, to get the required byte size.
 		byte[] e = new byte[t/8];
 		//Fill the byte array with random values.
 		random.nextBytes(e);
-		//Call the other simulate function with the given input and the samples e.
+		//Call the other simulate function with the given input and the sampled e.
 		try {
 			return simulate(input, e);
 		} catch (CheatAttemptException e1) {

@@ -68,7 +68,7 @@ public class SigmaPedersenCTKnowledgeVerifier implements SigmaVerifierComputatio
 	 */
 	public SigmaPedersenCTKnowledgeVerifier(DlogGroup dlog, int t, SecureRandom random) {
 		
-		// Sets the other parameter 
+		// Sets the given parameters. 
 		setParameters(dlog, t, random);
 	}
 	
@@ -77,7 +77,7 @@ public class SigmaPedersenCTKnowledgeVerifier implements SigmaVerifierComputatio
 	 */
 	public SigmaPedersenCTKnowledgeVerifier() {
 		try {
-			//Calls the other constructor with Miracl Koblitz 233 Elliptic curve.
+			//Create Miracl Koblitz 233 Elliptic curve and set default parameters.
 			setParameters(new MiraclDlogECF2m("K-233"), 80, new SecureRandom());
 		} catch (IOException e) {
 			//If there is a problem with the elliptic curves file, create Zp DlogGroup.
@@ -86,7 +86,7 @@ public class SigmaPedersenCTKnowledgeVerifier implements SigmaVerifierComputatio
 	}
 
 	/**
-	 * If soundness parameter is valid, sets the parameters. Else, throw IllegalArgumentException.
+	 * If soundness parameter and DlogGroup are valid, sets the parameters. Else, throw IllegalArgumentException.
 	 * @param dlog
 	 * @param t soundness parameter in BITS
 	 * @throws IllegalArgumentException if the given dlog is invalid.
@@ -193,7 +193,7 @@ public class SigmaPedersenCTKnowledgeVerifier implements SigmaVerifierComputatio
 			throw new IllegalArgumentException("second message must be an instance of SigmaPedersenCTKnowledgeMsg");
 		}
 		
-		//Get the h from the input and verify that it in the Dlog Group.
+		//Get the h from the input and verify that it is in the Dlog Group.
 		GroupElement h = input.getH();
 		
 		//If h is not member in the group, set verified to false.
