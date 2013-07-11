@@ -81,7 +81,7 @@ public class SigmaDHExtendedVerifier implements SigmaVerifierComputation, DlogBa
 	 */
 	public SigmaDHExtendedVerifier() {
 		try {
-			//Calls the other constructor with Miracl Koblitz 233 Elliptic curve.
+			//Create Miracl Koblitz 233 Elliptic curve and set default parameters.
 			setParameters(new MiraclDlogECF2m("K-233"), 80, new SecureRandom());
 		} catch (IOException e) {
 			//If there is a problem with the elliptic curves file, create Zp DlogGroup.
@@ -90,7 +90,7 @@ public class SigmaDHExtendedVerifier implements SigmaVerifierComputation, DlogBa
 	}
 
 	/**
-	 * If soundness parameter is valid, sets the parameters. Else, throw IllegalArgumentException.
+	 * If soundness parameter and DlogGroup are valid, sets the parameters. Else, throw IllegalArgumentException.
 	 * @param dlog
 	 * @param t soundness parameter in BITS
 	 * @param random
@@ -220,22 +220,23 @@ public class SigmaDHExtendedVerifier implements SigmaVerifierComputation, DlogBa
 		ArrayList<GroupElement> hArray = input.getHArray();
 		//Get the exponent in the second message from the prover.
 		SigmaBIMsg exponent = (SigmaBIMsg) z;
-		
-		
+		//Convert e to BigInteger.
+		BigInteger eBI = new BigInteger(1, e);
+		GroupElement left, right;
+		GroupElement hToe;
+		GroupElement aElement;
 		for (int i=0; i<len; i++){
 			//Verify that gi^z = ai*hi^e:
 			
 			//Compute gi^z (left size of the equation).
-			GroupElement left = dlog.exponentiate(gArray.get(i), exponent.getMsg());
+			left = dlog.exponentiate(gArray.get(i), exponent.getMsg());
 			
 			//Compute ai*hi^e (right side of the verify equation).
-			//Convert e to BigInteger.
-			BigInteger eBI = new BigInteger(1, e);
 			//Calculate hi^e.
-			GroupElement hToe = dlog.exponentiate(hArray.get(i), eBI);
+			hToe = dlog.exponentiate(hArray.get(i), eBI);
 			//Calculate a*hi^e.
-			GroupElement aElement = dlog.reconstructElement(true, aArray.get(i));
-			GroupElement right = dlog.multiplyGroupElements(aElement, hToe);
+			aElement = dlog.reconstructElement(true, aArray.get(i));
+			right = dlog.multiplyGroupElements(aElement, hToe);
 			
 			//If left and right sides of the equation are not equal, set verified to false.
 			verified = verified && left.equals(right);
