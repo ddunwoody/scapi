@@ -84,7 +84,7 @@ public class SigmaDlogProver implements SigmaProverComputation, DlogBasedSigma{
 	 */
 	public SigmaDlogProver() {
 		try {
-			//Calls the other constructor with Miracl Koblitz 233 Elliptic curve.
+			//Create Miracl Koblitz 233 Elliptic curve and set default parameters.
 			setParameters(new MiraclDlogECF2m("K-233"), 80, new SecureRandom());
 		} catch (IOException e) {
 			//If there is a problem with the elliptic curves file, create Zp DlogGroup.

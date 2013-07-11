@@ -78,7 +78,7 @@ public class SigmaDlogSimulator implements SigmaSimulator{
 	 */
 	public SigmaDlogSimulator() {
 		try {
-			//Calls the other constructor with Miracl Koblitz 233 Elliptic curve.
+			//Create Miracl Koblitz 233 Elliptic curve and set default parameters.
 			setParameters(new MiraclDlogECF2m("K-233"), 80, new SecureRandom());
 		} catch (IOException e) {
 			//If there is a problem with the elliptic curves file, create Zp DlogGroup.
@@ -175,7 +175,7 @@ public class SigmaDlogSimulator implements SigmaSimulator{
 		byte[] e = new byte[t/8];
 		//Fill the byte array with random values.
 		random.nextBytes(e);
-		//Call the other simulate function with the given input and the samples e.
+		//Call the other simulate function with the given input and the sampled e.
 		try {
 			return simulate(input, e);
 		} catch (CheatAttemptException e1) {

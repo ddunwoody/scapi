@@ -79,7 +79,7 @@ public class SigmaDlogVerifier implements SigmaVerifierComputation, DlogBasedSig
 	 */
 	public SigmaDlogVerifier() {
 		try {
-			//Calls the other constructor with Miracl Koblitz 233 Elliptic curve.
+			//Create Miracl Koblitz 233 Elliptic curve and set default parameters.
 			setParameters(new MiraclDlogECF2m("K-233"), 80, new SecureRandom());
 		} catch (IOException e) {
 			//If there is a problem with the elliptic curves file, create Zp DlogGroup.
@@ -200,7 +200,7 @@ public class SigmaDlogVerifier implements SigmaVerifierComputation, DlogBasedSig
 		//Get the exponent in the second message from the prover.
 		SigmaBIMsg exponent = (SigmaBIMsg) z;
 		
-		//Get the h from the input and verify that it in the Dlog Group.
+		//Get the h from the input and verify that it is in the Dlog Group.
 		GroupElement h = input.getH();
 		
 		//If h is not member in the group, set verified to false.
