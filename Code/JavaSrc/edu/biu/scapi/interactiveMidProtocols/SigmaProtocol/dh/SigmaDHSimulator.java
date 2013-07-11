@@ -78,7 +78,7 @@ public class SigmaDHSimulator implements SigmaSimulator{
 	 */
 	public SigmaDHSimulator() {
 		try {
-			//Calls the other constructor with Miracl Koblitz 233 Elliptic curve.
+			//Create Miracl Koblitz 233 Elliptic curve and set default parameters.
 			setParameters(new MiraclDlogECF2m("K-233"), 80, new SecureRandom());
 		} catch (IOException e) {
 			//If there is a problem with the elliptic curves file, create Zp DlogGroup.
@@ -170,16 +170,16 @@ public class SigmaDHSimulator implements SigmaSimulator{
 	
 	/**
 	 * Computes the simulator computation.
-	 * @param input MUST be an instance of SigmaDlogInput.
+	 * @param input MUST be an instance of SigmaDHInput.
 	 * @return the output of the computation - (a, e, z).
-	 * @throws IllegalArgumentException if the given input is not an instance of SigmaDlogInput.
+	 * @throws IllegalArgumentException if the given input is not an instance of SigmaDHInput.
 	 */
 	public SigmaSimulatorOutput simulate(SigmaProtocolInput input){
 		//Create a new byte array of size t/8, to get the required byte size.
 		byte[] e = new byte[t/8];
 		//Fill the byte array with random values.
 		random.nextBytes(e);
-		//Call the other simulate function with the given input and the samples e.
+		//Call the other simulate function with the given input and the sampled e.
 		try {
 			return simulate(input, e);
 		} catch (CheatAttemptException e1) {

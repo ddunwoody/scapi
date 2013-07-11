@@ -83,7 +83,7 @@ public class SigmaDHProver implements SigmaProverComputation, DlogBasedSigma{
 	 */
 	public SigmaDHProver() {
 		try {
-			//Calls the other constructor with Miracl Koblitz 233 Elliptic curve.
+			//Create Miracl Koblitz 233 Elliptic curve and set default parameters.
 			setParameters(new MiraclDlogECF2m("K-233"), 80, new SecureRandom());
 		} catch (IOException e) {
 			//If there is a problem with the elliptic curves file, create Zp DlogGroup.
@@ -167,7 +167,7 @@ public class SigmaDHProver implements SigmaProverComputation, DlogBasedSigma{
 		GroupElement a = dlog.exponentiate(dlog.getGenerator(), r);
 		//Compute b = h^r.
 		GroupElement b = dlog.exponentiate(input.getH(), r);
-		//Create and return SigmaGroupElementMsg with a.
+		//Create and return SigmaGroupElementMsg with a and b.
 		return new SigmaDHMsg(a.generateSendableData(), b.generateSendableData());
 	}
 
@@ -176,7 +176,7 @@ public class SigmaDHProver implements SigmaProverComputation, DlogBasedSigma{
 	 * "COMPUTE z = (r + ew) mod q".
 	 * @param challenge
 	 * @return the computed message.
-	 * @throws CheatAttemptException if the received challenge's length is not equal to the soundness parameter.
+	 * @throws CheatAttemptException if the length of the received challenge is not equal to the soundness parameter.
 	 */
 	public SigmaProtocolMsg computeSecondMsg(byte[] challenge) throws CheatAttemptException {
 		

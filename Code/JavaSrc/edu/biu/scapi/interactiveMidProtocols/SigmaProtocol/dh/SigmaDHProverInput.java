@@ -31,7 +31,7 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
 /**
  * Concrete implementation of SigmaProtocol input, used by the SigmaDHProver.
  * In SigmaProtocolDH, the prover gets three GroupElements - h, u, v and a BigInteger w such that g^w = u and h^w = v.
- * This class derives the SigmaDlogInput that contains h.
+ * This class derives the SigmaDHInput that contains h, u, and v.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *

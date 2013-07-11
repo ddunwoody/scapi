@@ -68,7 +68,7 @@ public class SigmaDHVerifier implements SigmaVerifierComputation, DlogBasedSigma
 	 */
 	public SigmaDHVerifier(DlogGroup dlog, int t, SecureRandom random) {
 		
-		// Sets the other parameter 
+		// Sets the given parameters. 
 		setParameters(dlog, t, random);
 	}
 	
@@ -77,7 +77,7 @@ public class SigmaDHVerifier implements SigmaVerifierComputation, DlogBasedSigma
 	 */
 	public SigmaDHVerifier() {
 		try {
-			//Calls the other constructor with Miracl Koblitz 233 Elliptic curve.
+			//Create Miracl Koblitz 233 Elliptic curve and set default parameters.
 			setParameters(new MiraclDlogECF2m("K-233"), 80, new SecureRandom());
 		} catch (IOException e) {
 			//If there is a problem with the elliptic curves file, create Zp DlogGroup.
@@ -86,7 +86,7 @@ public class SigmaDHVerifier implements SigmaVerifierComputation, DlogBasedSigma
 	}
 
 	/**
-	 * If soundness parameter is valid, sets the parameters. Else, throw IllegalArgumentException.
+	 * If soundness parameter and dlog are valid, sets the parameters. Else, throw IllegalArgumentException.
 	 * @param dlog
 	 * @param t soundness parameter in BITS
 	 * @param random
@@ -192,7 +192,7 @@ public class SigmaDHVerifier implements SigmaVerifierComputation, DlogBasedSigma
 			throw new IllegalArgumentException("second message must be an instance of SigmaBIMsg");
 		}
 		
-		//Get the h from the input and verify that it in the Dlog Group.
+		//Get the h from the input and verify that it is in the Dlog Group.
 		GroupElement h = input.getH();
 		//If h is not member in the group, set verified to false.
 		verified = verified && dlog.isMember(h);
@@ -219,12 +219,12 @@ public class SigmaDHVerifier implements SigmaVerifierComputation, DlogBasedSigma
 		verified = verified && left.equals(right);
 		
 		//Verify that h^z = bv^e:
-		//Compute g^z (left size of the equation).
+		//Compute h^z (left size of the equation).
 		left = dlog.exponentiate(h, exponent.getMsg());
 		//Compute b*v^e (right side of the verify equation).
 		//Calculate v^e.
 		GroupElement vToe = dlog.exponentiate(input.getV(), eBI);
-		//Calculate a*h^e.
+		//Calculate b*v^e.
 		right = dlog.multiplyGroupElements(bElement, vToe);
 		//If left and right sides of the equation are not equal, set verified to false.
 		verified = verified && left.equals(right);
