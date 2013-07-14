@@ -177,7 +177,7 @@ public class SigmaDHVerifier implements SigmaVerifierComputation, DlogBasedSigma
 	 * 	"ACC IFF VALID_PARAMS(G,q,g) = TRUE AND h in G AND g^z = au^e  AND h^z = bv^e".     
 	 * @param z second message from prover
 	 * @return true if the proof has been verified; false, otherwise.
-	 * @throws IllegalArgumentException if the first message of the prover is not an instance of SigmaGroupElementMsg
+	 * @throws IllegalArgumentException if the first message of the prover is not an instance of SigmaDHMsg
 	 * @throws IllegalArgumentException if the second message of the prover is not an instance of SigmaBIMsg
 	 */
 	public boolean verify(SigmaProtocolMsg a, SigmaProtocolMsg z) {

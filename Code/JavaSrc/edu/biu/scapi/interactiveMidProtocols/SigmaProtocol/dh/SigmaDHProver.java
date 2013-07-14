@@ -167,7 +167,7 @@ public class SigmaDHProver implements SigmaProverComputation, DlogBasedSigma{
 		GroupElement a = dlog.exponentiate(dlog.getGenerator(), r);
 		//Compute b = h^r.
 		GroupElement b = dlog.exponentiate(input.getH(), r);
-		//Create and return SigmaGroupElementMsg with a and b.
+		//Create and return SigmaDHMsg with a and b.
 		return new SigmaDHMsg(a.generateSendableData(), b.generateSendableData());
 	}
 
