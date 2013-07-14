@@ -34,7 +34,7 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
  * Concrete implementation of SigmaProtocol input, used by the SigmaCramerShoupEncryptedValueProver.<p>
  * 
  * In SigmaCramerShoupEncryptedValue protocol, the prover gets a GroupElement x, an CramerShoup public key, 
- * the ciphertext of x using the CramerShoup encryption scheme and the rsndomness value used to encrypt x.
+ * the ciphertext of x using the CramerShoup encryption scheme and the randomness value used to encrypt x.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *

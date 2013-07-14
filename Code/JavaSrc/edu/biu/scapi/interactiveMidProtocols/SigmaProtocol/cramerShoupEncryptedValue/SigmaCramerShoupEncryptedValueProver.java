@@ -108,7 +108,7 @@ public class SigmaCramerShoupEncryptedValueProver implements SigmaProverComputat
 	 * @param random
 	 */
 	private void setParameters(DlogGroup dlog, CryptographicHash hash, int t, SecureRandom random) {
-		//Creates the underlying SigmaDHProver object with the given parameters.
+		//Creates the underlying SigmaDHExtendedProver object with the given parameters.
 		sigmaDH = new SigmaDHExtendedProver(dlog, t, random);
 		this.dlog = dlog;
 		this.hash = hash;
@@ -119,7 +119,7 @@ public class SigmaCramerShoupEncryptedValueProver implements SigmaProverComputat
 	 * @return t soundness parameter
 	 */
 	public int getSoundness(){
-		//Delegates the computation to the underlying Sigma DH prover.
+		//Delegates the computation to the underlying Sigma DHExtended prover.
 		return sigmaDH.getSoundness();
 	}
 

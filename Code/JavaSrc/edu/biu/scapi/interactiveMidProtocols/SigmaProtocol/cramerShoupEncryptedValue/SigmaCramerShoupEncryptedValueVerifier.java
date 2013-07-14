@@ -63,7 +63,7 @@ public class SigmaCramerShoupEncryptedValueVerifier implements SigmaVerifierComp
 			•	Common input: (g1,g2,g3,g4,h1,h2,h3,h4) = (g1,g2,h,cd^w,u1,u2,e/x,v)
 	*/	
 	
-	private SigmaDHExtendedVerifier sigmaDH;		//underlying SigmaDlogVerifier to use.
+	private SigmaDHExtendedVerifier sigmaDH;		//underlying SigmaDHExtendedVerifier to use.
 	private DlogGroup dlog;							//We save the dlog because we need it to calculate the input for the underlying Sigma verifier.
 	private CryptographicHash hash;					//Underlying hash function that used in the CramerShoup cryptosystem.
 	
@@ -104,7 +104,7 @@ public class SigmaCramerShoupEncryptedValueVerifier implements SigmaVerifierComp
 	 * @param random
 	 */
 	private void setParameters(DlogGroup dlog, CryptographicHash hash, int t, SecureRandom random) {
-		//Creates the underlying SigmaDHProver object with the given parameters.
+		//Creates the underlying SigmaDHExtendedVerifier object with the given parameters.
 		sigmaDH = new SigmaDHExtendedVerifier(dlog, t, random);
 		this.dlog = dlog;
 		this.hash = hash;
@@ -115,7 +115,7 @@ public class SigmaCramerShoupEncryptedValueVerifier implements SigmaVerifierComp
 	 * @return t soundness parameter
 	 */
 	public int getSoundness(){
-		//Delegates to the underlying sigmaDH verifier.
+		//Delegates to the underlying sigmaDHExtended verifier.
 		return sigmaDH.getSoundness();
 	}
 
@@ -135,11 +135,11 @@ public class SigmaCramerShoupEncryptedValueVerifier implements SigmaVerifierComp
 		CramerShoupOnGroupElementCiphertext cipher = input.getCipher();
 		GroupElement x = input.getX();
 		
-		//Prepare the input for the underlying SigmaDHExtendedProver.
+		//Prepare the input for the underlying SigmaDHExtendedVerifier.
 		ArrayList<GroupElement> gArray = new ArrayList<GroupElement>();
 		ArrayList<GroupElement> hArray = new ArrayList<GroupElement>();
 		
-		//Converts the given input to the necessary input to the underlying SigmaDHExtendedProver.
+		//Converts the given input to the necessary input to the underlying SigmaDHExtendedVerifier.
 		//(g1,g2,g3,g4,h1,h2,h3,h4) = (g1,g2,h,cd^w,u1,u2,e/x,v)
 		
 		//add the input for the gArray:
@@ -164,7 +164,7 @@ public class SigmaCramerShoupEncryptedValueVerifier implements SigmaVerifierComp
 		hArray.add(h3);			   			   //add h3 = e/x.
 		hArray.add(cipher.getV());			   //add h4 = v.
 		
-		//Create an input object to the underlying sigma DHExtended prover.
+		//Create an input object to the underlying sigma DHExtended verifier.
 		SigmaDHExtendedInput underlyingInput = new SigmaDHExtendedInput(gArray, hArray);
 		sigmaDH.setInput(underlyingInput);
 		
@@ -232,7 +232,7 @@ public class SigmaCramerShoupEncryptedValueVerifier implements SigmaVerifierComp
 	 * Verifies the proof.
 	 * @param z second message from prover
 	 * @return true if the proof has been verified; false, otherwise.
-	 * @throws IllegalArgumentException if the first message of the prover is not an instance of SigmaGroupElementMsg
+	 * @throws IllegalArgumentException if the first message of the prover is not an instance of SigmaDHExtendedMsg
 	 * @throws IllegalArgumentException if the second message of the prover is not an instance of SigmaBIMsg
 	 */
 	public boolean verify(SigmaProtocolMsg a, SigmaProtocolMsg z) {

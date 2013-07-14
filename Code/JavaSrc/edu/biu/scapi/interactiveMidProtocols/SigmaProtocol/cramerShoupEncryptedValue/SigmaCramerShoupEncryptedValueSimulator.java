@@ -56,7 +56,7 @@ import edu.biu.scapi.primitives.hash.cryptopp.CryptoPpSHA1;
 public class SigmaCramerShoupEncryptedValueSimulator implements SigmaSimulator{
 	
 	/*	
-	  This class uses an instance of SigmaDlogSimulator with:
+	  This class uses an instance of SigmaDHExtendedSimulator with:
 	  	•	Common DlogGroup
 	  	•	Common input: (g1,g2,g3,g4,h1,h2,h3,h4) = (g1,g2,h,cd^w,u1,u2,e/x,v)
 	*/
@@ -103,7 +103,7 @@ public class SigmaCramerShoupEncryptedValueSimulator implements SigmaSimulator{
 	 * @param random
 	 */
 	private void setParameters(DlogGroup dlog, CryptographicHash hash, int t, SecureRandom random) {
-		//Creates the underlying SigmaDlogSimulator object with the given parameters.
+		//Creates the underlying SigmaDHextendedSimulator object with the given parameters.
 		dhSim = new SigmaDHExtendedSimulator(dlog, t, random);
 		this.dlog = dlog;
 		this.hash = hash;
@@ -112,7 +112,7 @@ public class SigmaCramerShoupEncryptedValueSimulator implements SigmaSimulator{
 	/**
 	 * Constructor that gets a simulator and sets it.
 	 * In getSimulator function in SigmaCramerShoupEncryptedValueProver, the prover needs to create an instance of this class.
-	 * The problem is that the prover does not know which Dlog, t and random to give, since they are values of the underlying 
+	 * The problem is that the prover does not know which t and random to give, since they are values of the underlying 
 	 * SigmaDHExtendedProver that the prover holds.
 	 * Using this constructor, the (CramerShoup) prover can get the DHExtended simulator from the underlying (DHExtended) prover 
 	 * and use it to create this object.
@@ -125,7 +125,7 @@ public class SigmaCramerShoupEncryptedValueSimulator implements SigmaSimulator{
 		if (!(simulator instanceof SigmaDHExtendedSimulator)){
 			throw new IllegalArgumentException("The given simulator is not an instance of SigmaDHExtendedSimulator");
 		}
-		//Sets the given object to the underlying SigmaDlogSimulator.
+		//Sets the given object to the underlying SigmaDHExtendedSimulator.
 		dhSim = (SigmaDHExtendedSimulator) simulator;
 	}
 	
@@ -139,7 +139,7 @@ public class SigmaCramerShoupEncryptedValueSimulator implements SigmaSimulator{
 	
 	/**
 	 * Computes the simulator computation.
-	 * @param input MUST be an instance of SigmaElGamalEncryptedValuePrivKeyInput OR SigmaElGamalEncryptedValueRandomnessInput.
+	 * @param input MUST be an instance of SigmaCramerShoupEncryptedValueInput.
 	 * @param challenge
 	 * @return the output of the computation - (a, e, z).
 	 * @throws CheatAttemptException if the received challenge's length is not equal to the soundness parameter.
@@ -148,21 +148,21 @@ public class SigmaCramerShoupEncryptedValueSimulator implements SigmaSimulator{
 	public SigmaSimulatorOutput simulate(SigmaProtocolInput in, byte[] challenge) throws CheatAttemptException{
 		SigmaDHExtendedInput underlyingInput = checkAndCreateUnderlyingInput(in);
 		
-		//Delegates the computation to the underlying Sigma DH simulator.
+		//Delegates the computation to the underlying Sigma DHExtended simulator.
 		return dhSim.simulate(underlyingInput, challenge); 
 				
 	}
 	
 	/**
 	 * Computes the simulator computation.
-	 * @param input MUST be an instance of SigmaElGamalEncryptedValuePrivKeyInput OR SigmaElGamalEncryptedValueRandomnessInput.
+	 * @param input MUST be an instance of SigmaCramerShoupEncryptedValueInput.
 	 * @return the output of the computation - (a, e, z).
 	 * @throws IllegalArgumentException if input is not the expected.
 	 */
 	public SigmaSimulatorOutput simulate(SigmaProtocolInput in){
 		SigmaDHExtendedInput underlyingInput = checkAndCreateUnderlyingInput(in);
 		
-		//Delegates the computation to the underlying Sigma DH simulator.
+		//Delegates the computation to the underlying Sigma DHExtended simulator.
 		return dhSim.simulate(underlyingInput); 
 				
 	}
@@ -185,11 +185,11 @@ public class SigmaCramerShoupEncryptedValueSimulator implements SigmaSimulator{
 		CramerShoupOnGroupElementCiphertext cipher = input.getCipher();
 		GroupElement x = input.getX();
 		
-		//Prepare the input for the underlying SigmaDHExtendedProver.
+		//Prepare the input for the underlying SigmaDHExtendedSimulator.
 		ArrayList<GroupElement> gArray = new ArrayList<GroupElement>();
 		ArrayList<GroupElement> hArray = new ArrayList<GroupElement>();
 		
-		//Converts the given input to the necessary input to the underlying SigmaDHExtendedProver.
+		//Converts the given input to the necessary input to the underlying SigmaDHExtendedSimulator.
 		//(g1,g2,g3,g4,h1,h2,h3,h4) = (g1,g2,h,cd^w,u1,u2,e/x,v)
 		
 		//add the input for the gArray:
@@ -214,7 +214,7 @@ public class SigmaCramerShoupEncryptedValueSimulator implements SigmaSimulator{
 		hArray.add(h3);			   			   //add h3 = e/x.
 		hArray.add(cipher.getV());			   //add h4 = v.
 		
-		//Create an input object to the underlying sigma DHExtended prover.
+		//Create an input object to the underlying sigma DHExtended simulator.
 		SigmaDHExtendedInput underlyingInput = new SigmaDHExtendedInput(gArray, hArray);
 		return underlyingInput;
 	}
