@@ -30,7 +30,7 @@ import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCElGamalCommitme
 
 /**
  * Concrete implementation of SigmaProtocol input, used by the SigmaElGamalCTKnowldgeProver.
- * In SigmaElGamalCTKnowldge protocol, the prover gets an ElGamal commitment and a value w in Zq such that h = g^w.
+ * In SigmaElGamalCTKnowldge protocol, the prover gets an ElGamal commitment message and a value w in Zq such that h = g^w.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *

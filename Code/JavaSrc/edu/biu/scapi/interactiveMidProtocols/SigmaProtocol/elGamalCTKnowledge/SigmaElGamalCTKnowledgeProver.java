@@ -86,9 +86,14 @@ public class SigmaElGamalCTKnowledgeProver implements SigmaProverComputation, Dl
 		setParameters(dlog, 80, new SecureRandom());
 	}
 	
-	
+	/**
+	 * Sets the given parameters.
+	 * @param dlog
+	 * @param t Soundness parameter in BITS.
+	 * @param random
+	 */
 	private void setParameters(DlogGroup dlog, int t, SecureRandom random) {
-		//Creates the underlying SigmaDlogProver object with default parameters.
+		//Creates the underlying SigmaDlogProver object with the given parameters.
 		sigmaDlog = new SigmaDlogProver(dlog, t, random);
 		this.dlog = dlog;
 	}

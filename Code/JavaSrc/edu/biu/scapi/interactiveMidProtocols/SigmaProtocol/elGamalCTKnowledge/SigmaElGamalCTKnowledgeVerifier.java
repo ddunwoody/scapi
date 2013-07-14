@@ -84,8 +84,14 @@ public class SigmaElGamalCTKnowledgeVerifier implements SigmaVerifierComputation
 		setParameters(dlog, 80, new SecureRandom());
 	}
 	
+	/**
+	 * Sets the given parameters.
+	 * @param dlog
+	 * @param t Soundness parameter in BITS.
+	 * @param random
+	 */
 	private void setParameters(DlogGroup dlog, int t, SecureRandom random) {
-		//Creates the underlying SigmaDlogVerifier object with default parameters.
+		//Create the underlying SigmaDlogVerifier object with the given parameters.
 		sigmaDlog = new SigmaDlogVerifier(dlog, t, random);
 		this.dlog = dlog;
 	}

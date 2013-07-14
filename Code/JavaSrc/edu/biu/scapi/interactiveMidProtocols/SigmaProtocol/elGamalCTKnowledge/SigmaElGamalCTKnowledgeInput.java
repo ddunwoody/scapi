@@ -29,7 +29,7 @@ import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCElGamalCommitme
 
 /**
  * Concrete implementation of SigmaProtocol input, used by the SigmaElGamalCTKnowledgeVerifier.
- * In SigmaElGamalCTKnowledge protocol, the verifier gets an ElGamal commitment.
+ * In SigmaElGamalCTKnowledge protocol, the verifier gets an ElGamal commitment message.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *

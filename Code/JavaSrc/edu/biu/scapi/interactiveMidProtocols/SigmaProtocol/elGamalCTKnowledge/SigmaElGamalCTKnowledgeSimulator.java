@@ -82,8 +82,14 @@ public class SigmaElGamalCTKnowledgeSimulator implements SigmaSimulator{
 		setParameters(dlog, 80, new SecureRandom());
 	}
 	
+	/**
+	 * Sets the given parameters.
+	 * @param dlog
+	 * @param t
+	 * @param random
+	 */
 	private void setParameters(DlogGroup dlog, int t, SecureRandom random) {
-		//Creates the underlying SigmaDlogSimulator object with default parameters.
+		//Creates the underlying SigmaDlogSimulator object with the given parameters.
 		dlogSim = new SigmaDlogSimulator(dlog, t, random);
 		this.dlog = dlog;
 	}
@@ -103,7 +109,7 @@ public class SigmaElGamalCTKnowledgeSimulator implements SigmaSimulator{
 		if (!(simulator instanceof SigmaDlogSimulator)){
 			throw new IllegalArgumentException("The given simulator is not an instance of SigmaDlogSimulator");
 		}
-		//Sets the given object to the underlying SigmaDlogSimulator.
+		//Sets the given object as the underlying SigmaDlogSimulator.
 		dlogSim = (SigmaDlogSimulator) simulator;
 	}
 	
@@ -124,6 +130,21 @@ public class SigmaElGamalCTKnowledgeSimulator implements SigmaSimulator{
 	 * @throws IllegalArgumentException if the given input is not an instance of SigmaElGamalCTKnowledgeInput.
 	 */
 	public SigmaSimulatorOutput simulate(SigmaProtocolInput input, byte[] challenge) throws CheatAttemptException{
+		//Converts the input to an input object of the underlying simulator.
+		SigmaDlogInput dlogInput = convertInput(input);
+		
+		//Delegates the computation to the underlying Sigma Dlog prover.
+		return dlogSim.simulate(dlogInput, challenge); 
+				
+	}
+
+	/**
+	 * Converts the given input to an input object of the underlying Sigma simulator.
+	 * @param input MUST be an instance of SigmaElGamalCTKnowledgeInput.
+	 * @return the converted input.
+	 * @throws IllegalArgumentException if the given input is not an instance of SigmaElGamalCTKnowledgeInput.
+	 */
+	private SigmaDlogInput convertInput(SigmaProtocolInput input) {
 		if (!(input instanceof SigmaElGamalCTKnowledgeInput)){
 			throw new IllegalArgumentException("the given input must be an instance of SigmaElGamalCTKnowledgeInput");
 		}
@@ -132,10 +153,7 @@ public class SigmaElGamalCTKnowledgeSimulator implements SigmaSimulator{
 		//Convert the input to match the required SigmaDlogSimulator's input.
 		GroupElement h = dlog.reconstructElement(true, elGamalInput.getCommitment().getPublicKey().getC());
 		SigmaDlogInput dlogInput = new SigmaDlogInput(h);
-		
-		//Delegates the computation to the underlying Sigma Dlog prover.
-		return dlogSim.simulate(dlogInput, challenge); 
-				
+		return dlogInput;
 	}
 	
 	/**
@@ -145,14 +163,8 @@ public class SigmaElGamalCTKnowledgeSimulator implements SigmaSimulator{
 	 * @throws IllegalArgumentException if the given input is not an instance of SigmaElGamalCTKnowledgeInput.
 	 */
 	public SigmaSimulatorOutput simulate(SigmaProtocolInput input){
-		if (!(input instanceof SigmaElGamalCTKnowledgeInput)){
-			throw new IllegalArgumentException("the given input must be an instance of SigmaElGamalCTKnowledgeInput");
-		}
-		SigmaElGamalCTKnowledgeInput elGamalInput = (SigmaElGamalCTKnowledgeInput) input;
-		
-		//Convert the input to match the required SigmaDlogSimulator's input.
-		GroupElement h = dlog.reconstructElement(true, elGamalInput.getCommitment().getPublicKey().getC());
-		SigmaDlogInput dlogInput = new SigmaDlogInput(h);
+		//Converts the input to an input object of the underlying simulator.
+		SigmaDlogInput dlogInput = convertInput(input);
 		
 		//Delegates the computation to the underlying Sigma Dlog simulator.
 		return dlogSim.simulate(dlogInput); 
