@@ -31,7 +31,6 @@ import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaSimulator;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHSimulator;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog.SigmaDlogSimulator;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaSimulatorOutput;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
@@ -49,7 +48,7 @@ import edu.biu.scapi.primitives.dlog.miracl.MiraclDlogECF2m;
 public class SigmaElGamalCommittedValueSimulator implements SigmaSimulator{
 
 	/*	
-	  This class uses an instance of SigmaDlogSimulator with:
+	  This class uses an instance of SigmaDHSimulator with:
 	  	•	Common parameters (G,q,g) and t
 		•	Common input: (g,h,u,v) = (g,h,c1,c2/x)
 	*/
@@ -83,28 +82,34 @@ public class SigmaElGamalCommittedValueSimulator implements SigmaSimulator{
 		setParameters(dlog, 80, new SecureRandom());
 	}
 	
+	/**
+	 * Creates the underlying simulator and sets the given parameters. 
+	 * @param dlog
+	 * @param t Soundness parameter in BITS.
+	 * @param random
+	 */
 	private void setParameters(DlogGroup dlog, int t, SecureRandom random) {
-		//Creates the underlying SigmaDlogSimulator object with default parameters.
+		//Creates the underlying SigmaDHSimulator object with the given parameters.
 		dhSim = new SigmaDHSimulator(dlog, t, random);
 		this.dlog = dlog;
 	}
 	
 	/**
 	 * Constructor that gets a simulator and sets it.
-	 * In getSimulator function in SigmaElGamalPrivateKeyProver, the prover needs to create an instance of this class.
+	 * In getSimulator function in SigmaElGamalCommittedValueProver, the prover needs to create an instance of this class.
 	 * The problem is that the prover does not know which Dlog, t and random to give, since they are values of the underlying 
-	 * SigmaDlogProver that the prover holds.
-	 * Using this constructor, the (ElGamal) prover can get the dlog simulator from the underlying (Dlog) prover and use it to create this object.
+	 * SigmaDHProver that the prover holds.
+	 * Using this constructor, the (ElGamal) prover can get the DH simulator from the underlying (DH) prover and use it to create this object.
 	 * 
-	 * @param simulator MUST be an instance of SigmaDlogSimulator.
-	 * @throws IllegalArgumentException if the given simulator is not an instance of SigmaDlogSimulator.
+	 * @param simulator MUST be an instance of SigmaDHSimulator.
+	 * @throws IllegalArgumentException if the given simulator is not an instance of SigmaDHSimulator.
 	 */
 	SigmaElGamalCommittedValueSimulator(SigmaSimulator simulator) {
 		
-		if (!(simulator instanceof SigmaDlogSimulator)){
-			throw new IllegalArgumentException("The given simulator is not an instance of SigmaDlogSimulator");
+		if (!(simulator instanceof SigmaDHSimulator)){
+			throw new IllegalArgumentException("The given simulator is not an instance of SigmaDHSimulator");
 		}
-		//Sets the given object to the underlying SigmaDlogSimulator.
+		//Sets the given object to the underlying SigmaDHSimulator.
 		dhSim = (SigmaDHSimulator) simulator;
 	}
 	
@@ -125,13 +130,27 @@ public class SigmaElGamalCommittedValueSimulator implements SigmaSimulator{
 	 * @throws IllegalArgumentException if the given input is not an instance of SigmaElGamalCommittedValueInput.
 	 */
 	public SigmaSimulatorOutput simulate(SigmaProtocolInput in, byte[] challenge) throws CheatAttemptException{
+		//Convert the input to an input object for the underlying simulator.
+		SigmaDHInput dhInput = convertInput(in);
+		
+		//Delegates the computation to the underlying Sigma DH prover.
+		return dhSim.simulate(dhInput, challenge); 
+				
+	}
+
+	/**
+	 * Converts the input to an input object for the underlying simulator.
+	 * @param in
+	 * @return
+	 */
+	private SigmaDHInput convertInput(SigmaProtocolInput in) {
 		if (!(in instanceof SigmaElGamalCommittedValueInput)){
 			throw new IllegalArgumentException("the given input must be an instance of SigmaElGamalCommittedValueInput");
 		}
 		SigmaElGamalCommittedValueInput input = (SigmaElGamalCommittedValueInput) in;
 		
 		
-		//Conver t input to the underlying DH prover:
+		//Convert input to the underlying DH prover:
 		//(g,h,u,v) = (g,h,c1,c2/x).
 		GroupElement h = dlog.reconstructElement(true, input.getCommitment().getPublicKey().getC());
 		//u = c1
@@ -141,10 +160,7 @@ public class SigmaElGamalCommittedValueSimulator implements SigmaSimulator{
 		GroupElement xInv = dlog.getInverse(input.getX());
 		GroupElement v = dlog.multiplyGroupElements(c2, xInv);
 		SigmaDHInput dhInput = new SigmaDHInput(h, u, v);
-		
-		//Delegates the computation to the underlying Sigma Dh prover.
-		return dhSim.simulate(dhInput, challenge); 
-				
+		return dhInput;
 	}
 	
 	/**
@@ -154,24 +170,10 @@ public class SigmaElGamalCommittedValueSimulator implements SigmaSimulator{
 	 * @throws IllegalArgumentException if the given input is not an instance of SigmaElGamalCommittedValueInput.
 	 */
 	public SigmaSimulatorOutput simulate(SigmaProtocolInput in){
-		if (!(in instanceof SigmaElGamalCommittedValueInput)){
-			throw new IllegalArgumentException("the given input must be an instance of SigmaElGamalCommittedValueInput");
-		}
-		SigmaElGamalCommittedValueInput input = (SigmaElGamalCommittedValueInput) in;
+		//Convert the input to an input object for the underlying simulator.
+		SigmaDHInput dhInput = convertInput(in);
 		
-		
-		//Conver t input to the underlying DH prover:
-		//(g,h,u,v) = (g,h,c1,c2/x).
-		GroupElement h = dlog.reconstructElement(true, input.getCommitment().getPublicKey().getC());
-		//u = c1
-		GroupElement u = dlog.reconstructElement(true, input.getCommitment().getCipherData().getCipher1());
-		//Calculate v = c2/x = c2*x^(-1)
-		GroupElement c2 = dlog.reconstructElement(true, input.getCommitment().getCipherData().getCipher2());
-		GroupElement xInv = dlog.getInverse(input.getX());
-		GroupElement v = dlog.multiplyGroupElements(c2, xInv);
-		SigmaDHInput dhInput = new SigmaDHInput(h, u, v);
-		
-		//Delegates the computation to the underlying Sigma Dh simulator.
+		//Delegates the computation to the underlying Sigma DH simulator.
 		return dhSim.simulate(dhInput); 
 	}
 
