@@ -52,6 +52,9 @@ import edu.biu.scapi.primitives.dlog.miracl.MiraclDlogECF2m;
 public class SigmaElGamalEncryptedValueProver implements SigmaProverComputation, DlogBasedSigma{
 
 	/*	
+	  There are two versions of SigmaElGamalEncryptedValue protocol, depending upon if the prover knows 
+	  the secret key or it knows the randomness used to generate the ciphertext.
+	  
 	  This class uses an instance of SigmaDHProver with:
 	  
 	  		•	Common DlogGroup
@@ -63,7 +66,7 @@ public class SigmaElGamalEncryptedValueProver implements SigmaProverComputation,
 			•	P’s private input: a value r <- Zq such that c1=g^r and c2/x =h^r.
 	*/	 
 	
-	private SigmaDHProver sigmaDH;	//underlying SigmaDlogProver to use.
+	private SigmaDHProver sigmaDH;	//underlying SigmaDHProver to use.
 	private DlogGroup dlog;			//We save the dlog because we need it to calculate the input for the underlying Sigma prover.
 	
 	/**
