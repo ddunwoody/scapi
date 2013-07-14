@@ -31,8 +31,8 @@ import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCPedersenCommitm
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**
- * Concrete implementation of SigmaProtocol input, used by the SigmaPedersenCommitedValueVerifier.
- * In SigmaPedersenCommitedValue protocol, the verifier gets a GroupElement h, a commitment message and the committed value x.
+ * Concrete implementation of SigmaProtocol input, used by the SigmaPedersenCommittedValueVerifier.
+ * In SigmaPedersenCommittedValue protocol, the verifier gets a GroupElement h, a commitment message and the committed value x.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *

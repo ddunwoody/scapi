@@ -88,7 +88,7 @@ public class SigmaPedersenCommittedValueSimulator implements SigmaSimulator{
 	
 	private void setParameters(DlogGroup dlog, int t, SecureRandom random) {
 		
-		//Creates the underlying SigmaDlogVerifier object with default parameters.
+		//Creates the underlying SigmaDlogSimulator object with the given parameters.
 		dlogSim = new SigmaDlogSimulator(dlog, t, random);
 		this.dlog = dlog;
 	}
@@ -129,10 +129,10 @@ public class SigmaPedersenCommittedValueSimulator implements SigmaSimulator{
 	 * @throws IllegalArgumentException if the given input is not an instance of SigmaPedersenCommittedValueInput.
 	 */
 	public SigmaSimulatorOutput simulate(SigmaProtocolInput in, byte[] challenge) throws CheatAttemptException{
-		//convert the given input to the underlying Dlog simulator input.
+		//Convert the given input to the underlying Dlog simulator input.
 		SigmaDlogInput underlyingInput = convertInput(in);
 		
-		//Delegates the computation to the underlying Sigma Dlog prover.
+		//Delegate the computation to the underlying Sigma Dlog simulator.
 		return dlogSim.simulate(underlyingInput, challenge); 
 				
 	}
@@ -144,10 +144,10 @@ public class SigmaPedersenCommittedValueSimulator implements SigmaSimulator{
 	 * @throws IllegalArgumentException if the given input is not an instance of SigmaPedersenCommittedValueInput.
 	 */
 	public SigmaSimulatorOutput simulate(SigmaProtocolInput in){
-		//convert the given input to the underlying Dlog simulator input.
+		//Convert the given input to the underlying Dlog simulator input.
 		SigmaDlogInput underlyingInput = convertInput(in);
 		
-		//Delegates the computation to the underlying Sigma Dlog simulator.
+		//Delegate the computation to the underlying Sigma Dlog simulator.
 		return dlogSim.simulate(underlyingInput); 
 	}
 	
@@ -158,19 +158,19 @@ public class SigmaPedersenCommittedValueSimulator implements SigmaSimulator{
 	 * @throws IllegalArgumentException if the given input is not an instance of SigmaPedersenCommittedValueInput.
 	 */
 	private SigmaDlogInput convertInput(SigmaProtocolInput in) {
-		//if the given input id not an instance of SigmaPedersenCommittedValueInput throw exception
+		//If the given input is not an instance of SigmaPedersenCommittedValueInput throw exception
 		if (!(in instanceof SigmaPedersenCommittedValueInput)){
 			throw new IllegalArgumentException("the given input must be an instance of SigmaPedersenCommittedValueInput");
 		}
 		SigmaPedersenCommittedValueInput input = (SigmaPedersenCommittedValueInput) in;
 		
-		//convert the input to the underlying Dlog prover. h’ = c*h^(-x).
+		//Convert the input to the underlying Dlog prover. h’ = c*h^(-x).
 		BigInteger minusX = dlog.getOrder().subtract(input.getX());
 		GroupElement hToX = dlog.exponentiate(input.getH(), minusX);
 		GroupElement c = dlog.reconstructElement(true, input.getCommitment().getC());
 		GroupElement hTag = dlog.multiplyGroupElements(c, hToX);
 		
-		//create and return the input instance with the computes h'.
+		//Create and return the input instance with the computes h'.
 		SigmaDlogInput underlyingInput = new SigmaDlogInput(hTag);
 		return underlyingInput;
 	}

@@ -87,9 +87,15 @@ public class SigmaPedersenCommittedValueVerifier implements SigmaVerifierComputa
 		
 	}
 	
+	/**
+	 * Sets the given parameters.
+	 * @param dlog
+	 * @param t Soundness parameter in BITS.
+	 * @param random
+	 */
 	private void setParameters(DlogGroup dlog, int t, SecureRandom random) {
 		
-		//Creates the underlying SigmaDlogVerifier object with default parameters.
+		//Creates the underlying SigmaDlogVerifier object with the given parameters.
 		sigmaDlog = new SigmaDlogVerifier(dlog, t, random);
 		this.dlog = dlog;
 	}
@@ -115,7 +121,7 @@ public class SigmaPedersenCommittedValueVerifier implements SigmaVerifierComputa
 		}
 		SigmaPedersenCommittedValueInput input = (SigmaPedersenCommittedValueInput) in;
 		
-		//convert the input to the underlying Dlog prover. h’ = c*h^(-x).
+		//Convert the input to the underlying Dlog prover. h’ = c*h^(-x).
 		BigInteger minusX = dlog.getOrder().subtract(input.getX());
 		GroupElement hToX = dlog.exponentiate(input.getH(), minusX);
 		GroupElement c = dlog.reconstructElement(true, input.getCommitment().getC());
