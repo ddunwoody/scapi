@@ -58,8 +58,8 @@ public class SigmaElGamalCommittedValueProver implements SigmaProverComputation,
 
 	*/	 
 	
-	private SigmaDHProver sigmaDH;	//underlying SigmaDlogProver to use.
-	private DlogGroup dlog;				//We need the DlogGroup instance in order to calculate the input for the underlying SigmaDlogProver
+	private SigmaDHProver sigmaDH;	//underlying SigmaDHProver to use.
+	private DlogGroup dlog;			//We need the DlogGroup instance in order to calculate the input for the underlying SigmaDlogProver
 	
 	/**
 	 * Constructor that gets the underlying DlogGroup, soundness parameter and SecureRandom.
@@ -87,9 +87,14 @@ public class SigmaElGamalCommittedValueProver implements SigmaProverComputation,
 		setParameters(dlog, 80, new SecureRandom());
 	}
 	
-	
+	/**
+	 * Creates the underlying prover computation and sets the given parameters.
+	 * @param dlog
+	 * @param t Soundness parameter in BITS.
+	 * @param random
+	 */
 	private void setParameters(DlogGroup dlog, int t, SecureRandom random) {
-		//Creates the underlying SigmaDlogProver object with default parameters.
+		//Creates the underlying SigmaDHProver object with the given parameters.
 		sigmaDH = new SigmaDHProver(dlog, t, random);
 		this.dlog = dlog;
 	}
@@ -99,7 +104,7 @@ public class SigmaElGamalCommittedValueProver implements SigmaProverComputation,
 	 * @return t soundness parameter
 	 */
 	public int getSoundness(){
-		//Delegates the computation to the underlying Sigma Dlog prover.
+		//Delegates the computation to the underlying Sigma DH prover.
 		return sigmaDH.getSoundness();
 	}
 
@@ -115,7 +120,7 @@ public class SigmaElGamalCommittedValueProver implements SigmaProverComputation,
 		}
 		SigmaElGamalCommittedValueProverInput input = (SigmaElGamalCommittedValueProverInput) in;
 		
-		//Conver t input to the underlying DH prover:
+		//Convert input to the underlying DH prover:
 		//(g,h,u,v) = (g,h,c1,c2/x).
 		GroupElement h = dlog.reconstructElement(true, input.getCommitment().getPublicKey().getC());
 		//u = c1
@@ -160,7 +165,7 @@ public class SigmaElGamalCommittedValueProver implements SigmaProverComputation,
 	
 	/**
 	 * Returns the simulator that matches this sigma protocol prover.
-	 * @return SigmaDlogSimulator
+	 * @return SigmaElGamalCommittedValueSimulator
 	 */
 	public SigmaSimulator getSimulator(){
 		return new SigmaElGamalCommittedValueSimulator(sigmaDH.getSimulator());

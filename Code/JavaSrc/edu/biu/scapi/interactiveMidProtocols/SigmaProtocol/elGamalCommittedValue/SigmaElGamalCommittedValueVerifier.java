@@ -49,7 +49,7 @@ import edu.biu.scapi.primitives.dlog.miracl.MiraclDlogECF2m;
 public class SigmaElGamalCommittedValueVerifier implements SigmaVerifierComputation, DlogBasedSigma{
 
 	/*	
-	  This class uses an instance of SigmaDlogVerifier with:
+	  This class uses an instance of SigmaDHVerifier with:
 	  	•	Common parameters (G,q,g) and t
 		•	Common input: (g,h,u,v) = (g,h,c1,c2/x)
 	*/	
@@ -84,8 +84,14 @@ public class SigmaElGamalCommittedValueVerifier implements SigmaVerifierComputat
 		setParameters(dlog, 80, new SecureRandom());
 	}
 	
+	/**
+	 * Creates the underlying verifier and set the given parameters.
+	 * @param dlog
+	 * @param t
+	 * @param random
+	 */
 	private void setParameters(DlogGroup dlog, int t, SecureRandom random) {
-		//Creates the underlying SigmaDlogVerifier object with default parameters.
+		//Creates the underlying SigmaDHVerifier object with the given parameters.
 		sigmaDH = new SigmaDHVerifier(dlog, t, random);
 		this.dlog = dlog;
 	}
@@ -111,7 +117,7 @@ public class SigmaElGamalCommittedValueVerifier implements SigmaVerifierComputat
 		SigmaElGamalCommittedValueInput input = (SigmaElGamalCommittedValueInput) in;
 		
 		
-		//Conver t input to the underlying DH prover:
+		//Convert input to the underlying DH prover:
 		//(g,h,u,v) = (g,h,c1,c2/x).
 		GroupElement h = dlog.reconstructElement(true, input.getCommitment().getPublicKey().getC());
 		//u = c1
@@ -155,7 +161,7 @@ public class SigmaElGamalCommittedValueVerifier implements SigmaVerifierComputat
 	 * Verifies the proof.
 	 * @param z second message from prover
 	 * @return true if the proof has been verified; false, otherwise.
-	 * @throws IllegalArgumentException if the first message of the prover is not an instance of SigmaGroupElementMsg
+	 * @throws IllegalArgumentException if the first message of the prover is not an instance of SigmaDHMsg
 	 * @throws IllegalArgumentException if the second message of the prover is not an instance of SigmaBIMsg
 	 */
 	public boolean verify(SigmaProtocolMsg a, SigmaProtocolMsg z) {

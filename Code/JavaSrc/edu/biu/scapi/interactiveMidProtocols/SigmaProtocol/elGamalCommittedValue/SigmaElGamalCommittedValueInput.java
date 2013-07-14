@@ -30,7 +30,8 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**
  * Concrete implementation of SigmaProtocol input, used by the SigmaElGamalCommittedValueVerifier.
- * In SigmaElGamalCommittedValue protocol, the verifier gets an ElGamal commitment and the value committed x.
+ * In SigmaElGamalCommittedValue protocol, the verifier gets an ElGamal commitment message 
+ * and the value committed x.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *

@@ -31,8 +31,8 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**
  * Concrete implementation of SigmaProtocol input, used by the SigmaElGamalCommittedValueProver.
- * In SigmaElGamalCommittedValue protocol, the prover gets an ElGamal commitment, the value committed x 
- * and the value r in Zq such that c1=g^r and c2 =h^r*x.
+ * In SigmaElGamalCommittedValue protocol, the prover gets an ElGamal commitment message, 
+ * the value committed x and the value r in Zq such that c1=g^r and c2 =h^r*x.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
