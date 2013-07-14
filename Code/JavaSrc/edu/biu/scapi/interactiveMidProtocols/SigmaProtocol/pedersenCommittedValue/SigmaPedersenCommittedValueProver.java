@@ -98,7 +98,7 @@ public class SigmaPedersenCommittedValueProver implements SigmaProverComputation
 	 * @param random
 	 */
 	private void setParameters(DlogGroup dlog, int t, SecureRandom random) {
-		//Create the underlying SigmaDlogProver object with default parameters.
+		//Create the underlying SigmaDlogProver object with the given parameters.
 		sigmaDlog = new SigmaDlogProver(dlog, t, random);
 		this.dlog = dlog;
 	}
