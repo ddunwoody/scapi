@@ -114,7 +114,7 @@ public class SigmaElGamalPrivateKeySimulator implements SigmaSimulator{
 		//Convert the input to match the required SigmaDlogSimulator's input.
 		SigmaDlogInput dlogInput = new SigmaDlogInput(elGamalInput.getPublicKey().getH());
 		
-		//Delegates the computation to the underlying Sigma Dlog prover.
+		//Delegates the computation to the underlying Sigma Dlog simulator.
 		return dlogSim.simulate(dlogInput, challenge); 
 				
 	}

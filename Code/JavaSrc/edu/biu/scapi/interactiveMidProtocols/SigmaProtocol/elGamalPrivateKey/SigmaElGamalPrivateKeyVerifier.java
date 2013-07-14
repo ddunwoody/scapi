@@ -94,7 +94,7 @@ public class SigmaElGamalPrivateKeyVerifier implements SigmaVerifierComputation,
 		}
 		SigmaElGamalPrivateKeyInput input = (SigmaElGamalPrivateKeyInput) in;
 		
-		//Create an input object to the underlying sigma dlog prover.
+		//Create an input object to the underlying sigma dlog verifier.
 		SigmaDlogInput underlyingInput = new SigmaDlogInput(input.getPublicKey().getH());
 		sigmaDlog.setInput(underlyingInput);
 				
