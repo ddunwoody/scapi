@@ -49,7 +49,10 @@ import edu.biu.scapi.primitives.dlog.miracl.MiraclDlogECF2m;
 public class SigmaElGamalEncryptedValueSimulator implements SigmaSimulator{
 	
 	/*	
-	  This class uses an instance of SigmaDlogSimulator with:
+	  There are two versions of SigmaElGamalEncryptedValue protocol, depending upon if the prover knows 
+	  the secret key or it knows the randomness used to generate the ciphertext.
+	  
+	  This class uses an instance of SigmaDHSimulator with:
 	  	•	Common DlogGroup
 	  	In case we use knowledge of the private key:
 			•	Common input: (g,h,u,v) = (g,c1,h,c2/x) and
@@ -67,7 +70,7 @@ public class SigmaElGamalEncryptedValueSimulator implements SigmaSimulator{
 	 * @param random
 	 */
 	public SigmaElGamalEncryptedValueSimulator(DlogGroup dlog, int t, SecureRandom random){
-		//Creates the underlying SigmaDlogSimulator object with the given parameters.
+		//Creates the underlying SigmaDHSimulator object with the given parameters.
 		dhSim = new SigmaDHSimulator(dlog, t, random);
 		this.dlog = dlog;
 	}
@@ -92,7 +95,7 @@ public class SigmaElGamalEncryptedValueSimulator implements SigmaSimulator{
 	/**
 	 * Constructor that gets a simulator and sets it.
 	 * In getSimulator function in SigmaElGamalEncryptedValueProver, the prover needs to create an instance of this class.
-	 * The problem is that the prover does not know which Dlog, t and random to give, since they are values of the underlying 
+	 * The problem is that the prover does not know which t and random to give, since they are values of the underlying 
 	 * SigmaDHProver that the prover holds.
 	 * Using this constructor, the (ElGamal) prover can get the DH simulator from the underlying (DH) prover and use it to create this object.
 	 * 
@@ -104,7 +107,7 @@ public class SigmaElGamalEncryptedValueSimulator implements SigmaSimulator{
 		if (!(simulator instanceof SigmaDHSimulator)){
 			throw new IllegalArgumentException("The given simulator is not an instance of SigmaDHSimulator");
 		}
-		//Sets the given object to the underlying SigmaDlogSimulator.
+		//Sets the given object to the underlying SigmaDHSimulator.
 		dhSim = (SigmaDHSimulator) simulator;
 	}
 	
@@ -118,7 +121,7 @@ public class SigmaElGamalEncryptedValueSimulator implements SigmaSimulator{
 	
 	/**
 	 * Computes the simulator computation.
-	 * @param input MUST be an instance of SigmaElGamalEncryptedValuePrivKeyInput OR SigmaElGamalEncryptedValueRandomnessInput.
+	 * @param input MUST be an instance of SigmaElGamalEncryptedValueInput.
 	 * @param challenge
 	 * @return the output of the computation - (a, e, z).
 	 * @throws CheatAttemptException if the received challenge's length is not equal to the soundness parameter.
@@ -134,7 +137,7 @@ public class SigmaElGamalEncryptedValueSimulator implements SigmaSimulator{
 	
 	/**
 	 * Computes the simulator computation.
-	 * @param input MUST be an instance of SigmaElGamalEncryptedValuePrivKeyInput OR SigmaElGamalEncryptedValueRandomnessInput.
+	 * @param input MUST be an instance of SigmaElGamalEncryptedValueInput.
 	 * @return the output of the computation - (a, e, z).
 	 * @throws IllegalArgumentException if input is not the expected.
 	 */
@@ -148,20 +151,26 @@ public class SigmaElGamalEncryptedValueSimulator implements SigmaSimulator{
 
 	/**
 	 * Checks the given input and creates the input for the underlying DH simulator according to it.
-	 * @param in MUST be an instance of SigmaElGamalEncryptedValuePrivKeyInput OR SigmaElGamalEncryptedValueRandomnessInput.
+	 * @param in MUST be an instance of SigmaElGamalEncryptedValueInput.
 	 * @return SigmaDHInput the input for the underlying simulator.
 	 * @throws IllegalArgumentException if input is not the expected.
 	 */
 	private SigmaDHInput checkAndCreateUnderlyingInput(SigmaProtocolInput in) {
+		if (!(in instanceof SigmaElGamalEncryptedValueInput)){
+			throw new IllegalArgumentException("the given input must be an instance of SigmaElGamalEncryptedValueInput");
+		}
+		
+		SigmaElGamalEncryptedValueInput input = (SigmaElGamalEncryptedValueInput) in;
+		boolean isRandomness = input.isRandomness();
 		//Converts the given input to the necessary input to the underlying SigmaDHVerifier.
-		GroupElement h;
-		GroupElement u;
-		GroupElement v;
+		GroupElement h = null;
+		GroupElement u = null;;
+		GroupElement v = null;
 		
 		//In case we use knowledge of the private key, the input should be:
 		// (h, u, v) = (c1, h, c2/x) 
-		if (in instanceof SigmaElGamalEncryptedValuePrivKeyInput){
-			SigmaElGamalEncryptedValuePrivKeyInput input = (SigmaElGamalEncryptedValuePrivKeyInput) in;
+		if (!isRandomness){
+			
 			//h = c1;
 			h = input.getCipher().getC1();
 			//u = h;
@@ -173,8 +182,7 @@ public class SigmaElGamalEncryptedValueSimulator implements SigmaSimulator{
 		}
 		//In case we use knowledge of the randomness used to encrypt:
 		// (h,u,v, w) = (h,c1,c2/x, r)
-		else if (in instanceof SigmaElGamalEncryptedValueRandomnessInput){
-			SigmaElGamalEncryptedValueRandomnessInput input = (SigmaElGamalEncryptedValueRandomnessInput) in;
+		if (isRandomness){
 			//h = c1;
 			h = input.getPublicKey().getH();
 			//u = h;
@@ -183,10 +191,6 @@ public class SigmaElGamalEncryptedValueSimulator implements SigmaSimulator{
 			GroupElement c2 = input.getCipher().getC2();
 			GroupElement xInverse = dlog.getInverse(input.getX());
 			v = dlog.multiplyGroupElements(c2, xInverse);
-		}
-		else {
-			throw new IllegalArgumentException("the given input must be an instance of SigmaElGamalEncryptedValuePrivKeyInput " +
-												"or SigmaElGamalEncryptedValueRandomnessInput");
 		}
 		
 		

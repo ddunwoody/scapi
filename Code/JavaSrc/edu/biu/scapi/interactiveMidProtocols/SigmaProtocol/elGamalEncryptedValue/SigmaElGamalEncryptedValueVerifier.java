@@ -49,6 +49,9 @@ import edu.biu.scapi.primitives.dlog.miracl.MiraclDlogECF2m;
 public class SigmaElGamalEncryptedValueVerifier implements SigmaVerifierComputation, DlogBasedSigma{
 
 	/*	
+	  There are two versions of SigmaElGamalEncryptedValue protocol, depending upon if the prover knows 
+	  the secret key or it knows the randomness used to generate the ciphertext.
+	  
 	  This class uses an instance of SigmaDHProver with:
 	  
 	  		•	Common DlogGroup
@@ -60,7 +63,7 @@ public class SigmaElGamalEncryptedValueVerifier implements SigmaVerifierComputat
 			•	P’s private input: a value r <- Zq such that c1=g^r and c2/x =h^r.
 	*/	
 	
-	private SigmaDHVerifier sigmaDH;	//underlying SigmaDlogVerifier to use.
+	private SigmaDHVerifier sigmaDH;	//underlying SigmaDHVerifier to use.
 	private DlogGroup dlog;				//We save the dlog because we need it to calculate the input for the underlying Sigma verifier.
 	
 	/**
@@ -71,7 +74,7 @@ public class SigmaElGamalEncryptedValueVerifier implements SigmaVerifierComputat
 	 */
 	public SigmaElGamalEncryptedValueVerifier(DlogGroup dlog, int t, SecureRandom random) {
 		
-		//Creates the underlying SigmaDlogVerifier object with the given parameters.
+		//Creates the underlying SigmaDHVerifier object with the given parameters.
 		sigmaDH = new SigmaDHVerifier(dlog, t, random);
 		this.dlog = dlog;
 	}
@@ -103,23 +106,25 @@ public class SigmaElGamalEncryptedValueVerifier implements SigmaVerifierComputat
 
 	/**
 	 * Sets the input for this Sigma protocol.
-	 * There are two versions of this protocol, depending upon if the prover knows the secret key or it knows the randomness used to generate the ciphertext.
-	 * The only separation in these two version is the type of input. 
-	 * In case we use knowledge of private key, the input should be an instance of SigmaElGamalEncryptedValuePrivKeyInput.
-	 * In case we use knowledge of randomness, the input should be an instance of SigmaElGamalEncryptedValueRandomnessInput.
-	 * @param input MUST be an instance of SigmaElGamalEncryptedValuePrivKeyInput OR SigmaElGamalEncryptedValueRandomnessInput.
+	 * @param input MUST be an instance of SigmaElGamalEncryptedValueInput.
 	 * @throws IllegalArgumentException if input is not the expected.
 	 */
 	public void setInput(SigmaProtocolInput in) {
+		if (!(in instanceof SigmaElGamalEncryptedValueInput)){
+			throw new IllegalArgumentException("the given input must be an instance of SigmaElGamalEncryptedValueInput");
+		}
+		
+		SigmaElGamalEncryptedValueInput input = (SigmaElGamalEncryptedValueInput) in;
+		boolean isRandomness = input.isRandomness();
 		//Converts the given input to the necessary input to the underlying SigmaDHVerifier.
-		GroupElement h;
-		GroupElement u;
-		GroupElement v;
+		GroupElement h = null;
+		GroupElement u = null;;
+		GroupElement v = null;
 		
 		//In case we use knowledge of the private key, the input should be:
-		// (h, u, v, w) = (c1, h, c2/x, w) 
-		if (in instanceof SigmaElGamalEncryptedValuePrivKeyInput){
-			SigmaElGamalEncryptedValuePrivKeyInput input = (SigmaElGamalEncryptedValuePrivKeyInput) in;
+		// (h, u, v) = (c1, h, c2/x) 
+		if (!isRandomness){
+			
 			//h = c1;
 			h = input.getCipher().getC1();
 			//u = h;
@@ -131,8 +136,7 @@ public class SigmaElGamalEncryptedValueVerifier implements SigmaVerifierComputat
 		}
 		//In case we use knowledge of the randomness used to encrypt:
 		// (h,u,v, w) = (h,c1,c2/x, r)
-		else if (in instanceof SigmaElGamalEncryptedValueRandomnessInput){
-			SigmaElGamalEncryptedValueRandomnessInput input = (SigmaElGamalEncryptedValueRandomnessInput) in;
+		if (isRandomness){
 			//h = c1;
 			h = input.getPublicKey().getH();
 			//u = h;
@@ -141,10 +145,6 @@ public class SigmaElGamalEncryptedValueVerifier implements SigmaVerifierComputat
 			GroupElement c2 = input.getCipher().getC2();
 			GroupElement xInverse = dlog.getInverse(input.getX());
 			v = dlog.multiplyGroupElements(c2, xInverse);
-		}
-		else {
-			throw new IllegalArgumentException("the given input must be an instance of SigmaElGamalEncryptedValuePrivKeyInput " +
-												"or SigmaElGamalEncryptedValueRandomnessInput");
 		}
 		
 		
@@ -184,7 +184,7 @@ public class SigmaElGamalEncryptedValueVerifier implements SigmaVerifierComputat
 	 * Verifies the proof.
 	 * @param z second message from prover
 	 * @return true if the proof has been verified; false, otherwise.
-	 * @throws IllegalArgumentException if the first message of the prover is not an instance of SigmaGroupElementMsg
+	 * @throws IllegalArgumentException if the first message of the prover is not an instance of SigmaDHMsg
 	 * @throws IllegalArgumentException if the second message of the prover is not an instance of SigmaBIMsg
 	 */
 	public boolean verify(SigmaProtocolMsg a, SigmaProtocolMsg z) {
