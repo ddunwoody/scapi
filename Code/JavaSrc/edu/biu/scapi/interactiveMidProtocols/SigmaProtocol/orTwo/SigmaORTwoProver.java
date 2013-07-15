@@ -44,14 +44,14 @@ import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaSimulato
  */
 public class SigmaORTwoProver implements SigmaProverComputation{
 	/*	
-	  Let (ai,ei,zi) denote the steps of a Sigma protocol Sigmai for proving that xi is in LRi (i=0,1)
+	  Let (ai,ei,zi) denote the steps of a Sigma protocol SigmaI for proving that xi is in LRi (i=0,1)
 	  This class computes the following calculations:
-		  	COMPUTE the first message ab in Sigmab, using (xb,w) as input
+		  	COMPUTE the first message ab in SigmaB, using (xb,w) as input
 			SAMPLE a random challenge  e1-b <- {0, 1}^t 
-			RUN the simulator M for Sigmai on input (x1-b, e1-b) to obtain (a1-b, e1-b, z1-b)
+			RUN the simulator M for SigmaI on input (x1-b, e1-b) to obtain (a1-b, e1-b, z1-b)
 			The message is (a0,a1); e1-b,z1-b are stored for later.
 			SET eb = e XOR e1-b
-			COMPUTE the response zb to (ab, eb) in Sigmab using input (xb,w)
+			COMPUTE the response zb to (ab, eb) in SigmaB using input (xb,w)
 			The message is e0,z0,e1,z1
 
 	*/
@@ -104,24 +104,25 @@ public class SigmaORTwoProver implements SigmaProverComputation{
 			throw new IllegalArgumentException("The given input must be an instance of SigmaORTwoProverInput");
 		}
 		SigmaORTwoProverInput input = (SigmaORTwoProverInput) in;
+		//Get b such that (xb,w) is in R.
 		b = input.getB();
 		
-		//Save the input to the simulator and the b.
+		//Save the input to the simulator.
 		inputOneMinusB = input.getInputs()[1-b];
 		
 		
-		//Sets the input WITH THE WIDNESS to the underlying prover.
+		//Sets the input WITH THE WITNESS to the corresponding prover.
 		//The second prover will not be in use so it does not need to set the input.
 		provers[b].setInput(input.getInputs()[b]);
 	}
 
 	/**
-	 * Call the sampleRandomValues function in each of the underlying provers and computes the following line from the protocol:
+	 * Call the sampleRandomValues function of the prover that has the witness and computes the following line from the protocol:
 	 * "SAMPLE a random challenge  e1-b <- {0, 1}^t" for the simulator.
 	 */
 	public void sampleRandomValues() {
-		//Call the sigma WITH THE WIDNESS to sample random values.
-		//The second prover will not be in use so it does not need to be called.
+		//Call the sigma WITH THE WITNESS to sample random values.
+		//The second prover will not be in use so it does not need to sample values.
 		provers[b].sampleRandomValues();
 		
 		//Create the challenge for the Simulator.
@@ -133,9 +134,9 @@ public class SigmaORTwoProver implements SigmaProverComputation{
 	}
 
 	/**
-	 * Computes the following line from the protocol:
+	 * Computes the following lines from the protocol:
 	 * "COMPUTE the first message ab in SigmaB, using (xb,w) as input
-		RUN the simulator M for Sigmai on input (x1-b, e1-b) to obtain (a1-b, e1-b, z1-b)
+		RUN the simulator M for SigmaI on input (x1-b, e1-b) to obtain (a1-b, e1-b, z1-b)
 		The message is (a0,a1); e1-b,z1-b are stored for later". 
 	 * @return SigmaORFirstMsg contains a0, a1.  
 	 */
@@ -155,7 +156,7 @@ public class SigmaORTwoProver implements SigmaProverComputation{
 		//Save the z1-b to the future.
 		zOneMinusB = output.getZ();
 		
-		//Create and return SigmaORMsg with a0, a1.
+		//Create and return SigmaORTwoFirstMsg with a0, a1.
 		SigmaORTwoFirstMsg msg = null;
 		if (b == 0){
 			msg = new SigmaORTwoFirstMsg(aB, aOneMinusB);
@@ -167,12 +168,12 @@ public class SigmaORTwoProver implements SigmaProverComputation{
 	}
 
 	/**
-	 * Computes the following line from the protocol:
+	 * Computes the following lines from the protocol:
 	 * "SET eb = e XOR e1-b
-	 *	COMPUTE the response zb to (ab, eb) in Sigmab using input (xb,w)
+	 *	COMPUTE the response zb to (ab, eb) in SigmaB using input (xb,w)
 	 *	The message is e0,z0,e1,z1".
 	 * @param challenge
-	 * @return SigmaORSecondMsg contains e0,z0,e1,z1.
+	 * @return SigmaORTwoSecondMsg contains e0,z0,e1,z1.
 	 * @throws CheatAttemptException if the received challenge's length is not equal to the soundness parameter.
 	 */
 	public SigmaProtocolMsg computeSecondMsg(byte[] challenge) throws CheatAttemptException {
@@ -188,10 +189,10 @@ public class SigmaORTwoProver implements SigmaProverComputation{
 			eb[i] = (byte) (challenge[i] ^ eOneMinusB[i]);
 		}
 		
-		//Compute the response zb in Sigmab using input (xb,w).
+		//Compute the response zb in SigmaB using input (xb,w).
 		SigmaProtocolMsg zb = provers[b].computeSecondMsg(eb);
 		
-		//Create and return SigmaORSecondMsg with z0, e0, z1, e1.
+		//Create and return SigmaORTwoSecondMsg with z0, e0, z1, e1.
 		SigmaORTwoSecondMsg msg = null;
 		if (b == 0){
 			msg = new SigmaORTwoSecondMsg(zb, eb, zOneMinusB, eOneMinusB);
@@ -216,8 +217,10 @@ public class SigmaORTwoProver implements SigmaProverComputation{
 	 * @return SigmaProtocolANDSimulator
 	 */
 	public SigmaSimulator getSimulator(){
-		
+		//Create a simulators array with simulators that matches the underlying provers.
 		SigmaSimulator[] simulators = new SigmaSimulator[2];
+		simulators[0] = provers[0].getSimulator();
+		simulators[1] = provers[1].getSimulator();
 		return new SigmaORTwoSimulator(simulators, t, random);
 	}
 }
