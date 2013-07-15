@@ -27,8 +27,8 @@ package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility;
 import java.math.BigInteger;
 
 /**
- * Concrete implementation SigmaProtocol message. 
- * This message contains one BigInteger value and used when the prover send the second message to the verifier.
+ * Concrete implementation of SigmaProtocol message. 
+ * This message contains one BigInteger value and used when the prover sends a message to the verifier.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *

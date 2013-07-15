@@ -27,9 +27,9 @@ package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility;
 import java.util.ArrayList;
 
 /**
- * Concrete implementation SigmaProtocol message. 
+ * Concrete implementation of SigmaProtocol message. 
  * 
- * This message contains array of SigmaProtocolMsg and used when the SigmaANDProver sends the messages to the verifier.
+ * This message contains array of SigmaProtocolMsg and used, for example, when the SigmaANDProver sends the messages to the verifier.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
