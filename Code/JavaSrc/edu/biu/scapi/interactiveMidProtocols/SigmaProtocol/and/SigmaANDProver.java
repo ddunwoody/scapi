@@ -57,7 +57,7 @@ public class SigmaANDProver implements SigmaProverComputation{
 	private SecureRandom random;
 	
 	/**
-	 * Constructor that gets the underlying provers.
+	 * Constructor that sets the underlying provers.
 	 * @param provers array of SigmaProverComputation, where each object represent a statement 
 	 * 		  and the prover wants to prove to the verify that the AND of all statements are true. 
 	 * @param t soundness parameter. t MUST be equal to all t values of the underlying provers object.
@@ -110,7 +110,7 @@ public class SigmaANDProver implements SigmaProverComputation{
 	}
 
 	/**
-	 * Call the sampleRandomVelues function in each of the underlying provers.
+	 * Call the sampleRandomValues function in each of the underlying provers.
 	 */
 	public void sampleRandomValues() {
 		
@@ -122,7 +122,7 @@ public class SigmaANDProver implements SigmaProverComputation{
 	/**
 	 * Computes the following line from the protocol:
 	 * "COMPUTE all first prover messages a1,…,am". 
-	 * @return SigmaANDMsg contains a1, …, am.  
+	 * @return SigmaMultipleMsg contains a1, …, am.  
 	 */
 	public SigmaProtocolMsg computeFirstMsg() {
 		//Create an array to hold all messages.
@@ -132,7 +132,7 @@ public class SigmaANDProver implements SigmaProverComputation{
 		for (int i = 0; i < len; i++){
 			firstMessages.add(provers.get(i).computeFirstMsg());
 		}
-		//Create a SigmaANDMsg with the messages array.
+		//Create a SigmaMultipleMsg with the messages array.
 		return new SigmaMultipleMsg(firstMessages);
 		
 	}
@@ -141,7 +141,7 @@ public class SigmaANDProver implements SigmaProverComputation{
 	 * Computes the following line from the protocol:
 	 * "COMPUTE all second prover messages z1,…,zm".
 	 * @param challenge
-	 * @return SigmaANDMsg contains z1, …, zm.
+	 * @return SigmaMultipleMsg contains z1, …, zm.
 	 * @throws CheatAttemptException if the received challenge's length is not equal to the soundness parameter.
 	 */
 	public SigmaProtocolMsg computeSecondMsg(byte[] challenge) throws CheatAttemptException {
@@ -153,14 +153,14 @@ public class SigmaANDProver implements SigmaProverComputation{
 			secondMessages.add(provers.get(i).computeSecondMsg(challenge));
 		}
 		
-		//Create a SigmaANDMsg with the messages array.
+		//Create a SigmaMultipleMsg with the messages array.
 		return new SigmaMultipleMsg(secondMessages);
 		
 	}
 	
 	/**
 	 * Returns the simulator that matches this sigma protocol prover.
-	 * @return SigmaProtocolANDSimulator
+	 * @return SigmaANDSimulator
 	 */
 	public SigmaSimulator getSimulator(){
 		ArrayList<SigmaSimulator> simulators = new ArrayList<SigmaSimulator>();

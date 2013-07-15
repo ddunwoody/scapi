@@ -57,9 +57,9 @@ public class SigmaANDSimulator implements SigmaSimulator{
 	private SecureRandom random;
 	
 	/**
-	 * Constructor that gets the underlying provers.
+	 * Constructor that gets the underlying simulators.
 	 * @param simulators array of SigmaSimulator, where each object represent a statement 
-	 * 		  and the prover wants to prove to the verify that that the AND of all statements are true. 
+	 * 		  where the prover wants to prove to the verify that that the AND of all statements are true. 
 	 * @param t soundness parameter. t MUST be equal to all t values of the underlying simulators object.
 	 * @param random source of randomness
 	 */
@@ -112,14 +112,15 @@ public class SigmaANDSimulator implements SigmaSimulator{
 		
 		ArrayList<SigmaProtocolMsg> aOutputs = new ArrayList<SigmaProtocolMsg>();
 		ArrayList<SigmaProtocolMsg> zOutputs = new ArrayList<SigmaProtocolMsg>();
+		SigmaSimulatorOutput output = null;
 		//Run each Sigma protocol simulator with the given challenge.
 		for (int i = 0; i < len; i++){
-			SigmaSimulatorOutput output = simulators.get(i).simulate(simulatorsInput.get(i), challenge);
+			output = simulators.get(i).simulate(simulatorsInput.get(i), challenge);
 			aOutputs.add(output.getA());
 			zOutputs.add(output.getZ());
 		}
 		
-		//Create a SigmaANDMsg from the simulates function's outputs to create a and z.
+		//Create a SigmaMultipleMsg from the simulates function's outputs to create a and z.
 		SigmaMultipleMsg a = new SigmaMultipleMsg(aOutputs);
 		SigmaMultipleMsg z = new SigmaMultipleMsg(zOutputs);
 		

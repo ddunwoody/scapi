@@ -151,7 +151,7 @@ public class SigmaANDVerifier implements SigmaVerifierComputation{
 	 * @param a first message from prover
 	 * @param z second message from prover
 	 * @return true if the proof has been verified; false, otherwise.
-	 * @throws IllegalArgumentException if the first or second message of the prover is not an instance of SigmaANDMsg
+	 * @throws IllegalArgumentException if the first or second message of the prover is not an instance of SigmaMultipleMsg
 	 */
 	public boolean verify(SigmaProtocolMsg a, SigmaProtocolMsg z) {
 		
@@ -159,10 +159,10 @@ public class SigmaANDVerifier implements SigmaVerifierComputation{
 		
 		//If one of the messages is illegal, throw exception.
 		if (!(a instanceof SigmaMultipleMsg)){
-			throw new IllegalArgumentException("first message must be an instance of SigmaANDMsg");
+			throw new IllegalArgumentException("first message must be an instance of SigmaMultipleMsg");
 		}
 		if (!(z instanceof SigmaMultipleMsg)){
-			throw new IllegalArgumentException("second message must be an instance of SigmaANDMsg");
+			throw new IllegalArgumentException("second message must be an instance of SigmaMultipleMsg");
 		}
 		SigmaMultipleMsg first = (SigmaMultipleMsg) a; 
 		SigmaMultipleMsg second = (SigmaMultipleMsg) z; 
