@@ -51,11 +51,11 @@ public class SigmaDamgardJurikProductVerifier implements SigmaVerifierComputatio
         
 	*/
 	
-	private int t; 									// soundness parameter in BITS.
-	private int lengthParameter;					// length parameter in BITS.
+	private int t; 						// Soundness parameter in BITS.
+	private int lengthParameter;		// Length parameter in BITS.
 	private SecureRandom random;
 	private SigmaDJProductInput input;	// Contains public key n and 3 ciphertexts.
-	private byte[] e;								//The challenge.
+	private byte[] e;					// The challenge.
 	
 	/**
 	 * Constructor that gets the soundness parameter, length parameter and SecureRandom.
@@ -87,12 +87,12 @@ public class SigmaDamgardJurikProductVerifier implements SigmaVerifierComputatio
 	
 	/**
 	 * Sets the input for this Sigma protocol
-	 * @param input MUST be an instance of SigmaDJProductRandomnessInput.
-	 * @throws IllegalArgumentException if input is not an instance of SigmaDJProductRandomnessInput.
+	 * @param input MUST be an instance of SigmaDJProductInput.
+	 * @throws IllegalArgumentException if input is not an instance of SigmaDJProductInput.
 	 */
 	public void setInput(SigmaProtocolInput input) {
 		if (!(input instanceof SigmaDJProductInput)){
-			throw new IllegalArgumentException("the given input must be an instance of SigmaDJProductRandomnessInput");
+			throw new IllegalArgumentException("the given input must be an instance of SigmaDJProductInput");
 		}
 		
 		BigInteger modulus = ((SigmaDJProductInput) input).getPublicKey().getModulus();

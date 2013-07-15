@@ -52,8 +52,8 @@ public class SigmaDamgardJurikProductSimulator implements SigmaSimulator{
 
 	*/
 	
-	private int t; 												// soundness parameter in BITS.
-	private int lengthParameter;								// length parameter in BITS.
+	private int t; 					// Soundness parameter in BITS.
+	private int lengthParameter;	// Length parameter in BITS.
 	private SecureRandom random;
 	
 	/**
@@ -86,11 +86,11 @@ public class SigmaDamgardJurikProductSimulator implements SigmaSimulator{
 	
 	/**
 	 * Computes the simulator computation.
-	 * @param input MUST be an instance of SigmaDJProductRandomnessInput.
+	 * @param input MUST be an instance of SigmaDJProductInput.
 	 * @param challenge
 	 * @return the output of the computation - (a, e, z).
 	 * @throws CheatAttemptException if the received challenge's length is not equal to the soundness parameter.
-	 * @throws IllegalArgumentException if the given input is not an instance of SigmaDJProductRandomnessInput.
+	 * @throws IllegalArgumentException if the given input is not an instance of SigmaDJProductInput.
 	 */
 	public SigmaSimulatorOutput simulate(SigmaProtocolInput input, byte[] challenge) throws CheatAttemptException{
 		/*
@@ -105,7 +105,7 @@ public class SigmaDamgardJurikProductSimulator implements SigmaSimulator{
 		}
 		
 		if (!(input instanceof SigmaDJProductInput)){
-			throw new IllegalArgumentException("the given input must be an instance of SigmaDJProductRandomnessInput");
+			throw new IllegalArgumentException("the given input must be an instance of SigmaDJProductInput");
 		}
 		SigmaDJProductInput djInput = (SigmaDJProductInput) input;
 		
@@ -153,16 +153,16 @@ public class SigmaDamgardJurikProductSimulator implements SigmaSimulator{
 	
 	/**
 	 * Computes the simulator computation.
-	 * @param input MUST be an instance of SigmaDJProductRandomnessInput.
+	 * @param input MUST be an instance of SigmaDJProductInput.
 	 * @return the output of the computation - (a, e, z).
-	 * @throws IllegalArgumentException if the given input is not an instance of SigmaDJProductRandomnessInput.
+	 * @throws IllegalArgumentException if the given input is not an instance of SigmaDJProductInput.
 	 */
 	public SigmaSimulatorOutput simulate(SigmaProtocolInput input){
 		//Create a new byte array of size t/8, to get the required byte size.
 		byte[] e = new byte[t/8];
 		//Fill the byte array with random values.
 		random.nextBytes(e);
-		//Call the other simulate function with the given input and the samples e.
+		//Call the other simulate function with the given input and the sampled e.
 		try {
 			return simulate(input, e);
 		} catch (CheatAttemptException e1) {

@@ -52,13 +52,13 @@ public class SigmaDamgardJurikProductProver implements SigmaProverComputation, D
 			COMPUTE z1=e*x1+d mod N, z2 = r1^e*rd mod n, z3=(r2^z1)/(rdb*r3^e) mod n, and SET z=(z1,z2,z3)
 	*/	
 	
-	private int t; 										// soundness parameter in BITS.
-	private int lengthParameter;						// length parameter in BITS.
+	private int t; 								// Soundness parameter in BITS.
+	private int lengthParameter;				// Length parameter in BITS.
 	private SecureRandom random;
 	private SigmaDJProductProverInput input;	// Contains n, 3 ciphertexts, 3 plaintexts and 3 random values used to encrypt.
-	private BigInteger n;								//modulus
-	private BigInteger N, NTag;							//N = n^lengthParameter and N' = n^(lengthParameter+1).
-	private BigInteger d, rd, rdb;						// The random value chosen in the protocol.
+	private BigInteger n;						// Modulus
+	private BigInteger N, NTag;					// N = n^lengthParameter and N' = n^(lengthParameter+1).
+	private BigInteger d, rd, rdb;				// The random value chosen in the protocol.
 	
 	/**
 	 * Constructor that gets the soundness parameter, length parameter and SecureRandom.
@@ -90,12 +90,12 @@ public class SigmaDamgardJurikProductProver implements SigmaProverComputation, D
 	
 	/**
 	 * Sets the input for this Sigma protocol
-	 * @param input MUST be an instance of SigmaDJProductRandomnessProverInput.
-	 * @throws IllegalArgumentException if input is not an instance of SigmaDJProductRandomnessProverInput.
+	 * @param input MUST be an instance of SigmaDJProductProverInput.
+	 * @throws IllegalArgumentException if input is not an instance of SigmaDJProductProverInput.
 	 */
 	public void setInput(SigmaProtocolInput input) {
 		if (!(input instanceof SigmaDJProductProverInput)){
-			throw new IllegalArgumentException("the given input must be an instance of SigmaDJProductRandomnessProverInput");
+			throw new IllegalArgumentException("the given input must be an instance of SigmaDJProductProverInput");
 		}
 		
 		BigInteger modulus = ((SigmaDJProductProverInput) input).getPublicKey().getModulus();
@@ -165,7 +165,7 @@ public class SigmaDamgardJurikProductProver implements SigmaProverComputation, D
 		//Calculate a2 = ((1+n)^(d*x2))*(rdb^N) mod N’
 		BigInteger a2 = nPlusOnePow.multiply(rdbToN).mod(NTag);
 		
-		//Create and return SigmaDJMsg with a1 and a2.
+		//Create and return SigmaDJProductFirstMsg with a1 and a2.
 		return new SigmaDJProductFirstMsg(a1, a2);
 		
 	}

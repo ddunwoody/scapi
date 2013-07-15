@@ -29,7 +29,7 @@ import java.math.BigInteger;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
 
 /**
- * Concrete implementation SigmaProtocol message. 
+ * Concrete implementation of SigmaProtocol message. 
  * This message contains three BigIntegers and used when the DamgardJurikProduct prover send the second message to the verifier.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
