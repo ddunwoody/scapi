@@ -55,12 +55,12 @@ public class SigmaDamgardJurikEncryptedZeroProver implements SigmaProverComputat
 	
 	*/	
 	
-	private int t; 												// soundness parameter in BITS.
-	private int lengthParameter;								// length parameter in BITS.
+	private int t; 									// Soundness parameter in BITS.
+	private int lengthParameter;					// Length parameter in BITS.
 	private SecureRandom random;
 	private SigmaDJEncryptedZeroProverInput input;	// Contains public key n, ciphertext c and the random value used to encrypt.
-	private BigInteger n;
-	private BigInteger s;										// The random value chosen in the protocol.
+	private BigInteger n;							// Modulus.
+	private BigInteger s;							// The random value chosen in the protocol.
 	
 	/**
 	 * Constructor that gets the soundness parameter, length parameter and SecureRandom.
@@ -92,12 +92,12 @@ public class SigmaDamgardJurikEncryptedZeroProver implements SigmaProverComputat
 	
 	/**
 	 * Sets the input for this Sigma protocol
-	 * @param input MUST be an instance of SigmaDJEncryptedZeroRandomnessProverInput.
-	 * @throws IllegalArgumentException if input is not an instance of SigmaDJEncryptedZeroRandomnessProverInput.
+	 * @param input MUST be an instance of SigmaDJEncryptedZeroProverInput.
+	 * @throws IllegalArgumentException if input is not an instance of SigmaDJEncryptedZeroProverInput.
 	 */
 	public void setInput(SigmaProtocolInput input) {
 		if (!(input instanceof SigmaDJEncryptedZeroProverInput)){
-			throw new IllegalArgumentException("the given input must be an instance of SigmaDJEncryptedZeroRandomnessProverInput");
+			throw new IllegalArgumentException("the given input must be an instance of SigmaDJEncryptedZeroProverInput");
 		}
 		
 		BigInteger modulus = ((SigmaDJEncryptedZeroInput) input).getPublicKey().getModulus();
@@ -146,7 +146,7 @@ public class SigmaDamgardJurikEncryptedZeroProver implements SigmaProverComputat
 		
 		//Compute a = s^N mod N'.
 		BigInteger a = s.modPow(N, NTag);
-		//Create and return SigmaGroupElementMsg with a.
+		//Create and return SigmaBIMsg with a.
 		return new SigmaBIMsg(a);
 	}
 

@@ -47,12 +47,19 @@ public class SigmaDJEncryptedZeroProverInput extends SigmaDJEncryptedZeroInput{
 		this.r = r;
 	}
 	
+	/**
+	 * This protocol assumes that the prover knows the randomness used to encrypt.
+	 * If the prover knows the secret key, then it can compute (once) the value m=n^(-1) mod phi(n)=n^(-1) mod (p-1)(q-1). 
+	 * Then, it can recover the randomness r from c by computing c^m mod n (this equals r^(n/n) mod n = r). 
+	 * Once given r, the prover can proceed with the protocol.
+	 * @param publicKey
+	 * @param cipher
+	 * @param privateKey
+	 */
 	public SigmaDJEncryptedZeroProverInput(DamgardJurikPublicKey publicKey, BigIntegerCiphertext cipher, DamgardJurikPrivateKey privateKey){
 		super(publicKey, cipher);
-		//This protocol assumes that the prover knows the randomness used to encrypt. 
-		//If the prover knows the secret key, then it can compute (once) the value m=n^(-1) mod phi(n)=n^(-1) mod (p-1)(q-1). 
-		//Then, it can recover the randomness r from c by computing c^m mod n (this equals r^(n/n) mod n = r). 
-		//Once given r, the prover can proceed with the above protocol.
+		
+		//Calculate r from the given private key.
 		BigInteger p = privateKey.getP();
 		BigInteger q = privateKey.getQ();
 		BigInteger pMinusOne = p.subtract(BigInteger.ONE);

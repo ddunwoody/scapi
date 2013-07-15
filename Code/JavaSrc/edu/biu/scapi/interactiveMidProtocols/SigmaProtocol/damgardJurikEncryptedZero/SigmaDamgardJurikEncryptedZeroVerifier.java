@@ -50,12 +50,12 @@ public class SigmaDamgardJurikEncryptedZeroVerifier implements SigmaVerifierComp
         
 	*/
 	
-	private int t; 							// soundness parameter in BITS.
-	private int lengthParameter;			// length parameter in BITS.
+	private int t; 								// Soundness parameter in BITS.
+	private int lengthParameter;				// Length parameter in BITS.
 	private SecureRandom random;
 	private SigmaDJEncryptedZeroInput input;	// Contains public key n and ciphertext c.
-	private byte[] e;						//The challenge.
-	private BigInteger n;					//The modulus
+	private byte[] e;							//The challenge.
+	private BigInteger n;						//The modulus
 	
 	/**
 	 * Constructor that gets the soundness parameter, length parameter and SecureRandom.
@@ -79,12 +79,12 @@ public class SigmaDamgardJurikEncryptedZeroVerifier implements SigmaVerifierComp
 	
 	/**
 	 * Sets the input for this Sigma protocol
-	 * @param input MUST be an instance of SigmaDJEncryptedZeroRandomnessInput.
-	 * @throws IllegalArgumentException if input is not an instance of SigmaDJEncryptedZeroRandomnessInput.
+	 * @param input MUST be an instance of SigmaDJEncryptedZeroInput.
+	 * @throws IllegalArgumentException if input is not an instance of SigmaDJEncryptedZeroInput.
 	 */
 	public void setInput(SigmaProtocolInput input) {
 		if (!(input instanceof SigmaDJEncryptedZeroInput)){
-			throw new IllegalArgumentException("the given input must be an instance of SigmaDJEncryptedZeroRandomnessInput");
+			throw new IllegalArgumentException("the given input must be an instance of SigmaDJEncryptedZeroInput");
 		}
 		
 		BigInteger modulus = ((SigmaDJEncryptedZeroInput) input).getPublicKey().getModulus();
@@ -152,7 +152,7 @@ public class SigmaDamgardJurikEncryptedZeroVerifier implements SigmaVerifierComp
 	 * 	"ACC IFF c,a,z are relatively prime to n AND z^N = (a*c^e) mod N’".
 	 * @param z second message from prover
 	 * @return true if the proof has been verified; false, otherwise.
-	 * @throws IllegalArgumentException if the one of the prover's messages is not an instance of SigmaBIMsg
+	 * @throws IllegalArgumentException if the one of the prover's messages are not an instance of SigmaBIMsg
 	 */
 	public boolean verify(SigmaProtocolMsg a, SigmaProtocolMsg z) {
 		
