@@ -48,7 +48,7 @@ import edu.biu.scapi.midLayer.plaintext.BigIntegerPlainText;
 public class SigmaDamgardJurikEncryptedValueSimulator implements SigmaSimulator{
 
 	/*	
-	  This class uses an instance of SigmaDamgardJurikEncryptedZeroProver with:
+	  This class uses an instance of SigmaDamgardJurikEncryptedZeroSimulator with:
 	  	•	Common input: (n,c’) where c’=c*(1+n)^(-x) mod N'
 	*/
 	
@@ -135,6 +135,11 @@ public class SigmaDamgardJurikEncryptedValueSimulator implements SigmaSimulator{
 				
 	}
 	
+	/**
+	 * Converts the given input to an input object for the underlying simulator.
+	 * @param in MUST be an instance of SigmaDJEncryptedValueInput.
+	 * @return SigmaDJEncryptedZeroInput the converted input.
+	 */
 	private SigmaDJEncryptedZeroInput checkAndCreateUnderlyingInput(
 			SigmaProtocolInput in) {
 		if (!(in instanceof SigmaDJEncryptedValueInput)){
@@ -162,7 +167,7 @@ public class SigmaDamgardJurikEncryptedValueSimulator implements SigmaSimulator{
 		BigInteger newCipher = cipher.getCipher().multiply(multVal).mod(NTag);
 		BigIntegerCiphertext cipherTag = new BigIntegerCiphertext(newCipher);
 		
-		//Create an input object to the underlying sigmaDamgardJurik prover.
+		//Create an input object to the underlying sigmaDamgardJurik simulator.
 		SigmaDJEncryptedZeroInput underlyingInput = new SigmaDJEncryptedZeroInput(pubKey, cipherTag);
 		return underlyingInput;
 	}

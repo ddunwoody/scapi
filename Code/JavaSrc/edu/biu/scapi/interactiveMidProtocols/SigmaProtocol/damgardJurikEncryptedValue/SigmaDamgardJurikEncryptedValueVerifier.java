@@ -48,9 +48,8 @@ import edu.biu.scapi.midLayer.plaintext.BigIntegerPlainText;
 public class SigmaDamgardJurikEncryptedValueVerifier implements SigmaVerifierComputation, DJBasedSigma {
 
 	/*	
-	  This class uses an instance of SigmaDamgardJurikEncryptedZeroProver with:
+	  This class uses an instance of SigmaDamgardJurikEncryptedZeroVerifier with:
 	  	•	Common input: (n,c’) where c’=c*(1+n)^(-x) mod N'
-		•	P’s private input: a value r <- Zq such that c’=r^N mod N’.
 	
 	*/	
 	
@@ -123,7 +122,7 @@ public class SigmaDamgardJurikEncryptedValueVerifier implements SigmaVerifierCom
 		BigInteger newCipher = cipher.getCipher().multiply(multVal).mod(NTag);
 		BigIntegerCiphertext cipherTag = new BigIntegerCiphertext(newCipher);
 		
-		//Create an input object to the underlying sigmaDamgardJurik prover.
+		//Create an input object to the underlying sigmaDamgardJurik verifier.
 		SigmaDJEncryptedZeroInput underlyingInput = new SigmaDJEncryptedZeroInput(pubKey, cipherTag);
 		sigmaDamgardJurik.setInput(underlyingInput);
 		
@@ -161,8 +160,7 @@ public class SigmaDamgardJurikEncryptedValueVerifier implements SigmaVerifierCom
 	 * Verifies the proof.
 	 * @param z second message from prover
 	 * @return true if the proof has been verified; false, otherwise.
-	 * @throws IllegalArgumentException if the first message of the prover is not an instance of SigmaGroupElementMsg
-	 * @throws IllegalArgumentException if the second message of the prover is not an instance of SigmaBIMsg
+	 * @throws IllegalArgumentException if the messages of the prover are not an instance of SigmaBIMsg
 	 */
 	public boolean verify(SigmaProtocolMsg a, SigmaProtocolMsg z) {
 		//Delegates to the underlying sigmaDamgardJurik verifier.
