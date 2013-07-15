@@ -27,9 +27,9 @@ package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.orTwo;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
 
 /**
- * Concrete implementation SigmaProtocol message. 
+ * Concrete implementation of SigmaProtocol message. 
  * 
- * This message contains two SigmaProtocolMsg and used when the SigmaORProver sends the first message to the verifier.
+ * This message contains two SigmaProtocolMsg and used when the SigmaORTwoProver sends the first message to the verifier.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *

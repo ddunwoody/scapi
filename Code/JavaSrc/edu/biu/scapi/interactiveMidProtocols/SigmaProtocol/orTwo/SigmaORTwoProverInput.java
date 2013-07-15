@@ -27,9 +27,10 @@ package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.orTwo;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
 
 /**
- * Concrete implementation of SigmaProtocol input, used by the SigmaProtocolORTwoverifier.
+ * Concrete implementation of SigmaProtocol input, used by the SigmaProtocolORTwoProver.
  * 
- * In SigmaProtocolORTwoProver, the prover gets two instances of inputs to its underlying objects and a bit b, such that (xb,w) is in R.
+ * In SigmaProtocolORTwo protocol, the prover gets an array of SigmaProtocolInput that holds 
+ * two instances of inputs to its underlying objects and a bit b, such that (xb,w) is in R.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *

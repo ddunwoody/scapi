@@ -28,7 +28,8 @@ import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocol
 
 /**
  * Concrete implementation of SigmaProtocol input, used by the SigmaProtocolORTwoverifier.
- * In SigmaProtocolORTwoverifier, the verifier gets two instances of inputs to its underlying objects.
+ * In SigmaProtocolORTwoverifier, the verifier gets an arrya of SigmaProtocolInput that holds 
+ * two instances of inputs to its underlying objects.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
@@ -38,6 +39,9 @@ public class SigmaORTwoInput implements SigmaProtocolInput{
 	private SigmaProtocolInput[] inputs;
 	
 	public SigmaORTwoInput(SigmaProtocolInput[] inputs){
+		if (inputs.length != 2){
+			throw new IllegalArgumentException("The given inputs array must contains two objects.");
+		}
 		this.inputs = inputs;
 	}
 	

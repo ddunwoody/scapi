@@ -85,11 +85,11 @@ public class SigmaORTwoSimulator implements SigmaSimulator{
 	
 	/**
 	 * Computes the simulator computation.
-	 * @param input MUST be an instance of SigmaANDInput.
+	 * @param input MUST be an instance of SigmaORTwoInput.
 	 * @param challenge
 	 * @return the output of the computation - (a, e, z).
 	 * @throws CheatAttemptException if the received challenge's length is not equal to the soundness parameter.
-	 * @throws IllegalArgumentException if the given input is not an instance of SigmaANDInput.
+	 * @throws IllegalArgumentException if the given input is not an instance of SigmaORTwoInput.
 	 */
 	public SigmaSimulatorOutput simulate(SigmaProtocolInput in, byte[] challenge) throws CheatAttemptException{
 		/*
@@ -125,7 +125,7 @@ public class SigmaORTwoSimulator implements SigmaSimulator{
 		SigmaSimulatorOutput output1 = simulators[1].simulate(input.getInputs()[1], e1);
 		
 		
-		//Create a SigmaANDMsg from the simulates function's outputs to create a and z.
+		//Create a SigmaORTwo messages from the simulates function's outputs.
 		SigmaORTwoFirstMsg a = new SigmaORTwoFirstMsg(output0.getA(), output1.getA());
 		SigmaORTwoSecondMsg z = new SigmaORTwoSecondMsg(output0.getZ(), e0, output1.getZ(), e1);
 		
@@ -136,16 +136,16 @@ public class SigmaORTwoSimulator implements SigmaSimulator{
 	
 	/**
 	 * Computes the simulator computation.
-	 * @param input MUST be an instance of SigmaDJProductRandomnessInput.
+	 * @param input MUST be an instance of SigmaORTwoInput.
 	 * @return the output of the computation - (a, e, z).
-	 * @throws IllegalArgumentException if the given input is not an instance of SigmaDJProductRandomnessInput.
+	 * @throws IllegalArgumentException if the given input is not an instance of SigmaORTwoInput.
 	 */
 	public SigmaSimulatorOutput simulate(SigmaProtocolInput input){
 		//Create a new byte array of size t/8, to get the required byte size.
 		byte[] e = new byte[t/8];
 		//Fill the byte array with random values.
 		random.nextBytes(e);
-		//Call the other simulate function with the given input and the samples e.
+		//Call the other simulate function with the given input and the sampled e.
 		try {
 			return simulate(input, e);
 		} catch (CheatAttemptException e1) {

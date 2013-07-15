@@ -42,7 +42,7 @@ import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocol
 public class SigmaORTwoVerifier implements SigmaVerifierComputation{
 	
 	/*		
-	  Let (ai,ei,zi) denote the steps of a Sigma protocol Sigmai for proving that xi is in LRi (i=0,1)
+	  Let (ai,ei,zi) denote the steps of a Sigma protocol SigmaI for proving that xi is in LRi (i=0,1)
 	  This class computes the following calculations:
 		  	SAMPLE a single random challenge  e <- {0, 1}^t
 			ACC IFF all verifier checks are ACC.
@@ -58,7 +58,7 @@ public class SigmaORTwoVerifier implements SigmaVerifierComputation{
 	 * @param verifiers array of SigmaVerifierComputation that contains TWO underlying verifiers.
 	 * @param t soundness parameter. t MUST be equal to both t values of the underlying verifiers objects.
 	 * @throws IllegalArgumentException if the given t is not equal to both t values of the underlying verifiers.
-	 * @throws IllegalArgumentException if the given provers array does not contains two objects.
+	 * @throws IllegalArgumentException if the given verifiers array does not contains two objects.
 	 */
 	public SigmaORTwoVerifier(SigmaVerifierComputation[] verifiers, int t, SecureRandom random) {
 		if (verifiers.length != 2){
@@ -86,7 +86,7 @@ public class SigmaORTwoVerifier implements SigmaVerifierComputation{
 	 * Sets the inputs for each one of the underlying verifier.
 	 * @param input MUST be an instance of SigmaORTwoInput.
 	 * @throws IllegalArgumentException if input is not an instance of SigmaORTwoInput.
-	 * @throws IllegalArgumentException if the number of given inputs is different from the number of underlying verifier.
+	 * 
 	 */
 	public void setInput(SigmaProtocolInput in) {
 		if (!(in instanceof SigmaORTwoInput)){
@@ -133,8 +133,8 @@ public class SigmaORTwoVerifier implements SigmaVerifierComputation{
 	 * @param a first message from prover
 	 * @param z second message from prover
 	 * @return true if the proof has been verified; false, otherwise.
-	 * @throws IllegalArgumentException if the first message of the prover is not an instance of SigmaORFirstMsg
-	 * @throws IllegalArgumentException if the second message of the prover is not an instance of SigmaORSecondMsg
+	 * @throws IllegalArgumentException if the first message of the prover is not an instance of SigmaORTwoFirstMsg
+	 * @throws IllegalArgumentException if the second message of the prover is not an instance of SigmaORTwoSecondMsg
 	 */
 	public boolean verify(SigmaProtocolMsg a, SigmaProtocolMsg z) {
 		
@@ -142,10 +142,10 @@ public class SigmaORTwoVerifier implements SigmaVerifierComputation{
 		
 		//If one of the messages is illegal, throw exception.
 		if (!(a instanceof SigmaORTwoFirstMsg)){
-			throw new IllegalArgumentException("first message must be an instance of SigmaORFirstMsg");
+			throw new IllegalArgumentException("first message must be an instance of SigmaORTwoFirstMsg");
 		}
 		if (!(z instanceof SigmaORTwoSecondMsg)){
-			throw new IllegalArgumentException("second message must be an instance of SigmaORSecondMsg");
+			throw new IllegalArgumentException("second message must be an instance of SigmaORTwoSecondMsg");
 		}
 		SigmaORTwoFirstMsg first = (SigmaORTwoFirstMsg) a; 
 		SigmaORTwoSecondMsg second = (SigmaORTwoSecondMsg) z; 
