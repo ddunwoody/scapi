@@ -32,7 +32,7 @@ import edu.biu.scapi.midLayer.ciphertext.BigIntegerCiphertext;
 import edu.biu.scapi.midLayer.plaintext.BigIntegerPlainText;
 
 /**
- * Concrete implementation of SigmaProtocol input, used by the SigmaDamgardJurikEncryptedZeroProver.
+ * Concrete implementation of SigmaProtocol input, used by the SigmaDamgardJurikProductProver.
  * In SigmaProtocolDamgardJurikProduct, the prover gets DamgardJurikPublicKey, three BigIntegerCiphertexts and three random BigIntegers used to encrypt.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
@@ -57,7 +57,19 @@ public class SigmaDJProductProverInput extends SigmaDJProductInput{
 		this.x2 = x2;	
 	}
 	
-	
+	/**
+	 * This protocol assumes that the prover knows the randomness used to encrypt. 
+	 * If the prover knows the secret key, then it can compute (once) the value m=n^(-1) mod phi(n)=n^(-1) mod (p-1)(q-1). 
+	 * Then, it can recover the randomness ri from ci by computing ci^m mod n (this equals ri^(n/n) mod n = ri). 
+	 * Once given r, the prover can proceed with the protocol.
+	 * @param publicKey
+	 * @param c1
+	 * @param c2
+	 * @param c3
+	 * @param privateKey
+	 * @param x1
+	 * @param x2
+	 */
 	public SigmaDJProductProverInput(DamgardJurikPublicKey publicKey, 
 							BigIntegerCiphertext c1, BigIntegerCiphertext c2, BigIntegerCiphertext c3, 
 							DamgardJurikPrivateKey privateKey, BigIntegerPlainText x1, BigIntegerPlainText x2){
@@ -65,10 +77,7 @@ public class SigmaDJProductProverInput extends SigmaDJProductInput{
 		this.x1 = x1;
 		this.x2 = x2;
 		
-		//This protocol assumes that the prover knows the randomness used to encrypt. 
-		//If the prover knows the secret key, then it can compute (once) the value m=n^(-1) mod phi(n)=n^(-1) mod (p-1)(q-1). 
-		//Then, it can recover the randomness ri from ci by computing ci^m mod n (this equals ri^(n/n) mod n = ri). 
-		//Once given r, the prover can proceed with the above protocol.
+		//Calculate r from the given private key.
 		BigInteger p = privateKey.getP();
 		BigInteger q = privateKey.getQ();
 		BigInteger pMinusOne = p.subtract(BigInteger.ONE);
