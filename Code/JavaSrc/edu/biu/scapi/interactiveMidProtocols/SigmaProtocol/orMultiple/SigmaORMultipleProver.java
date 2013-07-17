@@ -38,7 +38,7 @@ import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaSimulato
 /**
  * Concrete implementation of Sigma Protocol prover computation.
  * 
- * This protocol is used for a prover to convince a verifier that at least k out of n statements is true, 
+ * This protocol is used for a prover to convince a verifier that at least k out of n statements are true, 
  * where each statement can be proven by an associated Sigma protocol.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
@@ -47,7 +47,7 @@ import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaSimulato
 public class SigmaORMultipleProver implements SigmaProverComputation{
 	
 	/*	
-	 * Let (ai,ei,zi) denote the steps of a Sigma protocol Sigmai for proving that xi is in LRi 
+	 * Let (ai,ei,zi) denote the steps of a Sigma protocol SigmaI for proving that xi is in LRi 
 	 * Let I denote the set of indices for which P has witnesses
 	  This class computes the following calculations:
 			For every j not in I, SAMPLE a random element ej <- GF[2^t]
@@ -57,43 +57,43 @@ public class SigmaORMultipleProver implements SigmaProverComputation{
 			
 			INTERPOLATE the points (0,e) and {(j,ej)} for every j not in I to obtain a degree n-k polynomial Q (s.t. Q(0)=e and Q(j)=ej for every j not in I)
 			For every i in I, SET ei = Q(i)
-			For every i in I, COMPUTE the response zi to (ai, ei) in Sigmai using input (xi,wi)
+			For every i in I, COMPUTE the response zi to (ai, ei) in SigmaI using input (xi,wi)
 			The message is Q,e1,z1,…,en,zn (where by Q we mean its coefficients)
 	*/
 	
 	private ArrayList<SigmaProverComputation> provers;			// Underlying Sigma protocol's provers to the OR calculation.
-	private int len;											// number of underlying provers.
+	private int len;											// Number of underlying provers.
 	private int t;												// Soundness parameter.
 	private SecureRandom random;
 	private ArrayList<Integer> I;								// The indexes of the statements which the prover knows the witnesses.
 	
-	private SigmaORMultipleProverInput input;					// We save in setInput function to use in computeFirstMsg function
+	private SigmaORMultipleProverInput input;					// Used in computeFirstMsg function.
 	
 	private byte[][] challenges;								// Will hold the challenges to the underlying provers/simulators.
 																// Some will be calculate in sampleRandomValues function and some in compueSecondMsg. 
 	
 	private ArrayList<SigmaSimulatorOutput> simulatorsOutput;	// We save this because we calculate it in computeFirstMsg and using 
-																//it after that, in computeSecondMsg
+																// it after that, in computeSecondMsg
 	
-	private long[] fieldElements;								//will hold pointers to the sampled field elements, 
+	private long[] fieldElements;								//Will hold pointers to the sampled field elements, 
 																//we save the pointers to save the creation of the elements again in computeSecondMsg function.
 	
-	//Initiaize the field GF2E with a random irreducible polynomial with degree t.
+	//Initializes the field GF2E with a random irreducible polynomial with degree t.
 	private native void initField(int t, int seed);
 	
 	//Creates random field elements to be the challenges.
 	private native byte[][] createRandomFieldElements(int numElements, long[] fieldElements);
 	
-	//Interpolate the points to get a polynoial.
+	//Interpolates the points to get a polynomial.
 	private native long interpolate(byte[] e, long[] fieldElements, int[] indexes);
 	
-	//Calculate the challenges for the statements with the widnesses.
+	//Calculates the challenges for the statements with the witnesses.
 	private native byte[][] getRestChallenges(long polynomial, int[] indexesInI);
 	
-	//return the byteArray of the polynomial coefficients.
+	//Returns the byteArray of the polynomial coefficients.
 	private native byte[][] getPolynomialBytes(long polynomial);
 	
-	//delete the allocated memory of the polynomial and the field elements.
+	//Deletes the allocated memory of the polynomial and the field elements.
 	private native void deletePointers(long polynomial, long[] fieldElements);
 	
 	/**
@@ -114,7 +114,7 @@ public class SigmaORMultipleProver implements SigmaProverComputation{
 		len = provers.size();
 		this.t = t; 
 		this.random = random;
-		
+		//Initialize the field GF2E with a random irreducible polynomial with degree t.
 		initField(t, random.nextInt());
 	}
 
@@ -170,7 +170,7 @@ public class SigmaORMultipleProver implements SigmaProverComputation{
 			} 
 		}
 		fieldElements = new long[len - I.size()];
-		//For every j not in I, SAMPLE a random element ej <- GF[2^t]. We sample the random elments at once.
+		//For every j not in I, sample a random element ej <- GF[2^t]. We sample the random elements in one native call.
 		byte[][] ejs = createRandomFieldElements(len - I.size(), fieldElements);
 		int index = 0;
 		challenges = new byte[len][];
@@ -180,7 +180,7 @@ public class SigmaORMultipleProver implements SigmaProverComputation{
 			if (!(I.contains(new Integer(i)))){
 				//in case that the sample element's length is not t, add zeros to its beginning.
 				challenges[i] = alignToT(ejs[index]);
-				index++; //increase the index of the sampled challenges.
+				index++; //increase the index of the sampled challenges array.
 			}
 		}
 	}
@@ -193,12 +193,18 @@ public class SigmaORMultipleProver implements SigmaProverComputation{
 	private byte[] alignToT(byte[] array) {
 		byte[] alignArr = new byte[t/8];
 		int len = array.length;
+		//in case the array is not aligned, add zeros.
 		if (len < t/8){
-			int diff = t/8 - len;
+			int diff = t/8 - len; //Number of bytes to fill with zeros.
 			int index = 0;
+			// NTL converts byte array to polynomial in the following way:
+			// x = sum(p[i]*X^(8*i), i = 0..n-1)
+			// This means that the most left byte in the array is the first degree of the polynomial.
+			// So, copy the original array content to the left side of the new array.
 			for (int i=0; i<len; i++){
 				alignArr[index++] = array[i];
 			}
+			//Add zeros in the right side of the array
 			for (int i=0; i<diff; i++){
 				alignArr[index++] = 0;
 			}
@@ -221,17 +227,18 @@ public class SigmaORMultipleProver implements SigmaProverComputation{
 		ArrayList<SigmaProtocolMsg> firstMessages = new ArrayList<SigmaProtocolMsg>();
 		//Create an array to hold all simaultor's outputs.
 		simulatorsOutput = new ArrayList<SigmaSimulatorOutput>();
-		simulatorsOutput.ensureCapacity(len);
+		SigmaSimulatorOutput output;
 		//Compute all first messages and add them to the array list.
 		for (int i = 0; i < len; i++){
 			//If i in I, call the underlying computeFirstMsg.
 			if (I.contains(new Integer(i))){
 				firstMessages.add(provers.get(i).computeFirstMsg());
+				//In case the prover knows the witness there is no need on the simulator and there is no output.
 				simulatorsOutput.add(i, null);
 			//If i not in I, run the simulator for xi.
 			} else{
 				try {
-					SigmaSimulatorOutput output = provers.get(i).getSimulator().simulate(input.getInputs().get(i), challenges[i]);
+					output = provers.get(i).getSimulator().simulate(input.getInputs().get(i), challenges[i]);
 					firstMessages.add(output.getA());
 					simulatorsOutput.add(i, output);
 				} catch (CheatAttemptException e) {
@@ -255,16 +262,15 @@ public class SigmaORMultipleProver implements SigmaProverComputation{
 	 * @throws CheatAttemptException if the received challenge's length is not equal to the soundness parameter.
 	 */
 	public SigmaProtocolMsg computeSecondMsg(byte[] challenge) throws CheatAttemptException {
-		//Create two arrays. This arrays used for calculate the interpolated polynomial.
+		//Create two arrays of indexes. These arrays used to calculate the interpolated polynomial.
 		int[] indexesNotInI= new int[len - I.size()];
 		int[] indexesInI= new int[I.size()];
 		int indexNotInI = 0;
 		int indexInI = 0;
 		//Fill the arrays with the indexes.
 		for (int i = 0; i < len; i++){
-			//If i in I, call the underlying computeFirstMsg.
 			if (I.contains(new Integer(i))){
-				indexesInI[indexInI++] = i+1;
+				indexesInI[indexInI++] = i+1; //i+1 because Q(0) = e.
 			} else {
 				indexesNotInI[indexNotInI++] = i+1;
 			}
@@ -287,8 +293,7 @@ public class SigmaORMultipleProver implements SigmaProverComputation{
 		//Compute all second messages and add them to the array list.
 		for (int i = 0; i < len; i++){
 			//If i in I, call the underlying computeSecondMsg.
-			if (I.contains(new Integer(i))){
-				
+			if (I.contains(new Integer(i))){	
 				secondMessages.add(provers.get(i).computeSecondMsg(challenges[i]));
 			//If i not in I, get z from the simulator output for xi.
 			} else{
@@ -296,19 +301,20 @@ public class SigmaORMultipleProver implements SigmaProverComputation{
 			}
 		}
 		
+		//Get the byte array that represent the polynomial
 		byte[][] polynomBytes = getPolynomialBytes(polynomial);
 		
 		//Delete the allocated memory of the polynomial and the field elements.
 		deletePointers(polynomial, fieldElements);
 		
-		//Create a SigmaANDMsg with the messages array.
+		//Create a SigmaORMultipleSecondMsg with the messages array.
 		return new SigmaORMultipleSecondMsg(polynomBytes, secondMessages, challenges);
 		
 	}
 	
 	/**
 	 * Returns the simulator that matches this sigma protocol prover.
-	 * @return SigmaProtocolANDSimulator
+	 * @return SigmaORMultipleSimulator
 	 */
 	public SigmaSimulator getSimulator(){
 		ArrayList<SigmaSimulator> simulators = new ArrayList<SigmaSimulator>();
