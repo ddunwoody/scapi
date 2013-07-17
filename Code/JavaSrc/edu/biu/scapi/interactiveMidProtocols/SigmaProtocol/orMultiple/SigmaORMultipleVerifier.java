@@ -53,27 +53,28 @@ public class SigmaORMultipleVerifier implements SigmaVerifierComputation{
        
 	*/
 	
-	private ArrayList<SigmaVerifierComputation> verifiers;	// Underlying Sigma protocol's verifier to the AND calculation.
-	private int len;										// number of underlying verifiers.
-	private byte[] e;										//The challenge.
-	private int t;											//Soundness parameter.
-	private long challengePointer;
-	private int k;											//number of true statements.
+	private ArrayList<SigmaVerifierComputation> verifiers;	// Underlying Sigma protocol verifiers to the OR calculation.
+	private int len;										// Number of underlying verifiers.
+	private byte[] e;										// The challenge.
+	private int t;											// Soundness parameter.
+	private long challengePointer;							// Pointer to the sampled challenge element.
+	private int k;											// Number of true statements.
 	
 	
-	//Initiaize the field GF2E with a random irreducible polynomial with degree t.
+	//Initializes the field GF2E with a random irreducible polynomial with degree t.
 	private native void initField(int t, int seed);
 	
 	//Samples the challenge as a field element.
 	private native byte[] sampleChallenge(long[] pointer);
 	
-	//Checks if Q is of degree n-k AND Q(i)=ei for all i=1,…,n AND Q(0)=e.
+	//Checks if Q is of degree n-k AND Q(i)=ei for all i=1,…,n AND Q(0)=e. This function also deletes the allocated memory.
 	private native boolean checkPolynomialValidity(byte[][] polynomial, int k, long challengePointer, byte[][] challenges);
 
+	
 	/**
 	 * Constructor that gets the underlying verifiers.
 	 * @param verifiers array of SigmaVerifierComputation, where each object represent a statement 
-	 * 		  and the prover wants to prove to the verify that that the AND of all statements are true. 
+	 * 		  and the prover wants to convince a verifier that at least k out of n statements is true.
 	 * @param t soundness parameter. t MUST be equal to all t values of the underlying verifiers object.
 	 * @param random source of randomness
 	 * @throws IllegalArgumentException if the given t is not equal to all t values of the underlying verifiers object.
@@ -88,6 +89,8 @@ public class SigmaORMultipleVerifier implements SigmaVerifierComputation{
 		this.verifiers = verifiers;
 		len = verifiers.size();
 		this.t = t; 
+		
+		//Initialize the field GF2E with a random irreducible polynomial with degree t.
 		initField(t, random.nextInt());
 	}
 	
@@ -133,6 +136,7 @@ public class SigmaORMultipleVerifier implements SigmaVerifierComputation{
 	public void sampleChallenge(){
 		//Call the native function to sample a field element.
 		long[] pointer = new long[2];
+		//The pointer to the sampled challenge will be in the first cell of the array. We send array from technical reasons.
 		e = sampleChallenge(pointer);
 		e = alignToT(e);
 		challengePointer = pointer[0];
@@ -146,12 +150,18 @@ public class SigmaORMultipleVerifier implements SigmaVerifierComputation{
 	private byte[] alignToT(byte[] array) {
 		byte[] alignArr = new byte[t/8];
 		int len = array.length;
+		//in case the array is not aligned, add zeros.
 		if (len < t/8){
-			int diff = t/8 - len;
+			int diff = t/8 - len; //Number of bytes to fill with zeros.
 			int index = 0;
+			// NTL converts byte array to polynomial in the following way:
+			// x = sum(p[i]*X^(8*i), i = 0..n-1)
+			// This means that the most left byte in the array is the first degree of the polynomial.
+			// So, copy the original array content to the left side of the new array.
 			for (int i=0; i<len; i++){
 				alignArr[index++] = array[i];
 			}
+			//Add zeros in the right side of the array
 			for (int i=0; i<diff; i++){
 				alignArr[index++] = 0;
 			}
@@ -184,7 +194,7 @@ public class SigmaORMultipleVerifier implements SigmaVerifierComputation{
 	 * @param a first message from prover
 	 * @param z second message from prover
 	 * @return true if the proof has been verified; false, otherwise.
-	 * @throws IllegalArgumentException if the first message of the prover is not an instance of SigmaANDMsg
+	 * @throws IllegalArgumentException if the first message of the prover is not an instance of SigmaMultipleMsg
 	 * @throws IllegalArgumentException if the second message of the prover is not an instance of SigmaORMultipleSecondMsg
 	 */
 	public boolean verify(SigmaProtocolMsg a, SigmaProtocolMsg z) {
@@ -193,7 +203,7 @@ public class SigmaORMultipleVerifier implements SigmaVerifierComputation{
 		
 		//If one of the messages is illegal, throw exception.
 		if (!(a instanceof SigmaMultipleMsg)){
-			throw new IllegalArgumentException("first message must be an instance of SigmaANDMsg");
+			throw new IllegalArgumentException("first message must be an instance of SigmaMultipleMsg");
 		}
 		if (!(z instanceof SigmaORMultipleSecondMsg)){
 			throw new IllegalArgumentException("second message must be an instance of SigmaORMultipleSecondMsg");
@@ -206,7 +216,7 @@ public class SigmaORMultipleVerifier implements SigmaVerifierComputation{
 		byte[][] polynomial = second.getPolynomial();
 		byte[][] challenges = second.getChallenges();
 		
-		//Call native function to check the polynomial.
+		//Call native function to check the polynomial validity.
 		verified = verified && checkPolynomialValidity(polynomial, k, challengePointer, challenges);
 		
 		//Compute all verifier checks.

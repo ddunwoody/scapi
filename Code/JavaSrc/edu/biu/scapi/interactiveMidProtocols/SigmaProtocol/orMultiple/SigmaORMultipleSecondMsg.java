@@ -29,10 +29,10 @@ import java.util.ArrayList;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
 
 /**
- * Concrete implementation SigmaProtocol message. 
+ * Concrete implementation of SigmaProtocol message. 
  * 
- * This message contains a pointer to the interpolated polynomial and multiple SigmaProtocolMsg and used when the 
- * SigmaORMultipleProver sends the first message to the verifier.
+ * This message contains an array the interpolated polynomial, array of SigmaProtocolMsg and challenges.
+ * The prover used this message to send the first message to the verifier.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *

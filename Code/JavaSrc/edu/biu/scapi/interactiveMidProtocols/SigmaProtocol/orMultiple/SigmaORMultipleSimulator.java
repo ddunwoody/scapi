@@ -52,27 +52,27 @@ public class SigmaORMultipleSimulator implements SigmaSimulator{
 			OUTPUT (a1,e1,z1),…, (an,en,zn).
 	*/
 	
-	private ArrayList<SigmaSimulator> simulators;	//underlying simulators.
+	private ArrayList<SigmaSimulator> simulators;	// Underlying simulators.
 	private int t;									// Soundness parameter.
 	private SecureRandom random;
-	int len;										// number of underlying simulators.
+	int len;										// Number of underlying simulators.
 	
-	//Initiaize the field GF2E with a random irreducible polynomial with degree t.
+	//Initializes the field GF2E with a random irreducible polynomial with degree t.
 	private native void initField(int t, int seed);
 	
 	//Creates random field elements to be the challenges.
 	private native byte[][] createRandomFieldElements(int numElements, long[] fieldElements);
 	
-	//Interpolate the points to get a polynoial.
+	//Interpolates the points to get a polynomial.
 	private native long interpolate(byte[] e, long[] fieldElements, int[] indexesNotInI);
 	
-	//Calculate the challenges for the statements with the widnesses.
+	//Calculates the challenges for the statements with the witnesses.
 	private native byte[][] getRestChallenges(long polynomial, int start, int end, int[] indexesInI);
 	
-	//return the byteArray of the polynomial coefficients.
+	//Returns the byteArray of the polynomial coefficients.
 	private native byte[][] getPolynomialBytes(long polynomial);
 	
-	//delete the allocated memory of the polynomial and the field elements.
+	//Deletes the allocated memory of the polynomial and the field elements.
 	private native void deletePointers(long polynomial, long[] fieldElements);
 	
 	/**
@@ -92,6 +92,7 @@ public class SigmaORMultipleSimulator implements SigmaSimulator{
 		}
 		this.simulators = simulators;
 		this.t = t; 
+		//Initialize the field GF2E with a random irreducible polynomial with degree t.
 		initField(t, random.nextInt());
 	}
 
@@ -123,26 +124,25 @@ public class SigmaORMultipleSimulator implements SigmaSimulator{
 		
 		int nMinusK = len - orInput.getK();
 		long[] fieldElements = new long[nMinusK];
-		//For every j = 1 to n-k, SAMPLE a random element ej <- GF[2^t]. We sample the random elments at once.
+		//For every j = 1 to n-k, sample a random element ej <- GF[2^t]. We sample the random elements in one native call.
 		byte[][] ejs = createRandomFieldElements(nMinusK, fieldElements);
 
 		byte[][] challenges = new byte[len][];
-		//byte[][] challenges = new byte[len-orInput.k][];
+		
 		//Set the created challenges to the challenges array in the first n-k indexes.
 		for (int i=0; i<nMinusK; i++){
 			challenges[i] = alignToT(ejs[i]);
 		}
 		
-		//Create two arrays. This arrays used for calculate the interpolated polynomial.
+		//Create two arrays of indexes. These arrays used for calculate the interpolated polynomial.
 		int[] indexesNotInI= new int[nMinusK];
 		int[] indexesInI= new int[orInput.getK()];
 		int indexNotInI = 0;
 		int indexInI = 0;
 		//Fill the arrays with the indexes.
 		for (int i = 0; i < len; i++){
-			//If i in I, call the underlying computeFirstMsg.
 			if (i<len-orInput.getK()){
-				indexesNotInI[indexNotInI++] = i+1;
+				indexesNotInI[indexNotInI++] = i+1; //i+1 because Q(0) = e.
 			} else {
 				indexesInI[indexInI++] = i+1;
 			}
@@ -159,12 +159,11 @@ public class SigmaORMultipleSimulator implements SigmaSimulator{
 		ArrayList<SigmaProtocolMsg> aOutputs = new ArrayList<SigmaProtocolMsg>();
 		ArrayList<byte[]> eOutputs = new ArrayList<byte[]>();
 		ArrayList<SigmaProtocolMsg> zOutputs = new ArrayList<SigmaProtocolMsg>();
-		
+		SigmaSimulatorOutput output;
 		//Run the simulator on each statement,challenge pair (xi,ei) for all i=1,…,n to obtain (ai,ei,zi).
 		for (int i = 0; i < len; i++){
-		//for (int i = 0; i < nMinusK; i++){
 			try {
-				SigmaSimulatorOutput output = simulators.get(i).simulate(orInput.getInputs().get(i), challenges[i]);
+				output = simulators.get(i).simulate(orInput.getInputs().get(i), challenges[i]);
 				aOutputs.add(output.getA());
 				eOutputs.add(output.getE());
 				zOutputs.add(output.getZ());
@@ -192,12 +191,18 @@ public class SigmaORMultipleSimulator implements SigmaSimulator{
 	private byte[] alignToT(byte[] array) {
 		byte[] alignArr = new byte[t/8];
 		int len = array.length;
+		//in case the array is not aligned, add zeros.
 		if (len < t/8){
-			int diff = t/8 - len;
+			int diff = t/8 - len; //Number of bytes to fill with zeros.
 			int index = 0;
+			// NTL converts byte array to polynomial in the following way:
+			// x = sum(p[i]*X^(8*i), i = 0..n-1)
+			// This means that the most left byte in the array is the first degree of the polynomial.
+			// So, copy the original array content to the left side of the new array.
 			for (int i=0; i<len; i++){
 				alignArr[index++] = array[i];
 			}
+			//Add zeros in the right side of the array
 			for (int i=0; i<diff; i++){
 				alignArr[index++] = 0;
 			}
@@ -219,7 +224,7 @@ public class SigmaORMultipleSimulator implements SigmaSimulator{
 		byte[] e = new byte[t/8];
 		//Fill the byte array with random values.
 		random.nextBytes(e);
-		//Call the other simulate function with the given input and the samples e.
+		//Call the other simulate function with the given input and the sampled e.
 		try {
 			return simulate(input, e);
 		} catch (CheatAttemptException e1) {
