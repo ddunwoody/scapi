@@ -76,19 +76,19 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\work\LAST_Project\SDK\Code\C++Src\JniMiracl\miraclLibrary\Win32;C:\Program Files %28x86%29\Java\jdk1.6.0_10\include\win32;C:\Program Files %28x86%29\Java\jdk1.6.0_10\include;C:\work\LAST_Project\SDK\Code\C++Src\JniMiracl\FromMoriya\miracl\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\work\LAST_Project\SDK\Code\C++Src\JniMiracl\miraclLibrary\Win32;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\development\SDK\Code\ExternalLibraries\Miracl\v_5.2\include\Win32;C:\development\SDK\Code\ExternalLibraries\Miracl\v_5.2\include;C:\Program Files\Java\jdk1.6.0_45\include;C:\Program Files\Java\jdk1.6.0_45\include\win32;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\development\SDK\Code\C++Src\JniMiracl\miraclLibrary\v_5.2\Win32;$(LibraryPath)</LibraryPath>
     <SourcePath>$(SourcePath)</SourcePath>
-    <OutDir>$(SolutionDir)$(Configuration)\$(Platform)\</OutDir>
-    <IntDir>$(Configuration)\$(Platform)\intermmidiate</IntDir>
+    <OutDir>$(SolutionDir)\$(Configuration)\$(Platform)\</OutDir>
+    <IntDir>$(SolutionDir)\$(Configuration)\$(Platform)\intermmidiate</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Program Files %28x86%29\Java\jdk1.6.0_10\include\win32;C:\Program Files %28x86%29\Java\jdk1.6.0_10\include;C:\work\LAST_Project\SDK\Code\ExternalLibraries\Miracl\v_5.2\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\work\LAST_Project\SDK\Code\C++Src\JniMiracl\miraclLibrary\x64;C:\work\LAST_Project\SDK\Code\C++Src\JniMiracl\miraclLibrary;C:\work\LAST_Project\SDK\Code\C++Src\JniMiracl\miraclLibrary\Win32;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\development\SDK\Code\ExternalLibraries\Miracl\v_5.2\include\x64;C:\Program Files\Java\jdk1.6.0_45\include;C:\Program Files\Java\jdk1.6.0_45\include\win32;C:\development\SDK\Code\ExternalLibraries\Miracl\v_5.2\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\development\SDK\Code\C++Src\JniMiracl\miraclLibrary\v_5.2\x64;C:\development\SDK\Code\C++Src\JniMiracl\miraclLibrary;C:\development\SDK\Code\C++Src\JniMiracl\miraclLibrary\v_5.2\Win32;$(LibraryPath)</LibraryPath>
     <SourcePath>$(SourcePath)</SourcePath>
-    <OutDir>$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)\</OutDir>
-    <IntDir>$(SolutionDir)\$(ProjectName)\$(Configuration)\$(Platform)\intermmidiate</IntDir>
+    <OutDir>$(SolutionDir)\$(Configuration)\$(Platform)\</OutDir>
+    <IntDir>$(SolutionDir)\$(Configuration)\$(Platform)\intermmidiate</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -133,7 +133,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\work\LAST_Project\SDK\Code\C++Src\JniMiracl\miraclLibrary\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ShowProgress>LinkVerboseLib</ShowProgress>
     </Link>
   </ItemDefinitionGroup>
@@ -146,15 +146,15 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;MIRACLJAVAINTERFACE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <CompileAs>CompileAsCpp</CompileAs>
-      <AdditionalIncludeDirectories>C:\work\LAST_Project\SDK\Code\ExternalLibraries\Miracl\v_5.2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\development\SDK\Code\ExternalLibraries\Miracl\v_5.2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>C:\work\LAST_Project\SDK\Code\C++Src\JniMiracl\miraclLibrary\x64\miraclLibrary.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\work\LAST_Project\SDK\Code\C++Src\JniMiracl\miraclLibrary;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>C:\development\SDK\Code\C++Src\JniMiracl\miraclLibrary\v_5.2\x64\miraclLibrary.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\development\SDK\Code\C++Src\JniMiracl\miraclLibrary;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <LinkStatus>true</LinkStatus>
     </Link>
   </ItemDefinitionGroup>

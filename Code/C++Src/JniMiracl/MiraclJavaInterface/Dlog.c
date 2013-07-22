@@ -41,6 +41,12 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_miracl_MiraclAdapterD
 	  return (jlong)mip; //return the pointer
 }
 
+JNIEXPORT void JNICALL Java_edu_biu_scapi_primitives_dlog_miracl_MiraclAdapterDlogEC_deleteMip
+  (JNIEnv *env, jobject obj, jlong mip){
+	 
+	  mirexit((miracl*)mip);
+}
+
 /* function initFpCurve : This function initializes an elliptic curve over Fp according to the accepted values
  * param p				  : field's prime
  * param aVal			  : a value of the equation

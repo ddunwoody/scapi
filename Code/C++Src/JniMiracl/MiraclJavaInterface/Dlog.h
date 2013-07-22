@@ -46,6 +46,9 @@ extern "C" {
 JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_miracl_MiraclAdapterDlogEC_createMip
   (JNIEnv *, jobject);
 
+JNIEXPORT void JNICALL Java_edu_biu_scapi_primitives_dlog_miracl_MiraclAdapterDlogEC_deleteMip
+  (JNIEnv *env, jobject obj, jlong mip);
+
 /*
  * Class:     edu_biu_scapi_primitives_dlog_miracl_MiraclDlogECFp
  * Method:    initFpCurve
