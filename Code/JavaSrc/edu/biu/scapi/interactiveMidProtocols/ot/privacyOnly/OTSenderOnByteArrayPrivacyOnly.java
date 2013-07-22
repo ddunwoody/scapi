@@ -83,7 +83,7 @@ public class OTSenderOnByteArrayPrivacyOnly extends OTSenderDDHPrivacyOnlyAbs im
 		OTSOnByteArrayInput inputStrings = (OTSOnByteArrayInput)input;
 		
 		//If x0, x1 are not of the same length, throw Exception.
-		if (inputStrings.getX0().length != inputStrings.getX0().length){
+		if (inputStrings.getX0().length != inputStrings.getX1().length){
 			throw new IllegalArgumentException("x0 and x1 should be of the same length.");
 		}
 		
