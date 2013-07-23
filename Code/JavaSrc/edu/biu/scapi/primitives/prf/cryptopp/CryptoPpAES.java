@@ -58,6 +58,7 @@ public class CryptoPpAES implements AES{
 	private native void optimizedCompute(long aesCompute, byte[] in, byte[] out, boolean forEncrypt);
 	private native String getName(long aes);
 	private native int getBlockSize(long aes);
+	private native void deleteAES(long aesCompute, long aesInvert);
 	
 	/**
 	 * Default constructor. Uses default implementation of SecureRandom.
@@ -358,6 +359,17 @@ public class CryptoPpAES implements AES{
 		else 
 			throw new IllegalBlockSizeException("Wrong size");
 		
+	}
+	
+	/**
+	 * deletes the related Dlog group object
+	 */
+	protected void finalize() throws Throwable {
+
+		// delete from the dll the dynamic allocation of AES pointers.
+		deleteAES(aesCompute, aesInvert);
+
+		super.finalize();
 	}
 	
 	//Load the crypto++ dll.
