@@ -49,7 +49,7 @@ public abstract class MiraclAdapterDlogEC extends DlogGroupEC
 	
 	//Native code functions:
 	private native long createMip();
-
+	private native void deleteMip(long mip);
 	
 	//Class members:
 	protected int window = 0;
@@ -133,6 +133,17 @@ public abstract class MiraclAdapterDlogEC extends DlogGroupEC
 			window = 10;
 		}
 		return window;
+	}
+	
+	/**
+	 * deletes the related Dlog group object
+	 */
+	public void finalize() throws Throwable {
+
+		// delete from the dll the dynamic allocation of MIRACL pointer.
+		deleteMip(mip);
+
+		super.finalize();
 	}
 	
 }
