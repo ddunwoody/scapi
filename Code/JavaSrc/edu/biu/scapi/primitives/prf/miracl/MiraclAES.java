@@ -333,7 +333,7 @@ public class MiraclAES implements AES{
 	/**
 	 * deletes the related Dlog group object
 	 */
-	public void finalize() throws Throwable {
+	protected void finalize() throws Throwable {
 
 		// delete from the dll the dynamic allocation of AES pointer.
 		deleteAES(aes);
