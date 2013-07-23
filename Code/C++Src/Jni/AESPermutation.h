@@ -88,6 +88,9 @@ JNIEXPORT jstring JNICALL Java_edu_biu_scapi_primitives_prf_cryptopp_CryptoPpAES
 JNIEXPORT jint JNICALL Java_edu_biu_scapi_primitives_prf_cryptopp_CryptoPpAES_getBlockSize
   (JNIEnv *, jobject, jlong);
 
+JNIEXPORT void JNICALL Java_edu_biu_scapi_primitives_prf_cryptopp_CryptoPpAES_deleteAES
+  (JNIEnv *, jobject, jlong, jlong);
+
 #ifdef __cplusplus
 }
 #endif

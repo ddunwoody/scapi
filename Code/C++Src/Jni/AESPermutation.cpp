@@ -118,3 +118,9 @@ JNIEXPORT jint JNICALL Java_edu_biu_scapi_primitives_prf_cryptopp_CryptoPpAES_ge
   (JNIEnv *, jobject, jlong aes){
 	  return ((AESEncryption*)aes)->BlockSize();
 }
+
+JNIEXPORT void JNICALL Java_edu_biu_scapi_primitives_prf_cryptopp_CryptoPpAES_deleteAES
+  (JNIEnv *, jobject, jlong aesCompute, jlong aesInvert){
+	  delete((AESEncryption*)aesCompute);
+	  delete((AESEncryption*)aesInvert);
+}
