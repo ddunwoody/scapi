@@ -28,6 +28,7 @@ import java.security.SecureRandom;
 
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CheatAttemptException;
+import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTROnByteArrayOutput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTROutput;
@@ -64,8 +65,9 @@ public class OTReceiverOnByteArrayPrivacyOnly extends OTReceiverDDHPrivacyOnlyAb
 	 * @param kdf
 	 * @param random
 	 * @throws SecurityLevelException if the given DlogGroup is not DDH secure.
+	 * @throws InvalidDlogGroupException if the given dlog is invalid.
 	 */
-	public OTReceiverOnByteArrayPrivacyOnly(Channel channel, DlogGroup dlog, KeyDerivationFunction kdf, SecureRandom random) throws SecurityLevelException{
+	public OTReceiverOnByteArrayPrivacyOnly(Channel channel, DlogGroup dlog, KeyDerivationFunction kdf, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException{
 		
 		super(channel, dlog, random);
 		this.kdf = kdf;
