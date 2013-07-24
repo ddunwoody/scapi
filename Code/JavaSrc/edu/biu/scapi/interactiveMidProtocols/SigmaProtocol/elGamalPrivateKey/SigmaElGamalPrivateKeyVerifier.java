@@ -26,6 +26,7 @@ package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.elGamalPrivateKey;
 
 import java.security.SecureRandom;
 
+import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.DlogBasedSigma;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaVerifierComputation;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog.SigmaDlogInput;
@@ -59,8 +60,9 @@ public class SigmaElGamalPrivateKeyVerifier implements SigmaVerifierComputation,
 	 * @param dlog
 	 * @param t Soundness parameter in BITS.
 	 * @param random
+	 * @throws InvalidDlogGroupException if the given dlog is invalid.
 	 */
-	public SigmaElGamalPrivateKeyVerifier(DlogGroup dlog, int t, SecureRandom random) {
+	public SigmaElGamalPrivateKeyVerifier(DlogGroup dlog, int t, SecureRandom random) throws InvalidDlogGroupException {
 		
 		//Creates the underlying SigmaDlogVerifier object with the given parameters.
 		sigmaDlog = new SigmaDlogVerifier(dlog, t, random);
