@@ -27,6 +27,7 @@ package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.elGamalEncryptedValu
 import java.io.IOException;
 import java.security.SecureRandom;
 
+import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.DlogBasedSigma;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaVerifierComputation;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHInput;
@@ -71,8 +72,9 @@ public class SigmaElGamalEncryptedValueVerifier implements SigmaVerifierComputat
 	 * @param dlog
 	 * @param t Soundness parameter in BITS.
 	 * @param random
+	 * @throws InvalidDlogGroupException if the given dlog is invalid.
 	 */
-	public SigmaElGamalEncryptedValueVerifier(DlogGroup dlog, int t, SecureRandom random) {
+	public SigmaElGamalEncryptedValueVerifier(DlogGroup dlog, int t, SecureRandom random) throws InvalidDlogGroupException {
 		
 		//Creates the underlying SigmaDHVerifier object with the given parameters.
 		sigmaDH = new SigmaDHVerifier(dlog, t, random);
@@ -92,7 +94,11 @@ public class SigmaElGamalEncryptedValueVerifier implements SigmaVerifierComputat
 		}
 		
 		//Creates the underlying SigmaDHVerifier object with default parameters.
-		sigmaDH = new SigmaDHVerifier(dlog, 80, new SecureRandom());
+		try {
+			sigmaDH = new SigmaDHVerifier(dlog, 80, new SecureRandom());
+		} catch (InvalidDlogGroupException e) {
+			// Can not occur since the DlogGroup is valid.
+		}
 	}
 	
 	/**
