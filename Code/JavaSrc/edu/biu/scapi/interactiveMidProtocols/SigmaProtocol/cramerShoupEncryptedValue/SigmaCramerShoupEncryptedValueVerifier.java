@@ -29,6 +29,7 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 
+import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.DlogBasedSigma;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaVerifierComputation;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dhExtended.SigmaDHExtendedInput;
@@ -73,8 +74,9 @@ public class SigmaCramerShoupEncryptedValueVerifier implements SigmaVerifierComp
 	 * @param hash CryptographicHash used in CramerShoup encryption scheme. 
 	 * @param t Soundness parameter in BITS.
 	 * @param random
+	 * @throws InvalidDlogGroupException if the given dlog is invalid.
 	 */
-	public SigmaCramerShoupEncryptedValueVerifier(DlogGroup dlog, CryptographicHash hash, int t, SecureRandom random) {
+	public SigmaCramerShoupEncryptedValueVerifier(DlogGroup dlog, CryptographicHash hash, int t, SecureRandom random) throws InvalidDlogGroupException {
 		
 		setParameters(dlog, hash, t, random);
 	}
@@ -93,7 +95,11 @@ public class SigmaCramerShoupEncryptedValueVerifier implements SigmaVerifierComp
 			dlogTemp = new CryptoPpDlogZpSafePrime();
 		}
 		
-		setParameters(dlogTemp, new CryptoPpSHA1(), 80, new SecureRandom());
+		try {
+			setParameters(dlogTemp, new CryptoPpSHA1(), 80, new SecureRandom());
+		} catch (InvalidDlogGroupException e) {
+			// Can not occur since the DlogGroup is valid.
+		}
 	}
 	
 	/**
@@ -102,8 +108,9 @@ public class SigmaCramerShoupEncryptedValueVerifier implements SigmaVerifierComp
 	 * @param hash CryptographicHash used in CramerShoup encryption scheme.
 	 * @param t Soundness parameter in BITS.
 	 * @param random
+	 * @throws InvalidDlogGroupException if the given DlogGroup is not valid.
 	 */
-	private void setParameters(DlogGroup dlog, CryptographicHash hash, int t, SecureRandom random) {
+	private void setParameters(DlogGroup dlog, CryptographicHash hash, int t, SecureRandom random) throws InvalidDlogGroupException {
 		//Creates the underlying SigmaDHExtendedVerifier object with the given parameters.
 		sigmaDH = new SigmaDHExtendedVerifier(dlog, t, random);
 		this.dlog = dlog;
