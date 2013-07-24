@@ -27,6 +27,7 @@ package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.elGamalCTKnowledge;
 import java.io.IOException;
 import java.security.SecureRandom;
 
+import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.DlogBasedSigma;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaVerifierComputation;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog.SigmaDlogInput;
@@ -63,8 +64,9 @@ public class SigmaElGamalCTKnowledgeVerifier implements SigmaVerifierComputation
 	 * @param dlog
 	 * @param t Soundness parameter in BITS.
 	 * @param random
+	 * @throws InvalidDlogGroupException if the given dlog is invalid.
 	 */
-	public SigmaElGamalCTKnowledgeVerifier(DlogGroup dlog, int t, SecureRandom random) {
+	public SigmaElGamalCTKnowledgeVerifier(DlogGroup dlog, int t, SecureRandom random) throws InvalidDlogGroupException {
 		
 		setParameters(dlog, t, random);
 	}
@@ -81,7 +83,11 @@ public class SigmaElGamalCTKnowledgeVerifier implements SigmaVerifierComputation
 			dlog = new CryptoPpDlogZpSafePrime();
 		}
 		
-		setParameters(dlog, 80, new SecureRandom());
+		try {
+			setParameters(dlog, 80, new SecureRandom());
+		} catch (InvalidDlogGroupException e) {
+			// Can not occur since the DlogGroup is valid.
+		}
 	}
 	
 	/**
@@ -89,8 +95,9 @@ public class SigmaElGamalCTKnowledgeVerifier implements SigmaVerifierComputation
 	 * @param dlog
 	 * @param t Soundness parameter in BITS.
 	 * @param random
+	 * @throws InvalidDlogGroupException if the given dlog is invalid.
 	 */
-	private void setParameters(DlogGroup dlog, int t, SecureRandom random) {
+	private void setParameters(DlogGroup dlog, int t, SecureRandom random) throws InvalidDlogGroupException {
 		//Create the underlying SigmaDlogVerifier object with the given parameters.
 		sigmaDlog = new SigmaDlogVerifier(dlog, t, random);
 		this.dlog = dlog;
