@@ -33,6 +33,7 @@ import org.bouncycastle.util.BigIntegers;
 
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CheatAttemptException;
+import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTRBasicInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTRInput;
@@ -104,9 +105,14 @@ public abstract class OTReceiverDDHPrivacyOnlyAbs implements OTReceiver{
 				//If there is a problem with the elliptic curves file, create Zp DlogGroup.
 				
 					setMembers(channel, new CryptoPpDlogZpSafePrime(), new SecureRandom());
+			} catch (IllegalArgumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		} catch (SecurityLevelException e) {
 			// Can not occur since the DlogGroup is DDH secure
+		} catch (InvalidDlogGroupException e) {
+			// Can not occur since the DlogGroup is valid.
 		}
 	}
 	
@@ -116,8 +122,9 @@ public abstract class OTReceiverDDHPrivacyOnlyAbs implements OTReceiver{
 	 * @param dlog must be DDH secure.
 	 * @param random
 	 * @throws SecurityLevelException if the given dlog is not DDH secure
+	 * @throws InvalidDlogGroupException if the given DlogGroup is not valid.
 	 */
-	public OTReceiverDDHPrivacyOnlyAbs(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException{
+	public OTReceiverDDHPrivacyOnlyAbs(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException{
 		
 		setMembers(channel, dlog, random);
 	}
@@ -128,9 +135,9 @@ public abstract class OTReceiverDDHPrivacyOnlyAbs implements OTReceiver{
 	 * @param dlog must be DDH secure.
 	 * @param random
 	 * @throws SecurityLevelException if the given dlog is not DDH secure
-	 * @throws IllegalArgumentException  if the given dlog is not valid.
+	 * @throws InvalidDlogGroupException if the given DlogGroup is not valid.
 	 */
-	private void setMembers(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException {
+	private void setMembers(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException {
 		//The underlying dlog group must be DDH secure.
 		if (!(dlog instanceof DDH)){
 			throw new SecurityLevelException("DlogGroup should have DDH security level");
@@ -141,9 +148,8 @@ public abstract class OTReceiverDDHPrivacyOnlyAbs implements OTReceiver{
 		//and in this case we assume the parameters are always correct and the validateGroup function always return true.
 		//It is also possible to upload a user-defined configuration file. In this case,
 		//it is the user's responsibility to check the validity of the parameters by override the implementation of this function.
-		if (!(dlog.validateGroup())){
-			throw new IllegalArgumentException("the given DlogGroup is not valid");
-		}
+		if(!dlog.validateGroup())
+			throw new InvalidDlogGroupException();
 		
 		this.channel = channel;
 		this.dlog = dlog;

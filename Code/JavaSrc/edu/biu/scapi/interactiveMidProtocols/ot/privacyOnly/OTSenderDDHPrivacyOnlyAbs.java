@@ -33,6 +33,7 @@ import org.bouncycastle.util.BigIntegers;
 
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CheatAttemptException;
+import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSender;
@@ -104,6 +105,8 @@ public abstract class OTSenderDDHPrivacyOnlyAbs implements OTSender{
 			}
 		} catch (SecurityLevelException e) {
 			// Can not occur since the DlogGroup is DDH secure
+		} catch (InvalidDlogGroupException e) {
+			// Can not occur since the DlogGroup is valid.
 		}
 	}
 	
@@ -113,8 +116,9 @@ public abstract class OTSenderDDHPrivacyOnlyAbs implements OTSender{
 	 * @param dlog must be DDH secure.
 	 * @param random
 	 * @throws SecurityLevelException if the given dlog is not DDH secure
+	 * @throws InvalidDlogGroupException if the given DlogGroup is not valid.
 	 */
-	public OTSenderDDHPrivacyOnlyAbs(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException{
+	public OTSenderDDHPrivacyOnlyAbs(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException{
 		
 		setMembers(channel, dlog, random);
 	}
@@ -125,17 +129,16 @@ public abstract class OTSenderDDHPrivacyOnlyAbs implements OTSender{
 	 * @param dlog must be DDH secure.
 	 * @param random
 	 * @throws SecurityLevelException if the given dlog is not DDH secure
-	 * @throws IllegalArgumentException if the given dlog is not valid.
+	 * @throws InvalidDlogGroupException if the given DlogGroup is not valid.
 	 */
-	private void setMembers(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException {
+	private void setMembers(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException {
 		//The underlying dlog group must be DDH secure.
 		if (!(dlog instanceof DDH)){
 			throw new SecurityLevelException("DlogGroup should have DDH security level");
 		}
 		//Check that the given dlog is valid.
-		if (!(dlog.validateGroup())){
-			throw new IllegalArgumentException("the given DlogGroup is not valid");
-		}
+		if(!dlog.validateGroup())
+			throw new InvalidDlogGroupException();
 		
 		this.channel = channel;
 		this.dlog = dlog;
