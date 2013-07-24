@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
+import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.DlogBasedSigma;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaVerifierComputation;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaBIMsg;
@@ -65,8 +66,9 @@ public class SigmaDHVerifier implements SigmaVerifierComputation, DlogBasedSigma
 	 * @param dlog
 	 * @param t Soundness parameter in BITS.
 	 * @param random
+	 * @throws InvalidDlogGroupException if the given dlog is invalid.
 	 */
-	public SigmaDHVerifier(DlogGroup dlog, int t, SecureRandom random) {
+	public SigmaDHVerifier(DlogGroup dlog, int t, SecureRandom random) throws InvalidDlogGroupException {
 		
 		// Sets the given parameters. 
 		setParameters(dlog, t, random);
@@ -81,22 +83,27 @@ public class SigmaDHVerifier implements SigmaVerifierComputation, DlogBasedSigma
 			setParameters(new MiraclDlogECF2m("K-233"), 80, new SecureRandom());
 		} catch (IOException e) {
 			//If there is a problem with the elliptic curves file, create Zp DlogGroup.
-			setParameters(new CryptoPpDlogZpSafePrime(), 80, new SecureRandom());
+			try {
+				setParameters(new CryptoPpDlogZpSafePrime(), 80, new SecureRandom());
+			} catch (InvalidDlogGroupException e1) {
+				// Can not occur since the DlogGroup is valid.
+			}
+		} catch (InvalidDlogGroupException e) {
+			// Can not occur since the DlogGroup is valid.
 		}
 	}
 
 	/**
-	 * If soundness parameter and dlog are valid, sets the parameters. Else, throw IllegalArgumentException.
+	 * If soundness parameter and dlog are valid, sets the parameters. 
 	 * @param dlog
 	 * @param t soundness parameter in BITS
 	 * @param random
-	 * @throws IllegalArgumentException if the given dlog is invalid.
+	 * @throws InvalidDlogGroupException if the given DlogGroup is not valid.
 	 * @throws IllegalArgumentException if soundness parameter is invalid.
 	 */
-	private void setParameters(DlogGroup dlog, int t, SecureRandom random) {
-		if (!(dlog.validateGroup())){
-			throw new IllegalArgumentException("the given DlogGroup is not valid");
-		}
+	private void setParameters(DlogGroup dlog, int t, SecureRandom random) throws InvalidDlogGroupException {
+		if(!dlog.validateGroup())
+			throw new InvalidDlogGroupException();
 		
 		//Sets the parameters.
 		this.dlog = dlog;
