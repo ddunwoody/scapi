@@ -118,6 +118,11 @@ public abstract class BcAdapterDlogEC extends DlogGroupEC
 		//gets the ECPoint
 		ECPoint point = ((ECPointBc)base).getPoint();
 		
+		//If the exponent is negative, convert it to be the exponent modulus q.
+		if (exponent.compareTo(BigInteger.ZERO) < 0){
+			exponent = exponent.mod(getOrder());
+		}
+		
 		/* 
 		 * BC treats EC as additive group while we treat that as multiplicative group. 
 		 * Therefore, exponentiate point is multiply.
