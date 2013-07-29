@@ -193,6 +193,11 @@ public class MiraclDlogECFp extends MiraclAdapterDlogEC implements DlogECFp, DDH
 			return base;
 		}
 
+		//If the exponent is negative, convert it to be the exponent modulus q.
+		if (exponent.compareTo(BigInteger.ZERO) < 0){
+			exponent = exponent.mod(getOrder());
+		}
+				
 		long point = ((ECFpPointMiracl) base).getPoint();
 		// call the native exponentiate function
 		long result = exponentiateFpPoint(mip, point, exponent.toByteArray());

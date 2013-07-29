@@ -220,6 +220,11 @@ public class MiraclDlogECF2m extends MiraclAdapterDlogEC implements DlogECF2m, D
 			return base;
 		}
 
+		//If the exponent is negative, convert it to be the exponent modulus q.
+		if (exponent.compareTo(BigInteger.ZERO) < 0){
+			exponent = exponent.mod(getOrder());
+		}
+		
 		long point = ((ECF2mPointMiracl) base).getPoint();
 		// call to native exponentiate function
 		long result = exponentiateF2mPoint(mip, point, exponent.toByteArray());
