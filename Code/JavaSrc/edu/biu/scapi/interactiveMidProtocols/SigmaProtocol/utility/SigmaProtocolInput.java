@@ -24,6 +24,8 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility;
 
+import edu.biu.scapi.interactiveMidProtocols.zeroKnowledge.ZeroKnowledgeInput;
+
 /**
  * Every Sigma protocol prover/receiver needs inputs during the protocol execution, but every concrete protocol needs 
  * different inputs.
@@ -33,6 +35,7 @@ package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public interface SigmaProtocolInput {
+public interface SigmaProtocolInput extends ZeroKnowledgeInput{
+
 
 }
