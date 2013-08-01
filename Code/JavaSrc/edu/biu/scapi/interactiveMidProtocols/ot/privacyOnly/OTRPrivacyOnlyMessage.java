@@ -35,7 +35,7 @@ import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-class OTRPrivacyMessage implements Serializable{
+public class OTRPrivacyOnlyMessage implements Serializable{
 	
 	private static final long serialVersionUID = 8620542140745898146L;
 	
@@ -44,7 +44,7 @@ class OTRPrivacyMessage implements Serializable{
 	private GroupElementSendableData z0;
 	private GroupElementSendableData z1;
 	
-	public OTRPrivacyMessage(GroupElementSendableData x, GroupElementSendableData y, 
+	public OTRPrivacyOnlyMessage(GroupElementSendableData x, GroupElementSendableData y, 
 							 GroupElementSendableData z0, GroupElementSendableData z1){
 		this.x = x;
 		this.y = y;

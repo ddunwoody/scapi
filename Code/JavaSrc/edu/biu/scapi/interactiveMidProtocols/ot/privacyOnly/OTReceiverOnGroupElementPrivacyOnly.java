@@ -41,7 +41,7 @@ import edu.biu.scapi.securityLevel.PrivacyOnly;
 /**
  * Concrete class for OT Privacy assuming DDH receiver ON GROUP ELEMENT.
  * This class derived from OTReceiverDDHPrivacyAbs and implements the functionality 
- * related to the byte array inputs.
+ * related to the group element inputs.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
@@ -74,16 +74,16 @@ public class OTReceiverOnGroupElementPrivacyOnly extends OTReceiverDDHPrivacyOnl
 	 * "IF  NOT 
 	 *		1. w0, w1, c0, c1 in the DlogGroup
 	 *	REPORT ERROR"
-	 * @param message received from the sender. must be OTSOnGroupElementPrivacyMessage.
+	 * @param message received from the sender. must be OTSOnGroupElementPrivacyOnlyMessage.
 	 * @throws CheatAttemptException if there was a cheat attempt during the execution of the protocol.
 	 */
 	protected void checkReceivedTuple(OTSMessage message) throws CheatAttemptException{
 		//If message is not instance of OTSOnGroupElementPrivacyMessage, throw Exception.
-		if(!(message instanceof OTSOnGroupElementPrivacyMessage)){
-			throw new IllegalArgumentException("message should be instance of OTSOnGroupElementPrivacyMessage");
+		if(!(message instanceof OTSOnGroupElementPrivacyOnlyMessage)){
+			throw new IllegalArgumentException("message should be instance of OTSOnGroupElementPrivacyOnlyMessage");
 		}
 		
-		OTSOnGroupElementPrivacyMessage msg = (OTSOnGroupElementPrivacyMessage)message;
+		OTSOnGroupElementPrivacyOnlyMessage msg = (OTSOnGroupElementPrivacyOnlyMessage)message;
 		
 		//Reconstruct the group elements from the given message.
 		w0 = dlog.reconstructElement(true, msg.getW0());

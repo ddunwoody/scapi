@@ -123,6 +123,6 @@ public class OTSenderOnByteArrayPrivacyOnly extends OTSenderDDHPrivacyOnlyAbs im
 		}
 		
 		//Create and return sender message.
-		return new OTSOnByteArrayPrivacyMessage(w0.generateSendableData(), c0, w1.generateSendableData(), c1);
+		return new OTSOnByteArrayPrivacyOnlyMessage(w0.generateSendableData(), c0, w1.generateSendableData(), c1);
 	}
 }

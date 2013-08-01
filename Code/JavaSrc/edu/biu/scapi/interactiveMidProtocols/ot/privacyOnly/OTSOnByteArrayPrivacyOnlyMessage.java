@@ -34,7 +34,7 @@ import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-class OTSOnByteArrayPrivacyMessage implements OTSMessage{
+public class OTSOnByteArrayPrivacyOnlyMessage implements OTSMessage{
 
 	private static final long serialVersionUID = 4767226698720455158L;
 
@@ -43,7 +43,7 @@ class OTSOnByteArrayPrivacyMessage implements OTSMessage{
 	private byte[] c0;
 	private byte[] c1;
 	
-	public OTSOnByteArrayPrivacyMessage(GroupElementSendableData w0, byte[] c0, 
+	public OTSOnByteArrayPrivacyOnlyMessage(GroupElementSendableData w0, byte[] c0, 
 										GroupElementSendableData w1, byte[] c1){
 		this.w0 = w0;
 		this.w1 = w1;

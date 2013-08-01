@@ -225,7 +225,7 @@ public abstract class OTReceiverDDHPrivacyOnlyAbs implements OTReceiver{
 		
 		try{
 			//Compute tuple for sender.
-			OTRPrivacyMessage a = computeTuple();
+			OTRPrivacyOnlyMessage a = computeTuple();
 			
 			//Send tuple to sender.
 			sendTupleToSender(a);
@@ -279,16 +279,16 @@ public abstract class OTReceiverDDHPrivacyOnlyAbs implements OTReceiver{
 				2.	If sigma = 1 then a = (g^alpha, g^beta, g^gamma, g^(alpha*beta))"
 	 * @return OTRSemiHonestMessage contains the tuple (h0, h1).
 	 */
-	private OTRPrivacyMessage computeTuple() {
+	private OTRPrivacyOnlyMessage computeTuple() {
 
 		if (sigma == 0){
-			return new OTRPrivacyMessage(gAlpha.generateSendableData(), 
+			return new OTRPrivacyOnlyMessage(gAlpha.generateSendableData(), 
 										 gBeta.generateSendableData(), 
 										 gAlphaBeta.generateSendableData(), 
 										 gGamma.generateSendableData());
 		}
 		else {
-			return new OTRPrivacyMessage(gAlpha.generateSendableData(), 
+			return new OTRPrivacyOnlyMessage(gAlpha.generateSendableData(), 
 										 gBeta.generateSendableData(), 
 										 gGamma.generateSendableData(), 
 										 gAlphaBeta.generateSendableData());
@@ -301,7 +301,7 @@ public abstract class OTReceiverDDHPrivacyOnlyAbs implements OTReceiver{
 	 * @param a the tuple to send to the sender.
 	 * @throws IOException 
 	 */
-	private void sendTupleToSender(OTRPrivacyMessage a) throws IOException {
+	private void sendTupleToSender(OTRPrivacyOnlyMessage a) throws IOException {
 		try {
 			channel.send(a);
 		} catch (IOException e) {

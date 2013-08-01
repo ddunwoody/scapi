@@ -39,7 +39,7 @@ import edu.biu.scapi.securityLevel.PrivacyOnly;
 /**
  * Concrete class for OT Privacy assuming DDH sender ON GroupElement.
  * This class derived from OTSenderDDHPrivacyAbs and implements the functionality 
- * related to the byte array inputs.
+ * related to the GroupElement inputs.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
@@ -101,7 +101,7 @@ public class OTSenderOnGroupElementPrivacyOnly extends OTSenderDDHPrivacyOnlyAbs
 		GroupElement c1 = dlog.multiplyGroupElements(x1, k1);
 		
 		//Create and return sender message.
-		return new OTSOnGroupElementPrivacyMessage(w0.generateSendableData(), 
+		return new OTSOnGroupElementPrivacyOnlyMessage(w0.generateSendableData(), 
 				c0.generateSendableData(), w1.generateSendableData(), c1.generateSendableData());
 	}
 }

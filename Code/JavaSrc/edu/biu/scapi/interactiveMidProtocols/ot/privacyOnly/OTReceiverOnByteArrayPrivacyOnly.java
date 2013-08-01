@@ -79,16 +79,16 @@ public class OTReceiverOnByteArrayPrivacyOnly extends OTReceiverDDHPrivacyOnlyAb
 	 *		1. w0, w1 in the DlogGroup, AND
 	 *		2. c0, c1 are binary strings of the same length
 	 *	   REPORT ERROR"
-	 * @param message received from the sender. must be OTSOnByteArrayPrivacyMessage.
+	 * @param message received from the sender. must be OTSOnByteArrayPrivacyOnlyMessage.
 	 * @throws CheatAttemptException if there was a cheat attempt during the execution of the protocol.
 	 */
 	protected void checkReceivedTuple(OTSMessage message) throws CheatAttemptException{
 		//If message is not instance of OTSOnByteArrayPrivacyMessage, throw Exception.
-		if(!(message instanceof OTSOnByteArrayPrivacyMessage)){
-			throw new IllegalArgumentException("message should be instance of OTSOnByteArrayPrivacyMessage");
+		if(!(message instanceof OTSOnByteArrayPrivacyOnlyMessage)){
+			throw new IllegalArgumentException("message should be instance of OTSOnByteArrayPrivacyOnlyMessage");
 		}
 		
-		OTSOnByteArrayPrivacyMessage msg = (OTSOnByteArrayPrivacyMessage)message;
+		OTSOnByteArrayPrivacyOnlyMessage msg = (OTSOnByteArrayPrivacyOnlyMessage)message;
 		
 		//Reconstruct the group elements from the given message.
 		w0 = dlog.reconstructElement(true, msg.getW0());

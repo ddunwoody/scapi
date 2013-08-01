@@ -168,7 +168,7 @@ public abstract class OTSenderDDHPrivacyOnlyAbs implements OTSender{
 				•	w1 = x^u1 • g^v1
 				•	k1 = (z1)^u1 • y^v1 
 		*/
-		OTRPrivacyMessage message = waitForMessageFromReceiver();
+		OTRPrivacyOnlyMessage message = waitForMessageFromReceiver();
 		checkReceivedTuple(message);
 		sampleRandomValues();
 		computePreProcessValues();
@@ -205,17 +205,17 @@ public abstract class OTSenderDDHPrivacyOnlyAbs implements OTSender{
 	 * @throws IOException if failed to receive a message.
 	 * @throws ClassNotFoundException 
 	 */
-	private OTRPrivacyMessage waitForMessageFromReceiver() throws IOException, ClassNotFoundException{
+	private OTRPrivacyOnlyMessage waitForMessageFromReceiver() throws IOException, ClassNotFoundException{
 		Serializable message = null;
 		try {
 			message = channel.receive();
 		} catch (IOException e) {
 			throw new IOException("failed to receive message. The thrown message is: " + e.getMessage());
 		}
-		if (!(message instanceof OTRPrivacyMessage)){
-			throw new IllegalArgumentException("the given message should be an instance of OTRPrivacyMessage");
+		if (!(message instanceof OTRPrivacyOnlyMessage)){
+			throw new IllegalArgumentException("the given message should be an instance of OTRPrivacyOnlyMessage");
 		}
-		return (OTRPrivacyMessage) message;
+		return (OTRPrivacyOnlyMessage) message;
 	}
 	
 	/**
@@ -227,7 +227,7 @@ public abstract class OTSenderDDHPrivacyOnlyAbs implements OTSender{
 	 * @return the received message.
 	 * @throws CheatAttemptException 
 	 */
-	private void checkReceivedTuple(OTRPrivacyMessage message) throws CheatAttemptException {
+	private void checkReceivedTuple(OTRPrivacyOnlyMessage message) throws CheatAttemptException {
 		//Reconstruct the group elements from the given message.
 		x = dlog.reconstructElement(true, message.getX());
 		y = dlog.reconstructElement(true, message.getY());
