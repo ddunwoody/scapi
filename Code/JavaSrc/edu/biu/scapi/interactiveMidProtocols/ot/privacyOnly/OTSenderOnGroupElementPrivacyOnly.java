@@ -32,6 +32,7 @@ import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnGroupElementInput;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnGroupElementMessage;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.securityLevel.PrivacyOnly;
@@ -101,7 +102,7 @@ public class OTSenderOnGroupElementPrivacyOnly extends OTSenderDDHPrivacyOnlyAbs
 		GroupElement c1 = dlog.multiplyGroupElements(x1, k1);
 		
 		//Create and return sender message.
-		return new OTSOnGroupElementPrivacyOnlyMessage(w0.generateSendableData(), 
+		return new OTSOnGroupElementMessage(w0.generateSendableData(), 
 				c0.generateSendableData(), w1.generateSendableData(), c1.generateSendableData());
 	}
 }

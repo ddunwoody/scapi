@@ -32,6 +32,7 @@ import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnByteArrayInput;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnByteArrayMessage;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
 import edu.biu.scapi.securityLevel.PrivacyOnly;
@@ -123,6 +124,6 @@ public class OTSenderOnByteArrayPrivacyOnly extends OTSenderDDHPrivacyOnlyAbs im
 		}
 		
 		//Create and return sender message.
-		return new OTSOnByteArrayPrivacyOnlyMessage(w0.generateSendableData(), c0, w1.generateSendableData(), c1);
+		return new OTSOnByteArrayMessage(w0.generateSendableData(), c0, w1.generateSendableData(), c1);
 	}
 }

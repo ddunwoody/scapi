@@ -34,6 +34,7 @@ import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTROnGroupElementOutput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTROutput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnGroupElementMessage;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.securityLevel.PrivacyOnly;
@@ -79,11 +80,11 @@ public class OTReceiverOnGroupElementPrivacyOnly extends OTReceiverDDHPrivacyOnl
 	 */
 	protected void checkReceivedTuple(OTSMessage message) throws CheatAttemptException{
 		//If message is not instance of OTSOnGroupElementPrivacyMessage, throw Exception.
-		if(!(message instanceof OTSOnGroupElementPrivacyOnlyMessage)){
+		if(!(message instanceof OTSOnGroupElementMessage)){
 			throw new IllegalArgumentException("message should be instance of OTSOnGroupElementPrivacyOnlyMessage");
 		}
 		
-		OTSOnGroupElementPrivacyOnlyMessage msg = (OTSOnGroupElementPrivacyOnlyMessage)message;
+		OTSOnGroupElementMessage msg = (OTSOnGroupElementMessage)message;
 		
 		//Reconstruct the group elements from the given message.
 		w0 = dlog.reconstructElement(true, msg.getW0());
