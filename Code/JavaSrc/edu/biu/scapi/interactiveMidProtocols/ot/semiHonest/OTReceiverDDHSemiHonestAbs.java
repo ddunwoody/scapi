@@ -34,6 +34,7 @@ import org.bouncycastle.util.BigIntegers;
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTRBasicInput;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTRMessage;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTRInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTROutput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTReceiver;
@@ -182,7 +183,7 @@ public abstract class OTReceiverDDHSemiHonestAbs implements OTReceiver{
 					 OR xSigma = vSigma * (kSigma)^(-1) 			- in GroupElement scenario
 		*/
 		try{
-			OTRSemiHonestMessage tuple = computeTuple();
+			OTRMessage tuple = computeTuple();
 			sendTupleToSender(tuple);
 			OTSMessage message = waitForMessageFromSender();
 			return computeFinalXSigma(message);
@@ -212,7 +213,7 @@ public abstract class OTReceiverDDHSemiHonestAbs implements OTReceiver{
 	 *		2.	If sigma = 1 then h0 = h and h1 = g^alpha"
 	 * @return OTRSemiHonestMessage contains the tuple (h0, h1).
 	 */
-	private OTRSemiHonestMessage computeTuple() {
+	private OTRMessage computeTuple() {
 		GroupElement h0 = null;
 		GroupElement h1 = null;
 		if (sigma == 0){
@@ -223,7 +224,7 @@ public abstract class OTReceiverDDHSemiHonestAbs implements OTReceiver{
 			h0 = h;
 			h1 = gAlpha;
 		}
-		return new OTRSemiHonestMessage(h0.generateSendableData(), h1.generateSendableData());
+		return new OTRMessage(h0.generateSendableData(), h1.generateSendableData());
 	}
 	
 	/**
@@ -232,7 +233,7 @@ public abstract class OTReceiverDDHSemiHonestAbs implements OTReceiver{
 	 * @param tuple to send to the sender
 	 * @throws IOException if failed to send the message.
 	 */
-	private void sendTupleToSender(OTRSemiHonestMessage tuple) throws IOException {
+	private void sendTupleToSender(OTRMessage tuple) throws IOException {
 		try {
 			channel.send(tuple);
 		} catch (IOException e) {

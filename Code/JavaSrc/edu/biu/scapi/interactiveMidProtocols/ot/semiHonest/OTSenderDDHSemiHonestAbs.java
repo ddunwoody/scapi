@@ -33,6 +33,7 @@ import org.bouncycastle.util.BigIntegers;
 
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.SecurityLevelException;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTRMessage;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSender;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
@@ -141,7 +142,7 @@ public abstract class OTSenderDDHSemiHonestAbs implements OTSender{
 					•	k0 = h0^r
 					•	k1 = h1^r
 		 */
-		OTRSemiHonestMessage message = waitForMessageFromReceiver();
+		OTRMessage message = waitForMessageFromReceiver();
 		BigInteger r = sampleRandomValues();
 		computePreProcessValues(r, message);
 	}
@@ -182,17 +183,17 @@ public abstract class OTSenderDDHSemiHonestAbs implements OTSender{
 	 * @throws ClassNotFoundException 
 	 * @throws IOException if failed to receive a message.
 	 */
-	private OTRSemiHonestMessage waitForMessageFromReceiver() throws ClassNotFoundException, IOException{
+	private OTRMessage waitForMessageFromReceiver() throws ClassNotFoundException, IOException{
 		Serializable message = null;
 		try {
 			message = channel.receive();
 		} catch (IOException e) {
 			throw new IOException("Failed to receive message. The thrown message is: " + e.getMessage());
 		}
-		if (!(message instanceof OTRSemiHonestMessage)){
-			throw new IllegalArgumentException("The received message should be an instance of OTSMessage");
+		if (!(message instanceof OTRMessage)){
+			throw new IllegalArgumentException("The received message should be an instance of OTRMessage");
 		}
-		return (OTRSemiHonestMessage) message;
+		return (OTRMessage) message;
 	}
 
 	/**
@@ -214,7 +215,7 @@ public abstract class OTSenderDDHSemiHonestAbs implements OTSender{
 	 * @param r the exponent
 	 * @param message contains h0, h1
 	 */
-	private void computePreProcessValues(BigInteger r, OTRSemiHonestMessage message) {
+	private void computePreProcessValues(BigInteger r, OTRMessage message) {
 		GroupElement g = dlog.getGenerator(); //Get the group generator.
 
 		//Calculate u = g^r.
@@ -222,8 +223,8 @@ public abstract class OTSenderDDHSemiHonestAbs implements OTSender{
 		GroupElement h0, h1;
 
 		//Recreate h0, h1 from the data in the received message.
-		h0 = dlog.reconstructElement(true, message.getH0());
-		h1 = dlog.reconstructElement(true, message.getH1());
+		h0 = dlog.reconstructElement(true, message.getFirstGE());
+		h1 = dlog.reconstructElement(true, message.getSecondGE());
 
 		//Calculate k0 = h0^r and k1 = h1^r.
 		k0 = dlog.exponentiate(h0, r);
