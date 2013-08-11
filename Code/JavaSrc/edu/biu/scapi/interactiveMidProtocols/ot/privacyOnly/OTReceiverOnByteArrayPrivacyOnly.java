@@ -28,6 +28,7 @@ import java.security.SecureRandom;
 
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CheatAttemptException;
+import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTROnByteArrayOutput;
@@ -38,6 +39,7 @@ import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
 import edu.biu.scapi.securityLevel.PrivacyOnly;
+import edu.biu.scapi.tools.Factories.KdfFactory;
 
 /**
  * Concrete class for OT Privacy assuming DDH receiver ON BYTE ARRAY.
@@ -57,6 +59,11 @@ public class OTReceiverOnByteArrayPrivacyOnly extends OTReceiverDDHPrivacyOnlyAb
 	 */
 	public OTReceiverOnByteArrayPrivacyOnly(Channel channel){
 		super(channel);
+		try {
+			this.kdf = KdfFactory.getInstance().getObject("HKDF(HMac(SHA-256))");
+		} catch (FactoriesException e) {
+			// will not occur since the given KDF name is valid.
+		}
 	}
 	
 	/**
