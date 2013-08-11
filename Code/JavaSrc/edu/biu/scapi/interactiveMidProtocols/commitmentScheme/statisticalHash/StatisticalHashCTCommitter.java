@@ -1,9 +1,9 @@
 /**
  * 
  */
-package edu.biu.scapi.interactiveMidProtocols.committmentScheme.statisticalHash;
+package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.statisticalHash;
 
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.CTCommitter;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter;
 import edu.biu.scapi.primitives.universalHash.UniversalHash;
 
 /**

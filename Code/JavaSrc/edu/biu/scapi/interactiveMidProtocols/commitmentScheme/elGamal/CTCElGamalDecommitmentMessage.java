@@ -22,12 +22,12 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-package edu.biu.scapi.interactiveMidProtocols.committmentScheme.elGamal;
+package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.elGamal;
 
 import java.io.Serializable;
 import java.math.BigInteger;
 
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.CTCDecommitmentMessage;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCDecommitmentMessage;
 
 /**
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
@@ -42,7 +42,7 @@ public class CTCElGamalDecommitmentMessage implements CTCDecommitmentMessage, Se
 	
 	BigInteger r; 
 	/* (non-Javadoc)
-	 * @see edu.biu.scapi.interactiveMidProtocols.committmentScheme.CTCDecommitmentMessage#getX()
+	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCDecommitmentMessage#getX()
 	 */
 	@Override
 //	public GroupElementSendableData getX() {
@@ -51,7 +51,7 @@ public class CTCElGamalDecommitmentMessage implements CTCDecommitmentMessage, Se
 	}
 
 	/* (non-Javadoc)
-	 * @see edu.biu.scapi.interactiveMidProtocols.committmentScheme.CTCDecommitmentMessage#getR()
+	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCDecommitmentMessage#getR()
 	 */
 	@Override
 	public BigInteger getR() {

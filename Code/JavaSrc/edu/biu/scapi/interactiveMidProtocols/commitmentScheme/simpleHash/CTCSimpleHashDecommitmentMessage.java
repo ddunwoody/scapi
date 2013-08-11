@@ -22,11 +22,11 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-package edu.biu.scapi.interactiveMidProtocols.committmentScheme.simpleHash;
+package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.simpleHash;
 
 import java.io.Serializable;
 
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.CTCDecommitmentMessage;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCDecommitmentMessage;
 
 /**
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)

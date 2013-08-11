@@ -22,7 +22,7 @@
  * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  * 
  */
-package edu.biu.scapi.interactiveMidProtocols.committmentScheme.pedersen;
+package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen;
 
 import java.io.Serializable;
 

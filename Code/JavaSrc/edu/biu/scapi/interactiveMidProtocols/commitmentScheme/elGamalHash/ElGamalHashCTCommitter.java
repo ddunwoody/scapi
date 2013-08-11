@@ -1,7 +1,7 @@
 /**
  * 
  */
-package edu.biu.scapi.interactiveMidProtocols.committmentScheme.elGamalHash;
+package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.elGamalHash;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -13,11 +13,11 @@ import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.exceptions.CommitValueException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.ByteArrayCommitValue;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.CTCommitter;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.CommitValue;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.elGamal.CTCElGamalDecommitmentMessage;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.elGamal.ElGamalCTCCore;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.ByteArrayCommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.elGamal.CTCElGamalDecommitmentMessage;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.elGamal.ElGamalCTCCore;
 import edu.biu.scapi.midLayer.asymmetricCrypto.encryption.ScElGamalOnByteArray;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
@@ -59,7 +59,7 @@ public class ElGamalHashCTCommitter extends ElGamalCTCCore implements CTCommitte
 
 
 	/* (non-Javadoc)
-	 * @see edu.biu.scapi.interactiveMidProtocols.committmentScheme.CTCommitter#commit(edu.biu.scapi.interactiveMidProtocols.committmentScheme.CommitValue, int)
+	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter#commit(edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue, int)
 	 */
 	@Override
 	public void commit(CommitValue input, int id) throws IOException {
@@ -109,7 +109,7 @@ public class ElGamalHashCTCommitter extends ElGamalCTCCore implements CTCommitte
 
 
 	/* (non-Javadoc)
-	 * @see edu.biu.scapi.interactiveMidProtocols.committmentScheme.CTCommitter#getCommitment(int)
+	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter#getCommitment(int)
 	 */
 	@Override
 	public Object getCommitment(int id) {
@@ -119,7 +119,7 @@ public class ElGamalHashCTCommitter extends ElGamalCTCCore implements CTCommitte
 
 
 	/* (non-Javadoc)
-	 * @see edu.biu.scapi.interactiveMidProtocols.committmentScheme.CTCommitter#generateCommitValue(byte[])
+	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter#generateCommitValue(byte[])
 	 */
 	@Override
 	public CommitValue generateCommitValue(byte[] x)throws CommitValueException {

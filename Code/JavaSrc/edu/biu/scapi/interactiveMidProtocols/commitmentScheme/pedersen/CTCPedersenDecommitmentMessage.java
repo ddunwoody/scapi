@@ -22,12 +22,12 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-package edu.biu.scapi.interactiveMidProtocols.committmentScheme.pedersen;
+package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen;
 
 import java.io.Serializable;
 import java.math.BigInteger;
 
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.CTCDecommitmentMessage;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCDecommitmentMessage;
 
 /**
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)

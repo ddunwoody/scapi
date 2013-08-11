@@ -22,7 +22,7 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-package edu.biu.scapi.interactiveMidProtocols.committmentScheme.pedersen;
+package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -35,9 +35,9 @@ import org.bouncycastle.util.BigIntegers;
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.BasicReceiverCommitPhaseOutput;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.BigIntegerCommitValue;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.CommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.BasicReceiverCommitPhaseOutput;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.BigIntegerCommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.dlog.cryptopp.CryptoPpDlogZpSafePrime;

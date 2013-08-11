@@ -23,7 +23,7 @@ Copyright (c) 2012 - SCAPI (http://crypto.biu.ac.il/scapi)
 * 
 */
 
-package edu.biu.scapi.interactiveMidProtocols.committmentScheme.pedersenHash;
+package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersenHash;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -31,11 +31,11 @@ import java.math.BigInteger;
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.ByteArrayCommitValue;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.CTReceiver;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.CommitValue;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.pedersen.CTCPedersenDecommitmentMessage;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.pedersen.PedersenReceiverCore;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.ByteArrayCommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTReceiver;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.CTCPedersenDecommitmentMessage;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.PedersenReceiverCore;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.hash.CryptographicHash;
@@ -74,7 +74,7 @@ public class PedersenHashCTReceiver extends PedersenReceiverCore implements CTRe
 
 
 	/* (non-Javadoc)
-	 * @see edu.biu.scapi.interactiveMidProtocols.committmentScheme.CTReceiver#receiveCommitment()
+	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTReceiver#receiveCommitment()
 	 */
 /*	@Override
 	public ReceiverCommitPhaseOutput receiveCommitment() throws ClassNotFoundException, IOException {
@@ -83,7 +83,7 @@ public class PedersenHashCTReceiver extends PedersenReceiverCore implements CTRe
 	*/
 
 	/* (non-Javadoc)
-	 * @see edu.biu.scapi.interactiveMidProtocols.committmentScheme.CTReceiver#receiveDecommitment(int)
+	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTReceiver#receiveDecommitment(int)
 	 */
 	@Override
 	public CommitValue receiveDecommitment(int id) throws ClassNotFoundException, IOException {

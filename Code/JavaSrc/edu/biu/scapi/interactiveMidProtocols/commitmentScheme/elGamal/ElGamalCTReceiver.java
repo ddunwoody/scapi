@@ -22,14 +22,14 @@ Copyright (c) 2012 - SCAPI (http://crypto.biu.ac.il/scapi)
  * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  * 
  */
-package edu.biu.scapi.interactiveMidProtocols.committmentScheme.elGamal;
+package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.elGamal;
 
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.CTReceiver;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.CommitValue;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.GroupElementCommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTReceiver;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.GroupElementCommitValue;
 import edu.biu.scapi.midLayer.asymmetricCrypto.encryption.ScElGamalOnGroupElement;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScElGamalPublicKey;
 import edu.biu.scapi.midLayer.ciphertext.ElGamalOnGroupElementCiphertext.ElGamalOnGrElSendableData;
@@ -60,7 +60,7 @@ public class ElGamalCTReceiver extends ElGamalCTRCore implements CTReceiver, Per
 	}
 	
 	/* (non-Javadoc)
-	 * @see edu.biu.scapi.interactiveMidProtocols.committmentScheme.ElGamalCTRCore#processDecommitment(int, edu.biu.scapi.interactiveMidProtocols.committmentScheme.CTCElGamalDecommitmentMessage)
+	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.ElGamalCTRCore#processDecommitment(int, edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCElGamalDecommitmentMessage)
 	 */
 	@Override
 	protected CommitValue processDecommitment(int id, CTCElGamalDecommitmentMessage msg) {

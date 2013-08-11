@@ -22,7 +22,7 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-package edu.biu.scapi.interactiveMidProtocols.committmentScheme.pedersenTrapdoor;
+package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersenTrapdoor;
 
 import java.math.BigInteger;
 
@@ -30,10 +30,10 @@ import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CommitValueException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.BigIntegerCommitValue;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.CTCommitter;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.CommitValue;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.pedersen.PedersenCommitterCore;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.BigIntegerCommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.PedersenCommitterCore;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.securityLevel.PerfectlyHidingCT;
 

@@ -22,7 +22,7 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-package edu.biu.scapi.interactiveMidProtocols.committmentScheme.simpleHash;
+package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.simpleHash;
 
 import java.io.Serializable;
 

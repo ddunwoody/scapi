@@ -23,7 +23,7 @@
  * 
  */
 
-package edu.biu.scapi.interactiveMidProtocols.committmentScheme.elGamalHash;
+package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.elGamalHash;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -33,12 +33,12 @@ import java.security.PublicKey;
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.ByteArrayCommitValue;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.CTReceiver;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.CommitValue;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.elGamal.CTCElGamalCommitmentMessage;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.elGamal.CTCElGamalDecommitmentMessage;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.elGamal.ElGamalCTRCore;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.ByteArrayCommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTReceiver;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.elGamal.CTCElGamalCommitmentMessage;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.elGamal.CTCElGamalDecommitmentMessage;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.elGamal.ElGamalCTRCore;
 import edu.biu.scapi.midLayer.asymmetricCrypto.encryption.ScElGamalOnByteArray;
 import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertext;
 import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertextSendableData;
@@ -88,7 +88,7 @@ public class ElGamalHashCTReceiver extends ElGamalCTRCore implements CTReceiver,
 	}
 	
 	/* (non-Javadoc)
-	 * @see edu.biu.scapi.interactiveMidProtocols.committmentScheme.ElGamalCTRCore#processDecommitment(int, edu.biu.scapi.interactiveMidProtocols.committmentScheme.CTCElGamalDecommitmentMessage)
+	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.ElGamalCTRCore#processDecommitment(int, edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCElGamalDecommitmentMessage)
 	 */
 	@Override
 	

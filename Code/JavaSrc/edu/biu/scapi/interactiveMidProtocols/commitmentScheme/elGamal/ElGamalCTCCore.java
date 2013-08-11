@@ -22,7 +22,7 @@
  * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  * 
  */
-package edu.biu.scapi.interactiveMidProtocols.committmentScheme.elGamal;
+package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.elGamal;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -38,11 +38,11 @@ import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.ByteArrayCommitValue;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.CTCDecommitmentMessage;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.CommitValue;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.CommitmentPair;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.GroupElementCommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.ByteArrayCommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCDecommitmentMessage;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitmentPair;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.GroupElementCommitValue;
 import edu.biu.scapi.midLayer.asymmetricCrypto.encryption.ElGamalEnc;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScElGamalPrivateKey;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScElGamalPublicKey;
@@ -112,7 +112,7 @@ public abstract class ElGamalCTCCore {
 	}
 
 	/* (non-Javadoc)
-	 * @see edu.biu.scapi.interactiveMidProtocols.committmentScheme.CTCommitter#preProcess()
+	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter#preProcess()
 	 */
 	public void preProcess() throws ClassNotFoundException, IOException, CheatAttemptException {
 		KeyPair pair = elGamal.generateKey();
@@ -164,7 +164,7 @@ public abstract class ElGamalCTCCore {
 	}
 
 	/* (non-Javadoc)
-	 * @see edu.biu.scapi.interactiveMidProtocols.committmentScheme.CTCommitter#decommit(int)
+	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter#decommit(int)
 	 */
 	public void decommit(int id) throws IOException {
 

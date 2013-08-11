@@ -23,7 +23,7 @@ Copyright (c) 2012 - SCAPI (http://crypto.biu.ac.il/scapi)
 * 
 */
 
-package edu.biu.scapi.interactiveMidProtocols.committmentScheme.pedersen;
+package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -39,9 +39,9 @@ import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.exceptions.CommitValueException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.BigIntegerCommitValue;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.CTCommitter;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.CommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.BigIntegerCommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
 //import edu.biu.scapi.interactiveMidProtocols.ot.semiHonest.OTRSemiHonestMessage;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
@@ -65,7 +65,7 @@ public class PedersenCTCommitter extends PedersenCommitterCore implements CTComm
 	}
 
 	/* (non-Javadoc)
-	 * @see edu.biu.scapi.interactiveMidProtocols.committmentScheme.CTCommitter#generateCommitValue(byte[])
+	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter#generateCommitValue(byte[])
 	 */
 	@Override
 	public CommitValue generateCommitValue(byte[] x) throws CommitValueException {

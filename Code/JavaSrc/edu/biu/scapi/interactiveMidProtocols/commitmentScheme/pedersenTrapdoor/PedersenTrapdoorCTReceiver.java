@@ -22,14 +22,14 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-package edu.biu.scapi.interactiveMidProtocols.committmentScheme.pedersenTrapdoor;
+package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersenTrapdoor;
 
 import java.math.BigInteger;
 
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.pedersen.PedersenReceiverCore;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.PedersenReceiverCore;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 
 /**

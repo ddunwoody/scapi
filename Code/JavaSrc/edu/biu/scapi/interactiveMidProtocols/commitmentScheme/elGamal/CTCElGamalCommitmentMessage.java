@@ -22,7 +22,7 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-package edu.biu.scapi.interactiveMidProtocols.committmentScheme.elGamal;
+package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.elGamal;
 
 import java.io.Serializable;
 

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package edu.biu.scapi.interactiveMidProtocols.committmentScheme;
+package edu.biu.scapi.interactiveMidProtocols.commitmentScheme;
 
 import java.io.IOException;
 

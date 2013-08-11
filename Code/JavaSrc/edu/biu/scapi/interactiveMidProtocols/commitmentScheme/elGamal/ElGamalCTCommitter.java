@@ -22,14 +22,14 @@ Copyright (c) 2012 - SCAPI (http://crypto.biu.ac.il/scapi)
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-package edu.biu.scapi.interactiveMidProtocols.committmentScheme.elGamal;
+package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.elGamal;
 
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CommitValueException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.CTCommitter;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.CommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
 import edu.biu.scapi.midLayer.asymmetricCrypto.encryption.ScElGamalOnGroupElement;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.securityLevel.PerfectlyBindingCT;
@@ -53,7 +53,7 @@ public class ElGamalCTCommitter extends ElGamalCTCCore implements CTCommitter, P
 	}
 
 	/* (non-Javadoc)
-	 * @see edu.biu.scapi.interactiveMidProtocols.committmentScheme.CTCommitter#generateCommitValue(byte[])
+	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter#generateCommitValue(byte[])
 	 */
 	@Override
 	public CommitValue generateCommitValue(byte[] x)throws CommitValueException {

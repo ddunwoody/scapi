@@ -1,7 +1,7 @@
 /**
  * 
  */
-package edu.biu.scapi.interactiveMidProtocols.committmentScheme.simpleHash;
+package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.simpleHash;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -11,12 +11,12 @@ import java.util.Map;
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.exceptions.CommitValueException;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.BigIntegerCommitValue;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.ByteArrayCommitValue;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.CTCDecommitmentMessage;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.CTCommitter;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.CommitValue;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.CommitmentPair;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.BigIntegerCommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.ByteArrayCommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCDecommitmentMessage;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitmentPair;
 import edu.biu.scapi.primitives.hash.CryptographicHash;
 import edu.biu.scapi.securityLevel.SecureCommit;
 
@@ -48,7 +48,7 @@ public class SimpleHashCTCommitter implements CTCommitter, SecureCommit {
 	}
 
 	/* (non-Javadoc)
-	 * @see edu.biu.scapi.interactiveMidProtocols.committmentScheme.CTCommitter#preProcess()
+	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter#preProcess()
 	 */
 	@Override
 	public void preProcess() throws ClassNotFoundException, IOException,CheatAttemptException {
@@ -56,7 +56,7 @@ public class SimpleHashCTCommitter implements CTCommitter, SecureCommit {
 	}
 
 	/* (non-Javadoc)
-	 * @see edu.biu.scapi.interactiveMidProtocols.committmentScheme.CTCommitter#commit(edu.biu.scapi.interactiveMidProtocols.committmentScheme.CommitValue, int)
+	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter#commit(edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue, int)
 	 */
 	@Override
 	public void commit(CommitValue input, int id) throws IOException {
@@ -103,7 +103,7 @@ public class SimpleHashCTCommitter implements CTCommitter, SecureCommit {
 	}
 
 	/* (non-Javadoc)
-	 * @see edu.biu.scapi.interactiveMidProtocols.committmentScheme.CTCommitter#decommit(int)
+	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter#decommit(int)
 	 */
 	@Override
 	public void decommit(int id) throws IOException {
@@ -134,7 +134,7 @@ public class SimpleHashCTCommitter implements CTCommitter, SecureCommit {
 		}
 
 	/* (non-Javadoc)
-	 * @see edu.biu.scapi.interactiveMidProtocols.committmentScheme.CTCommitter#generateCommitValue(byte[])
+	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter#generateCommitValue(byte[])
 	 */
 	@Override
 	public CommitValue generateCommitValue(byte[] x)throws CommitValueException {

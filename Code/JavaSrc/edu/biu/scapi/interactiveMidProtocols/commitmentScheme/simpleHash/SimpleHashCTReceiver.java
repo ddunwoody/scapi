@@ -22,21 +22,21 @@
  * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  * 
  */
-package edu.biu.scapi.interactiveMidProtocols.committmentScheme.simpleHash;
+package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.simpleHash;
 
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.Map;
 
 import edu.biu.scapi.comm.Channel;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.BasicReceiverCommitPhaseOutput;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.BigIntegerCommitValue;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.ByteArrayCommitValue;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.CTReceiver;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.CommitValue;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.ReceiverCommitPhaseOutput;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.elGamal.CTCElGamalCommitmentMessage;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.elGamal.CTCElGamalDecommitmentMessage;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.BasicReceiverCommitPhaseOutput;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.BigIntegerCommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.ByteArrayCommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTReceiver;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.ReceiverCommitPhaseOutput;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.elGamal.CTCElGamalCommitmentMessage;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.elGamal.CTCElGamalDecommitmentMessage;
 import edu.biu.scapi.midLayer.asymmetricCrypto.encryption.ElGamalEnc;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
@@ -83,7 +83,7 @@ public class SimpleHashCTReceiver implements CTReceiver, SecureCommit {
 	}
 
 	/* (non-Javadoc)
-	 * @see edu.biu.scapi.interactiveMidProtocols.committmentScheme.CTReceiver#receiveDecommitment(int)
+	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTReceiver#receiveDecommitment(int)
 	 */
 	@Override
 	public CommitValue receiveDecommitment(int id) throws ClassNotFoundException, IOException{

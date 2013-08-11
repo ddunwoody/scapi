@@ -22,7 +22,7 @@ Copyright (c) 2012 - SCAPI (http://crypto.biu.ac.il/scapi)
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-package edu.biu.scapi.interactiveMidProtocols.committmentScheme;
+package edu.biu.scapi.interactiveMidProtocols.commitmentScheme;
 
 import java.io.IOException;
 

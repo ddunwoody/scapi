@@ -1,7 +1,7 @@
 /**
  * 
  */
-package edu.biu.scapi.interactiveMidProtocols.committmentScheme.pedersen;
+package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -16,7 +16,7 @@ import org.bouncycastle.util.BigIntegers;
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.CTReceiver;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTReceiver;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.dlog.GroupElementSendableData;

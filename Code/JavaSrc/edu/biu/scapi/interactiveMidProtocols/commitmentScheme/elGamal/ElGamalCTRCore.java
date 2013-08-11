@@ -22,7 +22,7 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-package edu.biu.scapi.interactiveMidProtocols.committmentScheme.elGamal;
+package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.elGamal;
 
 import java.io.IOException;
 import java.util.Hashtable;
@@ -31,9 +31,9 @@ import java.util.Map;
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.BasicReceiverCommitPhaseOutput;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.CommitValue;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.ReceiverCommitPhaseOutput;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.BasicReceiverCommitPhaseOutput;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.ReceiverCommitPhaseOutput;
 import edu.biu.scapi.midLayer.asymmetricCrypto.encryption.ElGamalEnc;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.securityLevel.DDH;
@@ -74,14 +74,14 @@ public abstract class ElGamalCTRCore{
 
 
 	/* (non-Javadoc)`
-	 * @see edu.biu.scapi.interactiveMidProtocols.committmentScheme.CTReceiver#preProcess()
+	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTReceiver#preProcess()
 	 */
 	public void preProcess() throws IOException {
 		//No pre-process in ElGamal Commitment
 	}
 
 	/* (non-Javadoc)
-	 * @see edu.biu.scapi.interactiveMidProtocols.committmentScheme.CTReceiver#receiveCommitment()
+	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTReceiver#receiveCommitment()
 	 */
 	public ReceiverCommitPhaseOutput receiveCommitment() throws ClassNotFoundException, IOException {
 		CTCElGamalCommitmentMessage msg = null;
@@ -98,7 +98,7 @@ public abstract class ElGamalCTRCore{
 	}
 
 	/* (non-Javadoc)
-	 * @see edu.biu.scapi.interactiveMidProtocols.committmentScheme.CTReceiver#receiveDecommitment(int)
+	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTReceiver#receiveDecommitment(int)
 	 */
 	public CommitValue receiveDecommitment(int id) throws ClassNotFoundException, IOException, IllegalArgumentException {
 		CTCElGamalDecommitmentMessage msg = null;

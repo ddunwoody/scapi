@@ -1,9 +1,9 @@
 /**
  * 
  */
-package edu.biu.scapi.interactiveMidProtocols.committmentScheme.equivocal;
+package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.equivocal;
 
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.CTReceiver;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTReceiver;
 
 /**
  * <!-- begin-UML-doc --> <!-- end-UML-doc -->

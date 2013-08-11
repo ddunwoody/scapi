@@ -23,7 +23,7 @@ Copyright (c) 2012 - SCAPI (http://crypto.biu.ac.il/scapi)
 * 
 */
 
-package edu.biu.scapi.interactiveMidProtocols.committmentScheme.pedersenHash;
+package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersenHash;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -36,12 +36,12 @@ import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.exceptions.CommitValueException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.BigIntegerCommitValue;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.ByteArrayCommitValue;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.CTCommitter;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.CommitValue;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.pedersen.CTCPedersenDecommitmentMessage;
-import edu.biu.scapi.interactiveMidProtocols.committmentScheme.pedersen.PedersenCommitterCore;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.BigIntegerCommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.ByteArrayCommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.CTCPedersenDecommitmentMessage;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.PedersenCommitterCore;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.hash.CryptographicHash;
@@ -100,7 +100,7 @@ public class PedersenHashCTCommitter extends PedersenCommitterCore implements CT
 	 */
 	
 	/* (non-Javadoc)
-	 * @see edu.biu.scapi.interactiveMidProtocols.committmentScheme.CTCommitter#preProcess()
+	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter#preProcess()
 	 */
 	//@Override
 	/*
@@ -109,7 +109,7 @@ public class PedersenHashCTCommitter extends PedersenCommitterCore implements CT
 	}
 	*/
 	/* (non-Javadoc)
-	 * @see edu.biu.scapi.interactiveMidProtocols.committmentScheme.CTCommitter#commit(edu.biu.scapi.interactiveMidProtocols.committmentScheme.CommitValue, int)
+	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter#commit(edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue, int)
 	 */
 	@Override
 	public void commit(CommitValue input, int id) throws IOException, IllegalArgumentException {
@@ -131,7 +131,7 @@ public class PedersenHashCTCommitter extends PedersenCommitterCore implements CT
 	}
 
 	/* (non-Javadoc)
-	 * @see edu.biu.scapi.interactiveMidProtocols.committmentScheme.CTCommitter#decommit(int)
+	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter#decommit(int)
 	 */
 	@Override
 	public void decommit(int id) throws IOException {
@@ -154,7 +154,7 @@ public class PedersenHashCTCommitter extends PedersenCommitterCore implements CT
 	}
 
 	/* (non-Javadoc)
-	 * @see edu.biu.scapi.interactiveMidProtocols.committmentScheme.CTCommitter#generateCommitValue(byte[])
+	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter#generateCommitValue(byte[])
 	 */
 	@Override
 	public CommitValue generateCommitValue(byte[] x) throws CommitValueException {
