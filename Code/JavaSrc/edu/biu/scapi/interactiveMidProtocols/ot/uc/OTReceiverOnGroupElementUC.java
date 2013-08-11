@@ -52,19 +52,11 @@ public class OTReceiverOnGroupElementUC extends OTReceiverDDHUCAbs{
 	private GroupElement c0, c1;
 	
 	/**
-	 * Constructor that sets the given channel, and common reference string composed of a DLOG 
-	 * description (G,q,g0) and (g0,g1,h0,h1) which is a randomly chosen non-DDH tuple.
+	 * Constructor that sets the given channel and choose default values to the other parameters.
 	 * @param channel
-	 * @param dlog must be DDH secure.
-	 * @param g0 
-	 * @param g1 
-	 * @param h0 
-	 * @param h1 
-	 * @throws SecurityLevelException if the given DlogGroup is not DDH secure.
 	 */
-	public OTReceiverOnGroupElementUC(Channel channel, DlogGroup dlog, GroupElement g0, GroupElement g1, 
-			GroupElement h0, GroupElement h1) throws SecurityLevelException{
-		super(channel, dlog, g0, g1, h0, h1, new SecureRandom());
+	public OTReceiverOnGroupElementUC(Channel channel){
+		super(channel);
 	}
 	
 	/**
