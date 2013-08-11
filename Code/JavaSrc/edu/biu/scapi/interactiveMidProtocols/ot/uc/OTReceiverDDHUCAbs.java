@@ -42,6 +42,8 @@ import edu.biu.scapi.interactiveMidProtocols.ot.OTReceiver;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
+import edu.biu.scapi.primitives.dlog.cryptopp.CryptoPpDlogZpSafePrime;
+import edu.biu.scapi.primitives.dlog.miracl.MiraclDlogECF2m;
 import edu.biu.scapi.securityLevel.DDH;
 import edu.biu.scapi.securityLevel.UC;
 
@@ -86,6 +88,32 @@ public abstract class OTReceiverDDHUCAbs implements OTReceiver, UC{
 	protected BigInteger r;
 	protected GroupElement u0, u1;
 	
+	/**
+	 * Constructor that sets the given channel and choose default values to the other parameters.
+	 * @param channel
+	 */
+	public OTReceiverDDHUCAbs(Channel channel){
+		
+		
+			DlogGroup dlog;
+			try {
+				//Uses Miracl Koblitz 233 Elliptic curve.
+				dlog = new MiraclDlogECF2m("K-233");
+			} catch (IOException e) {
+				dlog = new CryptoPpDlogZpSafePrime();
+			} 
+		
+		GroupElement g0 = dlog.getGenerator();
+		GroupElement g1 = dlog.createRandomElement();
+		GroupElement h0 = dlog.createRandomElement();
+		GroupElement h1 = dlog.createRandomElement();
+		try {
+			setMembers(channel, dlog, g0, g1, h0, h1, new SecureRandom());
+		} catch (SecurityLevelException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	
 	/**
 	 * Constructor that sets the given channel, common reference string composed of a DLOG 
@@ -103,6 +131,23 @@ public abstract class OTReceiverDDHUCAbs implements OTReceiver, UC{
 	 */
 	public OTReceiverDDHUCAbs(Channel channel, DlogGroup dlog, GroupElement g0, GroupElement g1, 
 			GroupElement h0, GroupElement h1, SecureRandom random) throws SecurityLevelException{
+		setMembers(channel, dlog, g0, g1, h0, h1, random);
+		
+	}
+	
+	/**
+	 * Sets the given parameters.
+	 * @param channel
+	 * @param dlog must be DDH secure.
+	 * @param g0
+	 * @param g1
+	 * @param h0
+	 * @param h1
+	 * @param random
+	 * @throws SecurityLevelException if the given dlog is not DDH secure.
+	 */
+	private void setMembers(Channel channel, DlogGroup dlog, GroupElement g0, 
+			GroupElement g1, GroupElement h0, GroupElement h1, SecureRandom random) throws SecurityLevelException{
 		//The underlying dlog group must be DDH secure.
 		if (!(dlog instanceof DDH)){
 			throw new SecurityLevelException("DlogGroup should have DDH security level");
@@ -116,7 +161,6 @@ public abstract class OTReceiverDDHUCAbs implements OTReceiver, UC{
 		this.g1 = g1;
 		this.h0 = h0;
 		this.h1 = h1;
-		
 	}
 	
 	/**
