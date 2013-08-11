@@ -27,6 +27,7 @@ package edu.biu.scapi.interactiveMidProtocols.ot.oneSidedSimulation;
 import java.security.SecureRandom;
 
 import edu.biu.scapi.comm.Channel;
+import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSInput;
@@ -35,6 +36,7 @@ import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnByteArrayInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnByteArrayMessage;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
+import edu.biu.scapi.tools.Factories.KdfFactory;
 
 /**
  * Concrete class for OT DDH one sided simulation sender ON BYTE ARRAY.
@@ -57,6 +59,11 @@ private KeyDerivationFunction kdf; //Used in the calculation.
 	 */
 	public OTSenderOnByteArrayOneSidedSim(Channel channel){
 		super(channel);
+		try {
+			this.kdf = KdfFactory.getInstance().getObject("HKDF(HMac(SHA-256))");
+		} catch (FactoriesException e) {
+			// will not occur since the given KDF name is valid.
+		}
 	}
 	
 	/**
