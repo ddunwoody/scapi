@@ -98,8 +98,10 @@ public abstract class OTReceiverDDHFullSimAbs implements OTReceiver{
 	
 	//Values required for calculations:
 	protected short sigma;
-	private BigInteger y, alpha0, alpha1, r;
+	private BigInteger y, alpha0, alpha1;
+	protected BigInteger r;
 	GroupElement g1, h0, h1, g, h;
+	protected GroupElement u0, u1;
 	
 	/**
 	 * Constructor that gets the channel and chooses default values of DlogGroup and SecureRandom.
