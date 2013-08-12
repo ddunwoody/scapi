@@ -63,7 +63,7 @@ public abstract class PedersenReceiverCore {
 	//private GroupElement receivedCommitment;
 
 
-	public PedersenReceiverCore(Channel channel) throws IllegalArgumentException, SecurityLevelException, InvalidDlogGroupException{
+	public PedersenReceiverCore(Channel channel){
 		try {
 			//Uses Miracl Koblitz 233 Elliptic curve.
 			doConstruct(channel, new MiraclDlogECF2m("K-233"), new SecureRandom());
@@ -71,7 +71,24 @@ public abstract class PedersenReceiverCore {
 			//Why do we have this??
 
 			//If there is a problem with the elliptic curves file, create Zp DlogGroup.
-			doConstruct(channel, new CryptoPpDlogZpSafePrime(), new SecureRandom());
+			try {
+				doConstruct(channel, new CryptoPpDlogZpSafePrime(), new SecureRandom());
+			} catch (SecurityLevelException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (InvalidDlogGroupException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SecurityLevelException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidDlogGroupException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 	public PedersenReceiverCore(Channel channel, DlogGroup dlog) throws IllegalArgumentException, SecurityLevelException, InvalidDlogGroupException{

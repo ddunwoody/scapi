@@ -84,9 +84,9 @@ public abstract class PedersenCommitterCore {
 	//private BigInteger x; 			//Committer's private input x in Zq
 	//private BigInteger r; 			//Random value sampled during the sampleRandomValues stage;
 	//private CTRPedersenMessage msg; //Message obtained from the receiver during the preProcess stage. Later is needed to commit.
-    private GroupElement h; 		//The content of the message obtained from the receiver. 	
+    protected GroupElement h; 		//The content of the message obtained from the receiver. 	
 	//private int id;					
-	public PedersenCommitterCore(Channel channel) throws IllegalArgumentException, SecurityLevelException, InvalidDlogGroupException{
+	public PedersenCommitterCore(Channel channel) {
 		try {
 			//Uses Miracl Koblitz 233 Elliptic curve.
 			doConstruct(channel, new MiraclDlogECF2m("K-233"), new SecureRandom());
@@ -94,7 +94,24 @@ public abstract class PedersenCommitterCore {
 			//Why do we have this??
 			
 			//If there is a problem with the elliptic curves file, create Zp DlogGroup.
-			doConstruct(channel, new CryptoPpDlogZpSafePrime(), new SecureRandom());
+			try {
+				doConstruct(channel, new CryptoPpDlogZpSafePrime(), new SecureRandom());
+			} catch (SecurityLevelException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (InvalidDlogGroupException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SecurityLevelException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidDlogGroupException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 	
