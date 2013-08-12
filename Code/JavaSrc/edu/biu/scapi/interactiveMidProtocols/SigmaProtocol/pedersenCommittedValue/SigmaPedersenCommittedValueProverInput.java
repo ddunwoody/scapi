@@ -26,7 +26,7 @@ package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.pedersenCommittedVal
 
 import java.math.BigInteger;
 
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCPedersenCommitmentMessage;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.CTCPedersenCommitmentMessage;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**
