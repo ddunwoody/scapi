@@ -16,6 +16,7 @@ import org.bouncycastle.util.BigIntegers;
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.OnBigIntegerCommitmentScheme;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTReceiver;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
@@ -25,7 +26,7 @@ import edu.biu.scapi.primitives.dlog.miracl.MiraclDlogECF2m;
 import edu.biu.scapi.securityLevel.DDH;
 import edu.biu.scapi.securityLevel.PerfectlyHidingCT;
 
-public class PedersenCTReceiver extends PedersenReceiverCore implements CTReceiver, PerfectlyHidingCT {
+public class PedersenCTReceiver extends PedersenReceiverCore implements CTReceiver, PerfectlyHidingCT, OnBigIntegerCommitmentScheme {
 	private Channel channel;
 	protected DlogGroup dlog;
 	private SecureRandom random;
@@ -38,7 +39,7 @@ public class PedersenCTReceiver extends PedersenReceiverCore implements CTReceiv
 	//private GroupElement receivedCommitment;
 
 
-	public PedersenCTReceiver(Channel channel) throws IllegalArgumentException, SecurityLevelException, InvalidDlogGroupException{
+	public PedersenCTReceiver(Channel channel) {
 		/*try {
 			//Uses Miracl Koblitz 233 Elliptic curve.
 			doConstruct(channel, new MiraclDlogECF2m("K-233"), new SecureRandom());
