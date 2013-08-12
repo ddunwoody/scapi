@@ -88,10 +88,33 @@ public class ElGamalOnGroupElementCiphertext implements AsymmetricCiphertext {
 
 
 
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ElGamalOnGroupElementCiphertext other = (ElGamalOnGroupElementCiphertext) obj;
+		if (cipher1 == null) {
+			if (other.cipher1 != null)
+				return false;
+		} else if (!cipher1.equals(other.cipher1))
+			return false;
+		if (cipher2 == null) {
+			if (other.cipher2 != null)
+				return false;
+		} else if (!cipher2.equals(other.cipher2))
+			return false;
+		return true;
+	}
+
+
+
 
 	//Nested class that holds the sendable data of the outer class
-	static public class ElGamalOnGrElSendableData implements AsymmetricCiphertextSendableData {
-
+	static public class ElGamalOnGrElSendableData implements ElGamalCiphertextSendableData {
 
 		private static final long serialVersionUID = 4480691511084748707L;
 

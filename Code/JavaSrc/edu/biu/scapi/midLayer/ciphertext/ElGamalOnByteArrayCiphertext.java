@@ -87,8 +87,30 @@ public class ElGamalOnByteArrayCiphertext implements AsymmetricCiphertext{
 	}
 	
 	
+
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ElGamalOnByteArrayCiphertext other = (ElGamalOnByteArrayCiphertext) obj;
+		if (cipher1 == null) {
+			if (other.cipher1 != null)
+				return false;
+		} else if (!cipher1.equals(other.cipher1))
+			return false;
+		if (!Arrays.equals(cipher2, other.cipher2))
+			return false;
+		return true;
+	}
+
+
 	//Nested class that holds the sendable data of the outer class
-	static public class ElGamalOnByteArraySendableData implements AsymmetricCiphertextSendableData {
+	static public class ElGamalOnByteArraySendableData implements ElGamalCiphertextSendableData {
 
 		private static final long serialVersionUID = -4094624693278838188L;
 
