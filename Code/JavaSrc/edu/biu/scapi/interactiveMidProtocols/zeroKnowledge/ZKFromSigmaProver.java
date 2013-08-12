@@ -36,7 +36,7 @@ import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTReceiver;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.OnBigIntegerCommitmentScheme;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.OnByteArrayCommitmentScheme;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.PedersenCTReceiver;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.PedersenCTReceiver;
 import edu.biu.scapi.securityLevel.PerfectlyHidingCT;
 
 /**

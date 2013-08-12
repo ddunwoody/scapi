@@ -33,7 +33,7 @@ import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaProverComputatio
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.PedersenTrapdoorCTReceiver;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersenTrapdoor.PedersenTrapdoorCTReceiver;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.ReceiverCommitPhaseOutput;
 
 /**

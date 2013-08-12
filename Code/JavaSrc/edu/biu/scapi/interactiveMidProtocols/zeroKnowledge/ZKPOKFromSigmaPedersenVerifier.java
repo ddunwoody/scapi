@@ -29,13 +29,12 @@ import java.io.Serializable;
 
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CheatAttemptException;
-import edu.biu.scapi.exceptions.CommitValueException;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaVerifierComputation;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.PedersenTrapdoorCTCommitter;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.ReceiverCommitPhaseOutput;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersenTrapdoor.PedersenTrapdoorCTCommitter;
 
 /**
  * Concrete implementation of Zero Knowledge verifier.
@@ -99,9 +98,8 @@ public class ZKPOKFromSigmaPedersenVerifier implements ZeroKnowledgeVerifier{
 	 * @throws IOException if failed to send the message.
 	 * @throws ClassNotFoundException 
 	 * @throws CheatAttemptException 
-	 * @throws CommitValueException 
 	 */
-	public boolean verify() throws ClassNotFoundException, IOException, CheatAttemptException {
+	public boolean verify() throws ClassNotFoundException, IOException, CheatAttemptException{
 		//Sample a random challenge  e <- {0, 1}^t 
 		sVerifier.sampleChallenge();
 		byte[] e = sVerifier.getChallenge();
@@ -134,7 +132,6 @@ public class ZKPOKFromSigmaPedersenVerifier implements ZeroKnowledgeVerifier{
 	/**
 	 * Runs COMMIT.commit as the committer with input e
 	 * @param e
-	 * @throws CommitValueException 
 	 * @throws IOException 
 	 * @throws CheatAttemptException 
 	 * @throws ClassNotFoundException 
