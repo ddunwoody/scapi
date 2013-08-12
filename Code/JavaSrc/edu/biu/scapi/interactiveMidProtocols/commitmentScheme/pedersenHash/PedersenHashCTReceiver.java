@@ -34,6 +34,7 @@ import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.ByteArrayCommitValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTReceiver;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.OnBigIntegerCommitmentScheme;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.CTCPedersenDecommitmentMessage;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.PedersenReceiverCore;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
@@ -45,7 +46,7 @@ import edu.biu.scapi.securityLevel.PerfectlyHidingCT;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-public class PedersenHashCTReceiver extends PedersenReceiverCore implements CTReceiver, PerfectlyHidingCT {
+public class PedersenHashCTReceiver extends PedersenReceiverCore implements CTReceiver, PerfectlyHidingCT, OnBigIntegerCommitmentScheme {
 
 	private CryptographicHash hash;
 	
