@@ -25,7 +25,7 @@
 package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.elGamalCommittedValue;
 
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCElGamalCommitmentMessage;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.elGamal.CTCElGamalCommitmentMessage;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**
