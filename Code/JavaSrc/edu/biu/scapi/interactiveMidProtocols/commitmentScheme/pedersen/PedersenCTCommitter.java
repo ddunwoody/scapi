@@ -42,6 +42,7 @@ import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.BigIntegerCommitValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.OnBigIntegerCommitmentScheme;
 //import edu.biu.scapi.interactiveMidProtocols.ot.semiHonest.OTRSemiHonestMessage;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
@@ -54,9 +55,9 @@ import edu.biu.scapi.securityLevel.PerfectlyHidingCT;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-public class PedersenCTCommitter extends PedersenCommitterCore implements CTCommitter, PerfectlyHidingCT {
+public class PedersenCTCommitter extends PedersenCommitterCore implements CTCommitter, PerfectlyHidingCT, OnBigIntegerCommitmentScheme {
 		
-	public PedersenCTCommitter(Channel channel) throws IllegalArgumentException, SecurityLevelException, InvalidDlogGroupException{
+	public PedersenCTCommitter(Channel channel) {
 		super(channel);
 	}
 	
@@ -68,7 +69,7 @@ public class PedersenCTCommitter extends PedersenCommitterCore implements CTComm
 	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter#generateCommitValue(byte[])
 	 */
 	@Override
-	public CommitValue generateCommitValue(byte[] x) throws CommitValueException {
+	public CommitValue generateCommitValue(byte[] x)  {
 		return new BigIntegerCommitValue(new BigInteger(x));
 	}
 
