@@ -26,7 +26,8 @@ package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.elGamalCTKnowledge;
 
 import java.math.BigInteger;
 
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCElGamalCommitmentMessage;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.elGamal.CTCElGamalCommitmentMessage;
+
 
 /**
  * Concrete implementation of SigmaProtocol input, used by the SigmaElGamalCTKnowldgeProver.
