@@ -24,12 +24,14 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.commitmentScheme;
 
+import java.io.Serializable;
+
 
 /**
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-public interface ReceiverCommitPhaseOutput {
+public interface ReceiverCommitPhaseOutput extends Serializable{
 	
 	public int getCommitmentId();
 }
