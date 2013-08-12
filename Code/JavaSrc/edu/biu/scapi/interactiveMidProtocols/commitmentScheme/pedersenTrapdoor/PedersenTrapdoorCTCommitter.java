@@ -33,8 +33,11 @@ import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.BigIntegerCommitValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.ReceiverCommitPhaseOutput;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.TrapdoorReceiverCommitPhaseOutput;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.PedersenCommitterCore;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
+import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.securityLevel.PerfectlyHidingCT;
 
 /**
@@ -49,7 +52,7 @@ public class PedersenTrapdoorCTCommitter extends PedersenCommitterCore implement
 	 * @throws SecurityLevelException
 	 * @throws InvalidDlogGroupException
 	 */
-	public PedersenTrapdoorCTCommitter(Channel channel)	throws IllegalArgumentException, SecurityLevelException, InvalidDlogGroupException {
+	public PedersenTrapdoorCTCommitter(Channel channel){
 		super(channel);
 	}
 	
@@ -58,7 +61,20 @@ public class PedersenTrapdoorCTCommitter extends PedersenCommitterCore implement
 	}
 
 	@Override
-	public CommitValue generateCommitValue(byte[] x) throws CommitValueException {
+	public CommitValue generateCommitValue(byte[] x)  {
 		return new BigIntegerCommitValue(new BigInteger(x));
+	}
+	
+	public boolean validate(ReceiverCommitPhaseOutput trap){
+		if (!(trap instanceof TrapdoorReceiverCommitPhaseOutput)){
+			throw new IllegalArgumentException("the given trapdor should be an instance of TrapdoorReceiverCommitPhaseOutput");
+		}
+		TrapdoorReceiverCommitPhaseOutput trapdoor = (TrapdoorReceiverCommitPhaseOutput) trap;
+		GroupElement gToTrap = dlog.exponentiate(dlog.getGenerator(), trapdoor.getTrap());
+		
+		if (gToTrap.equals(h)){
+			return true;
+		}
+		return false;
 	}
 }
