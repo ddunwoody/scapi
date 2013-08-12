@@ -34,6 +34,7 @@ import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHVerifier;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
+import edu.biu.scapi.midLayer.ciphertext.ElGamalOnGroupElementCiphertext.ElGamalOnGrElSendableData;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.dlog.cryptopp.CryptoPpDlogZpSafePrime;
@@ -123,14 +124,17 @@ public class SigmaElGamalCommittedValueVerifier implements SigmaVerifierComputat
 		}
 		SigmaElGamalCommittedValueInput input = (SigmaElGamalCommittedValueInput) in;
 		
+		if (!(input.getCommitment().getCipherData() instanceof ElGamalOnGrElSendableData)){
+			throw new IllegalArgumentException("the given input must contain an instance of ElGamalOnGrElSendableData");
+		}
 		
 		//Convert input to the underlying DH prover:
 		//(g,h,u,v) = (g,h,c1,c2/x).
 		GroupElement h = dlog.reconstructElement(true, input.getCommitment().getPublicKey().getC());
 		//u = c1
-		GroupElement u = dlog.reconstructElement(true, input.getCommitment().getCipherData().getCipher1());
+		GroupElement u = dlog.reconstructElement(true, ((ElGamalOnGrElSendableData)input.getCommitment().getCipherData()).getCipher1());
 		//Calculate v = c2/x = c2*x^(-1)
-		GroupElement c2 = dlog.reconstructElement(true, input.getCommitment().getCipherData().getCipher2());
+		GroupElement c2 = dlog.reconstructElement(true, ((ElGamalOnGrElSendableData)input.getCommitment().getCipherData()).getCipher2());
 		GroupElement xInv = dlog.getInverse(input.getX());
 		GroupElement v = dlog.multiplyGroupElements(c2, xInv);
 		SigmaDHInput dhInput = new SigmaDHInput(h, u, v);
