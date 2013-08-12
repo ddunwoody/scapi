@@ -24,11 +24,14 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersenTrapdoor;
 
+import java.io.IOException;
 import java.math.BigInteger;
 
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.BasicReceiverCommitPhaseOutput;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.TrapdoorReceiverCommitPhaseOutput;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.PedersenReceiverCore;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 
@@ -43,7 +46,7 @@ public class PedersenTrapdoorCTReceiver extends PedersenReceiverCore {
 	 * @throws SecurityLevelException
 	 * @throws InvalidDlogGroupException
 	 */
-	public PedersenTrapdoorCTReceiver(Channel channel)	throws IllegalArgumentException, SecurityLevelException, InvalidDlogGroupException {
+	public PedersenTrapdoorCTReceiver(Channel channel)	 {
 		super(channel);
 	}
 	
@@ -53,5 +56,11 @@ public class PedersenTrapdoorCTReceiver extends PedersenReceiverCore {
 
 	public BigInteger getTrapdoor(){
 		return trapdoor;
+	}
+	
+	public BasicReceiverCommitPhaseOutput receiveCommitment() throws ClassNotFoundException, IOException {
+		BasicReceiverCommitPhaseOutput output = super.receiveCommitment();
+		
+		return new TrapdoorReceiverCommitPhaseOutput(trapdoor, output.getCommitmentId());
 	}
 }
