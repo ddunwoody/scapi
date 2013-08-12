@@ -26,6 +26,11 @@
 
 package edu.biu.scapi.midLayer.asymmetricCrypto.encryption;
 
+import java.math.BigInteger;
+
+import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertext;
+import edu.biu.scapi.midLayer.plaintext.Plaintext;
+
 /**
  * General interface for El Gamal encryption scheme. Every concrete implementation of ElGamal should implement this interface.
  * By definition, this encryption scheme is CPA-secure and Indistinguishable.
@@ -34,5 +39,14 @@ package edu.biu.scapi.midLayer.asymmetricCrypto.encryption;
  *
  */
 public interface ElGamalEnc extends AsymmetricEnc{
-
+	
+	/**
+	 * Encrypts the given message using ElGamal encryption scheme.
+	 * 
+	 * @param plaintext contains message to encrypt. The given plaintext must match this ElGamal type.
+	 * @return Ciphertext containing the encrypted message.
+	 * @throws IllegalStateException if no public key was set.
+	 * @throws IllegalArgumentException if the given Plaintext does not match this ElGamal type.
+	 */
+	public AsymmetricCiphertext encryptWithGivenRandomValue(Plaintext plaintext, BigInteger y);
 }

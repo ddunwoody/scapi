@@ -295,7 +295,41 @@ public abstract class ElGamalAbs implements ElGamalEnc{
 		
 		return completeEncryption(c1, hy, plaintext);
 	}
-	
+	/**
+	 * Encrypts the given message using ElGamal encryption scheme.
+	 * 
+	 * @param plaintext contains message to encrypt. The given plaintext must match this ElGamal type.
+	 * @return Ciphertext containing the encrypted message.
+	 * @throws IllegalStateException if no public key was set.
+	 * @throws IllegalArgumentException if the given Plaintext does not match this ElGamal type.
+	 */
+	public AsymmetricCiphertext encryptWithGivenRandomValue(Plaintext plaintext, BigInteger y) {
+		/* 
+		 * Pseudo-code:
+		 * 	•	
+		 *	•	Calculate c1 = g^y mod p //Mod p operation are performed automatically by the group.
+		 *	•	Calculate c2 = h^y * plaintext.getElement() mod p // For ElGamal on a GroupElement.
+		 *					OR KDF(h^y) XOR plaintext.getBytes()  // For ElGamal on a ByteArray.
+		 */
+		
+		// If there is no public key can not encrypt, throws exception.
+		if (!isKeySet()){
+			throw new IllegalStateException("in order to encrypt a message this object must be initialized with public key");
+		}
+		
+		//Check that the y random value passed to this function is in Zq.
+		if(!((y.compareTo(BigInteger.ZERO))>=0) && (y.compareTo(qMinusOne)<=0)) {
+			throw new IllegalArgumentException("y must be in Zq");
+		}
+		
+		
+		//Calculates c1 = g^y and c2 = msg * h^y.
+		GroupElement generator = dlog.getGenerator();
+		GroupElement c1 = dlog.exponentiate(generator, y);
+		GroupElement hy = dlog.exponentiate(publicKey.getH(), y);
+		
+		return completeEncryption(c1, hy, plaintext);
+	}
 	protected abstract AsymmetricCiphertext completeEncryption(GroupElement c1, GroupElement hy, Plaintext plaintext);
 	
 	
