@@ -40,7 +40,7 @@ public interface CTCommitter {
 	public void commit(CommitValue input, int id) throws IOException;
 
 
-	public void decommit(int id) throws IOException;
+	public void decommit(int id) throws IOException, CheatAttemptException, ClassNotFoundException, CommitValueException;
 	
 	public CommitValue generateCommitValue(byte[] x) throws CommitValueException;
 	
