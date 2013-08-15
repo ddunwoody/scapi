@@ -44,6 +44,7 @@ import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitmentPair;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.GroupElementCommitValue;
 import edu.biu.scapi.midLayer.asymmetricCrypto.encryption.ElGamalEnc;
+import edu.biu.scapi.midLayer.asymmetricCrypto.encryption.ScElGamalOnGroupElement;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScElGamalPrivateKey;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScElGamalPublicKey;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScElGamalPublicKey.ScElGamalPublicKeySendableData;
@@ -73,7 +74,9 @@ public abstract class ElGamalCTCCore {
 	protected ScElGamalPublicKey publicKey;
 	protected ScElGamalPrivateKey privateKey;
 
-
+	//These values used in getINputForZK function in the derives class.
+	protected BigInteger r;
+	protected CTCElGamalCommitmentMessage msg;
 
 	
 	ElGamalCTCCore(Channel channel, ElGamalEnc elGamal) throws IllegalArgumentException, SecurityLevelException, InvalidDlogGroupException{
@@ -93,6 +96,25 @@ public abstract class ElGamalCTCCore {
 	}
 
 
+
+	public ElGamalCTCCore(Channel channel) {
+		DlogGroup dlog = null;
+		try {
+			//Uses Miracl Koblitz 233 Elliptic curve.
+			dlog =  new MiraclDlogECF2m("K-233");
+		} catch (IOException e) {
+			dlog = new CryptoPpDlogZpSafePrime();
+		}
+		try {
+			doConstruct(channel, dlog, new SecureRandom(), new ScElGamalOnGroupElement(dlog));
+		} catch (SecurityLevelException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidDlogGroupException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 	private void doConstruct(Channel channel, DlogGroup dlog, SecureRandom random, ElGamalEnc elGamal) throws SecurityLevelException, InvalidDlogGroupException{
 		//The underlying dlog group must be DDH secure.
@@ -129,13 +151,14 @@ public abstract class ElGamalCTCCore {
 
 	public void commit(CommitValue input, int id) throws IOException {
 
-		BigInteger r = sampleRandomValues();	
+		r = sampleRandomValues();	
 
 		AsymmetricCiphertext c =  elGamal.encryptWithGivenRandomValue(input.convertToPlaintext(), r);
 
+		msg = new CTCElGamalCommitmentMessage((ScElGamalPublicKeySendableData) publicKey.generateSendableData(),  (ElGamalCiphertextSendableData)c.generateSendableData(), id);
 		try {
 			//Send the message by the channel.
-			channel.send(new CTCElGamalCommitmentMessage((ScElGamalPublicKeySendableData) publicKey.generateSendableData(),  (ElGamalCiphertextSendableData)c.generateSendableData(), id));
+			channel.send(msg);
 		} catch (IOException e) {
 			throw new IOException("failed to send the message. The error is: " + e.getMessage());
 		}	
