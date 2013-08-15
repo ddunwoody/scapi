@@ -35,7 +35,10 @@ import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.BasicReceiverCommi
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.ReceiverCommitPhaseOutput;
 import edu.biu.scapi.midLayer.asymmetricCrypto.encryption.ElGamalEnc;
+import edu.biu.scapi.midLayer.asymmetricCrypto.encryption.ScElGamalOnGroupElement;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
+import edu.biu.scapi.primitives.dlog.cryptopp.CryptoPpDlogZpSafePrime;
+import edu.biu.scapi.primitives.dlog.miracl.MiraclDlogECF2m;
 import edu.biu.scapi.securityLevel.DDH;
 
 /**
@@ -48,10 +51,31 @@ public abstract class ElGamalCTRCore{
 	protected DlogGroup dlog;
 	protected Channel channel;
 	protected ElGamalEnc elGamal;
-
+	protected CTCElGamalCommitmentMessage msg = null;
 	
 	public ElGamalCTRCore(Channel channel, DlogGroup dlog, ElGamalEnc elGamal) throws IllegalArgumentException, SecurityLevelException, InvalidDlogGroupException{
 		doConstruct(channel, dlog, elGamal);
+	}
+
+
+
+	public ElGamalCTRCore(Channel channel) {
+		DlogGroup dlog = null;
+		try {
+			//Uses Miracl Koblitz 233 Elliptic curve.
+			dlog =  new MiraclDlogECF2m("K-233");
+		} catch (IOException e) {
+			dlog = new CryptoPpDlogZpSafePrime();
+		}
+		try {
+			doConstruct(channel, dlog, new ScElGamalOnGroupElement(dlog));
+		} catch (SecurityLevelException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidDlogGroupException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 
@@ -84,7 +108,7 @@ public abstract class ElGamalCTRCore{
 	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTReceiver#receiveCommitment()
 	 */
 	public ReceiverCommitPhaseOutput receiveCommitment() throws ClassNotFoundException, IOException {
-		CTCElGamalCommitmentMessage msg = null;
+		
 		try{
 			msg = (CTCElGamalCommitmentMessage) channel.receive();
 		} catch (ClassNotFoundException e) {
