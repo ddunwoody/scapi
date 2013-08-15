@@ -57,8 +57,9 @@ public abstract class PedersenReceiverCore {
 	protected BigInteger trapdoor ; // Sampled random value in Zq
 									//TODO check if making this variable protected is a breach of security...
 
-	private GroupElement h;  //Receiver's message
+	protected GroupElement h;  //Receiver's message
 	private Map<Integer, GroupElement> commitmentMap;
+	protected CTCPedersenCommitmentMessage msg; //Committer's message. used in getInputForZK function.
 	
 	//private GroupElement receivedCommitment;
 
@@ -142,7 +143,6 @@ public abstract class PedersenReceiverCore {
 
 
 	public BasicReceiverCommitPhaseOutput receiveCommitment() throws ClassNotFoundException, IOException {
-		CTCPedersenCommitmentMessage msg = null;
 		try{
 			msg = (CTCPedersenCommitmentMessage) channel.receive();
 		} catch (ClassNotFoundException e) {
