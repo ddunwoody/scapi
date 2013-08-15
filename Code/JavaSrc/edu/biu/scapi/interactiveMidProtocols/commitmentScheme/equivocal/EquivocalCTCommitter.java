@@ -3,77 +3,124 @@
  */
 package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.equivocal;
 
+import java.io.IOException;
+
+import edu.biu.scapi.comm.Channel;
+import edu.biu.scapi.exceptions.CheatAttemptException;
+import edu.biu.scapi.exceptions.CommitValueException;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
+import edu.biu.scapi.interactiveMidProtocols.zeroKnowledge.ZeroKnowledgeProver;
+import edu.biu.scapi.securityLevel.EquivocalCT;
 
 /**
- * <!-- begin-UML-doc --> <!-- end-UML-doc -->
+ * Abstract implementation of Equivocal commitment scheme.
+ * This is a protocol to obtain an equivocal commitment from any commitment with a ZK-protocol 
+ * of the commitment value.
+ * The equivocality property means that a simulator can decommit to any value it needs 
+ * (needed for proofs of security).
  * 
- * @author user
- * @generated 
- *            "UML to Java (com.ibm.xtools.transform.uml2.java5.internal.UML2JavaTransform)"
+ * This class represent the committer.
+ * 
+ * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
+ *
  */
-public class EquivocalCTCommitter implements CTCommitter {
-	/**
-	 * <!-- begin-UML-doc --> <!-- end-UML-doc -->
-	 * 
-	 * @generated 
-	 *            "UML to Java (com.ibm.xtools.transform.uml2.java5.internal.UML2JavaTransform)"
+public abstract class EquivocalCTCommitter implements CTCommitter, EquivocalCT{
+	
+	/*
+	  Runs the following pseudo code:
+	  	Commit phase
+			RUN any COMMIT protocol for C to commit to x
+		Decommit phase, using ZK protocol of decommitment value
+			SEND x to R
+			Run ZK protocol as the prover, that x is the correct decommitment value
 	 */
-	private CTCommiter cTCommiter;
-
+	
+	protected CTCommitter cTCommitter;
+	protected ZeroKnowledgeProver prover;
+	private CommitValue input; //The commit value.
+	private Channel channel;
+	
 	/**
-	 * (non-Javadoc)
-	 * 
-	 * @see CTCommiter#preProcess()
-	 * @generated 
-	 *            "UML to Java (com.ibm.xtools.transform.uml2.java5.internal.UML2JavaTransform)"
+	 * Constructor that gets channel, committer and prover to use in the protocol execution.
+	 * @param channel
+	 * @param cTCommitter
+	 * @param prover
 	 */
-	public void preProcess() {
-		// begin-user-code
-		// TODO Auto-generated method stub
-
-		// end-user-code
+	public EquivocalCTCommitter(Channel channel, CTCommitter cTCommitter, ZeroKnowledgeProver prover){
+		this.cTCommitter = cTCommitter;
+		this.prover = prover;
+		this.channel = channel;
+	}
+	
+	/**
+	 * Computes the pre process of the commitment scheme.
+	 */
+	public void preProcess() throws ClassNotFoundException, IOException, CheatAttemptException {
+		cTCommitter.preProcess();
+	}
+	
+	/**
+	 * Runs the following line of the protocol:
+	 * "RUN any COMMIT protocol for C to commit to x".
+	 */
+	public void commit(CommitValue input, int id) throws IOException {
+		this.input = input;
+		cTCommitter.commit(input, id);
 	}
 
 	/**
-	 * (non-Javadoc)
-	 * 
-	 * @see CTCommiter#setInput()
-	 * @generated 
-	 *            "UML to Java (com.ibm.xtools.transform.uml2.java5.internal.UML2JavaTransform)"
+	 * Runs the following lines of the protocol:
+	 * "SEND x to R
+	 *	Run ZK protocol as the prover, that x is the correct decommitment value".
+	 * @throws IOException 
+	 * @throws ClassNotFoundException 
+	 * @throws CheatAttemptException 
+	 * @throws CommitValueException 
 	 */
-	public void setInput() {
-		// begin-user-code
-		// TODO Auto-generated method stub
-
-		// end-user-code
+	public void decommit(int id) throws IOException, CheatAttemptException, ClassNotFoundException, CommitValueException {
+		sendX();
+		
+		runZK();
 	}
 
 	/**
-	 * (non-Javadoc)
-	 * 
-	 * @see CTCommiter#commit()
-	 * @generated 
-	 *            "UML to Java (com.ibm.xtools.transform.uml2.java5.internal.UML2JavaTransform)"
+	 * Runs the following line of the protocol:
+	 * "Run ZK protocol as the prover, that x is the correct decommitment value".
+	 * @throws IOException
+	 * @throws CheatAttemptException
+	 * @throws ClassNotFoundException
+	 * @throws CommitValueException
 	 */
-	public void commit() {
-		// begin-user-code
-		// TODO Auto-generated method stub
+	protected abstract void runZK() throws IOException, CheatAttemptException, ClassNotFoundException, CommitValueException;
 
-		// end-user-code
+	/**
+	 * Runs the following lines of the protocol:
+	 * "SEND x to R".
+	 * @throws IOException
+	 */
+	private void sendX() throws IOException {
+		try{
+			channel.send(input.generateSendableData());
+		}
+		catch (IOException e) {
+			throw new IOException("failed to send the message. The error is: " + e.getMessage());
+		}
+		
 	}
 
 	/**
-	 * (non-Javadoc)
-	 * 
-	 * @see CTCommiter#decommit()
-	 * @generated 
-	 *            "UML to Java (com.ibm.xtools.transform.uml2.java5.internal.UML2JavaTransform)"
+	 * Generates CommitValue from the given byte array.
 	 */
-	public void decommit() {
-		// begin-user-code
-		// TODO Auto-generated method stub
+	public CommitValue generateCommitValue(byte[] x)
+			throws CommitValueException {
+		//delegate to the underlying committer
+		return cTCommitter.generateCommitValue(x);
+	}
 
-		// end-user-code
+	
+	public Object getCommitment(int id) {
+		// delete!
+		return null;
 	}
 }
