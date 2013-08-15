@@ -3,40 +3,19 @@
  */
 package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen;
 
-import java.io.IOException;
 import java.math.BigInteger;
-
-import java.security.SecureRandom;
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.Set;
-
-import org.bouncycastle.util.BigIntegers;
 
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.pedersenCommittedValue.SigmaPedersenCommittedValueInput;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.OnBigIntegerCommitmentScheme;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTReceiver;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
-import edu.biu.scapi.primitives.dlog.GroupElement;
-import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
-import edu.biu.scapi.primitives.dlog.cryptopp.CryptoPpDlogZpSafePrime;
-import edu.biu.scapi.primitives.dlog.miracl.MiraclDlogECF2m;
-import edu.biu.scapi.securityLevel.DDH;
 import edu.biu.scapi.securityLevel.PerfectlyHidingCT;
 
 public class PedersenCTReceiver extends PedersenReceiverCore implements CTReceiver, PerfectlyHidingCT, OnBigIntegerCommitmentScheme {
-	private Channel channel;
-	protected DlogGroup dlog;
-	private SecureRandom random;
-	private BigInteger qMinusOne;
-	private BigInteger a ; // Sampled random value in Zq
-
-	private GroupElement h;  //Receiver's message
-	private Map<Integer, GroupElement> commitmentMap;
 	
-	//private GroupElement receivedCommitment;
 
 
 	public PedersenCTReceiver(Channel channel) {
@@ -54,6 +33,10 @@ public class PedersenCTReceiver extends PedersenReceiverCore implements CTReceiv
 	public PedersenCTReceiver(Channel channel, DlogGroup dlog) throws IllegalArgumentException, SecurityLevelException, InvalidDlogGroupException{
 		//doConstruct(channel, dlog, new SecureRandom());
 		super(channel, dlog);
+	}
+	
+	public SigmaPedersenCommittedValueInput getInputForZK(BigInteger x){
+		return new SigmaPedersenCommittedValueInput(h, msg, x);
 	}
 
 
