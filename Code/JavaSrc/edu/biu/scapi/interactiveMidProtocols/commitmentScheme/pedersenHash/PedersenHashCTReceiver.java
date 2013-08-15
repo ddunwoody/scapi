@@ -31,6 +31,7 @@ import java.math.BigInteger;
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.pedersenCommittedValue.SigmaPedersenCommittedValueInput;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.ByteArrayCommitValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTReceiver;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
@@ -38,7 +39,6 @@ import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.OnBigIntegerCommit
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.CTCPedersenDecommitmentMessage;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.PedersenReceiverCore;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
-import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.hash.CryptographicHash;
 import edu.biu.scapi.primitives.hash.bc.BcSHA224;
 import edu.biu.scapi.securityLevel.PerfectlyHidingCT;
@@ -51,7 +51,7 @@ public class PedersenHashCTReceiver extends PedersenReceiverCore implements CTRe
 	private CryptographicHash hash;
 	
 	
-	public PedersenHashCTReceiver(Channel channel) throws IllegalArgumentException, SecurityLevelException, InvalidDlogGroupException{
+	public PedersenHashCTReceiver(Channel channel) {
 		//pedersenCTReceiver = new PedersenCTReceiver(channel);
 		super(channel);
 		hash = new BcSHA224(); 		//This default hash suits the default DlogGroup of the underlying Committer.
@@ -66,6 +66,9 @@ public class PedersenHashCTReceiver extends PedersenReceiverCore implements CTRe
 		this.hash = hash;
 }
 
+	public SigmaPedersenCommittedValueInput getInputForZK(byte[] x){
+		return new SigmaPedersenCommittedValueInput(h, msg, new BigInteger(x));
+	}
 
 	/*
 	@Override
