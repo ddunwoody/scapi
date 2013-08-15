@@ -27,6 +27,7 @@ package edu.biu.scapi.interactiveMidProtocols.zeroKnowledge;
 import java.io.IOException;
 
 import edu.biu.scapi.exceptions.CheatAttemptException;
+import edu.biu.scapi.exceptions.CommitValueException;
 
 /**
  * A zero-knowledge proof or zero-knowledge protocol is a method by which one party (the prover) can prove
@@ -52,7 +53,8 @@ public interface ZeroKnowledgeProver {
 	 * @throws IOException if failed to send the message.
 	 * @throws CheatAttemptException if the challenge's length is not as expected. 
 	 * @throws ClassNotFoundException 
+	 * @throws CommitValueException 
 	 */
-	public void prove() throws IOException, CheatAttemptException, ClassNotFoundException;
+	public void prove() throws IOException, CheatAttemptException, ClassNotFoundException, CommitValueException;
 	
 }
