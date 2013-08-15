@@ -27,6 +27,7 @@ package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.elGamal;
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.elGamalCommittedValue.SigmaElGamalCommittedValueInput;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTReceiver;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.GroupElementCommitValue;
@@ -59,6 +60,10 @@ public class ElGamalCTReceiver extends ElGamalCTRCore implements CTReceiver, Per
 		super(channel, dlog, new ScElGamalOnGroupElement(dlog));	
 	}
 	
+	public ElGamalCTReceiver(Channel channel) {
+		super(channel);
+	}
+
 	/* (non-Javadoc)
 	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.ElGamalCTRCore#processDecommitment(int, edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCElGamalDecommitmentMessage)
 	 */
@@ -96,5 +101,9 @@ public class ElGamalCTReceiver extends ElGamalCTRCore implements CTReceiver, Per
 		if( u.equals(gToR) && v.equals(dlog.multiplyGroupElements(hToR, xEl)) )
 			return new GroupElementCommitValue(xEl);
 		return null;
+	}
+	
+	public SigmaElGamalCommittedValueInput getInputForZK(GroupElement x){
+		return new SigmaElGamalCommittedValueInput(msg, x);
 	}
 }
