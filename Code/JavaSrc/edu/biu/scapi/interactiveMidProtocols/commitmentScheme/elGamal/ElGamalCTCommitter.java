@@ -24,14 +24,19 @@ Copyright (c) 2012 - SCAPI (http://crypto.biu.ac.il/scapi)
 */
 package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.elGamal;
 
+import java.io.IOException;
+
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CommitValueException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.elGamalCommittedValue.SigmaElGamalCommittedValueProverInput;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.GroupElementCommitValue;
 import edu.biu.scapi.midLayer.asymmetricCrypto.encryption.ScElGamalOnGroupElement;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
+import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.securityLevel.PerfectlyBindingCT;
 
 /** 
@@ -42,16 +47,24 @@ import edu.biu.scapi.securityLevel.PerfectlyBindingCT;
  */
 public class ElGamalCTCommitter extends ElGamalCTCCore implements CTCommitter, PerfectlyBindingCT {
 	
-	/*
-	public ElGamalCTCommitter(Channel channel) throws IllegalArgumentException, SecurityLevelException, InvalidDlogGroupException{
-		super(channel);
-	}
-	*/
+	private SigmaElGamalCommittedValueProverInput zkInput; //Returned in getInputForZK function.
+	
 	public ElGamalCTCommitter(Channel channel, DlogGroup dlog) throws IllegalArgumentException, SecurityLevelException, InvalidDlogGroupException{
 			//doConstruct(channel, dlog, new SecureRandom());
 		super(channel, dlog, new ScElGamalOnGroupElement(dlog));
 	}
 
+	public ElGamalCTCommitter(Channel channel) {
+		super(channel);
+	}
+
+	public void commit(CommitValue input, int id) throws IOException {
+		if (!(input instanceof GroupElementCommitValue))
+			throw new IllegalArgumentException("The input must be of type GroupElementCommitValue");
+		super.commit(input, id);
+		zkInput = new SigmaElGamalCommittedValueProverInput(msg, (GroupElement) input.getX(), r);
+	}
+	
 	/* (non-Javadoc)
 	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter#generateCommitValue(byte[])
 	 */
@@ -59,4 +72,10 @@ public class ElGamalCTCommitter extends ElGamalCTCCore implements CTCommitter, P
 	public CommitValue generateCommitValue(byte[] x)throws CommitValueException {
 		throw new CommitValueException("El Gamal committer cannot generate a CommitValue from a byte[], since there isn't always a suitable encoding");
 	}	
+	
+	
+	public SigmaElGamalCommittedValueProverInput getInputForZK(){
+		return zkInput;
+	}
+	
 }
