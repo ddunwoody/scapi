@@ -37,7 +37,7 @@ import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.BasicReceiverCommitPhaseOutput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.pedersenCommittedValue.SigmaPedersenCommittedValueProverInput;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.BigIntegerCommitValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCDecommitmentMessage;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
@@ -48,7 +48,6 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.dlog.cryptopp.CryptoPpDlogZpSafePrime;
 import edu.biu.scapi.primitives.dlog.miracl.MiraclDlogECF2m;
 import edu.biu.scapi.securityLevel.DDH;
-import edu.biu.scapi.securityLevel.PerfectlyHidingCT;
 /**
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
@@ -84,8 +83,9 @@ public abstract class PedersenCommitterCore {
 	//private BigInteger x; 			//Committer's private input x in Zq
 	//private BigInteger r; 			//Random value sampled during the sampleRandomValues stage;
 	//private CTRPedersenMessage msg; //Message obtained from the receiver during the preProcess stage. Later is needed to commit.
-    protected GroupElement h; 		//The content of the message obtained from the receiver. 	
-	//private int id;					
+    protected GroupElement h; 		//The content of the message obtained from the receiver. 
+    private SigmaPedersenCommittedValueProverInput input; //returned in getINputForZK function.
+    //private int id;					
 	public PedersenCommitterCore(Channel channel) {
 		try {
 			//Uses Miracl Koblitz 233 Elliptic curve.
@@ -156,9 +156,10 @@ public abstract class PedersenCommitterCore {
 		BigInteger r = sampleRandomValues();	
 		BigInteger x = ((BigIntegerCommitValue)in).getX();
 		GroupElement c =  computeCommitment(x, r);
+		CTCPedersenCommitmentMessage msg = new CTCPedersenCommitmentMessage(c.generateSendableData(), id);
 		try {
 			//Send the message by the channel.
-			channel.send(new CTCPedersenCommitmentMessage(c.generateSendableData(), id));
+			channel.send(msg);
 		} catch (IOException e) {
 			throw new IOException("failed to send the message. The error is: " + e.getMessage());
 		}	
@@ -169,6 +170,8 @@ public abstract class PedersenCommitterCore {
 		System.out.println("c = " + c);
 		//This is not according to the pseudo-code but for our programming needs. TODO Check if can be left.
 		//return c;
+		
+		input = new SigmaPedersenCommittedValueProverInput(h, msg, x, r);
 	}
 
 	//This function is for testing purposes only. It should be deleted before publishing this part of SCAPI.
@@ -223,6 +226,10 @@ public abstract class PedersenCommitterCore {
 	private GroupElement computeCommitment(BigInteger x, BigInteger r) {		
 		GroupElement c = dlog.multiplyGroupElements(dlog.exponentiate(dlog.getGenerator(), r), dlog.exponentiate(h, x));
 		return c;
+	}
+	
+	public SigmaPedersenCommittedValueProverInput getInputForZK(){
+		return input;
 	}
 
 }
