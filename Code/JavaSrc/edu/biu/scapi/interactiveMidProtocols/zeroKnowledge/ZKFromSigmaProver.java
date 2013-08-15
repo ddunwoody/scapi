@@ -28,6 +28,7 @@ import java.io.IOException;
 
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CheatAttemptException;
+import edu.biu.scapi.exceptions.CommitValueException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaProverComputation;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
@@ -119,8 +120,9 @@ public class ZKFromSigmaProver implements ZeroKnowledgeProver{
 	 * @throws IOException if failed to send the message.
 	 * @throws CheatAttemptException if the challenge's length is not as expected. 
 	 * @throws ClassNotFoundException 
+	 * @throws CommitValueException 
 	 */
-	public void prove() throws IOException, CheatAttemptException, ClassNotFoundException {
+	public void prove() throws IOException, CheatAttemptException, ClassNotFoundException, CommitValueException {
 		//Run the receiver in COMMIT.commit 
 		commit();
 		//Compute the first message a in sigma, using (x,w) as input and 
@@ -170,8 +172,9 @@ public class ZKFromSigmaProver implements ZeroKnowledgeProver{
 	 * @throws IOException 
 	 * @throws CheatAttemptException if decommit phase returned invalid.
 	 * @throws ClassNotFoundException 
+	 * @throws CommitValueException 
 	 */
-	private byte[] decommit() throws IOException, CheatAttemptException, ClassNotFoundException{
+	private byte[] decommit() throws IOException, CheatAttemptException, ClassNotFoundException, CommitValueException{
 		CommitValue val = receiver.receiveDecommitment(0);
 		if (val == null){
 			throw new CheatAttemptException("Decommit phase returned invalid");
