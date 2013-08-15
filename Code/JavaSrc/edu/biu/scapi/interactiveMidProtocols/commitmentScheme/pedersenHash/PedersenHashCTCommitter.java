@@ -27,12 +27,10 @@ package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersenHash;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.SecureRandom;
 import java.util.Hashtable;
 import java.util.Map;
 
 import edu.biu.scapi.comm.Channel;
-import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.exceptions.CommitValueException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
@@ -44,7 +42,6 @@ import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.OnBigIntegerCommit
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.CTCPedersenDecommitmentMessage;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.PedersenCommitterCore;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
-import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.hash.CryptographicHash;
 import edu.biu.scapi.primitives.hash.bc.BcSHA224;
 import edu.biu.scapi.securityLevel.PerfectlyHidingCT;
@@ -67,7 +64,7 @@ public class PedersenHashCTCommitter extends PedersenCommitterCore implements CT
 	 * @throws SecurityLevelException
 	 * @throws InvalidDlogGroupException
 	 */
-	public PedersenHashCTCommitter(Channel channel) throws IllegalArgumentException, SecurityLevelException, InvalidDlogGroupException{
+	public PedersenHashCTCommitter(Channel channel){
 		super(channel);
 		this.hash = new BcSHA224(); 		//This default hash suits the default DlogGroup of the underlying Committer.
 		//this.pedCommitter = new PedersenCTCommitter(channel);
