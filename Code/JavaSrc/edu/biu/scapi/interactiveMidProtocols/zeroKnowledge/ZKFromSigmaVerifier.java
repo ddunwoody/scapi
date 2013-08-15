@@ -178,8 +178,11 @@ public class ZKFromSigmaVerifier implements ZeroKnowledgeVerifier{
 	/**
 	 * Runs COMMIT.decommit as the decommitter.
 	 * @throws IOException 
+	 * @throws ClassNotFoundException 
+	 * @throws CheatAttemptException 
+	 * @throws CommitValueException 
 	 */
-	private void decommit() throws IOException {
+	private void decommit() throws IOException, CheatAttemptException, ClassNotFoundException, CommitValueException {
 		committer.decommit(0);
 		
 	}
