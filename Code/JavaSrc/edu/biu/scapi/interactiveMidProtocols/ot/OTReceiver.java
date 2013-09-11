@@ -26,6 +26,7 @@ package edu.biu.scapi.interactiveMidProtocols.ot;
 
 import java.io.IOException;
 
+import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CheatAttemptException;
 
 /**
@@ -40,23 +41,23 @@ import edu.biu.scapi.exceptions.CheatAttemptException;
  *
  */
 public interface OTReceiver {
-	/**
-	 * Run the part of the protocol where the receiver input is not yet necessary.
-	 */
-	public void preProcess();
+	
+	// Some OT protocols have a pre-process stage before the transfer. 
+	// Usually, pre process is done once at the beginning of the protocol and will not be executed later, 
+	// and then the transfer function could be called multiple times.
+	// We implement the preprocess stage at construction time. 
+	// A protocol that needs to call preprocess after the construction time, should create a new instance.
 	
 	/**
-	 * Sets the input for this OT receiver.
-	 * @param input
-	 */
-	public void setInput(OTRInput input);
-	
-	/**
-	 * Run the part of the protocol where the receiver input is necessary.
+	 * The transfer stage of OT protocol which can be called several times in parallel.
+	 * In order to enable the parallel calls, each transfer call should use a different channel to send and receive messages.
+	 * This way the parallel executions of the function will not block each other.
+	 * @param channel each call should get a different one.
+	 * @param input The parameters given in the input must match the DlogGroup member of this class, which given in the constructor.
 	 * @return OTROutput, the output of the protocol.
 	 * @throws CheatAttemptException if there was a cheat attempt during the execution of the protocol.
 	 * @throws IOException if the send or receive functions failed
 	 * @throws ClassNotFoundException if the receive function failed
 	 */
-	public OTROutput transfer() throws CheatAttemptException, IOException, ClassNotFoundException;
+	public OTROutput transfer(Channel channel, OTRInput input) throws CheatAttemptException, IOException, ClassNotFoundException;
 }
