@@ -235,16 +235,16 @@ public abstract class OTSenderDDHPrivacyOnlyAbs implements OTSender{
 		z1 = dlog.reconstructElement(true, message.getZ1());
 		
 		if (!(dlog.isMember(x))){
-			throw new CheatAttemptException("x element is not a member in the current DlogGroup");
+			throw new CheatAttemptException("x element is not a member of the current DlogGroup");
 		}
 		if (!(dlog.isMember(y))){
-			throw new CheatAttemptException("y element is not a member in the current DlogGroup");
+			throw new CheatAttemptException("y element is not a member of the current DlogGroup");
 		}
 		if (!(dlog.isMember(z0))){
-			throw new CheatAttemptException("z0 element is not a member in the current DlogGroup");
+			throw new CheatAttemptException("z0 element is not a member of the current DlogGroup");
 		}
 		if (!(dlog.isMember(z1))){
-			throw new CheatAttemptException("z1 element is not a member in the current DlogGroup");
+			throw new CheatAttemptException("z1 element is not a member of the current DlogGroup");
 		}
 		
 		if (z0.equals(z1)){
