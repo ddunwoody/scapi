@@ -26,6 +26,7 @@ package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.damgardJurikEncrypte
 
 import java.math.BigInteger;
 
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProverInput;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.DamgardJurikPrivateKey;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.DamgardJurikPublicKey;
 import edu.biu.scapi.midLayer.ciphertext.BigIntegerCiphertext;
@@ -38,12 +39,13 @@ import edu.biu.scapi.midLayer.plaintext.BigIntegerPlainText;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaDJEncryptedValueProverInput extends SigmaDJEncryptedValueInput{
+public class SigmaDJEncryptedValueProverInput implements SigmaProverInput{
 	
+	private SigmaDJEncryptedValueCommonInput params;
 	private BigInteger r;
 	
 	public SigmaDJEncryptedValueProverInput(DamgardJurikPublicKey publicKey, BigIntegerCiphertext cipher, BigIntegerPlainText plaintext, BigInteger r){
-		super(publicKey, cipher, plaintext);
+		params = new SigmaDJEncryptedValueCommonInput(publicKey, cipher, plaintext);
 		this.r = r;
 	}
 	
@@ -58,7 +60,7 @@ public class SigmaDJEncryptedValueProverInput extends SigmaDJEncryptedValueInput
 	 * @param privateKey
 	 */
 	public SigmaDJEncryptedValueProverInput(DamgardJurikPublicKey publicKey, BigIntegerCiphertext cipher, BigIntegerPlainText plaintext, DamgardJurikPrivateKey privateKey){
-		super(publicKey, cipher, plaintext);
+		params = new SigmaDJEncryptedValueCommonInput(publicKey, cipher, plaintext);
 		//Calculate r from the given private key.
 		BigInteger p = privateKey.getP();
 		BigInteger q = privateKey.getQ();
@@ -76,5 +78,9 @@ public class SigmaDJEncryptedValueProverInput extends SigmaDJEncryptedValueInput
 	public BigInteger getR(){
 		return r;
 	}
+
+	public SigmaDJEncryptedValueCommonInput getCommonParams() {
+		return params;
+	} 
 
 }
