@@ -28,10 +28,11 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 
 import edu.biu.scapi.exceptions.CheatAttemptException;
+import edu.biu.scapi.generals.ScapiDefaultConfiguration;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaSimulator;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.damgardJurikEncryptedZero.SigmaDJEncryptedZeroInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.damgardJurikEncryptedZero.SigmaDJEncryptedZeroCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.damgardJurikEncryptedZero.SigmaDamgardJurikEncryptedZeroSimulator;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaSimulatorOutput;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.DamgardJurikPublicKey;
 import edu.biu.scapi.midLayer.ciphertext.BigIntegerCiphertext;
@@ -63,18 +64,31 @@ public class SigmaDamgardJurikEncryptedValueSimulator implements SigmaSimulator{
 	 */
 	public SigmaDamgardJurikEncryptedValueSimulator(int t, int lengthParameter, SecureRandom random) {
 		
-		//Creates the underlying sigmaDamgardJurik object with the given parameters.
-		djSim = new SigmaDamgardJurikEncryptedZeroSimulator(t, lengthParameter, random);
-		this.lengthParameter = lengthParameter;
+		doConstruct(t, lengthParameter, random);
 	}
 	
 	/**
 	 * Default constructor that chooses default values for the parameters.
 	 */
 	public SigmaDamgardJurikEncryptedValueSimulator() {
-		lengthParameter = 1;
-		//Creates the underlying sigmaDamgardJurik object with default parameters.
-		djSim = new SigmaDamgardJurikEncryptedZeroSimulator(80, lengthParameter, new SecureRandom());
+		
+		//read the default statistical parameter used in sigma protocols from a configuration file.
+		String statisticalParameter = ScapiDefaultConfiguration.getInstance().getProperty("StatisticalParameter");
+		int t = Integer.parseInt(statisticalParameter);
+				
+		doConstruct(t, 1, new SecureRandom());
+	}
+	
+	/**
+	 * Sets the given parameters.
+	 * @param t Soundness parameter in BITS.
+	 * @param lengthParameter length parameter in BITS.
+	 * @param random
+	 */
+	private void doConstruct(int t, int lengthParameter, SecureRandom random){
+		//Creates the underlying sigmaDamgardJurik object with the given parameters.
+		djSim = new SigmaDamgardJurikEncryptedZeroSimulator(t, lengthParameter, random);
+		this.lengthParameter = lengthParameter;
 	}
 	
 	/**
@@ -101,20 +115,20 @@ public class SigmaDamgardJurikEncryptedValueSimulator implements SigmaSimulator{
 	 * Returns the soundness parameter for this Sigma protocol.
 	 * @return t soundness parameter
 	 */
-	public int getSoundness(){
-		return djSim.getSoundness();
+	public int getSoundnessParam(){
+		return djSim.getSoundnessParam();
 	}
 	
 	/**
 	 * Computes the simulator computation.
-	 * @param input MUST be an instance of SigmaDJEncryptedValueInput.
+	 * @param input MUST be an instance of SigmaDJEncryptedValueCommonInput.
 	 * @param challenge
 	 * @return the output of the computation - (a, e, z).
 	 * @throws CheatAttemptException if the received challenge's length is not equal to the soundness parameter.
 	 * @throws IllegalArgumentException if input is not the expected.
 	 */
-	public SigmaSimulatorOutput simulate(SigmaProtocolInput in, byte[] challenge) throws CheatAttemptException{
-		SigmaDJEncryptedZeroInput underlyingInput = checkAndCreateUnderlyingInput(in);
+	public SigmaSimulatorOutput simulate(SigmaCommonInput in, byte[] challenge) throws CheatAttemptException{
+		SigmaDJEncryptedZeroCommonInput underlyingInput = checkAndCreateUnderlyingInput(in);
 		
 		//Delegates the computation to the underlying SigmaDJEncryptedZeroSimulator.
 		return djSim.simulate(underlyingInput, challenge); 
@@ -127,8 +141,8 @@ public class SigmaDamgardJurikEncryptedValueSimulator implements SigmaSimulator{
 	 * @return the output of the computation - (a, e, z).
 	 * @throws IllegalArgumentException if input is not the expected.
 	 */
-	public SigmaSimulatorOutput simulate(SigmaProtocolInput in){
-		SigmaDJEncryptedZeroInput underlyingInput = checkAndCreateUnderlyingInput(in);
+	public SigmaSimulatorOutput simulate(SigmaCommonInput in){
+		SigmaDJEncryptedZeroCommonInput underlyingInput = checkAndCreateUnderlyingInput(in);
 		
 		//Delegates the computation to the underlying SigmaDJEncryptedZeroSimulator.
 		return djSim.simulate(underlyingInput); 
@@ -137,15 +151,14 @@ public class SigmaDamgardJurikEncryptedValueSimulator implements SigmaSimulator{
 	
 	/**
 	 * Converts the given input to an input object for the underlying simulator.
-	 * @param in MUST be an instance of SigmaDJEncryptedValueInput.
+	 * @param in MUST be an instance of SigmaDJEncryptedValueCommonInput.
 	 * @return SigmaDJEncryptedZeroInput the converted input.
 	 */
-	private SigmaDJEncryptedZeroInput checkAndCreateUnderlyingInput(
-			SigmaProtocolInput in) {
-		if (!(in instanceof SigmaDJEncryptedValueInput)){
-			throw new IllegalArgumentException("the given input must be an instance of SigmaDJEncryptedValueInput");
+	private SigmaDJEncryptedZeroCommonInput checkAndCreateUnderlyingInput(SigmaCommonInput in) {
+		if (!(in instanceof SigmaDJEncryptedValueCommonInput)){
+			throw new IllegalArgumentException("the given input must be an instance of SigmaDJEncryptedValueCommonInput");
 		}
-		SigmaDJEncryptedValueInput input = (SigmaDJEncryptedValueInput) in;
+		SigmaDJEncryptedValueCommonInput input = (SigmaDJEncryptedValueCommonInput) in;
 		
 		//Get public key, cipher and plaintext.
 		DamgardJurikPublicKey pubKey = input.getPublicKey();
@@ -168,7 +181,7 @@ public class SigmaDamgardJurikEncryptedValueSimulator implements SigmaSimulator{
 		BigIntegerCiphertext cipherTag = new BigIntegerCiphertext(newCipher);
 		
 		//Create an input object to the underlying sigmaDamgardJurik simulator.
-		SigmaDJEncryptedZeroInput underlyingInput = new SigmaDJEncryptedZeroInput(pubKey, cipherTag);
+		SigmaDJEncryptedZeroCommonInput underlyingInput = new SigmaDJEncryptedZeroCommonInput(pubKey, cipherTag);
 		return underlyingInput;
 	}
 }
