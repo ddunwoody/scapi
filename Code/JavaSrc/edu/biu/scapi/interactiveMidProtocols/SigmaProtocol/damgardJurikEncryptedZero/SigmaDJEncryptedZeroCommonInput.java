@@ -24,23 +24,27 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.damgardJurikEncryptedZero;
 
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.DamgardJurikPublicKey;
 import edu.biu.scapi.midLayer.ciphertext.BigIntegerCiphertext;
 
 /**
- * Concrete implementation of SigmaProtocol input, used by the SigmaDamgardJurikEncryptedZeroVerifier.
- * In SigmaProtocolDamgardJurikEncryptedZero, the verifier gets a DamgardJurikPublicKey and a BigIntegerCiphertext.
+ * Concrete implementation of SigmaProtocol input, used by the SigmaDamgardJurikEncryptedZero verifier and simulator.
+ * In SigmaProtocolDamgardJurikEncryptedZero, the common input contains DamgardJurikPublicKey and a BigIntegerCiphertext.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaDJEncryptedZeroInput implements SigmaProtocolInput{
-
+public class SigmaDJEncryptedZeroCommonInput implements SigmaCommonInput{
+	
+	private static final long serialVersionUID = -4073809422503620748L;
 	private DamgardJurikPublicKey publicKey;
 	private BigIntegerCiphertext cipher;
 	
-	public SigmaDJEncryptedZeroInput(DamgardJurikPublicKey publicKey, BigIntegerCiphertext cipher){
+	public SigmaDJEncryptedZeroCommonInput(DamgardJurikPublicKey publicKey, BigIntegerCiphertext cipher){
 		this.publicKey = publicKey;
 		this.cipher = cipher;
 	}
@@ -52,4 +56,10 @@ public class SigmaDJEncryptedZeroInput implements SigmaProtocolInput{
 	public BigIntegerCiphertext getCiphertext(){
 		return cipher;
 	}
+	
+	private void writeObject(ObjectOutputStream out) throws IOException {  
+        
+        out.writeObject(publicKey.generateSendableData());  
+        out.writeObject(cipher);
+    } 
 }
