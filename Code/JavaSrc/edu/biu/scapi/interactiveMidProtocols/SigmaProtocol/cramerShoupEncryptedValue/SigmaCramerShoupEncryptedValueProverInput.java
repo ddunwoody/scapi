@@ -26,6 +26,7 @@ package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.cramerShoupEncrypted
 
 import java.math.BigInteger;
 
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProverInput;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.CramerShoupPublicKey;
 import edu.biu.scapi.midLayer.ciphertext.CramerShoupOnGroupElementCiphertext;
 import edu.biu.scapi.primitives.dlog.GroupElement;
@@ -33,22 +34,27 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
 /**
  * Concrete implementation of SigmaProtocol input, used by the SigmaCramerShoupEncryptedValueProver.<p>
  * 
- * In SigmaCramerShoupEncryptedValue protocol, the prover gets a GroupElement x, an CramerShoup public key, 
+ * In SigmaCramerShoupEncryptedValue protocol, the prover gets a GroupElement x, a CramerShoup public key, 
  * the ciphertext of x using the CramerShoup encryption scheme and the randomness value used to encrypt x.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaCramerShoupEncryptedValueProverInput extends SigmaCramerShoupEncryptedValueInput{
+public class SigmaCramerShoupEncryptedValueProverInput implements SigmaProverInput{
 
+	private SigmaCramerShoupEncryptedValueCommonInput params;
 	private BigInteger r;
 	
 	public SigmaCramerShoupEncryptedValueProverInput(CramerShoupOnGroupElementCiphertext cipher, CramerShoupPublicKey pubKey, GroupElement x, BigInteger r){
-		super(cipher, pubKey, x);
+		params = new SigmaCramerShoupEncryptedValueCommonInput(cipher, pubKey, x);
 		this.r = r;
 	}
 	
 	public BigInteger getR(){
 		return r;
 	}
+	
+	public SigmaCramerShoupEncryptedValueCommonInput getCommonParams() {
+		return params;
+	}  
 }
