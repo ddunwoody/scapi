@@ -24,28 +24,51 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.damgardJurikEncryptedValue;
 
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.damgardJurikEncryptedZero.SigmaDJEncryptedZeroInput;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.DamgardJurikPublicKey;
 import edu.biu.scapi.midLayer.ciphertext.BigIntegerCiphertext;
 import edu.biu.scapi.midLayer.plaintext.BigIntegerPlainText;
 
 /**
- * Concrete implementation of SigmaProtocol input, used by the SigmaDamgardJurikEncryptedValueVerifier.
- * In SigmaProtocolDamgardJurikEncryptedValue, the verifier gets a DamgardJurikPublicKey, BigIntegerCiphertext and a BigIntegrPlaintext.
+ * Concrete implementation of SigmaProtocol input, used by the SigmaDamgardJurikEncryptedValue verifier and simulator.
+ * In SigmaProtocolDamgardJurikEncryptedValue, the common input contains DamgardJurikPublicKey, BigIntegerCiphertext and BigIntegerPlaintext.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaDJEncryptedValueInput extends SigmaDJEncryptedZeroInput{
-
+public class SigmaDJEncryptedValueCommonInput implements SigmaCommonInput{
+	
+	private static final long serialVersionUID = -5915961233248748044L;
+	
+	private DamgardJurikPublicKey publicKey;
+	private BigIntegerCiphertext cipher;
 	private BigIntegerPlainText plaintext;
 	
-	public SigmaDJEncryptedValueInput(DamgardJurikPublicKey publicKey, BigIntegerCiphertext cipher, BigIntegerPlainText plaintext){
-		super(publicKey, cipher);
+	public SigmaDJEncryptedValueCommonInput(DamgardJurikPublicKey publicKey, BigIntegerCiphertext cipher, BigIntegerPlainText plaintext){
+		this.publicKey = publicKey;
+		this.cipher = cipher;
 		this.plaintext = plaintext;
+	}
+	
+	public DamgardJurikPublicKey getPublicKey(){
+		return publicKey;
+	}
+	
+	public BigIntegerCiphertext getCiphertext(){
+		return cipher;
 	}
 	
 	public BigIntegerPlainText getPlaintext(){
 		return plaintext;
 	}
+	
+	private void writeObject(ObjectOutputStream out) throws IOException {  
+        
+        out.writeObject(publicKey.generateSendableData());  
+        out.writeObject(cipher);
+        out.writeObject(plaintext);
+    } 
 }
