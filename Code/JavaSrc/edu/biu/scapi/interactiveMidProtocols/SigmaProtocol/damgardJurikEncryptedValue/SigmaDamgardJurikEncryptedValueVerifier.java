@@ -27,11 +27,12 @@ package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.damgardJurikEncrypte
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
+import edu.biu.scapi.generals.ScapiDefaultConfiguration;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.DJBasedSigma;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaVerifierComputation;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.damgardJurikEncryptedZero.SigmaDJEncryptedZeroInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.damgardJurikEncryptedZero.SigmaDJEncryptedZeroCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.damgardJurikEncryptedZero.SigmaDamgardJurikEncryptedZeroVerifier;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.DamgardJurikPublicKey;
 import edu.biu.scapi.midLayer.ciphertext.BigIntegerCiphertext;
@@ -65,68 +66,41 @@ public class SigmaDamgardJurikEncryptedValueVerifier implements SigmaVerifierCom
 	 */
 	public SigmaDamgardJurikEncryptedValueVerifier(int t, int lengthParameter, SecureRandom random) {
 		
-		//Creates the underlying sigmaDamgardJurik object with the given parameters.
-		sigmaDamgardJurik = new SigmaDamgardJurikEncryptedZeroVerifier(t, lengthParameter, random);
-		this.lengthParameter = lengthParameter;
+		doConstruct(t, lengthParameter, random);
 	}
 	
 	/**
 	 * Default constructor that chooses default values for the parameters.
 	 */
 	public SigmaDamgardJurikEncryptedValueVerifier() {
-		lengthParameter = 1;
-		//Creates the underlying sigmaDamgardJurik object with default parameters.
-		sigmaDamgardJurik = new SigmaDamgardJurikEncryptedZeroVerifier(80, lengthParameter, new SecureRandom());
+		
+		//read the default statistical parameter used in sigma protocols from a configuration file.
+		String statisticalParameter = ScapiDefaultConfiguration.getInstance().getProperty("StatisticalParameter");
+		int t = Integer.parseInt(statisticalParameter);
+				
+		doConstruct(t, 1, new SecureRandom());
+	}
+	
+	/**
+	 * Sets the given parameters.
+	 * @param t Soundness parameter in BITS.
+	 * @param lengthParameter length parameter in BITS.
+	 * @param random
+	 */
+	private void doConstruct(int t, int lengthParameter, SecureRandom random){
+		
+		//Creates the underlying sigmaDamgardJurik object with the given parameters.
+		sigmaDamgardJurik = new SigmaDamgardJurikEncryptedZeroVerifier(t, lengthParameter, random);
+		this.lengthParameter = lengthParameter;
 	}
 	
 	/**
 	 * Returns the soundness parameter for this Sigma protocol.
 	 * @return t soundness parameter
 	 */
-	public int getSoundness(){
+	public int getSoundnessParam(){
 		//Delegates to the underlying sigmaDamgardJurik verifier.
-		return sigmaDamgardJurik.getSoundness();
-	}
-
-	/**
-	 * Converts the input to the underlying object input.
-	 * @param input MUST be an instance of SigmaDJEncryptedValueInput.
-	 * @throws IllegalArgumentException if input is not an instance of SigmaDJEncryptedValueInput.
-	 */
-	public void setInput(SigmaProtocolInput in) {
-		/*
-		 * Converts the input (n, c, x) to (n, c') where c’ = c*(1+n)^(-x) mod N'.
-		 */
-		if (!(in instanceof SigmaDJEncryptedValueInput)){
-			throw new IllegalArgumentException("the given input must be an instance of SigmaDJEncryptedValueInput");
-		}
-		SigmaDJEncryptedValueInput input = (SigmaDJEncryptedValueInput) in;
-		
-		//Get public key, cipher and plaintext.
-		DamgardJurikPublicKey pubKey = input.getPublicKey();
-		BigIntegerPlainText plaintext = input.getPlaintext();
-		BigIntegerCiphertext cipher = input.getCiphertext();
-		
-		//Convert the cipher c to c' = c*(1+n)^(-x)
-		BigInteger n = pubKey.getModulus();
-		BigInteger nPlusOne = n.add(BigInteger.ONE);
-		
-		//calculate N' = n^(s+1).
-		BigInteger NTag = n.pow(lengthParameter + 1);
-		
-		//Calculate (n+1)^(-x)
-		BigInteger minusX = plaintext.getX().negate();
-		BigInteger multVal = nPlusOne.modPow(minusX, NTag);
-		
-		//Calculate the ciphertext for DamgardJurikEncryptedZero - c*(n+1)^(-x).
-		BigInteger newCipher = cipher.getCipher().multiply(multVal).mod(NTag);
-		BigIntegerCiphertext cipherTag = new BigIntegerCiphertext(newCipher);
-		
-		//Create an input object to the underlying sigmaDamgardJurik verifier.
-		SigmaDJEncryptedZeroInput underlyingInput = new SigmaDJEncryptedZeroInput(pubKey, cipherTag);
-		sigmaDamgardJurik.setInput(underlyingInput);
-		
-				
+		return sigmaDamgardJurik.getSoundnessParam();
 	}
 	
 	/**
@@ -159,11 +133,44 @@ public class SigmaDamgardJurikEncryptedValueVerifier implements SigmaVerifierCom
 	/**
 	 * Verifies the proof.
 	 * @param z second message from prover
+	 * @param input MUST be an instance of SigmaDJEncryptedValueCommonInput.
 	 * @return true if the proof has been verified; false, otherwise.
+	 * @throws IllegalArgumentException if input is not an instance of SigmaDJEncryptedValueCommonInput.
 	 * @throws IllegalArgumentException if the messages of the prover are not an instance of SigmaBIMsg
 	 */
-	public boolean verify(SigmaProtocolMsg a, SigmaProtocolMsg z) {
+	public boolean verify(SigmaCommonInput in, SigmaProtocolMsg a, SigmaProtocolMsg z) {
+		/*
+		 * Converts the input (n, c, x) to (n, c') where c’ = c*(1+n)^(-x) mod N'.
+		 */
+		if (!(in instanceof SigmaDJEncryptedValueCommonInput)){
+			throw new IllegalArgumentException("the given input must be an instance of SigmaDJEncryptedValueCommonInput");
+		}
+		SigmaDJEncryptedValueCommonInput input = (SigmaDJEncryptedValueCommonInput) in;
+		
+		//Get public key, cipher and plaintext.
+		DamgardJurikPublicKey pubKey = input.getPublicKey();
+		BigIntegerPlainText plaintext = input.getPlaintext();
+		BigIntegerCiphertext cipher = input.getCiphertext();
+		
+		//Convert the cipher c to c' = c*(1+n)^(-x)
+		BigInteger n = pubKey.getModulus();
+		BigInteger nPlusOne = n.add(BigInteger.ONE);
+		
+		//calculate N' = n^(s+1).
+		BigInteger NTag = n.pow(lengthParameter + 1);
+		
+		//Calculate (n+1)^(-x)
+		BigInteger minusX = plaintext.getX().negate();
+		BigInteger multVal = nPlusOne.modPow(minusX, NTag);
+		
+		//Calculate the ciphertext for DamgardJurikEncryptedZero - c*(n+1)^(-x).
+		BigInteger newCipher = cipher.getCipher().multiply(multVal).mod(NTag);
+		BigIntegerCiphertext cipherTag = new BigIntegerCiphertext(newCipher);
+		
+		//Create an input object to the underlying sigmaDamgardJurik verifier.
+		SigmaDJEncryptedZeroCommonInput underlyingInput = new SigmaDJEncryptedZeroCommonInput(pubKey, cipherTag);
+		
 		//Delegates to the underlying sigmaDamgardJurik verifier.
-		return sigmaDamgardJurik.verify(a, z);
+		return sigmaDamgardJurik.verify(underlyingInput, a, z);
 	}
 }
