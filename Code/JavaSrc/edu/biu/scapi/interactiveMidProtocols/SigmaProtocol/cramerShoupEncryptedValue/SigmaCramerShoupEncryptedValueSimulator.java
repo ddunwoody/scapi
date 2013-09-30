@@ -24,25 +24,21 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.cramerShoupEncryptedValue;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 
 import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaSimulator;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dhExtended.SigmaDHExtendedInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dhExtended.SigmaDHExtendedCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dhExtended.SigmaDHExtendedSimulator;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaSimulatorOutput;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.CramerShoupPublicKey;
 import edu.biu.scapi.midLayer.ciphertext.CramerShoupOnGroupElementCiphertext;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
-import edu.biu.scapi.primitives.dlog.cryptopp.CryptoPpDlogZpSafePrime;
-import edu.biu.scapi.primitives.dlog.miracl.MiraclDlogECF2m;
 import edu.biu.scapi.primitives.hash.CryptographicHash;
-import edu.biu.scapi.primitives.hash.cryptopp.CryptoPpSHA1;
 
 /**
  * Concrete implementation of Sigma Simulator.
@@ -75,34 +71,6 @@ public class SigmaCramerShoupEncryptedValueSimulator implements SigmaSimulator{
 	 */
 	public SigmaCramerShoupEncryptedValueSimulator(DlogGroup dlog, CryptographicHash hash, int t, SecureRandom random) {
 		
-		setParameters(dlog, hash, t, random);
-	}
-	
-	/**
-	 * Default constructor that chooses default values for the parameters.
-	 */
-	public SigmaCramerShoupEncryptedValueSimulator() {
-	
-		DlogGroup dlogTemp;
-		try {
-			//Create Miracl Koblitz 233 Elliptic curve.
-			dlogTemp = new MiraclDlogECF2m("K-233");
-		} catch (IOException e) {
-			//If there is a problem with the elliptic curves file, create Zp DlogGroup.
-			dlogTemp = new CryptoPpDlogZpSafePrime();
-		}
-		
-		setParameters(dlogTemp, new CryptoPpSHA1(), 80, new SecureRandom());
-	}
-	
-	/**
-	 * Sets the given parameters.
-	 * @param dlog DlogGroup used in CramerShoup encryption scheme.
-	 * @param hash CryptographicHash used in CramerShoup encryption scheme.
-	 * @param t Soundness parameter in BITS.
-	 * @param random
-	 */
-	private void setParameters(DlogGroup dlog, CryptographicHash hash, int t, SecureRandom random) {
 		//Creates the underlying SigmaDHextendedSimulator object with the given parameters.
 		dhSim = new SigmaDHExtendedSimulator(dlog, t, random);
 		this.dlog = dlog;
@@ -133,8 +101,8 @@ public class SigmaCramerShoupEncryptedValueSimulator implements SigmaSimulator{
 	 * Returns the soundness parameter for this Sigma protocol.
 	 * @return t soundness parameter
 	 */
-	public int getSoundness(){
-		return dhSim.getSoundness();
+	public int getSoundnessParam(){
+		return dhSim.getSoundnessParam();
 	}
 	
 	/**
@@ -145,8 +113,8 @@ public class SigmaCramerShoupEncryptedValueSimulator implements SigmaSimulator{
 	 * @throws CheatAttemptException if the received challenge's length is not equal to the soundness parameter.
 	 * @throws IllegalArgumentException if input is not the expected.
 	 */
-	public SigmaSimulatorOutput simulate(SigmaProtocolInput in, byte[] challenge) throws CheatAttemptException{
-		SigmaDHExtendedInput underlyingInput = checkAndCreateUnderlyingInput(in);
+	public SigmaSimulatorOutput simulate(SigmaCommonInput in, byte[] challenge) throws CheatAttemptException{
+		SigmaDHExtendedCommonInput underlyingInput = checkAndCreateUnderlyingInput(in);
 		
 		//Delegates the computation to the underlying Sigma DHExtended simulator.
 		return dhSim.simulate(underlyingInput, challenge); 
@@ -159,8 +127,8 @@ public class SigmaCramerShoupEncryptedValueSimulator implements SigmaSimulator{
 	 * @return the output of the computation - (a, e, z).
 	 * @throws IllegalArgumentException if input is not the expected.
 	 */
-	public SigmaSimulatorOutput simulate(SigmaProtocolInput in){
-		SigmaDHExtendedInput underlyingInput = checkAndCreateUnderlyingInput(in);
+	public SigmaSimulatorOutput simulate(SigmaCommonInput in){
+		SigmaDHExtendedCommonInput underlyingInput = checkAndCreateUnderlyingInput(in);
 		
 		//Delegates the computation to the underlying Sigma DHExtended simulator.
 		return dhSim.simulate(underlyingInput); 
@@ -169,18 +137,18 @@ public class SigmaCramerShoupEncryptedValueSimulator implements SigmaSimulator{
 
 	/**
 	 * Checks the given input and creates the input for the underlying DH simulator according to it.
-	 * @param in MUST be an instance of SigmaCramerShoupEncryptedValueInput.
+	 * @param in MUST be an instance of SigmaCramerShoupEncryptedValueCommonInput.
 	 * @return SigmaDHExtendedInput the input for the underlying simulator.
 	 * @throws IllegalArgumentException if input is not the expected.
 	 */
-	private SigmaDHExtendedInput checkAndCreateUnderlyingInput(SigmaProtocolInput in) {
+	private SigmaDHExtendedCommonInput checkAndCreateUnderlyingInput(SigmaCommonInput in) {
 		
-		if (!(in instanceof SigmaCramerShoupEncryptedValueInput)){
-			throw new IllegalArgumentException("the given input must be an instance of SigmaCramerShoupEncryptedValueInput");
+		if (!(in instanceof SigmaCramerShoupEncryptedValueCommonInput)){
+			throw new IllegalArgumentException("the given input must be an instance of SigmaCramerShoupEncryptedValueCommonInput");
 		}
 		
 		//Gets the input values.
-		SigmaCramerShoupEncryptedValueInput input = (SigmaCramerShoupEncryptedValueInput) in;
+		SigmaCramerShoupEncryptedValueCommonInput input = (SigmaCramerShoupEncryptedValueCommonInput) in;
 		CramerShoupPublicKey publicKey = input.getPublicKey();
 		CramerShoupOnGroupElementCiphertext cipher = input.getCipher();
 		GroupElement x = input.getX();
@@ -215,7 +183,7 @@ public class SigmaCramerShoupEncryptedValueSimulator implements SigmaSimulator{
 		hArray.add(cipher.getV());			   //add h4 = v.
 		
 		//Create an input object to the underlying sigma DHExtended simulator.
-		SigmaDHExtendedInput underlyingInput = new SigmaDHExtendedInput(gArray, hArray);
+		SigmaDHExtendedCommonInput underlyingInput = new SigmaDHExtendedCommonInput(gArray, hArray);
 		return underlyingInput;
 	}
 	
