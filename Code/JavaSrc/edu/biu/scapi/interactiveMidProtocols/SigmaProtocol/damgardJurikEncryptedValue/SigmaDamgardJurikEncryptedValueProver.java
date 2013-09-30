@@ -28,12 +28,13 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 
 import edu.biu.scapi.exceptions.CheatAttemptException;
+import edu.biu.scapi.generals.ScapiDefaultConfiguration;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.DJBasedSigma;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaProverComputation;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaSimulator;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.damgardJurikEncryptedZero.SigmaDJEncryptedZeroProverInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.damgardJurikEncryptedZero.SigmaDamgardJurikEncryptedZeroProver;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProverInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.DamgardJurikPublicKey;
 import edu.biu.scapi.midLayer.ciphertext.BigIntegerCiphertext;
@@ -66,37 +67,50 @@ public class SigmaDamgardJurikEncryptedValueProver implements SigmaProverComputa
 	 */
 	public SigmaDamgardJurikEncryptedValueProver(int t, int lengthParameter, SecureRandom random) {
 		
-		//Creates the underlying sigmaDamgardJurik object with the given parameters.
-		sigmaDamgardJurik = new SigmaDamgardJurikEncryptedZeroProver(t, lengthParameter, random);
-		this.lengthParameter = lengthParameter;
+		doConstruct(t, lengthParameter, random);
 	}
 	
 	/**
 	 * Default constructor that chooses default values for the parameters.
 	 */
 	public SigmaDamgardJurikEncryptedValueProver() {
-		lengthParameter = 1;
-		//Creates the underlying sigmaDamgardJurik object with default parameters.
-		sigmaDamgardJurik = new SigmaDamgardJurikEncryptedZeroProver(80, lengthParameter, new SecureRandom());
 		
+		//read the default statistical parameter used in sigma protocols from a configuration file.
+		String statisticalParameter = ScapiDefaultConfiguration.getInstance().getProperty("StatisticalParameter");
+		int t = Integer.parseInt(statisticalParameter);
+				
+		doConstruct(t, 1, new SecureRandom());
+		
+	}
+	
+	/**
+	 * Sets the given parameters.
+	 * @param t Soundness parameter in BITS.
+	 * @param lengthParameter length parameter in BITS.
+	 * @param random
+	 */
+	private void doConstruct(int t, int lengthParameter, SecureRandom random){
+		//Creates the underlying sigmaDamgardJurik object with the given parameters.
+		sigmaDamgardJurik = new SigmaDamgardJurikEncryptedZeroProver(t, lengthParameter, random);
+		this.lengthParameter = lengthParameter;
 	}
 
 	/**
 	 * Returns the soundness parameter for this Sigma protocol.
 	 * @return t soundness parameter
 	 */
-	public int getSoundness(){
+	public int getSoundnessParam(){
 		//Delegates the computation to the underlying sigmaDamgardJurik prover.
-		return sigmaDamgardJurik.getSoundness();
+		return sigmaDamgardJurik.getSoundnessParam();
 	}
-	
+
 	/**
-	 * Converts the input to the underlying object input.
+	 * Computes the first message of the protocol.
 	 * @param input MUST be an instance of SigmaDJEncryptedValueProverInput.
+	 * @return the computed message
 	 * @throws IllegalArgumentException if input is not an instance of SigmaDJEncryptedValueProverInput.
 	 */
-	public void setInput(SigmaProtocolInput in) {
-		
+	public SigmaProtocolMsg computeFirstMsg(SigmaProverInput in) {
 		/*
 		 * Converts the input (n, c, x, r) to (n, c', r) where c’ = c*(1+n)^(-x) mod N'.
 		 */
@@ -106,9 +120,10 @@ public class SigmaDamgardJurikEncryptedValueProver implements SigmaProverComputa
 		SigmaDJEncryptedValueProverInput input = (SigmaDJEncryptedValueProverInput) in;
 		
 		//Get public key, cipher and plaintext.
-		DamgardJurikPublicKey pubKey = input.getPublicKey();
-		BigIntegerPlainText plaintext = input.getPlaintext();
-		BigIntegerCiphertext cipher = input.getCiphertext();
+		SigmaDJEncryptedValueCommonInput params = input.getCommonParams();
+		DamgardJurikPublicKey pubKey = params.getPublicKey();
+		BigIntegerPlainText plaintext = params.getPlaintext();
+		BigIntegerCiphertext cipher = params.getCiphertext();
 		
 		//Convert the cipher c to c' = c*(1+n)^(-x)
 		BigInteger n = pubKey.getModulus();
@@ -127,25 +142,9 @@ public class SigmaDamgardJurikEncryptedValueProver implements SigmaProverComputa
 		
 		//Create an input object to the underlying sigmaDamgardJurik prover.
 		SigmaDJEncryptedZeroProverInput underlyingInput = new SigmaDJEncryptedZeroProverInput(pubKey, cipherTag, input.getR());
-		sigmaDamgardJurik.setInput(underlyingInput);
 		
-	}
-
-	/**
-	 * Samples random value r in Zq.
-	 */
-	public void sampleRandomValues() {
-		//Delegates to the underlying sigmaDamgardJurik prover.
-		sigmaDamgardJurik.sampleRandomValues();
-	}
-
-	/**
-	 * Computes the first message of the protocol.
-	 * @return the computed message
-	 */
-	public SigmaProtocolMsg computeFirstMsg() {
 		//Delegates the computation to the underlying sigmaDamgardJurik prover.
-		return sigmaDamgardJurik.computeFirstMsg();
+		return sigmaDamgardJurik.computeFirstMsg(underlyingInput);
 	}
 
 	/**
