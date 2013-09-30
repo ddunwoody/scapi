@@ -27,7 +27,7 @@ package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol;
 import java.io.IOException;
 
 import edu.biu.scapi.exceptions.CheatAttemptException;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProverInput;
 
 /**
  * General interface for Sigma Protocol prover. Every class that implements it is signed as Sigma Protocol prover.
@@ -43,27 +43,23 @@ import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocol
 public interface SigmaProtocolProver {
 	
 	/**
-	 * Sets the input for this Sigma protocol.
-	 * @param input
-	 */
-	public void setInput(SigmaProtocolInput input);
-	
-	/**
 	 * Runs the proof of this protocol. 
 	 * This function executes the proof at once by calling the following functions one by one.
 	 * This function can be called when a user does not want to save time by doing operations in parallel.
+	 * @param input
 	 * @throws CheatAttemptException if the received challenge's length is not equal to the soundness parameter.
 	 * @throws IOException if failed to send or receive a message.
 	 * @throws ClassNotFoundException
 	 */
-	public void prove() throws CheatAttemptException, IOException, ClassNotFoundException;
+	public void prove(SigmaProverInput input) throws CheatAttemptException, IOException, ClassNotFoundException;
 	
 	/**
 	 * Processes the first step of the sigma protocol.
 	 * It computes the first message and sends it to the verifier.
+	 * @param input
 	 * @throws IOException if failed to send the message.
 	 */
-	public void processFirstMsg() throws IOException;
+	public void processFirstMsg(SigmaProverInput input) throws IOException;
 	
 	/**
 	 * Processes the second step of the sigma protocol.
