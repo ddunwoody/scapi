@@ -26,7 +26,7 @@ package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol;
 
 import java.io.IOException;
 
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 
 
 /**
@@ -41,27 +41,40 @@ import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocol
  *
  */
 public interface SigmaProtocolVerifier {
-
-	/**
-	 * Sets the input for this Sigma protocol.
-	 * @param input
-	 */
-	public void setInput(SigmaProtocolInput input);
 	
 	/**
 	 * Runs the verification of this protocol. 
 	 * This function executes the verification protocol at once by calling the following functions one by one.
 	 * This function can be called when a user does not want to save time by doing operations in parallel.
+	 * @param input
 	 * @return true if the proof has been verified; false, otherwise.
 	 * @throws IOException if failed to send or receive a message.
 	 * @throws ClassNotFoundException 
 	 */
-	public boolean verify() throws ClassNotFoundException, IOException;
+	public boolean verify(SigmaCommonInput input) throws ClassNotFoundException, IOException;
 	
 	/**
 	 * Samples the challenge for this protocol.
 	 */
 	public void sampleChallenge();
+	
+	/**
+	 * Waits for the prover's first message and then sends the chosen challenge to the prover.
+	 * This is a blocking function!
+	 * @throws IOException if failed to send or receive a message.
+	 * @throws ClassNotFoundException 
+	 */
+	public void sendChallenge() throws IOException, ClassNotFoundException;
+	
+	/**
+	 * Waits to the prover's second message and then verifies the proof.	
+	 * This is a blocking function!
+	 * @param input
+	 * @return true if the proof has been verified; false, otherwise.
+	 * @throws IOException if failed to receive a message.
+	 * @throws ClassNotFoundException 
+	 */
+	public boolean processVerify(SigmaCommonInput input) throws ClassNotFoundException, IOException;
 	
 	/**
 	 * Sets the given challenge.
@@ -74,22 +87,4 @@ public interface SigmaProtocolVerifier {
 	 * @return the challenge.
 	 */
 	public byte[] getChallenge();
-	
-	/**
-	 * Waits for the prover's first message and then sends the chosen challenge to the prover.
-	 * This is a blocking function!
-	 * @throws IOException if failed to send or receive a message.
-	 * @throws ClassNotFoundException 
-	 */
-	public void sendChallenge() throws IOException, ClassNotFoundException;
-	
-	
-	/**
-	 * Waits to the prover's second message and then verifies the proof.	
-	 * This is a blocking function!
-	 * @return true if the proof has been verified; false, otherwise.
-	 * @throws IOException if failed to receive a message.
-	 * @throws ClassNotFoundException 
-	 */
-	public boolean processVerify() throws ClassNotFoundException, IOException;
 }
