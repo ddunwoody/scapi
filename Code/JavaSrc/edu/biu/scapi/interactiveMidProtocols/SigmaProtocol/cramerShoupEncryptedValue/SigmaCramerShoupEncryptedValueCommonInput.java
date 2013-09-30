@@ -24,26 +24,31 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.cramerShoupEncryptedValue;
 
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.CramerShoupPublicKey;
 import edu.biu.scapi.midLayer.ciphertext.CramerShoupOnGroupElementCiphertext;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**
- * Concrete implementation of SigmaProtocol input, used by the SigmaCramerShoupEncryptedValueVerifier.<p>
- * In SigmaCramerShoupEncryptedValue protocol, the verifier gets a GroupElement x, an CramerShoup public key 
- * and the ciphertext of x using the CramerShoup encryption scheme.
+ * Concrete implementation of SigmaProtocol input, used by the SigmaCramerShoupEncryptedValue verifier and simulator.
  * 
+ * In SigmaCramerShoupEncryptedValue protocol, the common input contains a GroupElement x, a CramerShoup public key
+ * and the ciphertext of x using the CramerShoup encryption scheme.
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaCramerShoupEncryptedValueInput implements SigmaProtocolInput{
+public class SigmaCramerShoupEncryptedValueCommonInput implements SigmaCommonInput{
+	
+	private static final long serialVersionUID = 6613096710529810429L;
 	
 	private GroupElement x;
 	private CramerShoupPublicKey publicKey;
 	private CramerShoupOnGroupElementCiphertext cipher;
 	
-	public SigmaCramerShoupEncryptedValueInput(CramerShoupOnGroupElementCiphertext cipher, CramerShoupPublicKey publicKey, GroupElement x){
+	public SigmaCramerShoupEncryptedValueCommonInput(CramerShoupOnGroupElementCiphertext cipher, CramerShoupPublicKey publicKey, GroupElement x){
 		this.cipher = cipher;
 		this.publicKey = publicKey;
 		this.x = x;
@@ -59,6 +64,13 @@ public class SigmaCramerShoupEncryptedValueInput implements SigmaProtocolInput{
 
 	public CramerShoupOnGroupElementCiphertext getCipher() {
 		return cipher;
-	}
-
+	} 
+	
+	private void writeObject(ObjectOutputStream out) throws IOException {  
+        
+        out.writeObject(x.generateSendableData());  
+        out.writeObject(publicKey.generateSendableData());
+        out.writeObject(cipher.generateSendableData());
+    }  
 }
+
