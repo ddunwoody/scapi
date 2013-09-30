@@ -28,7 +28,7 @@ import java.io.IOException;
 import java.io.Serializable;
 
 import edu.biu.scapi.comm.Channel;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
 
 /**
@@ -68,29 +68,21 @@ public class SigmaVerifier implements SigmaProtocolVerifier{
 	}
 	
 	/**
-	 * Sets the input for this Sigma protocol.
-	 * @param input
-	 */
-	public void setInput(SigmaProtocolInput input){
-		//Delegates to the underlying verifierComputation object.
-		verifierComputation.setInput(input);
-	}
-	
-	/**
 	 * Runs the verification of this protocol. 
 	 * This function executes the verification protocol at once by calling the following functions one by one.
 	 * This function can be called when a user does not want to save time by doing operations in parallel.
+	 * @param input
 	 * @return true if the proof has been verified; false, otherwise.
 	 * @throws IOException if failed to send or receive a message.
 	 * @throws ClassNotFoundException
 	 */
-	public boolean verify() throws ClassNotFoundException, IOException{
+	public boolean verify(SigmaCommonInput input) throws ClassNotFoundException, IOException{
 		//Samples the challenge.
 		sampleChallenge();
 		//Sends the challenge.
 		sendChallenge();
 		//Verifies the proof.
-		return processVerify();
+		return processVerify(input);
 	}
 	
 	/**
@@ -151,11 +143,12 @@ public class SigmaVerifier implements SigmaProtocolVerifier{
 	 * 	"RECEIVE second message from the prover
 	 * 	 VERIFY proof".	
 	 * This is a blocking function!
+	 * @param input
 	 * @return true if the proof has been verified; false, otherwise.
 	 * @throws IOException if failed to receive a message.
 	 * @throws ClassNotFoundException
 	 */
-	public boolean processVerify() throws ClassNotFoundException, IOException{
+	public boolean processVerify(SigmaCommonInput input) throws ClassNotFoundException, IOException{
 		if (!doneChallenge){
 			throw new IllegalStateException("sampleChallenge and sendChallenge should be called before processVerify");
 		}
@@ -163,7 +156,7 @@ public class SigmaVerifier implements SigmaProtocolVerifier{
 		//Wait for second message from the prover.
 		SigmaProtocolMsg z = receiveMsgFromProver();
 		//Verify the proof
-		boolean verified = verifierComputation.verify(a,z);
+		boolean verified = verifierComputation.verify(input, a, z);
 		
 		//Save the state of the protocol.
 		doneChallenge = false;
