@@ -26,6 +26,7 @@ package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.damgardJurikEncrypte
 
 import java.math.BigInteger;
 
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProverInput;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.DamgardJurikPrivateKey;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.DamgardJurikPublicKey;
 import edu.biu.scapi.midLayer.ciphertext.BigIntegerCiphertext;
@@ -37,13 +38,14 @@ import edu.biu.scapi.midLayer.ciphertext.BigIntegerCiphertext;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaDJEncryptedZeroProverInput extends SigmaDJEncryptedZeroInput{
+public class SigmaDJEncryptedZeroProverInput implements SigmaProverInput{
 	
+	private SigmaDJEncryptedZeroCommonInput params;
 	private BigInteger r; //randomness used to encrypt.
 	
 	
 	public SigmaDJEncryptedZeroProverInput(DamgardJurikPublicKey publicKey, BigIntegerCiphertext cipher, BigInteger r){
-		super(publicKey, cipher);
+		params = new SigmaDJEncryptedZeroCommonInput(publicKey, cipher);
 		this.r = r;
 	}
 	
@@ -57,7 +59,7 @@ public class SigmaDJEncryptedZeroProverInput extends SigmaDJEncryptedZeroInput{
 	 * @param privateKey
 	 */
 	public SigmaDJEncryptedZeroProverInput(DamgardJurikPublicKey publicKey, BigIntegerCiphertext cipher, DamgardJurikPrivateKey privateKey){
-		super(publicKey, cipher);
+		params = new SigmaDJEncryptedZeroCommonInput(publicKey, cipher);
 		
 		//Calculate r from the given private key.
 		BigInteger p = privateKey.getP();
@@ -76,5 +78,10 @@ public class SigmaDJEncryptedZeroProverInput extends SigmaDJEncryptedZeroInput{
 	public BigInteger getR(){
 		return r;
 	}
+
+	@Override
+	public SigmaDJEncryptedZeroCommonInput getCommonParams() {
+		return params;
+	} 
 
 }
