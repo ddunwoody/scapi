@@ -25,7 +25,7 @@
 package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol;
 
 import edu.biu.scapi.exceptions.CheatAttemptException;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProverInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
 
 /**
@@ -38,32 +38,22 @@ import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocol
 public interface SigmaProverComputation {
 	
 	/**
-	 * Returns the soundness parameter for this Sigma protocol.
-	 * @return t soundness parameter
-	 */
-	public int getSoundness();
-	
-	/**
-	 * Sets the input for this Sigma protocol.
+	 * Computes the first message of the sigma protocol.
 	 * @param input
 	 */
-	public void setInput(SigmaProtocolInput input);
-	
-	/**
-	 * Samples random values used in the concrete sigma protocol.
-	 */
-	public void sampleRandomValues();
-	
-	/**
-	 * Computes the first message of the sigma protocol.
-	 */
-	public SigmaProtocolMsg computeFirstMsg();
+	public SigmaProtocolMsg computeFirstMsg(SigmaProverInput input);
 	
 	/**
 	 * Computes the second message of the sigma protocol.
 	 * @throws CheatAttemptException if the received challenge's length is not equal to the soundness parameter.
 	 */
 	public SigmaProtocolMsg computeSecondMsg(byte[] challenge) throws CheatAttemptException;
+	
+	/**
+	 * Returns the soundness parameter for this Sigma protocol.
+	 * @return t soundness parameter
+	 */
+	public int getSoundnessParam();
 	
 	/**
 	 * Returns the simulator that matches this sigma protocol prover.
