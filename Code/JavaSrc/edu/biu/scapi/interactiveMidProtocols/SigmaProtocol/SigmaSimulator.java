@@ -25,7 +25,7 @@
 package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol;
 
 import edu.biu.scapi.exceptions.CheatAttemptException;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaSimulatorOutput;
 
 /**
@@ -46,18 +46,18 @@ public interface SigmaSimulator {
 	 * @return the output of the computation - (a, e, z).
 	 * @throws CheatAttemptException if the received challenge's length is not equal to the soundness parameter.
 	 */
-	public SigmaSimulatorOutput simulate(SigmaProtocolInput input, byte[] challenge) throws CheatAttemptException;
+	public SigmaSimulatorOutput simulate(SigmaCommonInput input, byte[] challenge) throws CheatAttemptException;
 	
 	/**
 	 * Chooses random challenge and computes the simulator computation.
 	 * @param input
 	 * @return the output of the computation - (a, e, z).
 	 */
-	public SigmaSimulatorOutput simulate(SigmaProtocolInput input);
+	public SigmaSimulatorOutput simulate(SigmaCommonInput input);
 
 	/**
 	 * Returns the soundness parameter for this Sigma simulator.
 	 * @return t soundness parameter
 	 */
-	public int getSoundness();
+	public int getSoundnessParam();
 }
