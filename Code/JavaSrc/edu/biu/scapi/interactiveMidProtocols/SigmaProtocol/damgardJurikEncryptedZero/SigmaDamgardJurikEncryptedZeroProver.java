@@ -30,11 +30,12 @@ import java.security.SecureRandom;
 import org.bouncycastle.util.BigIntegers;
 
 import edu.biu.scapi.exceptions.CheatAttemptException;
+import edu.biu.scapi.generals.ScapiDefaultConfiguration;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.DJBasedSigma;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaProverComputation;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaSimulator;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaBIMsg;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProverInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
 
 /**
@@ -70,45 +71,39 @@ public class SigmaDamgardJurikEncryptedZeroProver implements SigmaProverComputat
 	 */
 	public SigmaDamgardJurikEncryptedZeroProver(int t, int lengthParameter, SecureRandom random) {
 		
-		this.t = t;
-		this.lengthParameter = lengthParameter;
-		this.random = random;
+		doConstruct(t, lengthParameter, random);
 	}
 	
 	/**
 	 * Default constructor that chooses default values for the parameters.
 	 */
 	public SigmaDamgardJurikEncryptedZeroProver() {
-		this(80, 1, new SecureRandom());
+		//read the default statistical parameter used in sigma protocols from a configuration file.
+		String statisticalParameter = ScapiDefaultConfiguration.getInstance().getProperty("StatisticalParameter");
+		int t = Integer.parseInt(statisticalParameter);
+		
+		doConstruct(t, 1, new SecureRandom());
+	}
+	
+	/**
+	 * Sets the given parameters.
+	 * @param t Soundness parameter in BITS.
+	 * @param lengthParameter length parameter in BITS.
+	 * @param random
+	 */
+	private void doConstruct(int t, int lengthParameter, SecureRandom random){
+		
+		this.t = t;
+		this.lengthParameter = lengthParameter;
+		this.random = random;
 	}
 	
 	/**
 	 * Returns the soundness parameter for this Sigma protocol.
 	 * @return t soundness parameter
 	 */
-	public int getSoundness(){
+	public int getSoundnessParam(){
 		return t;
-	}
-	
-	/**
-	 * Sets the input for this Sigma protocol
-	 * @param input MUST be an instance of SigmaDJEncryptedZeroProverInput.
-	 * @throws IllegalArgumentException if input is not an instance of SigmaDJEncryptedZeroProverInput.
-	 */
-	public void setInput(SigmaProtocolInput input) {
-		if (!(input instanceof SigmaDJEncryptedZeroProverInput)){
-			throw new IllegalArgumentException("the given input must be an instance of SigmaDJEncryptedZeroProverInput");
-		}
-		
-		BigInteger modulus = ((SigmaDJEncryptedZeroInput) input).getPublicKey().getModulus();
-		//Check the soundness validity.
-		if (!checkSoundness(modulus)){
-			throw new IllegalArgumentException("t must be less than a third of the length of the public key n");
-		}
-		
-		this.input = (SigmaDJEncryptedZeroProverInput) input;
-		n = modulus;
-		
 	}
 	
 	/**
@@ -116,7 +111,7 @@ public class SigmaDamgardJurikEncryptedZeroProver implements SigmaProverComputat
 	 * t must be less than a third of the length of the public key n.
 	 * @return true if the soundness parameter is valid; false, otherwise.
 	 */
-	private boolean checkSoundness(BigInteger modulus){
+	private boolean checkSoundnessParam(BigInteger modulus){
 		//If soundness parameter is not less than a third of the publicKey n, return false.
 		int third = modulus.bitLength() / 3;
 		if (t >= third){
@@ -125,20 +120,32 @@ public class SigmaDamgardJurikEncryptedZeroProver implements SigmaProverComputat
 		return true;
 	}
 	
-	/**
-	 * Computes the following line from the protocol:
-	 * "SAMPLE random value s <- Z*n "
-	 */
-	public void sampleRandomValues() {
-		s = BigIntegers.createRandomInRange(BigInteger.ONE, n.subtract(BigInteger.ONE), random);
-	}
+	
 
 	/**
 	 * Computes the following line from the protocol:
-	 * "COMPUTE a = s^N mod N’". 
+	 * "SAMPLE random value s <- Z*n
+	 * COMPUTE a = s^N mod N’". 
+	 * @param input MUST be an instance of SigmaDJEncryptedZeroProverInput.
 	 * @return the computed message
+	 * @throws IllegalArgumentException if input is not an instance of SigmaDJEncryptedZeroProverInput.
 	 */
-	public SigmaProtocolMsg computeFirstMsg() {
+	public SigmaProtocolMsg computeFirstMsg(SigmaProverInput input) {
+		if (!(input instanceof SigmaDJEncryptedZeroProverInput)){
+			throw new IllegalArgumentException("the given input must be an instance of SigmaDJEncryptedZeroProverInput");
+		}
+		
+		BigInteger modulus = ((SigmaDJEncryptedZeroProverInput) input).getCommonParams().getPublicKey().getModulus();
+		//Check the soundness validity.
+		if (!checkSoundnessParam(modulus)){
+			throw new IllegalArgumentException("t must be less than a third of the length of the public key n");
+		}
+		
+		this.input = (SigmaDJEncryptedZeroProverInput) input;
+		n = modulus;
+		
+		//Sample s in Z*n
+		s = BigIntegers.createRandomInRange(BigInteger.ONE, n.subtract(BigInteger.ONE), random);
 		
 		//Calculate N = n^s and N' = n^(s+1)
 		BigInteger N = n.pow(lengthParameter);
