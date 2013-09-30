@@ -24,7 +24,6 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.cramerShoupEncryptedValue;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -35,16 +34,13 @@ import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaProverComputatio
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaSimulator;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dhExtended.SigmaDHExtendedProver;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dhExtended.SigmaDHExtendedProverInput;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProverInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.CramerShoupPublicKey;
 import edu.biu.scapi.midLayer.ciphertext.CramerShoupOnGroupElementCiphertext;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
-import edu.biu.scapi.primitives.dlog.cryptopp.CryptoPpDlogZpSafePrime;
-import edu.biu.scapi.primitives.dlog.miracl.MiraclDlogECF2m;
 import edu.biu.scapi.primitives.hash.CryptographicHash;
-import edu.biu.scapi.primitives.hash.cryptopp.CryptoPpSHA1;
 
 /**
  * Concrete implementation of Sigma Protocol prover computation. <p>
@@ -80,34 +76,6 @@ public class SigmaCramerShoupEncryptedValueProver implements SigmaProverComputat
 	 */
 	public SigmaCramerShoupEncryptedValueProver(DlogGroup dlog, CryptographicHash hash, int t, SecureRandom random) {
 		
-		setParameters(dlog, hash, t, random);
-	}
-	
-	/**
-	 * Default constructor that chooses default values for the parameters.
-	 */
-	public SigmaCramerShoupEncryptedValueProver() {
-	
-		DlogGroup dlogTemp;
-		try {
-			//Create Miracl Koblitz 233 Elliptic curve.
-			dlogTemp = new MiraclDlogECF2m("K-233");
-		} catch (IOException e) {
-			//If there is a problem with the elliptic curves file, create Zp DlogGroup.
-			dlogTemp = new CryptoPpDlogZpSafePrime();
-		}
-		
-		setParameters(dlogTemp, new CryptoPpSHA1(), 80, new SecureRandom());
-	}
-	
-	/**
-	 * Sets the given parameters.
-	 * @param dlog DlogGroup used in CramerShoup encryption scheme.
-	 * @param hash CryptographicHash used in CramerShoup encryption scheme.
-	 * @param t Soundness parameter in BITS.
-	 * @param random
-	 */
-	private void setParameters(DlogGroup dlog, CryptographicHash hash, int t, SecureRandom random) {
 		//Creates the underlying SigmaDHExtendedProver object with the given parameters.
 		sigmaDH = new SigmaDHExtendedProver(dlog, t, random);
 		this.dlog = dlog;
@@ -118,26 +86,60 @@ public class SigmaCramerShoupEncryptedValueProver implements SigmaProverComputat
 	 * Returns the soundness parameter for this Sigma protocol.
 	 * @return t soundness parameter
 	 */
-	public int getSoundness(){
+	public int getSoundnessParam(){
 		//Delegates the computation to the underlying Sigma DHExtended prover.
-		return sigmaDH.getSoundness();
+		return sigmaDH.getSoundnessParam();
+	}
+	
+	/**
+	 * Receives three byte arrays and calculates the hash function on their concatenation.
+	 * @param u1ToByteArray
+	 * @param u2ToByteArray
+	 * @param eToByteArray
+	 * @return the result of hash(u1ToByteArray+u2ToByteArray+eToByteArray) as BigInteger.
+	 */
+	private BigInteger calcW(GroupElement u1, GroupElement u2, GroupElement e) {
+		
+		byte[] u1ToByteArray = dlog.mapAnyGroupElementToByteArray(u1);
+		byte[] u2ToByteArray = dlog.mapAnyGroupElementToByteArray(u2);
+		byte[] eToByteArray = dlog.mapAnyGroupElementToByteArray(e);
+		
+		//Concatenates u1, u2 and e into msgToHash.
+		int lengthOfMsgToHash =  u1ToByteArray.length + u2ToByteArray.length + eToByteArray.length;
+		byte[] msgToHash = new byte[lengthOfMsgToHash];
+		System.arraycopy(u1ToByteArray, 0, msgToHash, 0, u1ToByteArray.length);
+		System.arraycopy(u2ToByteArray, 0, msgToHash, u1ToByteArray.length, u2ToByteArray.length);
+		System.arraycopy(eToByteArray, 0, msgToHash, u2ToByteArray.length+u1ToByteArray.length, eToByteArray.length);
+		
+		//Calculates the hash of msgToHash.
+		
+		//Calls the update function in the Hash interface.
+		hash.update(msgToHash, 0, msgToHash.length);
+
+		//Gets the result of hashing the updated input.
+		byte[] alpha = new byte[hash.getHashedMsgSize()];
+		hash.hashFinal(alpha, 0);
+		
+		return new BigInteger(alpha);
 	}
 
 	/**
-	 * Sets the input for this Sigma protocol.
+	 * Computes the first message of the protocol.
 	 * @param input MUST be an instance of SigmaCramerShoupEncryptedValueProverInput.
+	 * @return the computed message
 	 * @throws IllegalArgumentException if input is not the expected.
 	 */
-	public void setInput(SigmaProtocolInput in) {
+	public SigmaProtocolMsg computeFirstMsg(SigmaProverInput in) {
 		if (!(in instanceof SigmaCramerShoupEncryptedValueProverInput)){
 			throw new IllegalArgumentException("the given input must be an instance of SigmaCramerShoupEncryptedValueProverInput");
 		}
 		
 		//Gets the input values.
 		SigmaCramerShoupEncryptedValueProverInput input = (SigmaCramerShoupEncryptedValueProverInput) in;
-		CramerShoupPublicKey publicKey = input.getPublicKey();
-		CramerShoupOnGroupElementCiphertext cipher = input.getCipher();
-		GroupElement x = input.getX();
+		SigmaCramerShoupEncryptedValueCommonInput params = input.getCommonParams();
+		CramerShoupPublicKey publicKey = params.getPublicKey();
+		CramerShoupOnGroupElementCiphertext cipher = params.getCipher();
+		GroupElement x = params.getX();
 		BigInteger r = input.getR();
 		
 		//Prepare the input for the underlying SigmaDHExtendedProver.
@@ -171,57 +173,8 @@ public class SigmaCramerShoupEncryptedValueProver implements SigmaProverComputat
 		
 		//Create an input object to the underlying sigma DHExtended prover.
 		SigmaDHExtendedProverInput underlyingInput = new SigmaDHExtendedProverInput(gArray, hArray, r);
-		sigmaDH.setInput(underlyingInput);
-		
-	}
-	
-	/**
-	 * Receives three byte arrays and calculates the hash function on their concatenation.
-	 * @param u1ToByteArray
-	 * @param u2ToByteArray
-	 * @param eToByteArray
-	 * @return the result of hash(u1ToByteArray+u2ToByteArray+eToByteArray) as BigInteger.
-	 */
-	protected BigInteger calcW(GroupElement u1, GroupElement u2, GroupElement e) {
-		
-		byte[] u1ToByteArray = dlog.mapAnyGroupElementToByteArray(u1);
-		byte[] u2ToByteArray = dlog.mapAnyGroupElementToByteArray(u2);
-		byte[] eToByteArray = dlog.mapAnyGroupElementToByteArray(e);
-		
-		//Concatenates u1, u2 and e into msgToHash.
-		int lengthOfMsgToHash =  u1ToByteArray.length + u2ToByteArray.length + eToByteArray.length;
-		byte[] msgToHash = new byte[lengthOfMsgToHash];
-		System.arraycopy(u1ToByteArray, 0, msgToHash, 0, u1ToByteArray.length);
-		System.arraycopy(u2ToByteArray, 0, msgToHash, u1ToByteArray.length, u2ToByteArray.length);
-		System.arraycopy(eToByteArray, 0, msgToHash, u2ToByteArray.length+u1ToByteArray.length, eToByteArray.length);
-		
-		//Calculates the hash of msgToHash.
-		
-		//Calls the update function in the Hash interface.
-		hash.update(msgToHash, 0, msgToHash.length);
-
-		//Gets the result of hashing the updated input.
-		byte[] alpha = new byte[hash.getHashedMsgSize()];
-		hash.hashFinal(alpha, 0);
-		
-		return new BigInteger(alpha);
-	}
-
-	/**
-	 * Samples random value r in Zq.
-	 */
-	public void sampleRandomValues() {
-		//Delegates to the underlying Sigma DHExtended prover.
-		sigmaDH.sampleRandomValues();
-	}
-
-	/**
-	 * Computes the first message of the protocol.
-	 * @return the computed message
-	 */
-	public SigmaProtocolMsg computeFirstMsg() {
 		//Delegates the computation to the underlying Sigma DHExtended prover.
-		return sigmaDH.computeFirstMsg();
+		return sigmaDH.computeFirstMsg(underlyingInput);
 	}
 
 	/**
