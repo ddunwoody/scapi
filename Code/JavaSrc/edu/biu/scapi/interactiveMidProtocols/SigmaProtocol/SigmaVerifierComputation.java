@@ -24,7 +24,7 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol;
 
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
 
 /**
@@ -37,21 +37,22 @@ import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocol
 public interface SigmaVerifierComputation {
 	
 	/**
-	 * Returns the soundness parameter for this Sigma protocol.
-	 * @return t soundness parameter
-	 */
-	public int getSoundness();
-	
-	/**
-	 * Sets the input for this Sigma protocol.
-	 * @param input
-	 */
-	public void setInput(SigmaProtocolInput input);
-	
-	/**
 	 * Samples the challenge for this protocol.
 	 */
 	public void sampleChallenge();
+	
+	/**
+	 * Verifies the proof.
+	 * @param input	
+	 * @return true if the proof has been verified; false, otherwise.
+	 */
+	public boolean verify(SigmaCommonInput input, SigmaProtocolMsg a, SigmaProtocolMsg z);
+	
+	/**
+	 * Returns the soundness parameter for this Sigma protocol.
+	 * @return t soundness parameter
+	 */
+	public int getSoundnessParam();
 	
 	/**
 	 * Sets the given challenge.
@@ -64,10 +65,4 @@ public interface SigmaVerifierComputation {
 	 * @return the challenge.
 	 */
 	public byte[] getChallenge();
-	
-	/**
-	 * Verifies the proof.	
-	 * @return true if the proof has been verified; false, otherwise.
-	 */
-	public boolean verify(SigmaProtocolMsg a, SigmaProtocolMsg z);
 }
