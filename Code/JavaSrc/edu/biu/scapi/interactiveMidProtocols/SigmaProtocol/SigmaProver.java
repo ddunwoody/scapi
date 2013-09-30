@@ -29,7 +29,7 @@ import java.io.Serializable;
 
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CheatAttemptException;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProverInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
 
 /**
@@ -69,27 +69,19 @@ public class SigmaProver implements SigmaProtocolProver{
 		this.proverComputation = proverComputation;
 		
 	}
-
-	/**
-	 * Sets the input for this Sigma protocol.
-	 * @param input
-	 */
-	public void setInput(SigmaProtocolInput input){
-		//Delegates to the underlying proverComputation.
-		proverComputation.setInput(input);
-	}
 	
 	/**
 	 * Runs the proof of this protocol. 
 	 * This function executes the proof at once by calling the following functions one by one.
 	 * This function can be called when a user does not want to save time by doing operations in parallel.
+	 * @param input
 	 * @throws CheatAttemptException if the received challenge's length is not equal to the soundness parameter.
 	 * @throws IOException if failed to send or receive a message.
 	 * @throws ClassNotFoundException 
 	 */
-	public void prove() throws CheatAttemptException, IOException, ClassNotFoundException{
+	public void prove(SigmaProverInput input) throws CheatAttemptException, IOException, ClassNotFoundException{
 		//Step one of the protocol.
-		processFirstMsg();
+		processFirstMsg(input);
 		
 		//Step two of the protocol.
 		processSecondMsg();
@@ -103,15 +95,10 @@ public class SigmaProver implements SigmaProtocolProver{
 	 * It computes the first message and sends it to the verifier.
 	 * @throws IOException if failed to send the message.
 	 */
-	public void processFirstMsg() throws IOException{
-		/*
-		 * Runs the following lines from the protocol:
-		 * 	
-		 */
-		//Sample random values for the protocol by the underlying proverComputation.
-		proverComputation.sampleRandomValues();
+	public void processFirstMsg(SigmaProverInput input) throws IOException{
+	
 		//Compute the first message by the underlying proverComputation.
-		SigmaProtocolMsg a = proverComputation.computeFirstMsg();
+		SigmaProtocolMsg a = proverComputation.computeFirstMsg(input);
 		//Send the first message.
 		sendMsgToVerifier(a);
 		//save the state of this protocol.
