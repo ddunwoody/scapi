@@ -27,10 +27,11 @@ package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.damgardJurikEncrypte
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
+import edu.biu.scapi.generals.ScapiDefaultConfiguration;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.DJBasedSigma;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaVerifierComputation;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaBIMsg;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
 
 /**
@@ -53,7 +54,6 @@ public class SigmaDamgardJurikEncryptedZeroVerifier implements SigmaVerifierComp
 	private int t; 								// Soundness parameter in BITS.
 	private int lengthParameter;				// Length parameter in BITS.
 	private SecureRandom random;
-	private SigmaDJEncryptedZeroInput input;	// Contains public key n and ciphertext c.
 	private byte[] e;							//The challenge.
 	private BigInteger n;						//The modulus
 	
@@ -65,37 +65,24 @@ public class SigmaDamgardJurikEncryptedZeroVerifier implements SigmaVerifierComp
 	 */
 	public SigmaDamgardJurikEncryptedZeroVerifier(int t, int lengthParameter, SecureRandom random) {
 		
-		this.t = t;
-		this.lengthParameter = lengthParameter;
-		this.random = random;
+		doConstruct(t, lengthParameter, random);
 	}
 	
 	/**
 	 * Default constructor that chooses default values for the parameters.
 	 */
 	public SigmaDamgardJurikEncryptedZeroVerifier() {
-		this(80, 1, new SecureRandom());
+		//read the default statistical parameter used in sigma protocols from a configuration file.
+		String statisticalParameter = ScapiDefaultConfiguration.getInstance().getProperty("StatisticalParameter");
+		int t = Integer.parseInt(statisticalParameter);
+				
+		doConstruct(t, 1, new SecureRandom());
 	}
 	
-	/**
-	 * Sets the input for this Sigma protocol
-	 * @param input MUST be an instance of SigmaDJEncryptedZeroInput.
-	 * @throws IllegalArgumentException if input is not an instance of SigmaDJEncryptedZeroInput.
-	 */
-	public void setInput(SigmaProtocolInput input) {
-		if (!(input instanceof SigmaDJEncryptedZeroInput)){
-			throw new IllegalArgumentException("the given input must be an instance of SigmaDJEncryptedZeroInput");
-		}
-		
-		BigInteger modulus = ((SigmaDJEncryptedZeroInput) input).getPublicKey().getModulus();
-		//Check the soundness validity.
-		if (!checkSoundness(modulus)){
-			throw new IllegalArgumentException("t must be less than a third of the length of the public key n");
-		}
-		
-		this.input = (SigmaDJEncryptedZeroInput) input;
-		n = modulus;
-		
+	private void doConstruct(int t, int lengthParameter, SecureRandom random){
+		this.t = t;
+		this.lengthParameter = lengthParameter;
+		this.random = random;
 	}
 	
 	/**
@@ -103,7 +90,7 @@ public class SigmaDamgardJurikEncryptedZeroVerifier implements SigmaVerifierComp
 	 * t must be less than a third of the length of the public key n.
 	 * @return true if the soundness parameter is valid; false, otherwise.
 	 */
-	public boolean checkSoundness(BigInteger modulus){
+	public boolean checkSoundnessParam(BigInteger modulus){
 		//If soundness parameter is not less than a third of the publicKey n, throw IllegalArgumentException.
 		int third = modulus.bitLength() / 3;
 		if (t >= third){
@@ -116,7 +103,7 @@ public class SigmaDamgardJurikEncryptedZeroVerifier implements SigmaVerifierComp
 	 * Returns the soundness parameter for this Sigma protocol.
 	 * @return t soundness parameter
 	 */
-	public int getSoundness(){
+	public int getSoundnessParam(){
 		return t;
 	}
 	
@@ -150,11 +137,23 @@ public class SigmaDamgardJurikEncryptedZeroVerifier implements SigmaVerifierComp
 	/**
 	 * Computes the following line from the protocol:
 	 * 	"ACC IFF c,a,z are relatively prime to n AND z^N = (a*c^e) mod N’".
+	 * @param input MUST be an instance of SigmaDJEncryptedZeroCommonInput.
 	 * @param z second message from prover
 	 * @return true if the proof has been verified; false, otherwise.
+	 * @throws IllegalArgumentException if input is not an instance of SigmaDJEncryptedZeroCommonInput.
 	 * @throws IllegalArgumentException if the one of the prover's messages are not an instance of SigmaBIMsg
 	 */
-	public boolean verify(SigmaProtocolMsg a, SigmaProtocolMsg z) {
+	public boolean verify(SigmaCommonInput input, SigmaProtocolMsg a, SigmaProtocolMsg z) {
+		if (!(input instanceof SigmaDJEncryptedZeroCommonInput)){
+			throw new IllegalArgumentException("the given input must be an instance of SigmaDJEncryptedZeroCommonInput");
+		}
+		
+		SigmaDJEncryptedZeroCommonInput djInput = (SigmaDJEncryptedZeroCommonInput) input;
+		n = djInput.getPublicKey().getModulus();
+		//Check the soundness validity.
+		if (!checkSoundnessParam(n)){
+			throw new IllegalArgumentException("t must be less than a third of the length of the public key n");
+		}
 		
 		boolean verified = true;
 		
@@ -171,7 +170,7 @@ public class SigmaDamgardJurikEncryptedZeroVerifier implements SigmaVerifierComp
 		//Get the exponent in the second message from the prover.
 		BigInteger aBI = ((SigmaBIMsg) a).getMsg();
 		//Get the cipher value.
-		BigInteger c = input.getCiphertext().getCipher();
+		BigInteger c = djInput.getCiphertext().getCipher();
 		
 		//If a is not relatively prime to n, set verified to false.
 		verified = verified && (aBI.gcd(n).equals(BigInteger.ONE));
