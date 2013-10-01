@@ -26,27 +26,28 @@ package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.orMultiple;
 
 import java.util.ArrayList;
 
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 
 /**
- * Concrete implementation of SigmaProtocol input, used by the SigmaProtocolORMultipleProver/verifier.
- * In SigmaProtocolORMultipleProver/verifier, the prover/verifier gets an array of inputs to all of 
+ * Concrete implementation of SigmaProtocol input, used by the SigmaProtocolORMultiple verifier and simulator.
+ * In SigmaProtocolORMultiple, the common input contains an array of inputs to all of 
  * its underlying objects and k - number of true statements.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaORMultipleInput implements SigmaProtocolInput{
+public class SigmaORMultipleCommonInput implements SigmaCommonInput{
 	
-	private ArrayList<SigmaProtocolInput> sigmaInputs;
+	private static final long serialVersionUID = 8647728161639616389L;
+	private ArrayList<SigmaCommonInput> sigmaInputs;
 	private int k; //number of statements that have a witness.
 	
-	public SigmaORMultipleInput(ArrayList<SigmaProtocolInput> input, int k){
+	public SigmaORMultipleCommonInput(ArrayList<SigmaCommonInput> input, int k){
 		sigmaInputs = input;
 		this.k = k;
 	}
 	
-	public ArrayList<SigmaProtocolInput> getInputs(){
+	public ArrayList<SigmaCommonInput> getInputs(){
 		return sigmaInputs;
 	}
 	
