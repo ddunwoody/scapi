@@ -27,26 +27,33 @@ package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dhExtended;
 import java.math.BigInteger;
 import java.util.ArrayList;
 
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProverInput;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**
  * Concrete implementation of SigmaProtocol input, used by the SigmaDHExtendedProver.
  * In SigmaProtocolDHExtended, the prover gets an extended DH tuple - (g1,…,gm,h1,…,hm) and a value w in Zq such that hi=gi^w for all i.
- * This class derives the SigmaDHExtendedInput that contains g and h arrays.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaDHExtendedProverInput extends SigmaDHExtendedInput{
+public class SigmaDHExtendedProverInput implements SigmaProverInput{
 
+	private SigmaDHExtendedCommonInput params;
 	private BigInteger w;
 	
 	public SigmaDHExtendedProverInput(ArrayList<GroupElement> gArray, ArrayList<GroupElement> hArray, BigInteger w){
-		super(gArray, hArray);
+		params = new SigmaDHExtendedCommonInput(gArray, hArray);
 		this.w = w;
 	}
 	
 	public BigInteger getW(){
 		return w;
 	}
+	
+	@Override
+	public SigmaDHExtendedCommonInput getCommonParams() {
+		
+		return params;
+	}  
 }
