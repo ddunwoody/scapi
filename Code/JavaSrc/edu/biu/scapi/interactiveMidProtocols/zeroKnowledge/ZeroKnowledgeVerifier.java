@@ -43,18 +43,13 @@ import edu.biu.scapi.exceptions.CommitValueException;
 public interface ZeroKnowledgeVerifier {
 
 	/**
-	 * Sets the input for this Zero Knowledge protocol.
-	 * @param input
-	 */
-	public void setInput(ZeroKnowledgeInput input);
-	
-	/**
 	 * Runs the verifier side of the Zero Knowledge proof.
+	 * @param input
 	 * @return true if the proof was verified; false, otherwise.
 	 * @throws IOException if failed to send the message.
 	 * @throws ClassNotFoundException 
 	 * @throws CheatAttemptException 
 	 * @throws CommitValueException 
 	 */
-	public boolean verify() throws  IOException, ClassNotFoundException, CommitValueException, CheatAttemptException;
+	public boolean verify(ZeroKnowledgeCommonInput input) throws  IOException, ClassNotFoundException, CommitValueException, CheatAttemptException;
 }
