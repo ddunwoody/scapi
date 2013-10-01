@@ -26,22 +26,23 @@ package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog;
 
 import java.math.BigInteger;
 
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProverInput;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**
  * Concrete implementation of SigmaProtocol input, used by the SigmaDlogProver.
  * In SigmaProtocolDlog, the prover gets a GroupElement h and a BigInteger w such that g^w = h.
- * This class derives the SigmaDlogInput that contains h.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaDlogProverInput extends SigmaDlogInput{
+public class SigmaDlogProverInput implements SigmaProverInput{
 
+	private SigmaDlogCommonInput params;
 	private BigInteger w;
 	
 	public SigmaDlogProverInput(GroupElement h, BigInteger w) {
-		super(h);
+		params = new SigmaDlogCommonInput(h);
 		this.w = w;
 	}
 	
@@ -49,6 +50,12 @@ public class SigmaDlogProverInput extends SigmaDlogInput{
 		return w;
 	}
 
-	
+	@Override
+	public SigmaDlogCommonInput getCommonParams() {
+		
+		return params;
+	}
+
+	 
 
 }
