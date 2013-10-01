@@ -24,18 +24,17 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility;
 
-import edu.biu.scapi.interactiveMidProtocols.zeroKnowledge.ZeroKnowledgeInput;
+import java.io.Serializable;
+
+import edu.biu.scapi.interactiveMidProtocols.zeroKnowledge.ZeroKnowledgeCommonInput;
 
 /**
- * Every Sigma protocol prover/receiver needs inputs during the protocol execution, but every concrete protocol needs 
- * different inputs.
- * This interface is a marker interface for Sigma protocol input, where there is an implementing class
- * for each concrete Sigma protocol.
+ * Marker interface for common input of Sigma Protocols.
+ * Each Sigma Protocol has a common input for the prover and the verifier, such input  shuold implement this interface. 
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public interface SigmaProtocolInput extends ZeroKnowledgeInput{
-
+public interface SigmaCommonInput extends ZeroKnowledgeCommonInput, Serializable{
 
 }
