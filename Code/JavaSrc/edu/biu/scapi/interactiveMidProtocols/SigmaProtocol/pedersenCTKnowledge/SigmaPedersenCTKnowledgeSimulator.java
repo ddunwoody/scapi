@@ -24,7 +24,6 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.pedersenCTKnowledge;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
@@ -32,13 +31,11 @@ import org.bouncycastle.util.BigIntegers;
 
 import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaSimulator;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaGroupElementMsg;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaSimulatorOutput;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
-import edu.biu.scapi.primitives.dlog.cryptopp.CryptoPpDlogZpSafePrime;
-import edu.biu.scapi.primitives.dlog.miracl.MiraclDlogECF2m;
 
 /**
  * Concrete implementation of Sigma Simulator.
@@ -64,41 +61,16 @@ public class SigmaPedersenCTKnowledgeSimulator implements SigmaSimulator{
 	 * @param dlog
 	 * @param t Soundness parameter in BITS.
 	 * @param random
-	 */
-	public SigmaPedersenCTKnowledgeSimulator(DlogGroup dlog, int t, SecureRandom random) {
-		
-		// Sets the given parameters.
-		setParameters(dlog, t, random);
-	}
-	
-	/**
-	 * Default constructor that chooses default values for the parameters.
-	 */
-	public SigmaPedersenCTKnowledgeSimulator() {
-		try {
-			//Create Miracl Koblitz 233 Elliptic curve and set default parameters.
-			setParameters(new MiraclDlogECF2m("K-233"), 80, new SecureRandom());
-		} catch (IOException e) {
-			//If there is a problem with the elliptic curves file, create Zp DlogGroup.
-			setParameters(new CryptoPpDlogZpSafePrime(), 80, new SecureRandom());
-		}
-	}
-
-	/**
-	 * If soundness parameter is valid, sets the parameters. Else, throw IllegalArgumentException.
-	 * @param dlog
-	 * @param t soundness parameter in BITS
-	 * @param random
 	 * @throws IllegalArgumentException if soundness parameter is invalid.
 	 */
-	private void setParameters(DlogGroup dlog, int t, SecureRandom random) {
+	public SigmaPedersenCTKnowledgeSimulator(DlogGroup dlog, int t, SecureRandom random) {
 		
 		//Sets the parameters.
 		this.dlog = dlog;
 		this.t = t;
 		
 		//Check the soundness validity.
-		if (!checkSoundness()){
+		if (!checkSoundnessParam()){
 			throw new IllegalArgumentException("soundness parameter t does not satisfy 2^t<q");
 		}
 		
@@ -109,7 +81,7 @@ public class SigmaPedersenCTKnowledgeSimulator implements SigmaSimulator{
 	 * Checks the validity of the given soundness parameter.
 	 * @return true if the soundness parameter is valid; false, otherwise.
 	 */
-	private boolean checkSoundness(){
+	private boolean checkSoundnessParam(){
 		//If soundness parameter does not satisfy 2^t<q, return false.
 		BigInteger soundness = new BigInteger("2").pow(t);
 		BigInteger q = dlog.getOrder();
@@ -123,19 +95,19 @@ public class SigmaPedersenCTKnowledgeSimulator implements SigmaSimulator{
 	 * Returns the soundness parameter for this Sigma protocol.
 	 * @return t soundness parameter
 	 */
-	public int getSoundness(){
+	public int getSoundnessParam(){
 		return t;
 	}
 	
 	/**
 	 * Computes the simulator computation.
-	 * @param input MUST be an instance of SigmaPedersenCTKnowledgeInput.
+	 * @param input MUST be an instance of SigmaPedersenCTKnowledgeCommonInput.
 	 * @param challenge
 	 * @return the output of the computation - (a, e, z).
 	 * @throws CheatAttemptException if the received challenge's length is not equal to the soundness parameter.
-	 * @throws IllegalArgumentException if the given input is not an instance of SigmaPedersenCTKnowledgeInput.
+	 * @throws IllegalArgumentException if the given input is not an instance of SigmaPedersenCTKnowledgeCommonInput.
 	 */
-	public SigmaSimulatorOutput simulate(SigmaProtocolInput input, byte[] challenge) throws CheatAttemptException{
+	public SigmaSimulatorOutput simulate(SigmaCommonInput input, byte[] challenge) throws CheatAttemptException{
 		//  SAMPLE random values u, v in Zq  
 		//	COMPUTE a = h^u*g^v*c^(-e) (where –e here means –e mod q)
 		//	OUTPUT (a,e,(u,v))
@@ -146,10 +118,10 @@ public class SigmaPedersenCTKnowledgeSimulator implements SigmaSimulator{
 			throw new CheatAttemptException("the length of the given challenge is differ from the soundness parameter");
 		}
 		
-		if (!(input instanceof SigmaPedersenCTKnowledgeInput)){
-			throw new IllegalArgumentException("the given input must be an instance of SigmaPedersenCTKnowledgeInput");
+		if (!(input instanceof SigmaPedersenCTKnowledgeCommonInput)){
+			throw new IllegalArgumentException("the given input must be an instance of SigmaPedersenCTKnowledgeCommonInput");
 		}
-		SigmaPedersenCTKnowledgeInput pedersenInput = (SigmaPedersenCTKnowledgeInput) input;
+		SigmaPedersenCTKnowledgeCommonInput params = (SigmaPedersenCTKnowledgeCommonInput) input;
 		
 		//SAMPLE a random u, v <- Zq
 		BigInteger qMinusOne = dlog.getOrder().subtract(BigInteger.ONE);
@@ -158,13 +130,13 @@ public class SigmaPedersenCTKnowledgeSimulator implements SigmaSimulator{
 		
 		//COMPUTE a = h^u*g^v*c^(-e) (where –e here means –e mod q)
 		//Compute h^u
-		GroupElement hToU = dlog.exponentiate(pedersenInput.getH(), u);
+		GroupElement hToU = dlog.exponentiate(params.getH(), u);
 		//Compute g^v
 		GroupElement gToV = dlog.exponentiate(dlog.getGenerator(), v);
 		//Compute c^(-e) 
 		BigInteger e = new BigInteger(1, challenge);
 		BigInteger minusE = dlog.getOrder().subtract(e);
-		GroupElement c = dlog.reconstructElement(true, pedersenInput.getCommitment().getC());
+		GroupElement c = dlog.reconstructElement(true, params.getCommitment().getC());
 		GroupElement cToE = dlog.exponentiate(c, minusE);
 		GroupElement a = dlog.multiplyGroupElements(hToU, gToV);
 		a = dlog.multiplyGroupElements(a, cToE);
@@ -182,7 +154,7 @@ public class SigmaPedersenCTKnowledgeSimulator implements SigmaSimulator{
 	 * @return the output of the computation - (a, e, z).
 	 * @throws IllegalArgumentException if the given input is not an instance of SigmaPedersenCTKnowledgeInput.
 	 */
-	public SigmaSimulatorOutput simulate(SigmaProtocolInput input){
+	public SigmaSimulatorOutput simulate(SigmaCommonInput input){
 		//Create a new byte array of size t/8, to get the required byte size.
 		byte[] e = new byte[t/8];
 		//Fill the byte array with random values.
