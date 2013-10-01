@@ -31,12 +31,13 @@ import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.exceptions.CommitValueException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaProverComputation;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProverInput;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTReceiver;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.OnBigIntegerCommitmentScheme;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.OnByteArrayCommitmentScheme;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.ReceiverCommitPhaseOutput;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.PedersenCTReceiver;
 import edu.biu.scapi.securityLevel.PerfectlyHidingCT;
 
@@ -90,19 +91,6 @@ public class ZKFromSigmaProver implements ZeroKnowledgeProver{
 	}
 	
 	/**
-	 * Sets the input for this Zero Knowledge protocol.
-	 * @param input must be an instance of SigmaProtocolInput.
-	 * @throws IllegalArgumentException if the given input is not an instance of SigmaProtocolInput
-	 */
-	public void setInput(ZeroKnowledgeInput input){
-		//The given input must be an instance of SigmaProtocolInput.
-		if (!(input instanceof SigmaProtocolInput)){
-			throw new IllegalArgumentException("the given input must be an instance of SigmaProtocolInput");
-		}
-		sProver.setInput((SigmaProtocolInput) input);
-	}
-	
-	/**
 	 * Runs the prover side of the Zero Knowledge proof.
 	 * Let (a,e,z) denote the prover1, verifier challenge and prover2 messages of the sigma protocol.
 	 * This function computes the following calculations:
@@ -117,20 +105,27 @@ public class ZKFromSigmaProver implements ZeroKnowledgeProver{
      *      		OUTPUT nothing
 	 *			ELSE (IF COMMIT.decommit returns INVALID)
      *      		OUTPUT ERROR (CHEAT_ATTEMPT_BY_V)
+     * @param input must be an instance of SigmaProverInput.
+     * @throws IllegalArgumentException if the given input is not an instance of SigmaProverInput
 	 * @throws IOException if failed to send the message.
 	 * @throws CheatAttemptException if the challenge's length is not as expected. 
 	 * @throws ClassNotFoundException 
 	 * @throws CommitValueException 
 	 */
-	public void prove() throws IOException, CheatAttemptException, ClassNotFoundException, CommitValueException {
+	public void prove(ZeroKnowledgeProverInput input) throws IOException, CheatAttemptException, ClassNotFoundException, CommitValueException {
+		//The given input must be an instance of SigmaProtocolInput.
+		if (!(input instanceof SigmaProverInput)){
+			throw new IllegalArgumentException("the given input must be an instance of SigmaProverInput");
+		}
+				
 		//Run the receiver in COMMIT.commit 
-		commit();
+		ReceiverCommitPhaseOutput output = receiveCommit();
 		//Compute the first message a in sigma, using (x,w) as input and 
 		//Send a to V
-		processFirstMsg();
+		processFirstMsg((SigmaProverInput) input);
 		//Run the receiver in COMMIT.decommit 
 		//If decommit returns INVALID output ERROR (CHEAT_ATTEMPT_BY_V)
-		byte[] e = decommit();
+		byte[] e = receiveDecommit(output.getCommitmentId());
 		//IF decommit returns some e, compute the response z to (a,e) according to sigma, 
 	    //Send z to V and output nothing
 		processSecondMsg(e);
@@ -142,23 +137,22 @@ public class ZKFromSigmaProver implements ZeroKnowledgeProver{
 	 * @throws IOException 
 	 * @throws ClassNotFoundException 
 	 */
-	private void commit() throws IOException, ClassNotFoundException{
+	private ReceiverCommitPhaseOutput receiveCommit() throws IOException, ClassNotFoundException{
 		receiver.preProcess();
-		receiver.receiveCommitment();
+		return receiver.receiveCommitment();
 	}
 
 	/**
 	 * Processes the first message of the Zero Knowledge protocol:
 	 *  "COMPUTE the first message a in sigma, using (x,w) as input
 	 *	SEND a to V".
+	 * @param input 
 	 * @throws IOException if failed to send the message.
 	 */
-	private void processFirstMsg() throws IOException{
+	private void processFirstMsg(SigmaProverInput input) throws IOException{
 		
-		//Sample random values for the protocol by the underlying proverComputation.
-		sProver.sampleRandomValues();
 		//Compute the first message by the underlying proverComputation.
-		SigmaProtocolMsg a = sProver.computeFirstMsg();
+		SigmaProtocolMsg a = sProver.computeFirstMsg(input);
 		//Send the first message.
 		sendMsgToVerifier(a);
 		
@@ -167,6 +161,7 @@ public class ZKFromSigmaProver implements ZeroKnowledgeProver{
 	/**
 	 * Runs the receiver in COMMIT.decommit
 	 * If decommit returns INVALID output ERROR (CHEAT_ATTEMPT_BY_V)
+	 * @param l 
 	 * @param ctOutput
 	 * @return
 	 * @throws IOException 
@@ -174,8 +169,8 @@ public class ZKFromSigmaProver implements ZeroKnowledgeProver{
 	 * @throws ClassNotFoundException 
 	 * @throws CommitValueException 
 	 */
-	private byte[] decommit() throws IOException, CheatAttemptException, ClassNotFoundException, CommitValueException{
-		CommitValue val = receiver.receiveDecommitment(0);
+	private byte[] receiveDecommit(long id) throws IOException, CheatAttemptException, ClassNotFoundException, CommitValueException{
+		CommitValue val = receiver.receiveDecommitment(id);
 		if (val == null){
 			throw new CheatAttemptException("Decommit phase returned invalid");
 		}
