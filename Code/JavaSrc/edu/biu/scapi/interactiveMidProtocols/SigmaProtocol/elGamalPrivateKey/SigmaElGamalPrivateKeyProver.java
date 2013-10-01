@@ -32,7 +32,7 @@ import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaProverComputatio
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaSimulator;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog.SigmaDlogProver;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog.SigmaDlogProverInput;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProverInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 
@@ -68,55 +68,31 @@ public class SigmaElGamalPrivateKeyProver implements SigmaProverComputation, Dlo
 	}
 	
 	/**
-	 * Default constructor that chooses default values for the parameters.
-	 */
-	public SigmaElGamalPrivateKeyProver() {
-		//Creates the underlying SigmaDlogProver object with default parameters.
-		sigmaDlog = new SigmaDlogProver();
-	}
-	
-	/**
 	 * Returns the soundness parameter for this Sigma protocol.
 	 * @return t soundness parameter
 	 */
-	public int getSoundness(){
+	public int getSoundnessParam(){
 		//Delegates the computation to the underlying Sigma Dlog prover.
-		return sigmaDlog.getSoundness();
+		return sigmaDlog.getSoundnessParam();
 	}
 
-
 	/**
-	 * Sets the input for this Sigma protocol
+	 * Computes the first message of the protocol.
 	 * @param input MUST be an instance of SigmaElGamalPrivateKeyProverInput.
+	 * @return the computed message
 	 * @throws IllegalArgumentException if input is not an instance of SigmaElGamalPrivateKeyProverInput.
 	 */
-	public void setInput(SigmaProtocolInput in) {
+	public SigmaProtocolMsg computeFirstMsg(SigmaProverInput in) {
 		if (!(in instanceof SigmaElGamalPrivateKeyProverInput)){
 			throw new IllegalArgumentException("the given input must be an instance of SigmaElGamalPrivateKeyProverInput");
 		}
 		SigmaElGamalPrivateKeyProverInput input = (SigmaElGamalPrivateKeyProverInput) in;
 		
 		//Create an input object to the underlying sigma dlog prover.
-		SigmaDlogProverInput underlyingInput = new SigmaDlogProverInput(input.getPublicKey().getH(), input.getPrivateKey().getX());
-		sigmaDlog.setInput(underlyingInput);
+		SigmaDlogProverInput underlyingInput = new SigmaDlogProverInput(input.getCommonParams().getPublicKey().getH(), input.getPrivateKey().getX());
 		
-	}
-
-	/**
-	 * Samples random value r in Zq.
-	 */
-	public void sampleRandomValues() {
-		//Delegates to the underlying Sigma Dlog prover.
-		sigmaDlog.sampleRandomValues();
-	}
-
-	/**
-	 * Computes the first message of the protocol.
-	 * @return the computed message
-	 */
-	public SigmaProtocolMsg computeFirstMsg() {
 		//Delegates the computation to the underlying Sigma Dlog prover.
-		return sigmaDlog.computeFirstMsg();
+		return sigmaDlog.computeFirstMsg(underlyingInput);
 	}
 
 	/**
