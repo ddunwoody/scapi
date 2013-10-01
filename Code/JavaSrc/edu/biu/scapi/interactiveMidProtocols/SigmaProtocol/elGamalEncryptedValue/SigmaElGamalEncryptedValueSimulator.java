@@ -24,19 +24,16 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.elGamalEncryptedValue;
 
-import java.io.IOException;
 import java.security.SecureRandom;
 
 import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaSimulator;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHSimulator;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaSimulatorOutput;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
-import edu.biu.scapi.primitives.dlog.cryptopp.CryptoPpDlogZpSafePrime;
-import edu.biu.scapi.primitives.dlog.miracl.MiraclDlogECF2m;
 
 /**
  * Concrete implementation of Sigma Simulator.
@@ -76,23 +73,6 @@ public class SigmaElGamalEncryptedValueSimulator implements SigmaSimulator{
 	}
 	
 	/**
-	 * Default constructor that chooses default values for the parameters.
-	 */
-	public SigmaElGamalEncryptedValueSimulator() {
-		try {
-			//Create Miracl Koblitz 233 Elliptic curve.
-			dlog = new MiraclDlogECF2m("K-233");
-		} catch (IOException e) {
-			//If there is a problem with the elliptic curves file, create Zp DlogGroup.
-			dlog = new CryptoPpDlogZpSafePrime();
-		}
-		
-		//Creates the underlying SigmaDHSimulator object with default parameters.
-		dhSim = new SigmaDHSimulator(dlog, 80, new SecureRandom());
-
-	}
-	
-	/**
 	 * Constructor that gets a simulator and sets it.
 	 * In getSimulator function in SigmaElGamalEncryptedValueProver, the prover needs to create an instance of this class.
 	 * The problem is that the prover does not know which t and random to give, since they are values of the underlying 
@@ -115,20 +95,20 @@ public class SigmaElGamalEncryptedValueSimulator implements SigmaSimulator{
 	 * Returns the soundness parameter for this Sigma protocol.
 	 * @return t soundness parameter
 	 */
-	public int getSoundness(){
-		return dhSim.getSoundness();
+	public int getSoundnessParam(){
+		return dhSim.getSoundnessParam();
 	}
 	
 	/**
 	 * Computes the simulator computation.
-	 * @param input MUST be an instance of SigmaElGamalEncryptedValueInput.
+	 * @param input MUST be an instance of SigmaElGamalEncryptedValueCommonInput.
 	 * @param challenge
 	 * @return the output of the computation - (a, e, z).
 	 * @throws CheatAttemptException if the received challenge's length is not equal to the soundness parameter.
 	 * @throws IllegalArgumentException if input is not the expected.
 	 */
-	public SigmaSimulatorOutput simulate(SigmaProtocolInput in, byte[] challenge) throws CheatAttemptException{
-		SigmaDHInput underlyingInput = checkAndCreateUnderlyingInput(in);
+	public SigmaSimulatorOutput simulate(SigmaCommonInput in, byte[] challenge) throws CheatAttemptException{
+		SigmaDHCommonInput underlyingInput = checkAndCreateUnderlyingInput(in);
 		
 		//Delegates the computation to the underlying Sigma DH simulator.
 		return dhSim.simulate(underlyingInput, challenge); 
@@ -141,8 +121,8 @@ public class SigmaElGamalEncryptedValueSimulator implements SigmaSimulator{
 	 * @return the output of the computation - (a, e, z).
 	 * @throws IllegalArgumentException if input is not the expected.
 	 */
-	public SigmaSimulatorOutput simulate(SigmaProtocolInput in){
-		SigmaDHInput underlyingInput = checkAndCreateUnderlyingInput(in);
+	public SigmaSimulatorOutput simulate(SigmaCommonInput in){
+		SigmaDHCommonInput underlyingInput = checkAndCreateUnderlyingInput(in);
 		
 		//Delegates the computation to the underlying Sigma DH simulator.
 		return dhSim.simulate(underlyingInput); 
@@ -151,17 +131,17 @@ public class SigmaElGamalEncryptedValueSimulator implements SigmaSimulator{
 
 	/**
 	 * Checks the given input and creates the input for the underlying DH simulator according to it.
-	 * @param in MUST be an instance of SigmaElGamalEncryptedValueInput.
+	 * @param in MUST be an instance of SigmaElGamalEncryptedValueCommonInput.
 	 * @return SigmaDHInput the input for the underlying simulator.
 	 * @throws IllegalArgumentException if input is not the expected.
 	 */
-	private SigmaDHInput checkAndCreateUnderlyingInput(SigmaProtocolInput in) {
-		if (!(in instanceof SigmaElGamalEncryptedValueInput)){
-			throw new IllegalArgumentException("the given input must be an instance of SigmaElGamalEncryptedValueInput");
+	private SigmaDHCommonInput checkAndCreateUnderlyingInput(SigmaCommonInput in) {
+		if (!(in instanceof SigmaElGamalEncryptedValueCommonInput)){
+			throw new IllegalArgumentException("the given input must be an instance of SigmaElGamalEncryptedValueCommonInput");
 		}
 		
-		SigmaElGamalEncryptedValueInput input = (SigmaElGamalEncryptedValueInput) in;
-		boolean isRandomness = input.isRandomness();
+		SigmaElGamalEncryptedValueCommonInput params = (SigmaElGamalEncryptedValueCommonInput) in;
+		boolean isRandomness = params.isRandomness();
 		//Converts the given input to the necessary input to the underlying SigmaDHVerifier.
 		GroupElement h = null;
 		GroupElement u = null;;
@@ -172,30 +152,30 @@ public class SigmaElGamalEncryptedValueSimulator implements SigmaSimulator{
 		if (!isRandomness){
 			
 			//h = c1;
-			h = input.getCipher().getC1();
+			h = params.getCipher().getC1();
 			//u = h;
-			u = input.getPublicKey().getH();
+			u = params.getPublicKey().getH();
 			//v = c2/x = c2*x^(-1)
-			GroupElement c2 = input.getCipher().getC2();
-			GroupElement xInverse = dlog.getInverse(input.getX());
+			GroupElement c2 = params.getCipher().getC2();
+			GroupElement xInverse = dlog.getInverse(params.getX());
 			v = dlog.multiplyGroupElements(c2, xInverse);
 		}
 		//In case we use knowledge of the randomness used to encrypt:
 		// (h,u,v, w) = (h,c1,c2/x, r)
 		if (isRandomness){
 			//h = c1;
-			h = input.getPublicKey().getH();
+			h = params.getPublicKey().getH();
 			//u = h;
-			u = input.getCipher().getC1();
+			u = params.getCipher().getC1();
 			//v = c2/x = c2*x^(-1)
-			GroupElement c2 = input.getCipher().getC2();
-			GroupElement xInverse = dlog.getInverse(input.getX());
+			GroupElement c2 = params.getCipher().getC2();
+			GroupElement xInverse = dlog.getInverse(params.getX());
 			v = dlog.multiplyGroupElements(c2, xInverse);
 		}
 		
 		
 		//Create an input object to the underlying sigma DH verifier.
-		SigmaDHInput underlyingInput = new SigmaDHInput(h,u, v);
+		SigmaDHCommonInput underlyingInput = new SigmaDHCommonInput(h,u, v);
 		return underlyingInput;
 	}
 	
