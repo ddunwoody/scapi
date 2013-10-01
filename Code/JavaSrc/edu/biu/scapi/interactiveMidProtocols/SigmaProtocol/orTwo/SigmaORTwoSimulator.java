@@ -28,7 +28,7 @@ import java.security.SecureRandom;
 
 import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaSimulator;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaSimulatorOutput;
 
 /**
@@ -66,7 +66,7 @@ public class SigmaORTwoSimulator implements SigmaSimulator{
 		}
 		
 		//If the given t is different from one of the underlying object's t values, throw exception.
-		if ((t != simulators[0].getSoundness()) || (t != simulators[1].getSoundness())){
+		if ((t != simulators[0].getSoundnessParam()) || (t != simulators[1].getSoundnessParam())){
 			throw new IllegalArgumentException("The given t does not equal to one of the t values in the underlying simulators objects.");
 		}
 				
@@ -79,19 +79,19 @@ public class SigmaORTwoSimulator implements SigmaSimulator{
 	 * Returns the soundness parameter for this Sigma protocol.
 	 * @return t soundness parameter
 	 */
-	public int getSoundness(){
+	public int getSoundnessParam(){
 		return t;
 	}
 	
 	/**
 	 * Computes the simulator computation.
-	 * @param input MUST be an instance of SigmaORTwoInput.
+	 * @param input MUST be an instance of SigmaORTwoCommonInput.
 	 * @param challenge
 	 * @return the output of the computation - (a, e, z).
 	 * @throws CheatAttemptException if the received challenge's length is not equal to the soundness parameter.
-	 * @throws IllegalArgumentException if the given input is not an instance of SigmaORTwoInput.
+	 * @throws IllegalArgumentException if the given input is not an instance of SigmaORTwoCommonInput.
 	 */
-	public SigmaSimulatorOutput simulate(SigmaProtocolInput in, byte[] challenge) throws CheatAttemptException{
+	public SigmaSimulatorOutput simulate(SigmaCommonInput in, byte[] challenge) throws CheatAttemptException{
 		/*
 		 * SAMPLE a random e0, 
 		 * 	COMPUTE e1 = e XOR e0 
@@ -103,10 +103,10 @@ public class SigmaORTwoSimulator implements SigmaSimulator{
 			throw new CheatAttemptException("the length of the given challenge is differ from the soundness parameter");
 		}
 				
-		if (!(in instanceof SigmaORTwoInput)){
-			throw new IllegalArgumentException("The given input must be an instance of SigmaORTwoInput");
+		if (!(in instanceof SigmaORTwoCommonInput)){
+			throw new IllegalArgumentException("The given input must be an instance of SigmaORTwoCommonInput");
 		}
-		SigmaORTwoInput input = (SigmaORTwoInput) in;
+		SigmaORTwoCommonInput input = (SigmaORTwoCommonInput) in;
 		
 		int len = t/8;
 		//Sample a random e0.
@@ -136,11 +136,11 @@ public class SigmaORTwoSimulator implements SigmaSimulator{
 	
 	/**
 	 * Computes the simulator computation.
-	 * @param input MUST be an instance of SigmaORTwoInput.
+	 * @param input MUST be an instance of SigmaORTwoCommonInput.
 	 * @return the output of the computation - (a, e, z).
-	 * @throws IllegalArgumentException if the given input is not an instance of SigmaORTwoInput.
+	 * @throws IllegalArgumentException if the given input is not an instance of SigmaORTwoCommonInput.
 	 */
-	public SigmaSimulatorOutput simulate(SigmaProtocolInput input){
+	public SigmaSimulatorOutput simulate(SigmaCommonInput input){
 		//Create a new byte array of size t/8, to get the required byte size.
 		byte[] e = new byte[t/8];
 		//Fill the byte array with random values.
