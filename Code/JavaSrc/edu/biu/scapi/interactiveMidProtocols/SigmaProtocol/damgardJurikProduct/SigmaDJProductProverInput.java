@@ -26,6 +26,7 @@ package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.damgardJurikProduct;
 
 import java.math.BigInteger;
 
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProverInput;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.DamgardJurikPrivateKey;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.DamgardJurikPublicKey;
 import edu.biu.scapi.midLayer.ciphertext.BigIntegerCiphertext;
@@ -38,8 +39,9 @@ import edu.biu.scapi.midLayer.plaintext.BigIntegerPlainText;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaDJProductProverInput extends SigmaDJProductInput{
+public class SigmaDJProductProverInput implements SigmaProverInput{
 	
+	private SigmaDJProductCommonInput params;
 	private BigInteger r1;
 	private BigInteger r2;
 	private BigInteger r3;
@@ -49,7 +51,7 @@ public class SigmaDJProductProverInput extends SigmaDJProductInput{
 	public SigmaDJProductProverInput(DamgardJurikPublicKey publicKey, 
 							BigIntegerCiphertext c1, BigIntegerCiphertext c2, BigIntegerCiphertext c3, 
 							BigInteger r1, BigInteger r2, BigInteger r3, BigIntegerPlainText x1, BigIntegerPlainText x2){
-		super(publicKey, c1, c2, c3);
+		params = new SigmaDJProductCommonInput(publicKey, c1, c2, c3);
 		this.r1 = r1;
 		this.r2 = r2;
 		this.r3 = r3;
@@ -73,7 +75,7 @@ public class SigmaDJProductProverInput extends SigmaDJProductInput{
 	public SigmaDJProductProverInput(DamgardJurikPublicKey publicKey, 
 							BigIntegerCiphertext c1, BigIntegerCiphertext c2, BigIntegerCiphertext c3, 
 							DamgardJurikPrivateKey privateKey, BigIntegerPlainText x1, BigIntegerPlainText x2){
-		super(publicKey, c1, c2, c3);
+		params = new SigmaDJProductCommonInput(publicKey, c1, c2, c3);
 		this.x1 = x1;
 		this.x2 = x2;
 		
@@ -112,4 +114,10 @@ public class SigmaDJProductProverInput extends SigmaDJProductInput{
 	public BigIntegerPlainText getX2(){
 		return x2;
 	}
+
+	@Override
+	public SigmaDJProductCommonInput getCommonParams() {
+		
+		return params;
+	} 
 }
