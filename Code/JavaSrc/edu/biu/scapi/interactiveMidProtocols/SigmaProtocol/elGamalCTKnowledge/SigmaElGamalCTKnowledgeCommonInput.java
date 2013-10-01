@@ -24,26 +24,34 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.elGamalCTKnowledge;
 
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.elGamal.CTCElGamalCommitmentMessage;
 
 /**
- * Concrete implementation of SigmaProtocol input, used by the SigmaElGamalCTKnowledgeVerifier.
- * In SigmaElGamalCTKnowledge protocol, the verifier gets an ElGamal commitment message.
+ * Concrete implementation of SigmaProtocol input, used by the SigmaElGamalCTKnowldge verifier and simulator.
+ * In SigmaElGamalCTKnowldge protocol, the common input contains an ElGamal commitment message.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaElGamalCTKnowledgeInput implements SigmaProtocolInput{
+public class SigmaElGamalCTKnowledgeCommonInput implements SigmaCommonInput{
+
+	private static final long serialVersionUID = 761506828568805999L;
+	private CTCElGamalCommitmentMessage commitment;
 	
-	protected CTCElGamalCommitmentMessage commitment;
-	
-	public SigmaElGamalCTKnowledgeInput(CTCElGamalCommitmentMessage commitment){
+	public SigmaElGamalCTKnowledgeCommonInput(CTCElGamalCommitmentMessage commitment){
 		this.commitment = commitment;
 	}
 	
 	public CTCElGamalCommitmentMessage getCommitment(){
 		return commitment;
 	}
-
+	
+	private void writeObject(ObjectOutputStream out) throws IOException {  
+        
+		out.writeObject(commitment);   
+    }  
 }
