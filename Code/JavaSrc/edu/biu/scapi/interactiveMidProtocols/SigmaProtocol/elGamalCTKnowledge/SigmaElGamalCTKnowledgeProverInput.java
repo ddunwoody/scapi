@@ -26,6 +26,7 @@ package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.elGamalCTKnowledge;
 
 import java.math.BigInteger;
 
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProverInput;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.elGamal.CTCElGamalCommitmentMessage;
 
 
@@ -36,12 +37,13 @@ import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.elGamal.CTCElGamal
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaElGamalCTKnowledgeProverInput extends SigmaElGamalCTKnowledgeInput {
-	 
+public class SigmaElGamalCTKnowledgeProverInput implements SigmaProverInput{
+	
+	private SigmaElGamalCTKnowledgeCommonInput params;
 	private BigInteger w;
 	
 	public SigmaElGamalCTKnowledgeProverInput(CTCElGamalCommitmentMessage commitment, BigInteger w){
-		super(commitment);
+		params = new SigmaElGamalCTKnowledgeCommonInput(commitment);
 		this.w = w;
 	}
 	
@@ -49,4 +51,8 @@ public class SigmaElGamalCTKnowledgeProverInput extends SigmaElGamalCTKnowledgeI
 		return w;
 	}
 
+	@Override
+	public SigmaElGamalCTKnowledgeCommonInput getCommonParams() {
+		return params;
+	}
 }
