@@ -24,7 +24,6 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.elGamalEncryptedValue;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
@@ -34,12 +33,10 @@ import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaProverComputatio
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaSimulator;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHProver;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHProverInput;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProverInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
-import edu.biu.scapi.primitives.dlog.cryptopp.CryptoPpDlogZpSafePrime;
-import edu.biu.scapi.primitives.dlog.miracl.MiraclDlogECF2m;
 
 /**
  * Concrete implementation of Sigma Protocol prover computation. <p>
@@ -83,33 +80,16 @@ public class SigmaElGamalEncryptedValueProver implements SigmaProverComputation,
 	}
 	
 	/**
-	 * Default constructor that chooses default values for the parameters.
-	 */
-	public SigmaElGamalEncryptedValueProver() {
-	
-		try {
-			//Create Miracl Koblitz 233 Elliptic curve.
-			dlog = new MiraclDlogECF2m("K-233");
-		} catch (IOException e) {
-			//If there is a problem with the elliptic curves file, create Zp DlogGroup.
-			dlog = new CryptoPpDlogZpSafePrime();
-		}
-		
-		//Creates the underlying SigmaDHProver object with default parameters.
-		sigmaDH = new SigmaDHProver(dlog, 80, new SecureRandom());
-	}
-	
-	/**
 	 * Returns the soundness parameter for this Sigma protocol.
 	 * @return t soundness parameter
 	 */
-	public int getSoundness(){
+	public int getSoundnessParam(){
 		//Delegates the computation to the underlying Sigma DH prover.
-		return sigmaDH.getSoundness();
+		return sigmaDH.getSoundnessParam();
 	}
 
 	/**
-	 * Sets the input for this Sigma protocol.
+	 * Converts the input for the underlying Sigma protocol.
 	 * There are two versions of this protocol, depending upon if the prover knows the secret key or it knows the randomness used to generate the ciphertext.
 	 * The only separation in these two version is the type of input. 
 	 * In case we use knowledge of private key, the input should be an instance of SigmaElGamalEncryptedValuePrivKeyProverInput.
@@ -117,7 +97,7 @@ public class SigmaElGamalEncryptedValueProver implements SigmaProverComputation,
 	 * @param input MUST be an instance of SigmaElGamalEncryptedValuePrivKeyProverInput OR SigmaElGamalEncryptedValueRandomnessProverInput.
 	 * @throws IllegalArgumentException if input is not the expected.
 	 */
-	public void setInput(SigmaProtocolInput in) {
+	private SigmaDHProverInput convertInput(SigmaProverInput in) {
 		
 		//Converts the given input to the necessary input to the underlying SigmaDHProver.
 		GroupElement h;
@@ -129,13 +109,14 @@ public class SigmaElGamalEncryptedValueProver implements SigmaProverComputation,
 		// (h, u, v, w) = (c1, h, c2/x, w) 
 		if (in instanceof SigmaElGamalEncryptedValuePrivKeyProverInput){
 			SigmaElGamalEncryptedValuePrivKeyProverInput input = (SigmaElGamalEncryptedValuePrivKeyProverInput) in;
+			SigmaElGamalEncryptedValueCommonInput params = input.getCommonParams();
 			//h = c1;
-			h = input.getCipher().getC1();
+			h = params.getCipher().getC1();
 			//u = h;
-			u = input.getPublicKey().getH();
+			u = params.getPublicKey().getH();
 			//v = c2/x = c2*x^(-1)
-			GroupElement c2 = input.getCipher().getC2();
-			GroupElement xInverse = dlog.getInverse(input.getX());
+			GroupElement c2 = params.getCipher().getC2();
+			GroupElement xInverse = dlog.getInverse(params.getX());
 			v = dlog.multiplyGroupElements(c2, xInverse);
 			//get the private key.
 			w = input.getPrivateKey().getX();
@@ -144,13 +125,14 @@ public class SigmaElGamalEncryptedValueProver implements SigmaProverComputation,
 		// (h,u,v, w) = (h,c1,c2/x, r)
 		else if (in instanceof SigmaElGamalEncryptedValueRandomnessProverInput){
 			SigmaElGamalEncryptedValueRandomnessProverInput input = (SigmaElGamalEncryptedValueRandomnessProverInput) in;
+			SigmaElGamalEncryptedValueCommonInput params = input.getCommonParams();
 			//h = h;
-			h = input.getPublicKey().getH();
+			h = params.getPublicKey().getH();
 			//u = c1;
-			u = input.getCipher().getC1();
+			u = params.getCipher().getC1();
 			//v = c2/x = c2*x^(-1)
-			GroupElement c2 = input.getCipher().getC2();
-			GroupElement xInverse = dlog.getInverse(input.getX());
+			GroupElement c2 = params.getCipher().getC2();
+			GroupElement xInverse = dlog.getInverse(params.getX());
 			v = dlog.multiplyGroupElements(c2, xInverse);
 			//get the randomness.
 			w = input.getR();
@@ -162,26 +144,20 @@ public class SigmaElGamalEncryptedValueProver implements SigmaProverComputation,
 		
 		
 		//Create an input object to the underlying sigma DH prover.
-		SigmaDHProverInput underlyingInput = new SigmaDHProverInput(h,u, v, w);
-		sigmaDH.setInput(underlyingInput);
+		return new SigmaDHProverInput(h,u, v, w);
 		
-	}
-
-	/**
-	 * Samples random value r in Zq.
-	 */
-	public void sampleRandomValues() {
-		//Delegates to the underlying Sigma DH prover.
-		sigmaDH.sampleRandomValues();
 	}
 
 	/**
 	 * Computes the first message of the protocol.
 	 * @return the computed message
 	 */
-	public SigmaProtocolMsg computeFirstMsg() {
+	public SigmaProtocolMsg computeFirstMsg(SigmaProverInput in) {
+		//Converts the input to the underlying prover.
+		SigmaDHProverInput input = convertInput(in);
+		
 		//Delegates the computation to the underlying Sigma DH prover.
-		return sigmaDH.computeFirstMsg();
+		return sigmaDH.computeFirstMsg(input);
 	}
 
 	/**
