@@ -27,7 +27,7 @@ package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.orTwo;
 import java.security.SecureRandom;
 
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaVerifierComputation;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
 
 /**
@@ -65,7 +65,7 @@ public class SigmaORTwoVerifier implements SigmaVerifierComputation{
 			throw new IllegalArgumentException("The given verifiers array must contains two objects.");
 		}
 		//If the given t is different from one of the underlying object's t values, throw exception.
-		if ((t != verifiers[0].getSoundness()) || (t != verifiers[1].getSoundness())){
+		if ((t != verifiers[0].getSoundnessParam()) || (t != verifiers[1].getSoundnessParam())){
 			throw new IllegalArgumentException("The given t does not equal to one of the t values in the underlying verifiers objects.");
 		}
 		
@@ -78,25 +78,8 @@ public class SigmaORTwoVerifier implements SigmaVerifierComputation{
 	 * Returns the soundness parameter for this Sigma protocol.
 	 * @return t soundness parameter
 	 */
-	public int getSoundness(){
+	public int getSoundnessParam(){
 		return t;
-	}
-
-	/**
-	 * Sets the inputs for each one of the underlying verifier.
-	 * @param input MUST be an instance of SigmaORTwoInput.
-	 * @throws IllegalArgumentException if input is not an instance of SigmaORTwoInput.
-	 * 
-	 */
-	public void setInput(SigmaProtocolInput in) {
-		if (!(in instanceof SigmaORTwoInput)){
-			throw new IllegalArgumentException("The given input must be an instance of SigmaORTwoInput");
-		}
-		SigmaORTwoInput input = (SigmaORTwoInput) in;
-		
-		//Sets the inputs to the underlying verifiers.
-		verifiers[0].setInput(input.getInputs()[0]);
-		verifiers[1].setInput(input.getInputs()[1]);
 	}
 	
 	/**
@@ -130,13 +113,19 @@ public class SigmaORTwoVerifier implements SigmaVerifierComputation{
 	/**
 	 * Computes the following line from the protocol:
 	 * 	"ACC IFF all verifier checks are ACC".
+	 * @param input MUST be an instance of SigmaORTwoCommonInput.
 	 * @param a first message from prover
 	 * @param z second message from prover
 	 * @return true if the proof has been verified; false, otherwise.
+	 * @throws IllegalArgumentException if input is not an instance of SigmaORTwoCommonInput.
 	 * @throws IllegalArgumentException if the first message of the prover is not an instance of SigmaORTwoFirstMsg
 	 * @throws IllegalArgumentException if the second message of the prover is not an instance of SigmaORTwoSecondMsg
 	 */
-	public boolean verify(SigmaProtocolMsg a, SigmaProtocolMsg z) {
+	public boolean verify(SigmaCommonInput in, SigmaProtocolMsg a, SigmaProtocolMsg z) {
+		if (!(in instanceof SigmaORTwoCommonInput)){
+			throw new IllegalArgumentException("The given input must be an instance of SigmaORTwoCommonInput");
+		}
+		SigmaORTwoCommonInput input = (SigmaORTwoCommonInput) in;
 		
 		boolean verified = true;
 		
@@ -155,10 +144,10 @@ public class SigmaORTwoVerifier implements SigmaVerifierComputation{
 		verifiers[1].setChallenge(second.getE1());
 		
 		//Compute the first verify check
-		verified = verified && verifiers[0].verify(first.getA0(), second.getZ0());
+		verified = verified && verifiers[0].verify(input.getInputs()[0], first.getA0(), second.getZ0());
 		
 		//Compute the second verify check
-		verified = verified && verifiers[1].verify(first.getA1(), second.getZ1());
+		verified = verified && verifiers[1].verify(input.getInputs()[1], first.getA1(), second.getZ1());
 		
 		//Return true if all verifiers returned true; false, otherwise.
 		return verified;	
