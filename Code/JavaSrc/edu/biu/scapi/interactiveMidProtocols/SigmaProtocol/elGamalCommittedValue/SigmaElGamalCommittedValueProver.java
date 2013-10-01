@@ -24,7 +24,6 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.elGamalCommittedValue;
 
-import java.io.IOException;
 import java.security.SecureRandom;
 
 import edu.biu.scapi.exceptions.CheatAttemptException;
@@ -33,13 +32,11 @@ import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaProverComputatio
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaSimulator;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHProver;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHProverInput;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProverInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
 import edu.biu.scapi.midLayer.ciphertext.ElGamalOnGroupElementCiphertext.ElGamalOnGrElSendableData;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
-import edu.biu.scapi.primitives.dlog.cryptopp.CryptoPpDlogZpSafePrime;
-import edu.biu.scapi.primitives.dlog.miracl.MiraclDlogECF2m;
 
 /**
  * Concrete implementation of Sigma Protocol prover computation.
@@ -70,31 +67,6 @@ public class SigmaElGamalCommittedValueProver implements SigmaProverComputation,
 	 */
 	public SigmaElGamalCommittedValueProver(DlogGroup dlog, int t, SecureRandom random) {
 		
-		setParameters(dlog, t, random);
-	}
-	
-	/**
-	 * Default constructor that chooses default values for the parameters.
-	 */
-	public SigmaElGamalCommittedValueProver() {
-		try {
-			//Create Miracl Koblitz 233 Elliptic curve.
-			dlog = new MiraclDlogECF2m("K-233");
-		} catch (IOException e) {
-			//If there is a problem with the elliptic curves file, create Zp DlogGroup.
-			dlog = new CryptoPpDlogZpSafePrime();
-		}
-		
-		setParameters(dlog, 80, new SecureRandom());
-	}
-	
-	/**
-	 * Creates the underlying prover computation and sets the given parameters.
-	 * @param dlog
-	 * @param t Soundness parameter in BITS.
-	 * @param random
-	 */
-	private void setParameters(DlogGroup dlog, int t, SecureRandom random) {
 		//Creates the underlying SigmaDHProver object with the given parameters.
 		sigmaDH = new SigmaDHProver(dlog, t, random);
 		this.dlog = dlog;
@@ -104,56 +76,53 @@ public class SigmaElGamalCommittedValueProver implements SigmaProverComputation,
 	 * Returns the soundness parameter for this Sigma protocol.
 	 * @return t soundness parameter
 	 */
-	public int getSoundness(){
+	public int getSoundnessParam(){
 		//Delegates the computation to the underlying Sigma DH prover.
-		return sigmaDH.getSoundness();
+		return sigmaDH.getSoundnessParam();
 	}
 
 
 	/**
-	 * Sets the input for this Sigma protocol
+	 * Converts the input for this Sigma protocol to the underlying protocol.
 	 * @param input MUST be an instance of SigmaElGamalCommittedValueProverInput.
 	 * @throws IllegalArgumentException if input is not an instance of SigmaElGamalCommittedValueProverInput.
 	 */
-	public void setInput(SigmaProtocolInput in) {
+	private SigmaDHProverInput convertInput(SigmaProverInput in) {
 		if (!(in instanceof SigmaElGamalCommittedValueProverInput)){
 			throw new IllegalArgumentException("the given input must be an instance of SigmaElGamalCommittedValueProverInput");
 		}
 		SigmaElGamalCommittedValueProverInput input = (SigmaElGamalCommittedValueProverInput) in;
+		SigmaElGamalCommittedValueCommonInput params = input.getCommonParams();
 		
-		if (!(input.getCommitment().getCipherData() instanceof ElGamalOnGrElSendableData)){
+		if (!(params.getCommitment().getCipherData() instanceof ElGamalOnGrElSendableData)){
 			throw new IllegalArgumentException("the given input must contain an instance of ElGamalOnGrElSendableData");
 		}
 		
 		//Convert input to the underlying DH prover:
 		//(g,h,u,v) = (g,h,c1,c2/x).
-		GroupElement h = dlog.reconstructElement(true, input.getCommitment().getPublicKey().getC());
+		GroupElement h = dlog.reconstructElement(true, params.getCommitment().getPublicKey().getC());
 		//u = c1
-		GroupElement u = dlog.reconstructElement(true, ((ElGamalOnGrElSendableData)input.getCommitment().getCipherData()).getCipher1());
+		GroupElement u = dlog.reconstructElement(true, ((ElGamalOnGrElSendableData)params.getCommitment().getCipherData()).getCipher1());
 		//Calculate v = c2/x = c2*x^(-1)
-		GroupElement c2 = dlog.reconstructElement(true, ((ElGamalOnGrElSendableData)input.getCommitment().getCipherData()).getCipher2());
-		GroupElement xInv = dlog.getInverse(input.getX());
+		GroupElement c2 = dlog.reconstructElement(true, ((ElGamalOnGrElSendableData)params.getCommitment().getCipherData()).getCipher2());
+		GroupElement xInv = dlog.getInverse(params.getX());
 		GroupElement v = dlog.multiplyGroupElements(c2, xInv);
-		SigmaDHProverInput dhInput = new SigmaDHProverInput(h, u, v, input.getR());
-		sigmaDH.setInput(dhInput);
+		
+		return new SigmaDHProverInput(h, u, v, input.getR());
 		
 	}
 
 	/**
-	 * Samples random value r in Zq.
-	 */
-	public void sampleRandomValues() {
-		//Delegates to the underlying Sigma DH prover.
-		sigmaDH.sampleRandomValues();
-	}
-
-	/**
 	 * Computes the first message of the protocol.
+	 * @param input MUST be an instance of SigmaElGamalCommittedValueProverInput.
 	 * @return the computed message
+	 * @throws IllegalArgumentException if input is not an instance of SigmaElGamalCommittedValueProverInput.
 	 */
-	public SigmaProtocolMsg computeFirstMsg() {
+	public SigmaProtocolMsg computeFirstMsg(SigmaProverInput in) {
+		SigmaDHProverInput input = convertInput(in);
+		
 		//Delegates the computation to the underlying Sigma DH prover.
-		return sigmaDH.computeFirstMsg();
+		return sigmaDH.computeFirstMsg(input);
 	}
 
 	/**
