@@ -29,9 +29,9 @@ import java.security.SecureRandom;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.DlogBasedSigma;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaVerifierComputation;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog.SigmaDlogInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog.SigmaDlogCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog.SigmaDlogVerifier;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 
@@ -69,39 +69,14 @@ public class SigmaElGamalPrivateKeyVerifier implements SigmaVerifierComputation,
 	}
 	
 	/**
-	 * Default constructor that chooses default values for the parameters.
-	 */
-	public SigmaElGamalPrivateKeyVerifier() {
-		//Creates the underlying SigmaDlogVerifier object with default parameters.
-		sigmaDlog = new SigmaDlogVerifier();
-	}
-	
-	/**
 	 * Returns the soundness parameter for this Sigma protocol.
 	 * @return t soundness parameter
 	 */
-	public int getSoundness(){
+	public int getSoundnessParam(){
 		//Delegates to the underlying Sigma Dlog verifier.
-		return sigmaDlog.getSoundness();
+		return sigmaDlog.getSoundnessParam();
 	}
 
-	/**
-	 * Sets the input for this Sigma protocol
-	 * @param input MUST be an instance of SigmaElGamalPrivateKeyInput.
-	 * @throws IllegalArgumentException if input is not an instance of SigmaElGamalPrivateKeyInput.
-	 */
-	public void setInput(SigmaProtocolInput in) {
-		if (!(in instanceof SigmaElGamalPrivateKeyInput)){
-			throw new IllegalArgumentException("the given input must be an instance of SigmaElGamalPrivateKeyInput");
-		}
-		SigmaElGamalPrivateKeyInput input = (SigmaElGamalPrivateKeyInput) in;
-		
-		//Create an input object to the underlying sigma dlog verifier.
-		SigmaDlogInput underlyingInput = new SigmaDlogInput(input.getPublicKey().getH());
-		sigmaDlog.setInput(underlyingInput);
-				
-	}
-	
 	/**
 	 * Samples the challenge e <- {0,1}^t
 	 */
@@ -131,13 +106,22 @@ public class SigmaElGamalPrivateKeyVerifier implements SigmaVerifierComputation,
 	/**
 	 * Verifies the proof.
 	 * @param z second message from prover
+	 * @param input MUST be an instance of SigmaElGamalPrivateKeyCommonInput.
 	 * @return true if the proof has been verified; false, otherwise.
+	 * @throws IllegalArgumentException if input is not an instance of SigmaElGamalPrivateKeyCommonInput.
 	 * @throws IllegalArgumentException if the first message of the prover is not an instance of SigmaGroupElementMsg
 	 * @throws IllegalArgumentException if the second message of the prover is not an instance of SigmaBIMsg
 	 */
-	public boolean verify(SigmaProtocolMsg a, SigmaProtocolMsg z) {
+	public boolean verify(SigmaCommonInput in, SigmaProtocolMsg a, SigmaProtocolMsg z) {
+		if (!(in instanceof SigmaElGamalPrivateKeyCommonInput)){
+			throw new IllegalArgumentException("the given input must be an instance of SigmaElGamalPrivateKeyCommonInput");
+		}
+		SigmaElGamalPrivateKeyCommonInput input = (SigmaElGamalPrivateKeyCommonInput) in;
 		
-		return sigmaDlog.verify(a, z);
+		//Create an input object to the underlying sigma dlog verifier.
+		SigmaDlogCommonInput underlyingInput = new SigmaDlogCommonInput(input.getPublicKey().getH());
+		
+		return sigmaDlog.verify(underlyingInput, a, z);
 	}
 	
 	
