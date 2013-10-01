@@ -24,6 +24,7 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.elGamalPrivateKey;
 
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProverInput;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ElGamalPrivateKey;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ElGamalPublicKey;
 
@@ -34,17 +35,26 @@ import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ElGamalPublicKey;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaElGamalPrivateKeyProverInput extends SigmaElGamalPrivateKeyInput{
+public class SigmaElGamalPrivateKeyProverInput implements SigmaProverInput{
 	
+	private SigmaElGamalPrivateKeyCommonInput params;
 	private ElGamalPrivateKey privateKey;
 	
 	public SigmaElGamalPrivateKeyProverInput(ElGamalPublicKey pubKey, ElGamalPrivateKey privKey){
-		super(pubKey);
+		params = new SigmaElGamalPrivateKeyCommonInput(pubKey);
 		privateKey = privKey;
 	}
 	
 	public ElGamalPrivateKey getPrivateKey(){
 		return privateKey;
 	}
+
+	@Override
+	public SigmaElGamalPrivateKeyCommonInput getCommonParams() {
+		return params;
+	}
+	
+	
+	
 
 }
