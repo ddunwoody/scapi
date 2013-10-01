@@ -24,28 +24,63 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.orTwo;
 
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProverInput;
 
 /**
  * Concrete implementation of SigmaProtocol input, used by the SigmaProtocolORTwoProver.
  * 
- * In SigmaProtocolORTwo protocol, the prover gets an array of SigmaProtocolInput that holds 
- * two instances of inputs to its underlying objects and a bit b, such that (xb,w) is in R.
+ * In SigmaProtocolORTwo protocol, the prover gets an input for the true statement (with witness), 
+ * an input for the false statement (without witness) and a bit b, such that (xb,w) is in R.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaORTwoProverInput extends SigmaORTwoInput{
+public class SigmaORTwoProverInput implements SigmaProverInput{
 	
-	private int b;
+	private SigmaProverInput proverInput;
+	private SigmaCommonInput simulatorInput;
+	private byte b;
 	
-	public SigmaORTwoProverInput(SigmaProtocolInput[] inputs, int b){
-		super(inputs);
+	public SigmaORTwoProverInput(SigmaProverInput proverInput, SigmaCommonInput simulatorInput, byte b){
+		this.proverInput = proverInput;
+		this.simulatorInput = simulatorInput;
 		this.b = b;
 	}
 	
-	public int getB(){
+	public byte getB(){
 		return b;
+	}
+	
+	public SigmaProverInput getProverInput(){
+		return proverInput;
+	}
+	
+	public SigmaCommonInput getSimulatorInput(){
+		return simulatorInput;
+	}
+
+	@Override
+	public SigmaORTwoCommonInput getCommonParams() {
+		/*
+		 * 
+		 * There are two options to implement this function:
+		 * 1. Create a new instance of SigmaANDCommonInput every time the function is called.
+		 * 2. Create the object in the construction time and return it every time this function is called.
+		 * This class holds an array of SigmaProverInput, where each instance in the array holds 
+		 * an instance of SigmaCommonParams inside it.
+		 * In the second option above, this class will have in addition an array of SigmaCommonInput. 
+		 * This way, the SigmaCommonInput instances will appear twice -
+		 * once in the array and once in the corresponding SigmaProverInput. 
+		 * This is an undesired duplication and redundancy, So we decided to implement using the 
+		 * first way, although this is less efficient.
+		 * In case the efficiency is important, a user can derive this class and override this implementation.
+		 */
+		
+		SigmaCommonInput[] inputArr = new SigmaCommonInput[2];
+		inputArr[b] = proverInput.getCommonParams();
+		inputArr[1-b] = simulatorInput;
+		return new SigmaORTwoCommonInput(inputArr);
 	}
 
 }
