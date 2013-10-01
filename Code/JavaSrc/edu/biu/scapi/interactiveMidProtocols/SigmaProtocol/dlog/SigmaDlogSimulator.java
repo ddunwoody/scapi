@@ -24,7 +24,6 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
@@ -33,13 +32,11 @@ import org.bouncycastle.util.BigIntegers;
 import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaSimulator;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaBIMsg;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaGroupElementMsg;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaSimulatorOutput;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
-import edu.biu.scapi.primitives.dlog.cryptopp.CryptoPpDlogZpSafePrime;
-import edu.biu.scapi.primitives.dlog.miracl.MiraclDlogECF2m;
 
 /**
  * Concrete implementation of Sigma Simulator.
@@ -67,52 +64,27 @@ public class SigmaDlogSimulator implements SigmaSimulator{
 	 * @param dlog
 	 * @param t Soundness parameter in BITS.
 	 * @param random
-	 */
-	public SigmaDlogSimulator(DlogGroup dlog, int t, SecureRandom random){
-		// Sets the given parameters.
-		setParameters(dlog, t, random);
-	}
-	
-	/**
-	 * Default constructor that chooses default values for the parameters.
-	 */
-	public SigmaDlogSimulator() {
-		try {
-			//Create Miracl Koblitz 233 Elliptic curve and set default parameters.
-			setParameters(new MiraclDlogECF2m("K-233"), 80, new SecureRandom());
-		} catch (IOException e) {
-			//If there is a problem with the elliptic curves file, create Zp DlogGroup.
-			setParameters(new CryptoPpDlogZpSafePrime(), 80, new SecureRandom());
-		}
-	}
-
-	/**
-	 * If soundness parameter is valid, sets the parameters. Else, throw IllegalArgumentException.
-	 * @param dlog
-	 * @param t soundness parameter in BITS
-	 * @param random
 	 * @throws IllegalArgumentException if soundness parameter is invalid.
 	 */
-	private void setParameters(DlogGroup dlog, int t, SecureRandom random) {
-		
+	public SigmaDlogSimulator(DlogGroup dlog, int t, SecureRandom random){
 		//Sets the parameters.
 		this.dlog = dlog;
 		this.t = t;
 		
 		//Check the soundness validity.
-		if (!checkSoundness()){
+		if (!checkSoundnessParam()){
 			throw new IllegalArgumentException("soundness parameter t does not satisfy 2^t<q");
 		}
 		
 		this.random = random;
 		qMinusOne = dlog.getOrder().subtract(BigInteger.ONE);
 	}
-	
+
 	/**
 	 * Checks the validity of the given soundness parameter.
 	 * @return true if the soundness parameter is valid; false, otherwise.
 	 */
-	private boolean checkSoundness(){
+	private boolean checkSoundnessParam(){
 		//If soundness parameter does not satisfy 2^t<q, return false.
 		BigInteger soundness = new BigInteger("2").pow(t);
 		BigInteger q = dlog.getOrder();
@@ -126,28 +98,29 @@ public class SigmaDlogSimulator implements SigmaSimulator{
 	 * Returns the soundness parameter for this Sigma protocol.
 	 * @return t soundness parameter
 	 */
-	public int getSoundness(){
+	public int getSoundnessParam(){
 		return t;
 	}
 	
 	/**
 	 * Computes the simulator computation.
-	 * @param input MUST be an instance of SigmaDlogInput.
+	 * @param input MUST be an instance of SigmaDlogCommonInput.
 	 * @param challenge
 	 * @return the output of the computation - (a, e, z).
 	 * @throws CheatAttemptException if the received challenge's length is not equal to the soundness parameter.
-	 * @throws IllegalArgumentException if the given input is not an instance of SigmaDlogInput.
+	 * @throws IllegalArgumentException if the given input is not an instance of SigmaDlogCommonInput.
 	 */
-	public SigmaSimulatorOutput simulate(SigmaProtocolInput input, byte[] challenge) throws CheatAttemptException{
+	public SigmaSimulatorOutput simulate(SigmaCommonInput input, byte[] challenge) throws CheatAttemptException{
 		//check the challenge validity.
 		if (!checkChallengeLength(challenge)){
 			throw new CheatAttemptException("the length of the given challenge is differ from the soundness parameter");
 		}
 		
-		if (!(input instanceof SigmaDlogInput)){
-			throw new IllegalArgumentException("the given input must be an instance of SigmaDlogInput");
+		if (!(input instanceof SigmaDlogCommonInput)){
+			throw new IllegalArgumentException("the given input must be an instance of SigmaDlogCommonInput");
 		}
-		SigmaDlogInput dlogInput = (SigmaDlogInput) input;
+		
+		SigmaDlogCommonInput dlogInput = (SigmaDlogCommonInput) input;
 		
 		//SAMPLE a random z <- Zq
 		BigInteger z = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
@@ -170,7 +143,7 @@ public class SigmaDlogSimulator implements SigmaSimulator{
 	 * @return the output of the computation - (a, e, z).
 	 * @throws IllegalArgumentException if the given input is not an instance of SigmaDlogInput.
 	 */
-	public SigmaSimulatorOutput simulate(SigmaProtocolInput input){
+	public SigmaSimulatorOutput simulate(SigmaCommonInput input){
 		//Create a new byte array of size t/8, to get the required byte size.
 		byte[] e = new byte[t/8];
 		//Fill the byte array with random values.
