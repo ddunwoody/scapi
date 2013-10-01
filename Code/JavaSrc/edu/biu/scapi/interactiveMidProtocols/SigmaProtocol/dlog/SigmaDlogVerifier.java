@@ -24,7 +24,6 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
@@ -32,13 +31,11 @@ import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.DlogBasedSigma;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaVerifierComputation;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaBIMsg;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaGroupElementMsg;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
-import edu.biu.scapi.primitives.dlog.cryptopp.CryptoPpDlogZpSafePrime;
-import edu.biu.scapi.primitives.dlog.miracl.MiraclDlogECF2m;
 
 /**
  * Concrete implementation of Sigma Protocol verifier computation. <p>
@@ -59,7 +56,6 @@ public class SigmaDlogVerifier implements SigmaVerifierComputation, DlogBasedSig
 	
 	private DlogGroup dlog;			// Underlying DlogGroup.
 	private int t; 					//Soundness parameter in BITS.
-	private SigmaDlogInput input;	// Contains h.
 	private byte[] e;				//The challenge.
 	private SecureRandom random;
 	
@@ -69,40 +65,10 @@ public class SigmaDlogVerifier implements SigmaVerifierComputation, DlogBasedSig
 	 * @param t Soundness parameter in BITS.
 	 * @param random
 	 * @throws InvalidDlogGroupException if the given dlog is invalid.
+	 * @throws IllegalArgumentException if soundness parameter is invalid.
 	 */
 	public SigmaDlogVerifier(DlogGroup dlog, int t, SecureRandom random) throws InvalidDlogGroupException {
 		
-		// Sets the other parameter 
-		setParameters(dlog, t, random);
-	}
-	
-	/**
-	 * Default constructor that chooses default values for the parameters.
-	 */
-	public SigmaDlogVerifier() {
-		try {
-			//Create Miracl Koblitz 233 Elliptic curve and set default parameters.
-			setParameters(new MiraclDlogECF2m("K-233"), 80, new SecureRandom());
-		} catch (IOException e) {
-			//If there is a problem with the elliptic curves file, create Zp DlogGroup.
-			try {
-				setParameters(new CryptoPpDlogZpSafePrime(), 80, new SecureRandom());
-			} catch (InvalidDlogGroupException e1) {
-				// Can not occur since the DlogGroup is valid.
-			}
-		} catch (InvalidDlogGroupException e) {
-			// Can not occur since the DlogGroup is valid.
-		}
-	}
-
-	/**
-	 * If soundness parameter is valid, sets the parameters. 
-	 * @param dlog
-	 * @param t soundness parameter in BITS
-	 * @throws InvalidDlogGroupException if the given dlog is invalid.
-	 * @throws IllegalArgumentException if soundness parameter is invalid.
-	 */
-	private void setParameters(DlogGroup dlog, int t, SecureRandom random) throws InvalidDlogGroupException {
 		if(!dlog.validateGroup())
 			throw new InvalidDlogGroupException();
 		
@@ -111,7 +77,7 @@ public class SigmaDlogVerifier implements SigmaVerifierComputation, DlogBasedSig
 		this.t = t;
 		
 		//Check the soundness validity.
-		if (!checkSoundness()){
+		if (!checkSoundnessParam()){
 			throw new IllegalArgumentException("soundness parameter t does not satisfy 2^t<q");
 		}
 		
@@ -122,7 +88,7 @@ public class SigmaDlogVerifier implements SigmaVerifierComputation, DlogBasedSig
 	 * Checks the validity of the given soundness parameter.
 	 * @return true if the soundness parameter is valid; false, otherwise.
 	 */
-	private boolean checkSoundness(){
+	private boolean checkSoundnessParam(){
 		//If soundness parameter does not satisfy 2^t<q, throw IllegalArgumentException.
 		BigInteger soundness = new BigInteger("2").pow(t);
 		BigInteger q = dlog.getOrder();
@@ -136,21 +102,8 @@ public class SigmaDlogVerifier implements SigmaVerifierComputation, DlogBasedSig
 	 * Returns the soundness parameter for this Sigma protocol.
 	 * @return t soundness parameter
 	 */
-	public int getSoundness(){
+	public int getSoundnessParam(){
 		return t;
-	}
-
-	/**
-	 * Sets the input for this Sigma protocol
-	 * @param input MUST be an instance of SigmaDlogInput.
-	 * @throws IllegalArgumentException if input is not an instance of SigmaDlogInput.
-	 */
-	public void setInput(SigmaProtocolInput input) {
-		if (!(input instanceof SigmaDlogInput)){
-			throw new IllegalArgumentException("the given input must be an instance of SigmaDlogInput");
-		}
-		this.input = (SigmaDlogInput) input;
-		
 	}
 	
 	/**
@@ -185,11 +138,16 @@ public class SigmaDlogVerifier implements SigmaVerifierComputation, DlogBasedSig
 	 * 	"ACC IFF VALID_PARAMS(G,q,g) = TRUE AND h in G AND g^z = ah^e".
 	 * @param a first message from prover
 	 * @param z second message from prover
+	 * @param input MUST be an instance of SigmaDlogCommonInput.
 	 * @return true if the proof has been verified; false, otherwise.
+	 * @throws IllegalArgumentException if input is not an instance of SigmaDlogCommonInput.
 	 * @throws IllegalArgumentException if the first message of the prover is not an instance of SigmaGroupElementMsg
 	 * @throws IllegalArgumentException if the second message of the prover is not an instance of SigmaBIMsg
 	 */
-	public boolean verify(SigmaProtocolMsg a, SigmaProtocolMsg z) {
+	public boolean verify(SigmaCommonInput input, SigmaProtocolMsg a, SigmaProtocolMsg z) {
+		if (!(input instanceof SigmaDlogCommonInput)){
+			throw new IllegalArgumentException("the given input must be an instance of SigmaDlogCommonInput");
+		}
 		
 		boolean verified = true;
 		
@@ -209,7 +167,7 @@ public class SigmaDlogVerifier implements SigmaVerifierComputation, DlogBasedSig
 		SigmaBIMsg exponent = (SigmaBIMsg) z;
 		
 		//Get the h from the input and verify that it is in the Dlog Group.
-		GroupElement h = input.getH();
+		GroupElement h = ((SigmaDlogCommonInput) input).getH();
 		
 		//If h is not member in the group, set verified to false.
 		verified = verified && dlog.isMember(h);
