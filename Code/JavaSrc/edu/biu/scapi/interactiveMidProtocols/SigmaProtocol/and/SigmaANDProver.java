@@ -31,7 +31,7 @@ import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaProverComputation;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaSimulator;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaMultipleMsg;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProverInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
 
 /**
@@ -66,7 +66,7 @@ public class SigmaANDProver implements SigmaProverComputation{
 	public SigmaANDProver(ArrayList<SigmaProverComputation> provers, int t, SecureRandom random) {
 		//If the given t is different from one of the underlying object's t values, throw exception.
 		for (int i = 0; i < provers.size(); i++){
-			if (t != provers.get(i).getSoundness()){
+			if (t != provers.get(i).getSoundnessParam()){
 				throw new IllegalArgumentException("the given t does not equal to one of the t values in the underlying provers objects.");
 			}
 		}
@@ -80,57 +80,48 @@ public class SigmaANDProver implements SigmaProverComputation{
 	 * Returns the soundness parameter for this Sigma protocol.
 	 * @return t soundness parameter
 	 */
-	public int getSoundness(){
+	public int getSoundnessParam(){
 		return t;
 	}
 
 	/**
 	 * Sets the inputs for each one of the underlying prover.
-	 * @param input MUST be an instance of SigmaANDInput.
-	 * @throws IllegalArgumentException if input is not an instance of SigmaANDInput.
+	 * @param input MUST be an instance of SigmaANDProverInput.
+	 * @throws IllegalArgumentException if input is not an instance of SigmaANDProverInput.
 	 * @throws IllegalArgumentException if the number of given inputs is different from the number of underlying provers.
 	 */
-	public void setInput(SigmaProtocolInput in) {
-		if (!(in instanceof SigmaANDInput)){
-			throw new IllegalArgumentException("the given input must be an instance of SigmaANDInput");
+	private void checkInput(SigmaProverInput in) {
+		if (!(in instanceof SigmaANDProverInput)){
+			throw new IllegalArgumentException("the given input must be an instance of SigmaANDProverInput");
 		}
-		SigmaANDInput input = (SigmaANDInput) in;
-		ArrayList<SigmaProtocolInput> proversInput = input.getInputs();
-		int inputLen = proversInput.size();
+		SigmaANDProverInput input = (SigmaANDProverInput) in;
+		int inputLen = input.getInputs().size();
 		
 		// If number of inputs is not equal to number of provers, throw exception.
 		if (inputLen != len) {
 			throw new IllegalArgumentException("number of inputs is different from number of underlying provers.");
-		}
-		
-		//Sets the input to each underlying prover.
-		for (int i = 0; i < len; i++){
-			provers.get(i).setInput(proversInput.get(i));
-		}
-	}
-
-	/**
-	 * Call the sampleRandomValues function in each of the underlying provers.
-	 */
-	public void sampleRandomValues() {
-		
-		for (int i = 0; i < len; i++){
-			provers.get(i).sampleRandomValues();
 		}
 	}
 
 	/**
 	 * Computes the following line from the protocol:
 	 * "COMPUTE all first prover messages a1,…,am". 
+	 * @param input MUST be an instance of SigmaANDInput.
 	 * @return SigmaMultipleMsg contains a1, …, am.  
+	 * @throws IllegalArgumentException if input is not an instance of SigmaANDInput.
+	 * @throws IllegalArgumentException if the number of given inputs is different from the number of underlying provers.
 	 */
-	public SigmaProtocolMsg computeFirstMsg() {
+	public SigmaProtocolMsg computeFirstMsg(SigmaProverInput in) {
+		//Checks that the input is as expected.
+		checkInput(in);
+		ArrayList<SigmaProverInput> proversInput = ((SigmaANDProverInput) in).getInputs();
+		
 		//Create an array to hold all messages.
 		ArrayList<SigmaProtocolMsg> firstMessages = new ArrayList<SigmaProtocolMsg>();
 		
 		//Compute all first messages and add them to the array list.
 		for (int i = 0; i < len; i++){
-			firstMessages.add(provers.get(i).computeFirstMsg());
+			firstMessages.add(provers.get(i).computeFirstMsg(proversInput.get(i)));
 		}
 		//Create a SigmaMultipleMsg with the messages array.
 		return new SigmaMultipleMsg(firstMessages);
