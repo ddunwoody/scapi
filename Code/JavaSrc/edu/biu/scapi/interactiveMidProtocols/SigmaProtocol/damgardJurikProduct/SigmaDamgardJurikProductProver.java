@@ -30,10 +30,11 @@ import java.security.SecureRandom;
 import org.bouncycastle.util.BigIntegers;
 
 import edu.biu.scapi.exceptions.CheatAttemptException;
+import edu.biu.scapi.generals.ScapiDefaultConfiguration;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.DJBasedSigma;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaProverComputation;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaSimulator;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProverInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
 
 /**
@@ -68,23 +69,38 @@ public class SigmaDamgardJurikProductProver implements SigmaProverComputation, D
 	 */
 	public SigmaDamgardJurikProductProver(int t, int lengthParameter, SecureRandom random) {
 		
-		this.t = t;
-		this.lengthParameter = lengthParameter;
-		this.random = random;
+		doConstruct(t, lengthParameter, random);
 	}
 	
 	/**
 	 * Default constructor that chooses default values for the parameters.
 	 */
 	public SigmaDamgardJurikProductProver() {
-		this(80, 1, new SecureRandom());
+		//read the default statistical parameter used in sigma protocols from a configuration file.
+		String statisticalParameter = ScapiDefaultConfiguration.getInstance().getProperty("StatisticalParameter");
+		int t = Integer.parseInt(statisticalParameter);
+		
+		doConstruct(t, 1, new SecureRandom());
+	}
+	
+	/**
+	 * Sets the given parameters.
+	 * @param t Soundness parameter in BITS.
+	 * @param lengthParameter length parameter in BITS.
+	 * @param random
+	 */
+	private void doConstruct(int t, int lengthParameter, SecureRandom random){
+		
+		this.t = t;
+		this.lengthParameter = lengthParameter;
+		this.random = random;
 	}
 	
 	/**
 	 * Returns the soundness parameter for this Sigma protocol.
 	 * @return t soundness parameter
 	 */
-	public int getSoundness(){
+	public int getSoundnessParam(){
 		return t;
 	}
 	
@@ -93,14 +109,14 @@ public class SigmaDamgardJurikProductProver implements SigmaProverComputation, D
 	 * @param input MUST be an instance of SigmaDJProductProverInput.
 	 * @throws IllegalArgumentException if input is not an instance of SigmaDJProductProverInput.
 	 */
-	public void setInput(SigmaProtocolInput input) {
+	private void checkInput(SigmaProverInput input) {
 		if (!(input instanceof SigmaDJProductProverInput)){
 			throw new IllegalArgumentException("the given input must be an instance of SigmaDJProductProverInput");
 		}
 		
-		BigInteger modulus = ((SigmaDJProductProverInput) input).getPublicKey().getModulus();
+		BigInteger modulus = ((SigmaDJProductProverInput) input).getCommonParams().getPublicKey().getModulus();
 		//Check the soundness validity.
-		if (!checkSoundness(modulus)){
+		if (!checkSoundnessParam(modulus)){
 			throw new IllegalArgumentException("t must be less than a third of the length of the public key n");
 		}
 		
@@ -119,7 +135,7 @@ public class SigmaDamgardJurikProductProver implements SigmaProverComputation, D
 	 * t must be less than a third of the length of the public key n.
 	 * @return true if the soundness parameter is valid; false, otherwise.
 	 */
-	private boolean checkSoundness(BigInteger modulus){
+	private boolean checkSoundnessParam(BigInteger modulus){
 		//If soundness parameter is not less than a third of the publicKey n, return false.
 		int third = modulus.bitLength() / 3;
 		if (t >= third){
@@ -132,7 +148,7 @@ public class SigmaDamgardJurikProductProver implements SigmaProverComputation, D
 	 * Computes the following line from the protocol:
 	 * "SAMPLE random values d <- ZN, rd <- Z*n, rdb <- Z*n"
 	 */
-	public void sampleRandomValues() {
+	private void sampleRandomValues() {
 		//Sample d <-[0, ..., N-1]
 		d = BigIntegers.createRandomInRange(BigInteger.ZERO, N.subtract(BigInteger.ONE), random);
 		
@@ -143,11 +159,17 @@ public class SigmaDamgardJurikProductProver implements SigmaProverComputation, D
 
 	/**
 	 * Computes the following line from the protocol:
-	 * "COMPUTE a1 = (1+n)^d*rd^N mod N’ and a2 = ((1+n)^(d*x2))*(rdb^N) mod N’ and SET a = (a1,a2)". 
+	 * "SAMPLE random values d <- ZN, rd <- Z*n, rdb <- Z*n
+	 *  COMPUTE a1 = (1+n)^d*rd^N mod N’ and a2 = ((1+n)^(d*x2))*(rdb^N) mod N’ and SET a = (a1,a2)". 
+	 * @param input MUST be an instance of SigmaDJProductProverInput.
 	 * @return the computed message
+	 * @throws IllegalArgumentException if input is not an instance of SigmaDJProductProverInput.
 	 */
-	public SigmaProtocolMsg computeFirstMsg() {
+	public SigmaProtocolMsg computeFirstMsg(SigmaProverInput input) {
+		checkInput(input);
 		
+		sampleRandomValues();
+				
 		//Calculate 1+n
 		BigInteger nPlusOne = n.add(BigInteger.ONE);
 		//Calculate (1+n)^d
@@ -158,7 +180,7 @@ public class SigmaDamgardJurikProductProver implements SigmaProverComputation, D
 		BigInteger a1 = nPlusOneToD.multiply(rdToN).mod(NTag);
 		
 		//Calculate (1+n)^(d*x2)
-		BigInteger exponent = d.multiply(input.getX2().getX());
+		BigInteger exponent = d.multiply(((SigmaDJProductProverInput) input).getX2().getX());
 		BigInteger nPlusOnePow = nPlusOne.modPow(exponent, NTag);
 		//Calculate rdb^N
 		BigInteger rdbToN = rdb.modPow(N, NTag);
