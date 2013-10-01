@@ -24,24 +24,28 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.elGamalCommittedValue;
 
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.elGamal.CTCElGamalCommitmentMessage;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**
- * Concrete implementation of SigmaProtocol input, used by the SigmaElGamalCommittedValueVerifier.
- * In SigmaElGamalCommittedValue protocol, the verifier gets an ElGamal commitment message 
+ * Concrete implementation of SigmaProtocol input, used by the SigmaElGamalCommittedValue verifier and simulator.
+ * In SigmaElGamalCommittedValue protocol, the common input contains an ElGamal commitment message
  * and the value committed x.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaElGamalCommittedValueInput implements SigmaProtocolInput{
+public class SigmaElGamalCommittedValueCommonInput implements SigmaCommonInput{
 	
-	protected CTCElGamalCommitmentMessage commitment;
-	protected GroupElement x;
+	private static final long serialVersionUID = 7108469354272702947L;
+	private CTCElGamalCommitmentMessage commitment;
+	private GroupElement x;
 	
-	public SigmaElGamalCommittedValueInput(CTCElGamalCommitmentMessage commitment, GroupElement x){
+	public SigmaElGamalCommittedValueCommonInput(CTCElGamalCommitmentMessage commitment, GroupElement x){
 		this.commitment = commitment;
 		this.x = x;
 	}
@@ -53,5 +57,10 @@ public class SigmaElGamalCommittedValueInput implements SigmaProtocolInput{
 	public GroupElement getX(){
 		return x;
 	}
-
+	
+	private void writeObject(ObjectOutputStream out) throws IOException {  
+        
+		out.writeObject(commitment);  
+		out.writeObject(x.generateSendableData());  
+    }  
 }
