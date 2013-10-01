@@ -24,7 +24,6 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.elGamalCTKnowledge;
 
-import java.io.IOException;
 import java.security.SecureRandom;
 
 import edu.biu.scapi.exceptions.CheatAttemptException;
@@ -33,12 +32,10 @@ import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaProverComputatio
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaSimulator;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog.SigmaDlogProver;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog.SigmaDlogProverInput;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProverInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
-import edu.biu.scapi.primitives.dlog.cryptopp.CryptoPpDlogZpSafePrime;
-import edu.biu.scapi.primitives.dlog.miracl.MiraclDlogECF2m;
 
 /**
  * Concrete implementation of Sigma Protocol prover computation.
@@ -68,31 +65,6 @@ public class SigmaElGamalCTKnowledgeProver implements SigmaProverComputation, Dl
 	 */
 	public SigmaElGamalCTKnowledgeProver(DlogGroup dlog, int t, SecureRandom random) {
 		
-		setParameters(dlog, t, random);
-	}
-	
-	/**
-	 * Default constructor that chooses default values for the parameters.
-	 */
-	public SigmaElGamalCTKnowledgeProver() {
-		try {
-			//Create Miracl Koblitz 233 Elliptic curve.
-			dlog = new MiraclDlogECF2m("K-233");
-		} catch (IOException e) {
-			//If there is a problem with the elliptic curves file, create Zp DlogGroup.
-			dlog = new CryptoPpDlogZpSafePrime();
-		}
-		
-		setParameters(dlog, 80, new SecureRandom());
-	}
-	
-	/**
-	 * Sets the given parameters.
-	 * @param dlog
-	 * @param t Soundness parameter in BITS.
-	 * @param random
-	 */
-	private void setParameters(DlogGroup dlog, int t, SecureRandom random) {
 		//Creates the underlying SigmaDlogProver object with the given parameters.
 		sigmaDlog = new SigmaDlogProver(dlog, t, random);
 		this.dlog = dlog;
@@ -102,45 +74,40 @@ public class SigmaElGamalCTKnowledgeProver implements SigmaProverComputation, Dl
 	 * Returns the soundness parameter for this Sigma protocol.
 	 * @return t soundness parameter
 	 */
-	public int getSoundness(){
+	public int getSoundnessParam(){
 		//Delegates the computation to the underlying Sigma Dlog prover.
-		return sigmaDlog.getSoundness();
+		return sigmaDlog.getSoundnessParam();
 	}
 
 
 	/**
-	 * Sets the input for this Sigma protocol
+	 * Converts the input for this Sigma protocol to the underlying protocol.
 	 * @param input MUST be an instance of SigmaElGamalCTKnowledgeProverInput.
 	 * @throws IllegalArgumentException if input is not an instance of SigmaElGamalCTKnowledgeProverInput.
 	 */
-	public void setInput(SigmaProtocolInput in) {
+	private SigmaDlogProverInput convertInput(SigmaProverInput in) {
 		if (!(in instanceof SigmaElGamalCTKnowledgeProverInput)){
 			throw new IllegalArgumentException("the given input must be an instance of SigmaElGamalCTKnowledgeProverInput");
 		}
 		SigmaElGamalCTKnowledgeProverInput input = (SigmaElGamalCTKnowledgeProverInput) in;
 		
 		//Create an input object to the underlying sigma dlog prover.
-		GroupElement h = dlog.reconstructElement(true, input.getCommitment().getPublicKey().getC());
-		SigmaDlogProverInput underlyingInput = new SigmaDlogProverInput(h, input.getW());
-		sigmaDlog.setInput(underlyingInput);
+		GroupElement h = dlog.reconstructElement(true, input.getCommonParams().getCommitment().getPublicKey().getC());
+		return new SigmaDlogProverInput(h, input.getW());
 		
 	}
 
 	/**
-	 * Samples random value r in Zq.
-	 */
-	public void sampleRandomValues() {
-		//Delegates to the underlying Sigma Dlog prover.
-		sigmaDlog.sampleRandomValues();
-	}
-
-	/**
 	 * Computes the first message of the protocol.
+	 * @param input MUST be an instance of SigmaElGamalCTKnowledgeProverInput.
 	 * @return the computed message
+	 * @throws IllegalArgumentException if input is not an instance of SigmaElGamalCTKnowledgeProverInput.
 	 */
-	public SigmaProtocolMsg computeFirstMsg() {
+	public SigmaProtocolMsg computeFirstMsg(SigmaProverInput in) {
+		SigmaDlogProverInput input = convertInput(in);
+		
 		//Delegates the computation to the underlying Sigma Dlog prover.
-		return sigmaDlog.computeFirstMsg();
+		return sigmaDlog.computeFirstMsg(input);
 	}
 
 	/**
