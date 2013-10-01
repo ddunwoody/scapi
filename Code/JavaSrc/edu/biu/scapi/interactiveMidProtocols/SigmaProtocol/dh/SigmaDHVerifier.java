@@ -24,7 +24,6 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
@@ -32,12 +31,10 @@ import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.DlogBasedSigma;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaVerifierComputation;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaBIMsg;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
-import edu.biu.scapi.primitives.dlog.cryptopp.CryptoPpDlogZpSafePrime;
-import edu.biu.scapi.primitives.dlog.miracl.MiraclDlogECF2m;
 
 /**
  * Concrete implementation of Sigma Protocol verifier computation. <p>
@@ -57,7 +54,6 @@ public class SigmaDHVerifier implements SigmaVerifierComputation, DlogBasedSigma
 	
 	private DlogGroup dlog;			// Underlying DlogGroup.
 	private int t; 					//Soundness parameter in BITS.
-	private SigmaDHInput input;		// Contains h.
 	private byte[] e;				//The challenge.
 	private SecureRandom random;
 	
@@ -67,41 +63,10 @@ public class SigmaDHVerifier implements SigmaVerifierComputation, DlogBasedSigma
 	 * @param t Soundness parameter in BITS.
 	 * @param random
 	 * @throws InvalidDlogGroupException if the given dlog is invalid.
+	 * @throws IllegalArgumentException if soundness parameter is invalid.
 	 */
 	public SigmaDHVerifier(DlogGroup dlog, int t, SecureRandom random) throws InvalidDlogGroupException {
 		
-		// Sets the given parameters. 
-		setParameters(dlog, t, random);
-	}
-	
-	/**
-	 * Constructor that chooses default values for the other parameters.
-	 */
-	public SigmaDHVerifier() {
-		try {
-			//Create Miracl Koblitz 233 Elliptic curve and set default parameters.
-			setParameters(new MiraclDlogECF2m("K-233"), 80, new SecureRandom());
-		} catch (IOException e) {
-			//If there is a problem with the elliptic curves file, create Zp DlogGroup.
-			try {
-				setParameters(new CryptoPpDlogZpSafePrime(), 80, new SecureRandom());
-			} catch (InvalidDlogGroupException e1) {
-				// Can not occur since the DlogGroup is valid.
-			}
-		} catch (InvalidDlogGroupException e) {
-			// Can not occur since the DlogGroup is valid.
-		}
-	}
-
-	/**
-	 * If soundness parameter and dlog are valid, sets the parameters. 
-	 * @param dlog
-	 * @param t soundness parameter in BITS
-	 * @param random
-	 * @throws InvalidDlogGroupException if the given DlogGroup is not valid.
-	 * @throws IllegalArgumentException if soundness parameter is invalid.
-	 */
-	private void setParameters(DlogGroup dlog, int t, SecureRandom random) throws InvalidDlogGroupException {
 		if(!dlog.validateGroup())
 			throw new InvalidDlogGroupException();
 		
@@ -110,18 +75,19 @@ public class SigmaDHVerifier implements SigmaVerifierComputation, DlogBasedSigma
 		this.t = t;
 		
 		//Check the soundness validity.
-		if (!checkSoundness()){
+		if (!checkSoundnessParam()){
 			throw new IllegalArgumentException("soundness parameter t does not satisfy 2^t<q");
 		}
 		
 		this.random = random;
+		
 	}
 	
 	/**
 	 * Checks the validity of the given soundness parameter.
 	 * @return true if the soundness parameter is valid; false, otherwise.
 	 */
-	private boolean checkSoundness(){
+	private boolean checkSoundnessParam(){
 		//If soundness parameter does not satisfy 2^t<q, throw IllegalArgumentException.
 		BigInteger soundness = new BigInteger("2").pow(t);
 		BigInteger q = dlog.getOrder();
@@ -135,21 +101,8 @@ public class SigmaDHVerifier implements SigmaVerifierComputation, DlogBasedSigma
 	 * Returns the soundness parameter for this Sigma protocol.
 	 * @return t soundness parameter
 	 */
-	public int getSoundness(){
+	public int getSoundnessParam(){
 		return t;
-	}
-
-	/**
-	 * Sets the input for this Sigma protocol
-	 * @param input MUST be an instance of SigmaDHInput.
-	 * @throws IllegalArgumentException if input is not an instance of SigmaDHInput.
-	 */
-	public void setInput(SigmaProtocolInput input) {
-		if (!(input instanceof SigmaDHInput)){
-			throw new IllegalArgumentException("the given input must be an instance of SigmaDHInput");
-		}
-		this.input = (SigmaDHInput) input;
-		
 	}
 	
 	/**
@@ -182,13 +135,18 @@ public class SigmaDHVerifier implements SigmaVerifierComputation, DlogBasedSigma
 	/**
 	 * Computes the following line from the protocol:
 	 * 	"ACC IFF VALID_PARAMS(G,q,g) = TRUE AND h in G AND g^z = au^e  AND h^z = bv^e".     
+	 * @param input MUST be an instance of SigmaDHCommonInput.
 	 * @param z second message from prover
 	 * @return true if the proof has been verified; false, otherwise.
+	 * @throws IllegalArgumentException if input is not an instance of SigmaDHCommonInput.
 	 * @throws IllegalArgumentException if the first message of the prover is not an instance of SigmaDHMsg
 	 * @throws IllegalArgumentException if the second message of the prover is not an instance of SigmaBIMsg
 	 */
-	public boolean verify(SigmaProtocolMsg a, SigmaProtocolMsg z) {
-		
+	public boolean verify(SigmaCommonInput input, SigmaProtocolMsg a, SigmaProtocolMsg z) {
+		if (!(input instanceof SigmaDHCommonInput)){
+			throw new IllegalArgumentException("the given input must be an instance of SigmaDHCommonInput");
+		}
+		SigmaDHCommonInput dhInput = (SigmaDHCommonInput) input;
 		boolean verified = true;
 		
 		//If one of the messages is illegal, throw exception.
@@ -200,7 +158,7 @@ public class SigmaDHVerifier implements SigmaVerifierComputation, DlogBasedSigma
 		}
 		
 		//Get the h from the input and verify that it is in the Dlog Group.
-		GroupElement h = input.getH();
+		GroupElement h = (dhInput.getH());
 		//If h is not member in the group, set verified to false.
 		verified = verified && dlog.isMember(h);
 		
@@ -219,7 +177,7 @@ public class SigmaDHVerifier implements SigmaVerifierComputation, DlogBasedSigma
 		//Convert e to BigInteger.
 		BigInteger eBI = new BigInteger(1, e);
 		//Calculate u^e.
-		GroupElement uToe = dlog.exponentiate(input.getU(), eBI);
+		GroupElement uToe = dlog.exponentiate(dhInput.getU(), eBI);
 		//Calculate a*h^e.
 		GroupElement right = dlog.multiplyGroupElements(aElement, uToe);
 		//If left and right sides of the equation are not equal, set verified to false.
@@ -230,7 +188,7 @@ public class SigmaDHVerifier implements SigmaVerifierComputation, DlogBasedSigma
 		left = dlog.exponentiate(h, exponent.getMsg());
 		//Compute b*v^e (right side of the verify equation).
 		//Calculate v^e.
-		GroupElement vToe = dlog.exponentiate(input.getV(), eBI);
+		GroupElement vToe = dlog.exponentiate(dhInput.getV(), eBI);
 		//Calculate b*v^e.
 		right = dlog.multiplyGroupElements(bElement, vToe);
 		//If left and right sides of the equation are not equal, set verified to false.
