@@ -24,7 +24,7 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.orTwo;
 
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 
 /**
  * Concrete implementation of SigmaProtocol input, used by the SigmaProtocolORTwoverifier.
@@ -34,18 +34,19 @@ import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocol
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaORTwoInput implements SigmaProtocolInput{
+public class SigmaORTwoCommonInput implements SigmaCommonInput{
 	
-	private SigmaProtocolInput[] inputs;
+	private static final long serialVersionUID = 1200842938254920765L;
+	private SigmaCommonInput[] inputs;
 	
-	public SigmaORTwoInput(SigmaProtocolInput[] inputs){
+	public SigmaORTwoCommonInput(SigmaCommonInput[] inputs){
 		if (inputs.length != 2){
 			throw new IllegalArgumentException("The given inputs array must contains two objects.");
 		}
 		this.inputs = inputs;
 	}
 	
-	public SigmaProtocolInput[] getInputs(){
+	public SigmaCommonInput[] getInputs(){
 		return inputs;
 	}
 }
