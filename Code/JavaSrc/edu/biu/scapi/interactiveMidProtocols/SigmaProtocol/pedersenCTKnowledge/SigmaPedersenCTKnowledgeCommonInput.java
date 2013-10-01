@@ -24,23 +24,28 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.pedersenCTKnowledge;
 
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.CTCPedersenCommitmentMessage;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**
- * Concrete implementation of SigmaProtocol input, used by the SigmaPedersenCTKnowledgeVerifier.
- * In SigmaPedersenCTKnowledge protocol, the verifier gets a GroupElement h and a commitment message.
+ * Concrete implementation of SigmaProtocol input, used by the SigmaPedersenCTKnowledge verifier and simulator.
+ * 
+ * In SigmaPedersenCTKnowledge protocol, the common input contains a GroupElement h and a commitment message.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaPedersenCTKnowledgeInput implements SigmaProtocolInput{
+public class SigmaPedersenCTKnowledgeCommonInput implements SigmaCommonInput{
 	
+	private static final long serialVersionUID = 6360210454705006144L;
 	private GroupElement h;
 	private CTCPedersenCommitmentMessage commitment;
 	
-	public SigmaPedersenCTKnowledgeInput(GroupElement h, CTCPedersenCommitmentMessage commitment){
+	public SigmaPedersenCTKnowledgeCommonInput(GroupElement h, CTCPedersenCommitmentMessage commitment){
 		this.h = h;
 		this.commitment = commitment;
 	}
@@ -52,5 +57,10 @@ public class SigmaPedersenCTKnowledgeInput implements SigmaProtocolInput{
 	public CTCPedersenCommitmentMessage getCommitment(){
 		return commitment;
 	}
-
+	
+	private void writeObject(ObjectOutputStream out) throws IOException {  
+        
+        out.writeObject(h.generateSendableData());  
+        out.writeObject(commitment);
+    } 
 }
