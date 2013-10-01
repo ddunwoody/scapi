@@ -26,12 +26,15 @@ package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.orMultiple;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Hashtable;
 
 import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaProverComputation;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaSimulator;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaMultipleMsg;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProverInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaSimulatorOutput;
 
@@ -61,19 +64,20 @@ public class SigmaORMultipleProver implements SigmaProverComputation{
 			The message is Q,e1,z1,…,en,zn (where by Q we mean its coefficients)
 	*/
 	
-	private ArrayList<SigmaProverComputation> provers;			// Underlying Sigma protocol's provers to the OR calculation.
+	private Hashtable<Integer, SigmaProverComputation> provers;	// Underlying Sigma protocol's provers to the OR calculation.
+	private Hashtable<Integer, SigmaSimulator> simulators;		// Underlying Sigma protocol's simulators to the OR calculation.
 	private int len;											// Number of underlying provers.
 	private int t;												// Soundness parameter.
-	private SecureRandom random;
-	private ArrayList<Integer> I;								// The indexes of the statements which the prover knows the witnesses.
+	private int k;												//number of witnesses.
+	private SecureRandom random;								// The indexes of the statements which the prover knows the witnesses.
 	
 	private SigmaORMultipleProverInput input;					// Used in computeFirstMsg function.
 	
 	private byte[][] challenges;								// Will hold the challenges to the underlying provers/simulators.
 																// Some will be calculate in sampleRandomValues function and some in compueSecondMsg. 
 	
-	private ArrayList<SigmaSimulatorOutput> simulatorsOutput;	// We save this because we calculate it in computeFirstMsg and using 
-																// it after that, in computeSecondMsg
+	private Hashtable<Integer, SigmaSimulatorOutput> simulatorsOutput;	// We save this because we calculate it in computeFirstMsg and using 
+																	// it after that, in computeSecondMsg
 	
 	private long[] fieldElements;								//Will hold pointers to the sampled field elements, 
 																//we save the pointers to save the creation of the elements again in computeSecondMsg function.
@@ -103,15 +107,25 @@ public class SigmaORMultipleProver implements SigmaProverComputation{
 	 * @param t soundness parameter. t MUST be equal to all t values of the underlying provers object.
 	 * @throws IllegalArgumentException if the given t is not equal to all t values of the underlying provers object.
 	 */
-	public SigmaORMultipleProver(ArrayList<SigmaProverComputation> provers, int t, SecureRandom random) {
+	public SigmaORMultipleProver(Hashtable<Integer, SigmaProverComputation> provers, Hashtable<Integer, SigmaSimulator> simulators, int t, SecureRandom random) {
 		//If the given t is different from one of the underlying object's t values, throw exception.
-		for (int i = 0; i < provers.size(); i++){
-			if (t != provers.get(i).getSoundness()){
+		
+		Enumeration<SigmaProverComputation> proversEl = provers.elements();
+		while (proversEl.hasMoreElements()){
+			if (t != proversEl.nextElement().getSoundnessParam()){
 				throw new IllegalArgumentException("the given t does not equal to one of the t values in the underlying provers objects.");
 			}
 		}
+		Enumeration<SigmaSimulator> simulatorsEl = simulators.elements();
+		while (simulatorsEl.hasMoreElements()){
+			if (t != simulatorsEl.nextElement().getSoundnessParam()){
+				throw new IllegalArgumentException("the given t does not equal to one of the t values in the underlying simulators objects.");
+			}
+		}
 		this.provers = provers;
-		len = provers.size();
+		k = provers.size();
+		this.simulators = simulators;
+		len = k + simulators.size();
 		this.t = t; 
 		this.random = random;
 		//Initialize the field GF2E with a random irreducible polynomial with degree t.
@@ -122,67 +136,30 @@ public class SigmaORMultipleProver implements SigmaProverComputation{
 	 * Returns the soundness parameter for this Sigma protocol.
 	 * @return t soundness parameter
 	 */
-	public int getSoundness(){
+	public int getSoundnessParam(){
 		return t;
 	}
 
 	/**
 	 * Sets the inputs for each one of the underlying prover.
-	 * @param input MUST be an instance of SigmaORMultipleInput.
-	 * @throws IllegalArgumentException if input is not an instance of SigmaORMultipleInput.
+	 * @param input MUST be an instance of SigmaORMultipleProverInput.
+	 * @throws IllegalArgumentException if input is not an instance of SigmaORMultipleProverInput.
 	 * @throws IllegalArgumentException if the number of given inputs is different from the number of underlying provers.
 	 */
-	public void setInput(SigmaProtocolInput in) {
+	private void checkInput(SigmaProverInput in) {
 		if (!(in instanceof SigmaORMultipleProverInput)){
-			throw new IllegalArgumentException("the given input must be an instance of SigmaORMultipleInput");
+			throw new IllegalArgumentException("the given input must be an instance of SigmaORMultipleProverInput");
 		}
 		input = (SigmaORMultipleProverInput) in;
 		
-		ArrayList<SigmaProtocolInput> proversInput = input.getInputs();
-		int inputLen = proversInput.size();
+		int inputLen = input.getProversInput().size()+input.getSimulatorsInput().size();
 		
 		// If number of inputs is not equal to number of provers, throw exception.
 		if (inputLen != len) {
-			throw new IllegalArgumentException("number of inputs is different from number of underlying provers.");
+			throw new IllegalArgumentException("number of inputs is different from number of underlying provers");
 		}
 		
-		this.I = input.getI();
 		
-		//Sets the input to each underlying prover that the prover knows its witness. The other provers will not be in use so they don't need to set input.
-		for (int i = 0; i < len; i++){
-			if (I.contains(new Integer(i))){
-				provers.get(i).setInput(proversInput.get(i));
-			}
-		}
-		
-	}
-
-	/**
-	 * Samples random values for this protocol.
-	 */
-	public void sampleRandomValues() {
-		
-		//For every j in I, call the sampleRandomValues function.
-		for (int i = 0; i < len; i++){
-			//If i in I, call the underlying sampleRandomValues.
-			if (I.contains(new Integer(i))){
-				provers.get(i).sampleRandomValues();
-			} 
-		}
-		fieldElements = new long[len - I.size()];
-		//For every j not in I, sample a random element ej <- GF[2^t]. We sample the random elements in one native call.
-		byte[][] ejs = createRandomFieldElements(len - I.size(), fieldElements);
-		int index = 0;
-		challenges = new byte[len][];
-		
-		//Set the created challenges to the challenges array in the empty indexes.
-		for (int i=0; i<len; i++){
-			if (!(I.contains(new Integer(i)))){
-				//in case that the sample element's length is not t, add zeros to its beginning.
-				challenges[i] = alignToT(ejs[index]);
-				index++; //increase the index of the sampled challenges array.
-			}
-		}
 	}
 
 	/**
@@ -217,30 +194,55 @@ public class SigmaORMultipleProver implements SigmaProverComputation{
 
 	/**
 	 * Computes the following lines from the protocol:
-	 * "For every j not in I, RUN the simulator on statement xj and challenge ej to get transcript (aj,ej,zj)
+	 * "For every j not in I, SAMPLE a random element ej <- GF[2^t]
+	 *  For every j not in I, RUN the simulator on statement xj and challenge ej to get transcript (aj,ej,zj)
 		For every i in I, RUN the prover P on statement xi to get first message ai
 		SET a=(a1,…,an)". 
-	 * @return SigmaMultipleMsg contains a1, …, am.  
+	 * @param input MUST be an instance of SigmaORMultipleInput.
+	 * @return SigmaMultipleMsg contains a1, …, am. 
+	 * @throws IllegalArgumentException if input is not an instance of SigmaORMultipleInput.
+	 * @throws IllegalArgumentException if the number of given inputs is different from the number of underlying provers. 
 	 */
-	public SigmaProtocolMsg computeFirstMsg() {
+	public SigmaProtocolMsg computeFirstMsg(SigmaProverInput in) {
+		//Check the given input.
+		checkInput(in);
+		Hashtable<Integer, SigmaProverInput> proversInput = input.getProversInput();
+		Hashtable<Integer, SigmaCommonInput> simulatorsInput = input.getSimulatorsInput();
+		
+		//Sample random values for this protocol.
+		fieldElements = new long[len - k];
+		//For every j not in I, sample a random element ej <- GF[2^t]. We sample the random elements in one native call.
+		byte[][] ejs = createRandomFieldElements(len - k, fieldElements);
+		int index = 0;
+		challenges = new byte[len][];
+		
+		//Set the created challenges to the challenges array in the empty indexes.
+		for (int i=0; i<len; i++){
+			if (simulators.get(i) != null){
+				//in case that the sample element's length is not t, add zeros to its beginning.
+				challenges[i] = alignToT(ejs[index]);
+				index++; //increase the index of the sampled challenges array.
+			}
+		}
+		
 		//Create an array to hold all messages.
 		ArrayList<SigmaProtocolMsg> firstMessages = new ArrayList<SigmaProtocolMsg>();
 		//Create an array to hold all simaultor's outputs.
-		simulatorsOutput = new ArrayList<SigmaSimulatorOutput>();
+		simulatorsOutput = new Hashtable<Integer, SigmaSimulatorOutput>();
 		SigmaSimulatorOutput output;
 		//Compute all first messages and add them to the array list.
 		for (int i = 0; i < len; i++){
+			SigmaProverComputation prover = provers.get(i);
+			
 			//If i in I, call the underlying computeFirstMsg.
-			if (I.contains(new Integer(i))){
-				firstMessages.add(provers.get(i).computeFirstMsg());
-				//In case the prover knows the witness there is no need on the simulator and there is no output.
-				simulatorsOutput.add(i, null);
+			if (prover != null){
+				firstMessages.add(prover.computeFirstMsg(proversInput.get(i)));
 			//If i not in I, run the simulator for xi.
 			} else{
 				try {
-					output = provers.get(i).getSimulator().simulate(input.getInputs().get(i), challenges[i]);
+					output = simulators.get(i).simulate(simulatorsInput.get(i), challenges[i]);
 					firstMessages.add(output.getA());
-					simulatorsOutput.add(i, output);
+					simulatorsOutput.put(i, output);
 				} catch (CheatAttemptException e) {
 					// This exception will not be thrown because the length of the challenges is valid.
 				}
@@ -263,13 +265,13 @@ public class SigmaORMultipleProver implements SigmaProverComputation{
 	 */
 	public SigmaProtocolMsg computeSecondMsg(byte[] challenge) throws CheatAttemptException {
 		//Create two arrays of indexes. These arrays used to calculate the interpolated polynomial.
-		int[] indexesNotInI= new int[len - I.size()];
-		int[] indexesInI= new int[I.size()];
+		int[] indexesNotInI= new int[len - k];
+		int[] indexesInI= new int[k];
 		int indexNotInI = 0;
 		int indexInI = 0;
 		//Fill the arrays with the indexes.
 		for (int i = 0; i < len; i++){
-			if (I.contains(new Integer(i))){
+			if (provers.get(i) != null){ //prover i has a witness
 				indexesInI[indexInI++] = i+1; //i+1 because Q(0) = e.
 			} else {
 				indexesNotInI[indexNotInI++] = i+1;
@@ -282,7 +284,7 @@ public class SigmaORMultipleProver implements SigmaProverComputation{
 		byte[][] jsInI = getRestChallenges(polynomial, indexesInI);
 		int index = 0;
 		for(int i=0; i<len; i++){
-			if (I.contains(new Integer(i))){
+			if (provers.get(i) != null){
 				challenges[i] = alignToT(jsInI[index++]);
 			}
 		}
@@ -292,9 +294,10 @@ public class SigmaORMultipleProver implements SigmaProverComputation{
 		
 		//Compute all second messages and add them to the array list.
 		for (int i = 0; i < len; i++){
+			SigmaProverComputation prover = provers.get(i);
 			//If i in I, call the underlying computeSecondMsg.
-			if (I.contains(new Integer(i))){	
-				secondMessages.add(provers.get(i).computeSecondMsg(challenges[i]));
+			if (prover != null){	
+				secondMessages.add(prover.computeSecondMsg(challenges[i]));
 			//If i not in I, get z from the simulator output for xi.
 			} else{
 				secondMessages.add(simulatorsOutput.get(i).getZ());
