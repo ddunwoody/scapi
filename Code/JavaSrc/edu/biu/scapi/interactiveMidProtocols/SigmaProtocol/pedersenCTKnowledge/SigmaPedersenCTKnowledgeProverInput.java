@@ -26,6 +26,7 @@ package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.pedersenCTKnowledge;
 
 import java.math.BigInteger;
 
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProverInput;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.CTCPedersenCommitmentMessage;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
@@ -34,18 +35,18 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
  * 
  * In SigmaPedersenCTKnowledge protocol, the prover gets a GroupElement h, commitment message and 
  * values x,r <- Zq such that c = g^r * h^x.
- * This class derives the SigmaPedersenCTKnowledgeInput that contains h and c.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaPedersenCTKnowledgeProverInput extends SigmaPedersenCTKnowledgeInput{
+public class SigmaPedersenCTKnowledgeProverInput implements SigmaProverInput{
 	
+	private SigmaPedersenCTKnowledgeCommonInput params;
 	private BigInteger x;
 	private BigInteger r;
 	
 	public SigmaPedersenCTKnowledgeProverInput(GroupElement h, CTCPedersenCommitmentMessage commitment, BigInteger x, BigInteger r){
-		super(h, commitment);
+		params = new SigmaPedersenCTKnowledgeCommonInput(h, commitment);
 		this.x = x;
 		this.r = r;
 	}
@@ -57,4 +58,12 @@ public class SigmaPedersenCTKnowledgeProverInput extends SigmaPedersenCTKnowledg
 	public BigInteger getR(){
 		return r;
 	}
+
+	@Override
+	public SigmaPedersenCTKnowledgeCommonInput getCommonParams() {
+		return params;
+	}
+
+	 
+	
 }
