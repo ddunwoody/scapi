@@ -30,8 +30,9 @@ import java.security.SecureRandom;
 import org.bouncycastle.util.BigIntegers;
 
 import edu.biu.scapi.exceptions.CheatAttemptException;
+import edu.biu.scapi.generals.ScapiDefaultConfiguration;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaSimulator;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaSimulatorOutput;
 
 /**
@@ -64,35 +65,50 @@ public class SigmaDamgardJurikProductSimulator implements SigmaSimulator{
 	 */
 	public SigmaDamgardJurikProductSimulator(int t, int lengthParameter, SecureRandom random) {
 		
-		this.t = t;
-		this.lengthParameter = lengthParameter;
-		this.random = random;
+		doConstruct(t, lengthParameter, random);
 	}
 	
 	/**
 	 * Default constructor that chooses default values for the parameters.
 	 */
 	public SigmaDamgardJurikProductSimulator() {
-		this(80, 1, new SecureRandom());
+		//read the default statistical parameter used in sigma protocols from a configuration file.
+		String statisticalParameter = ScapiDefaultConfiguration.getInstance().getProperty("StatisticalParameter");
+		int t = Integer.parseInt(statisticalParameter);
+		
+		doConstruct(t, 1, new SecureRandom());
+	}
+	
+	/**
+	 * Sets the given parameters.
+	 * @param t Soundness parameter in BITS.
+	 * @param lengthParameter length parameter in BITS.
+	 * @param random
+	 */
+	private void doConstruct(int t, int lengthParameter, SecureRandom random){
+		
+		this.t = t;
+		this.lengthParameter = lengthParameter;
+		this.random = random;
 	}
 	
 	/**
 	 * Returns the soundness parameter for this Sigma protocol.
 	 * @return t soundness parameter
 	 */
-	public int getSoundness(){
+	public int getSoundnessParam(){
 		return t;
 	}
 	
 	/**
 	 * Computes the simulator computation.
-	 * @param input MUST be an instance of SigmaDJProductInput.
+	 * @param input MUST be an instance of SigmaDJProductCommonInput.
 	 * @param challenge
 	 * @return the output of the computation - (a, e, z).
 	 * @throws CheatAttemptException if the received challenge's length is not equal to the soundness parameter.
-	 * @throws IllegalArgumentException if the given input is not an instance of SigmaDJProductInput.
+	 * @throws IllegalArgumentException if the given input is not an instance of SigmaDJProductCommonInput.
 	 */
-	public SigmaSimulatorOutput simulate(SigmaProtocolInput input, byte[] challenge) throws CheatAttemptException{
+	public SigmaSimulatorOutput simulate(SigmaCommonInput input, byte[] challenge) throws CheatAttemptException{
 		/*
 		 * SAMPLE random values z1 <- ZN, z2 <- Z*n, z3 <- Z*n
 		 * COMPUTE a1 = (1+n)^z1*(z2^N/c1^e) mod N’ AND a2 = c2^z1/(z3^N*c3^e) mod N’
@@ -104,14 +120,14 @@ public class SigmaDamgardJurikProductSimulator implements SigmaSimulator{
 			throw new CheatAttemptException("the length of the given challenge is differ from the soundness parameter");
 		}
 		
-		if (!(input instanceof SigmaDJProductInput)){
-			throw new IllegalArgumentException("the given input must be an instance of SigmaDJProductInput");
+		if (!(input instanceof SigmaDJProductCommonInput)){
+			throw new IllegalArgumentException("the given input must be an instance of SigmaDJProductCommonInput");
 		}
-		SigmaDJProductInput djInput = (SigmaDJProductInput) input;
-		
+		SigmaDJProductCommonInput djInput = (SigmaDJProductCommonInput) input;
+		 
 		BigInteger n = djInput.getPublicKey().getModulus();
 		//Check the soundness validity.
-		if (!checkSoundness(n)){
+		if (!checkSoundnessParam(n)){
 			throw new IllegalArgumentException("t must be less than a third of the length of the public key n");
 		}
 		
@@ -157,7 +173,7 @@ public class SigmaDamgardJurikProductSimulator implements SigmaSimulator{
 	 * @return the output of the computation - (a, e, z).
 	 * @throws IllegalArgumentException if the given input is not an instance of SigmaDJProductInput.
 	 */
-	public SigmaSimulatorOutput simulate(SigmaProtocolInput input){
+	public SigmaSimulatorOutput simulate(SigmaCommonInput input){
 		//Create a new byte array of size t/8, to get the required byte size.
 		byte[] e = new byte[t/8];
 		//Fill the byte array with random values.
@@ -176,7 +192,7 @@ public class SigmaDamgardJurikProductSimulator implements SigmaSimulator{
 	 * t must be less than a third of the length of the public key n.
 	 * @return true if the soundness parameter is valid; false, otherwise.
 	 */
-	private boolean checkSoundness(BigInteger modulus){
+	private boolean checkSoundnessParam(BigInteger modulus){
 		//If soundness parameter is not less than a third of the publicKey n, return false.
 		int third = modulus.bitLength() / 3;
 		if (t >= third){
