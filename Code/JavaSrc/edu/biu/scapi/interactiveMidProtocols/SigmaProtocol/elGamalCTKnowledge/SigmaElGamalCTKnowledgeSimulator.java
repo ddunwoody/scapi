@@ -24,19 +24,16 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.elGamalCTKnowledge;
 
-import java.io.IOException;
 import java.security.SecureRandom;
 
 import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaSimulator;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog.SigmaDlogInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog.SigmaDlogCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog.SigmaDlogSimulator;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaSimulatorOutput;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
-import edu.biu.scapi.primitives.dlog.cryptopp.CryptoPpDlogZpSafePrime;
-import edu.biu.scapi.primitives.dlog.miracl.MiraclDlogECF2m;
 
 /**
  * Concrete implementation of Sigma Simulator.
@@ -64,31 +61,6 @@ public class SigmaElGamalCTKnowledgeSimulator implements SigmaSimulator{
 	 */
 	public SigmaElGamalCTKnowledgeSimulator(DlogGroup dlog, int t, SecureRandom random){
 		
-		setParameters(dlog, t, random);
-	}
-	
-	/**
-	 * Default constructor that chooses default values for the parameters.
-	 */
-	public SigmaElGamalCTKnowledgeSimulator() {
-		try {
-			//Create Miracl Koblitz 233 Elliptic curve.
-			dlog = new MiraclDlogECF2m("K-233");
-		} catch (IOException e) {
-			//If there is a problem with the elliptic curves file, create Zp DlogGroup.
-			dlog = new CryptoPpDlogZpSafePrime();
-		}
-		
-		setParameters(dlog, 80, new SecureRandom());
-	}
-	
-	/**
-	 * Sets the given parameters.
-	 * @param dlog
-	 * @param t
-	 * @param random
-	 */
-	private void setParameters(DlogGroup dlog, int t, SecureRandom random) {
 		//Creates the underlying SigmaDlogSimulator object with the given parameters.
 		dlogSim = new SigmaDlogSimulator(dlog, t, random);
 		this.dlog = dlog;
@@ -117,21 +89,21 @@ public class SigmaElGamalCTKnowledgeSimulator implements SigmaSimulator{
 	 * Returns the soundness parameter for this Sigma protocol.
 	 * @return t soundness parameter
 	 */
-	public int getSoundness(){
-		return dlogSim.getSoundness();
+	public int getSoundnessParam(){
+		return dlogSim.getSoundnessParam();
 	}
 	
 	/**
 	 * Computes the simulator computation.
-	 * @param input MUST be an instance of SigmaElGamalCTKnowledgeInput.
+	 * @param input MUST be an instance of SigmaElGamalCTKnowledgeCommonInput.
 	 * @param challenge
 	 * @return the output of the computation - (a, e, z).
 	 * @throws CheatAttemptException if the received challenge's length is not equal to the soundness parameter.
-	 * @throws IllegalArgumentException if the given input is not an instance of SigmaElGamalCTKnowledgeInput.
+	 * @throws IllegalArgumentException if the given input is not an instance of SigmaElGamalCTKnowledgeCommonInput.
 	 */
-	public SigmaSimulatorOutput simulate(SigmaProtocolInput input, byte[] challenge) throws CheatAttemptException{
+	public SigmaSimulatorOutput simulate(SigmaCommonInput input, byte[] challenge) throws CheatAttemptException{
 		//Converts the input to an input object of the underlying simulator.
-		SigmaDlogInput dlogInput = convertInput(input);
+		SigmaDlogCommonInput dlogInput = convertInput(input);
 		
 		//Delegates the computation to the underlying Sigma Dlog prover.
 		return dlogSim.simulate(dlogInput, challenge); 
@@ -140,31 +112,31 @@ public class SigmaElGamalCTKnowledgeSimulator implements SigmaSimulator{
 
 	/**
 	 * Converts the given input to an input object of the underlying Sigma simulator.
-	 * @param input MUST be an instance of SigmaElGamalCTKnowledgeInput.
+	 * @param input MUST be an instance of SigmaElGamalCTKnowledgeCommonInput.
 	 * @return the converted input.
-	 * @throws IllegalArgumentException if the given input is not an instance of SigmaElGamalCTKnowledgeInput.
+	 * @throws IllegalArgumentException if the given input is not an instance of SigmaElGamalCTKnowledgeCommonInput.
 	 */
-	private SigmaDlogInput convertInput(SigmaProtocolInput input) {
-		if (!(input instanceof SigmaElGamalCTKnowledgeInput)){
-			throw new IllegalArgumentException("the given input must be an instance of SigmaElGamalCTKnowledgeInput");
+	private SigmaDlogCommonInput convertInput(SigmaCommonInput input) {
+		if (!(input instanceof SigmaElGamalCTKnowledgeCommonInput)){
+			throw new IllegalArgumentException("the given input must be an instance of SigmaElGamalCTKnowledgeCommonInput");
 		}
-		SigmaElGamalCTKnowledgeInput elGamalInput = (SigmaElGamalCTKnowledgeInput) input;
+		SigmaElGamalCTKnowledgeCommonInput params = (SigmaElGamalCTKnowledgeCommonInput) input;
 		
 		//Convert the input to match the required SigmaDlogSimulator's input.
-		GroupElement h = dlog.reconstructElement(true, elGamalInput.getCommitment().getPublicKey().getC());
-		SigmaDlogInput dlogInput = new SigmaDlogInput(h);
+		GroupElement h = dlog.reconstructElement(true, params.getCommitment().getPublicKey().getC());
+		SigmaDlogCommonInput dlogInput = new SigmaDlogCommonInput(h);
 		return dlogInput;
 	}
 	
 	/**
 	 * Computes the simulator computation.
-	 * @param input MUST be an instance of SigmaElGamalCTKnowledgeInput.
+	 * @param input MUST be an instance of SigmaElGamalCTKnowledgeCommonInput.
 	 * @return the output of the computation - (a, e, z).
-	 * @throws IllegalArgumentException if the given input is not an instance of SigmaElGamalCTKnowledgeInput.
+	 * @throws IllegalArgumentException if the given input is not an instance of SigmaElGamalCTKnowledgeCommonInput.
 	 */
-	public SigmaSimulatorOutput simulate(SigmaProtocolInput input){
+	public SigmaSimulatorOutput simulate(SigmaCommonInput input){
 		//Converts the input to an input object of the underlying simulator.
-		SigmaDlogInput dlogInput = convertInput(input);
+		SigmaDlogCommonInput dlogInput = convertInput(input);
 		
 		//Delegates the computation to the underlying Sigma Dlog simulator.
 		return dlogSim.simulate(dlogInput); 
