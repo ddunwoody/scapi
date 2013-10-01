@@ -24,21 +24,18 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.pedersenCommittedValue;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.DlogBasedSigma;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaVerifierComputation;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog.SigmaDlogInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog.SigmaDlogCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog.SigmaDlogVerifier;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
-import edu.biu.scapi.primitives.dlog.cryptopp.CryptoPpDlogZpSafePrime;
-import edu.biu.scapi.primitives.dlog.miracl.MiraclDlogECF2m;
 
 /**
  * Concrete implementation of Sigma Protocol verifier computation. <p>
@@ -69,39 +66,6 @@ public class SigmaPedersenCommittedValueVerifier implements SigmaVerifierComputa
 	 */
 	public SigmaPedersenCommittedValueVerifier(DlogGroup dlog, int t, SecureRandom random) throws InvalidDlogGroupException {
 		
-		setParameters(dlog, t, random);
-	}
-	
-	/**
-	 * Default constructor that chooses default values for the parameters.
-	 */
-	public SigmaPedersenCommittedValueVerifier() {
-		
-		try {
-			//Create Miracl Koblitz 233 Elliptic curve.
-			dlog = new MiraclDlogECF2m("K-233");
-		} catch (IOException e) {
-			//If there is a problem with the elliptic curves file, create Zp DlogGroup.
-			dlog = new CryptoPpDlogZpSafePrime();
-		}
-		
-		try {
-			setParameters(dlog, 80, new SecureRandom());
-		} catch (InvalidDlogGroupException e) {
-			// Can not occur since the DlogGroup is valid.
-		}
-		
-	}
-	
-	/**
-	 * Sets the given parameters.
-	 * @param dlog
-	 * @param t Soundness parameter in BITS.
-	 * @param random
-	 * @throws InvalidDlogGroupException if the given dlog is invalid.
-	 */
-	private void setParameters(DlogGroup dlog, int t, SecureRandom random) throws InvalidDlogGroupException {
-		
 		//Creates the underlying SigmaDlogVerifier object with the given parameters.
 		sigmaDlog = new SigmaDlogVerifier(dlog, t, random);
 		this.dlog = dlog;
@@ -111,31 +75,30 @@ public class SigmaPedersenCommittedValueVerifier implements SigmaVerifierComputa
 	 * Returns the soundness parameter for this Sigma protocol.
 	 * @return t soundness parameter
 	 */
-	public int getSoundness(){
+	public int getSoundnessParam(){
 		//Delegates to the underlying Sigma Dlog verifier.
-		return sigmaDlog.getSoundness();
+		return sigmaDlog.getSoundnessParam();
 	}
 
 	/**
 	 * Sets the input for this Sigma protocol
-	 * @param input MUST be an instance of SigmaPedersenCommittedValueInput.
-	 * @throws IllegalArgumentException if input is not an instance of SigmaPedersenCommittedValueInput.
+	 * @param input MUST be an instance of SigmaPedersenCommittedValueCommonInput.
+	 * @throws IllegalArgumentException if input is not an instance of SigmaPedersenCommittedValueCommonInput.
 	 */
-	public void setInput(SigmaProtocolInput in) {
+	private SigmaDlogCommonInput convertInput(SigmaCommonInput in) {
 		
-		if (!(in instanceof SigmaPedersenCommittedValueInput)){
-			throw new IllegalArgumentException("the given input must be an instance of SigmaPedersenCommittedValueInput");
+		if (!(in instanceof SigmaPedersenCommittedValueCommonInput)){
+			throw new IllegalArgumentException("the given input must be an instance of SigmaPedersenCommittedValueCommonInput");
 		}
-		SigmaPedersenCommittedValueInput input = (SigmaPedersenCommittedValueInput) in;
+		SigmaPedersenCommittedValueCommonInput input = (SigmaPedersenCommittedValueCommonInput) in;
 		
 		//Convert the input to the underlying Dlog prover. h’ = c*h^(-x).
 		BigInteger minusX = dlog.getOrder().subtract(input.getX());
 		GroupElement hToX = dlog.exponentiate(input.getH(), minusX);
-		GroupElement c = dlog.reconstructElement(true, input.getCommitment().getC());
+		GroupElement c = input.getCommitment();
 		GroupElement hTag = dlog.multiplyGroupElements(c, hToX);
 		
-		SigmaDlogInput underlyingInput = new SigmaDlogInput(hTag);
-		sigmaDlog.setInput(underlyingInput);
+		return new SigmaDlogCommonInput(hTag);
 				
 	}
 	
@@ -172,9 +135,11 @@ public class SigmaPedersenCommittedValueVerifier implements SigmaVerifierComputa
 	 * @throws IllegalArgumentException if the first message of the prover is not an instance of SigmaGroupElementMsg
 	 * @throws IllegalArgumentException if the second message of the prover is not an instance of SigmaBIMsg
 	 */
-	public boolean verify(SigmaProtocolMsg a, SigmaProtocolMsg z) {
+	public boolean verify(SigmaCommonInput in, SigmaProtocolMsg a, SigmaProtocolMsg z) {
+		//Converts the input to the underlying verifier.
+		SigmaDlogCommonInput input = convertInput(in);
 		
-		return sigmaDlog.verify(a, z);
+		return sigmaDlog.verify(input, a, z);
 	}
 
 }
