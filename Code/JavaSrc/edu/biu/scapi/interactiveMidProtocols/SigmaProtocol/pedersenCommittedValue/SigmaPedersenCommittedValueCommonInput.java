@@ -24,30 +24,49 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.pedersenCommittedValue;
 
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.math.BigInteger;
 
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.pedersenCTKnowledge.SigmaPedersenCTKnowledgeInput;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.CTCPedersenCommitmentMessage;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**
- * Concrete implementation of SigmaProtocol input, used by the SigmaPedersenCommittedValueVerifier.
- * In SigmaPedersenCommittedValue protocol, the verifier gets a GroupElement h, a commitment message and the committed value x.
+ * Concrete implementation of SigmaProtocol input, used by the SigmaPedersenCommittedValue verifier and simulator.
+ * In SigmaPedersenCommittedValue protocol, the common input contains a GroupElement h, a commitment message and the committed value x. 
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaPedersenCommittedValueInput extends SigmaPedersenCTKnowledgeInput{
-	
+public class SigmaPedersenCommittedValueCommonInput implements SigmaCommonInput{
+
+	private static final long serialVersionUID = -7506409897610196712L;
 	private BigInteger x;
+	private GroupElement h;
+	private GroupElement commitment;
 	
-	public SigmaPedersenCommittedValueInput(GroupElement h, CTCPedersenCommitmentMessage commitment, BigInteger x){
-		super(h, commitment);
+	public SigmaPedersenCommittedValueCommonInput(GroupElement h, GroupElement commitment, BigInteger x){
+		this.h = h;
+		this.commitment = commitment;
 		this.x = x;
 	}
 	
 	public BigInteger getX(){
 		return x;
 	}
-
+	
+	public GroupElement getH(){
+		return h;
+	}
+	
+	public GroupElement getCommitment(){
+		return commitment;
+	}
+	
+	private void writeObject(ObjectOutputStream out) throws IOException {  
+        
+        out.writeObject(h.generateSendableData());  
+        out.writeObject(commitment.generateSendableData());
+        out.writeObject(x);
+    }  
 }
