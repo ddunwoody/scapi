@@ -26,7 +26,7 @@ package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.pedersenCommittedVal
 
 import java.math.BigInteger;
 
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.CTCPedersenCommitmentMessage;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProverInput;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**
@@ -37,17 +37,25 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaPedersenCommittedValueProverInput extends SigmaPedersenCommittedValueInput{
+public class SigmaPedersenCommittedValueProverInput implements SigmaProverInput{
 	
+	private SigmaPedersenCommittedValueCommonInput params;
 	private BigInteger r;
 	
-	public SigmaPedersenCommittedValueProverInput(GroupElement h, CTCPedersenCommitmentMessage commitment, BigInteger x, BigInteger r){
-		super(h, commitment, x);
+	public SigmaPedersenCommittedValueProverInput(GroupElement h, GroupElement commitment, BigInteger x, BigInteger r){
+		params = new SigmaPedersenCommittedValueCommonInput(h, commitment, x);
 		this.r = r;
 	}
 
 	public BigInteger getR(){
 		return r;
 	}
+
+	@Override
+	public SigmaPedersenCommittedValueCommonInput getCommonParams() {
+		
+		return params;
+	}
+	
 	
 }
