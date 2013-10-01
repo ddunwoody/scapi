@@ -24,25 +24,30 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.damgardJurikProduct;
 
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.DamgardJurikPublicKey;
 import edu.biu.scapi.midLayer.ciphertext.BigIntegerCiphertext;
 
 /**
- * Concrete implementation of SigmaProtocol input, used by the SigmaDamgardJurikProductVerifier.
- * In SigmaProtocolDamgardJurikProduct, the verifier gets a DamgardJurikPublicKey and three BigIntegerCiphertexts.
+ * Concrete implementation of SigmaProtocol input, used by the SigmaDamgardJurikProduct verifier and simulator.
+ * In SigmaProtocolDamgardJurikProduct, the common input contains DamgardJurikPublicKey and three BigIntegerCiphertexts.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaDJProductInput implements SigmaProtocolInput{
+public class SigmaDJProductCommonInput implements SigmaCommonInput{
+	
+	private static final long serialVersionUID = 2474346914281126954L;
 	
 	private DamgardJurikPublicKey publicKey;
 	private BigIntegerCiphertext cipher1;
 	private BigIntegerCiphertext cipher2;
 	private BigIntegerCiphertext cipher3;
 	
-	public SigmaDJProductInput(DamgardJurikPublicKey publicKey, BigIntegerCiphertext c1, BigIntegerCiphertext c2, BigIntegerCiphertext c3){
+	public SigmaDJProductCommonInput(DamgardJurikPublicKey publicKey, BigIntegerCiphertext c1, BigIntegerCiphertext c2, BigIntegerCiphertext c3){
 		this.publicKey = publicKey;
 		cipher1 = c1;
 		cipher2 = c2;
@@ -65,4 +70,11 @@ public class SigmaDJProductInput implements SigmaProtocolInput{
 		return cipher3;
 	}
 	
+	private void writeObject(ObjectOutputStream out) throws IOException {  
+        
+        out.writeObject(publicKey.generateSendableData());  
+        out.writeObject(cipher1);
+        out.writeObject(cipher2);
+        out.writeObject(cipher3);
+    } 
 }
