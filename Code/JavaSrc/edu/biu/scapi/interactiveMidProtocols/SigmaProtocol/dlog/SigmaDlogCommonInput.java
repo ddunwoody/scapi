@@ -24,25 +24,35 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog;
 
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**
- * Concrete implementation of SigmaProtocol input, used by the SigmaDlogVerifier.
- * In SigmaProtocolDlog, the verifier gets a GroupElement h.
+ * Concrete implementation of SigmaProtocol input, used by the SigmaDlog verifier and simulator.
+ * In SigmaProtocolDlog, the common input contains a GroupElement h.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaDlogInput implements SigmaProtocolInput{
+public class SigmaDlogCommonInput implements SigmaCommonInput{
 
+	
+	private static final long serialVersionUID = -2041812894475536801L;
 	private GroupElement h;
 	
-	public SigmaDlogInput(GroupElement h){
+	public SigmaDlogCommonInput(GroupElement h){
 		this.h = h;
 	}
 	
 	public GroupElement getH(){
 		return h;
 	}
+	
+	private void writeObject(ObjectOutputStream out) throws IOException {  
+        
+        out.writeObject(h.generateSendableData());  
+    }  
 }
