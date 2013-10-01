@@ -24,24 +24,27 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dhExtended;
 
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**
- * Concrete implementation of SigmaProtocol input, used by the SigmaDHExtendedVerifier.
- * In SigmaProtocolDHExtended, the verifier gets an extended DH tuple - (g1,…,gm,h1,…,hm).
+ * Concrete implementation of SigmaProtocol input, used by the SigmaDHExtended verifier and simulator.
+ * In SigmaProtocolDHExtended, the common input contains an extended DH tuple - (g1,…,gm,h1,…,hm).
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaDHExtendedInput implements SigmaProtocolInput{
+public class SigmaDHExtendedCommonInput implements SigmaCommonInput{
 
+	private static final long serialVersionUID = 2595300376835152550L;
 	private ArrayList<GroupElement> gArray;
 	private ArrayList<GroupElement> hArray;
 	
-	public SigmaDHExtendedInput(ArrayList<GroupElement> gArray, ArrayList<GroupElement> hArray){
+	public SigmaDHExtendedCommonInput(ArrayList<GroupElement> gArray, ArrayList<GroupElement> hArray){
 		this.gArray = gArray;
 		this.hArray = hArray;
 	}
@@ -53,4 +56,16 @@ public class SigmaDHExtendedInput implements SigmaProtocolInput{
 	public ArrayList<GroupElement> getHArray(){
 		return hArray;
 	}
+	
+	private void writeObject(ObjectOutputStream out) throws IOException {  
+        int gSize = gArray.size();
+		for(int i=0; i<gSize; i++){
+			out.writeObject(gArray.get(i).generateSendableData());
+		}
+		
+		int hSize = hArray.size();
+		for(int i=0; i<hSize; i++){
+			out.writeObject(hArray.get(i).generateSendableData());
+		}
+    }  
 }
