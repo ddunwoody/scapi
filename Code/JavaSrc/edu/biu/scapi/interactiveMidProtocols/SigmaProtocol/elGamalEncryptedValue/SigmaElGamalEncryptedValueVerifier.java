@@ -24,20 +24,17 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.elGamalEncryptedValue;
 
-import java.io.IOException;
 import java.security.SecureRandom;
 
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.DlogBasedSigma;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaVerifierComputation;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHVerifier;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
-import edu.biu.scapi.primitives.dlog.cryptopp.CryptoPpDlogZpSafePrime;
-import edu.biu.scapi.primitives.dlog.miracl.MiraclDlogECF2m;
 
 /**
  * Concrete implementation of Sigma Protocol verifier computation. <p>
@@ -82,46 +79,26 @@ public class SigmaElGamalEncryptedValueVerifier implements SigmaVerifierComputat
 	}
 	
 	/**
-	 * Default constructor that chooses default values for the parameters.
-	 */
-	public SigmaElGamalEncryptedValueVerifier() {
-		try {
-			//Create Miracl Koblitz 233 Elliptic curve.
-			dlog = new MiraclDlogECF2m("K-233");
-		} catch (IOException e) {
-			//If there is a problem with the elliptic curves file, create Zp DlogGroup.
-			dlog = new CryptoPpDlogZpSafePrime();
-		}
-		
-		//Creates the underlying SigmaDHVerifier object with default parameters.
-		try {
-			sigmaDH = new SigmaDHVerifier(dlog, 80, new SecureRandom());
-		} catch (InvalidDlogGroupException e) {
-			// Can not occur since the DlogGroup is valid.
-		}
-	}
-	
-	/**
 	 * Returns the soundness parameter for this Sigma protocol.
 	 * @return t soundness parameter
 	 */
-	public int getSoundness(){
+	public int getSoundnessParam(){
 		//Delegates to the underlying sigmaDH verifier.
-		return sigmaDH.getSoundness();
+		return sigmaDH.getSoundnessParam();
 	}
 
 	/**
 	 * Sets the input for this Sigma protocol.
-	 * @param input MUST be an instance of SigmaElGamalEncryptedValueInput.
+	 * @param input MUST be an instance of SigmaElGamalEncryptedValueCommonInput.
 	 * @throws IllegalArgumentException if input is not the expected.
 	 */
-	public void setInput(SigmaProtocolInput in) {
-		if (!(in instanceof SigmaElGamalEncryptedValueInput)){
-			throw new IllegalArgumentException("the given input must be an instance of SigmaElGamalEncryptedValueInput");
+	private SigmaDHCommonInput convertInput(SigmaCommonInput in) {
+		if (!(in instanceof SigmaElGamalEncryptedValueCommonInput)){
+			throw new IllegalArgumentException("the given input must be an instance of SigmaElGamalEncryptedValueCommonInput");
 		}
 		
-		SigmaElGamalEncryptedValueInput input = (SigmaElGamalEncryptedValueInput) in;
-		boolean isRandomness = input.isRandomness();
+		SigmaElGamalEncryptedValueCommonInput params = (SigmaElGamalEncryptedValueCommonInput) in;
+		boolean isRandomness = params.isRandomness();
 		//Converts the given input to the necessary input to the underlying SigmaDHVerifier.
 		GroupElement h = null;
 		GroupElement u = null;;
@@ -132,32 +109,30 @@ public class SigmaElGamalEncryptedValueVerifier implements SigmaVerifierComputat
 		if (!isRandomness){
 			
 			//h = c1;
-			h = input.getCipher().getC1();
+			h = params.getCipher().getC1();
 			//u = h;
-			u = input.getPublicKey().getH();
+			u = params.getPublicKey().getH();
 			//v = c2/x = c2*x^(-1)
-			GroupElement c2 = input.getCipher().getC2();
-			GroupElement xInverse = dlog.getInverse(input.getX());
+			GroupElement c2 = params.getCipher().getC2();
+			GroupElement xInverse = dlog.getInverse(params.getX());
 			v = dlog.multiplyGroupElements(c2, xInverse);
 		}
 		//In case we use knowledge of the randomness used to encrypt:
 		// (h,u,v, w) = (h,c1,c2/x, r)
 		if (isRandomness){
 			//h = c1;
-			h = input.getPublicKey().getH();
+			h = params.getPublicKey().getH();
 			//u = h;
-			u = input.getCipher().getC1();
+			u = params.getCipher().getC1();
 			//v = c2/x = c2*x^(-1)
-			GroupElement c2 = input.getCipher().getC2();
-			GroupElement xInverse = dlog.getInverse(input.getX());
+			GroupElement c2 = params.getCipher().getC2();
+			GroupElement xInverse = dlog.getInverse(params.getX());
 			v = dlog.multiplyGroupElements(c2, xInverse);
 		}
 		
 		
 		//Create an input object to the underlying sigma DH verifier.
-		SigmaDHInput underlyingInput = new SigmaDHInput(h,u, v);
-		sigmaDH.setInput(underlyingInput);
-		
+		return new SigmaDHCommonInput(h,u, v);
 	}
 	
 	/**
@@ -193,8 +168,11 @@ public class SigmaElGamalEncryptedValueVerifier implements SigmaVerifierComputat
 	 * @throws IllegalArgumentException if the first message of the prover is not an instance of SigmaDHMsg
 	 * @throws IllegalArgumentException if the second message of the prover is not an instance of SigmaBIMsg
 	 */
-	public boolean verify(SigmaProtocolMsg a, SigmaProtocolMsg z) {
+	public boolean verify(SigmaCommonInput in, SigmaProtocolMsg a, SigmaProtocolMsg z) {
+		//converts the input to the underlying verifier.
+		SigmaDHCommonInput input = convertInput(in);
+		
 		//Delegates to the underlying Sigma DH verifier.
-		return sigmaDH.verify(a, z);
+		return sigmaDH.verify(input, a, z);
 	}
 }
