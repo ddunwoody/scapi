@@ -24,26 +24,35 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.elGamalPrivateKey;
 
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ElGamalPublicKey;
 
 /**
- * Concrete implementation of SigmaProtocol input, used by the SigmaElGamalPrivateKeyVerifier.
- * In SigmaElGamalPrivateKey protocol, the verifier gets an ElGamal public key.
+ * Concrete implementation of SigmaProtocol input, used by the SigmaElGamalPrivateKey verifier and simulator.
+ * In SigmaElGamalPrivateKey protocol, the common input contains an ElGamal public key.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaElGamalPrivateKeyInput implements SigmaProtocolInput{
+public class SigmaElGamalPrivateKeyCommonInput implements SigmaCommonInput{
+
+	private static final long serialVersionUID = -7005455199829785734L;
+	private ElGamalPublicKey publicKey;
 	
-	protected ElGamalPublicKey publicKey;
-	
-	public SigmaElGamalPrivateKeyInput(ElGamalPublicKey publicKey){
+	public SigmaElGamalPrivateKeyCommonInput(ElGamalPublicKey publicKey){
 		this.publicKey = publicKey;
 	}
 	
 	public ElGamalPublicKey getPublicKey(){
 		return publicKey;
 	}
-
+	
+	private void writeObject(ObjectOutputStream out) throws IOException {  
+        
+		out.writeObject(publicKey.generateSendableData());  
+		
+    }  
 }
