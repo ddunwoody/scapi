@@ -25,8 +25,6 @@
 package edu.biu.scapi.interactiveMidProtocols.zeroKnowledge;
 
 /**
- * Every Sigma protocol prover/receiver needs inputs during the protocol execution, but every concrete protocol needs 
- * different inputs.
  * This interface is a marker interface for Zero Knowledge input, where there is an implementing class
  * for each concrete Zero Knowledge protocol.
  * 
