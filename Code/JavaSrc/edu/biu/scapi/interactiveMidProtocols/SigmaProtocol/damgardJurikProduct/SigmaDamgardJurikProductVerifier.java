@@ -27,9 +27,10 @@ package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.damgardJurikProduct;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
+import edu.biu.scapi.generals.ScapiDefaultConfiguration;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.DJBasedSigma;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaVerifierComputation;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
 
 /**
@@ -54,7 +55,6 @@ public class SigmaDamgardJurikProductVerifier implements SigmaVerifierComputatio
 	private int t; 						// Soundness parameter in BITS.
 	private int lengthParameter;		// Length parameter in BITS.
 	private SecureRandom random;
-	private SigmaDJProductInput input;	// Contains public key n and 3 ciphertexts.
 	private byte[] e;					// The challenge.
 	
 	/**
@@ -65,43 +65,56 @@ public class SigmaDamgardJurikProductVerifier implements SigmaVerifierComputatio
 	 */
 	public SigmaDamgardJurikProductVerifier(int t, int lengthParameter, SecureRandom random) {
 		
-		this.t = t;
-		this.lengthParameter = lengthParameter;
-		this.random = random;
+		doConstruct(t, lengthParameter, random);
 	}
 	
 	/**
 	 * Default constructor that chooses default values for the parameters.
 	 */
 	public SigmaDamgardJurikProductVerifier() {
-		this(80, 1, new SecureRandom());
+		//read the default statistical parameter used in sigma protocols from a configuration file.
+		String statisticalParameter = ScapiDefaultConfiguration.getInstance().getProperty("StatisticalParameter");
+		int t = Integer.parseInt(statisticalParameter);
+		
+		doConstruct(t, 1, new SecureRandom());
+	}
+	
+	/**
+	 * Sets the given parameters.
+	 * @param t Soundness parameter in BITS.
+	 * @param lengthParameter length parameter in BITS.
+	 * @param random
+	 */
+	private void doConstruct(int t, int lengthParameter, SecureRandom random){
+		
+		this.t = t;
+		this.lengthParameter = lengthParameter;
+		this.random = random;
 	}
 	
 	/**
 	 * Returns the soundness parameter for this Sigma protocol.
 	 * @return t soundness parameter
 	 */
-	public int getSoundness(){
+	public int getSoundnessParam(){
 		return t;
 	}
 	
 	/**
 	 * Sets the input for this Sigma protocol
-	 * @param input MUST be an instance of SigmaDJProductInput.
-	 * @throws IllegalArgumentException if input is not an instance of SigmaDJProductInput.
+	 * @param input MUST be an instance of SigmaDJProductCommonInput.
+	 * @throws IllegalArgumentException if input is not an instance of SigmaDJProductCommonInput.
 	 */
-	public void setInput(SigmaProtocolInput input) {
-		if (!(input instanceof SigmaDJProductInput)){
+	private void checkInput(SigmaCommonInput input) {
+		if (!(input instanceof SigmaDJProductCommonInput)){
 			throw new IllegalArgumentException("the given input must be an instance of SigmaDJProductInput");
 		}
 		
-		BigInteger modulus = ((SigmaDJProductInput) input).getPublicKey().getModulus();
+		BigInteger modulus = ((SigmaDJProductCommonInput) input).getPublicKey().getModulus();
 		// Check the soundness validity.
-		if (!checkSoundness(modulus)){
+		if (!checkSoundnessParam(modulus)){
 			throw new IllegalArgumentException("t must be less than a third of the length of the public key n");
 		}
-		
-		this.input = (SigmaDJProductInput) input;
 		
 	}
 	
@@ -110,7 +123,7 @@ public class SigmaDamgardJurikProductVerifier implements SigmaVerifierComputatio
 	 * t must be less than a third of the length of the public key n.
 	 * @return true if the soundness parameter is valid; false, otherwise.
 	 */
-	public boolean checkSoundness(BigInteger modulus){
+	public boolean checkSoundnessParam(BigInteger modulus){
 		//If soundness parameter is not less than a third of the publicKey n, throw IllegalArgumentException.
 		int third = modulus.bitLength() / 3;
 		if (t >= third){
@@ -156,8 +169,9 @@ public class SigmaDamgardJurikProductVerifier implements SigmaVerifierComputatio
 	 * @throws IllegalArgumentException if the first prover message is not an instance of SigmaDJProductFirstMsg
 	 * @throws IllegalArgumentException if the second prover message is not an instance of SigmaDJProductSecondMsg
 	 */
-	public boolean verify(SigmaProtocolMsg a, SigmaProtocolMsg z) {
-		
+	public boolean verify(SigmaCommonInput input, SigmaProtocolMsg a, SigmaProtocolMsg z) {
+		checkInput(input);
+		SigmaDJProductCommonInput djInput = (SigmaDJProductCommonInput) input;
 		boolean verified = true;
 		
 		//If one of the messages is illegal, throw exception.
@@ -169,12 +183,13 @@ public class SigmaDamgardJurikProductVerifier implements SigmaVerifierComputatio
 		}
 		SigmaDJProductFirstMsg firstMsg = (SigmaDJProductFirstMsg) a;
 		SigmaDJProductSecondMsg secondMsg = (SigmaDJProductSecondMsg) z;
-		BigInteger n = input.getPublicKey().getModulus();
+		
+		BigInteger n = djInput.getPublicKey().getModulus();
 		
 		//Get the ciphertexts values from the input.
-		BigInteger c1 = input.getC1().getCipher();	
-		BigInteger c2 = input.getC2().getCipher();	
-		BigInteger c3 = input.getC3().getCipher();
+		BigInteger c1 = djInput.getC1().getCipher();	
+		BigInteger c2 = djInput.getC2().getCipher();	
+		BigInteger c3 = djInput.getC3().getCipher();
 		
 		//Get values from the prover's first message.
 		BigInteger a1 = firstMsg.getA1();
