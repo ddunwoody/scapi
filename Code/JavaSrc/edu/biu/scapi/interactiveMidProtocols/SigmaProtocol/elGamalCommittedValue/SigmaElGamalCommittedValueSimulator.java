@@ -24,20 +24,17 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.elGamalCommittedValue;
 
-import java.io.IOException;
 import java.security.SecureRandom;
 
 import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaSimulator;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHSimulator;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaSimulatorOutput;
 import edu.biu.scapi.midLayer.ciphertext.ElGamalOnGroupElementCiphertext.ElGamalOnGrElSendableData;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
-import edu.biu.scapi.primitives.dlog.cryptopp.CryptoPpDlogZpSafePrime;
-import edu.biu.scapi.primitives.dlog.miracl.MiraclDlogECF2m;
 
 /**
  * Concrete implementation of Sigma Simulator.
@@ -65,31 +62,6 @@ public class SigmaElGamalCommittedValueSimulator implements SigmaSimulator{
 	 */
 	public SigmaElGamalCommittedValueSimulator(DlogGroup dlog, int t, SecureRandom random){
 		
-		setParameters(dlog, t, random);
-	}
-	
-	/**
-	 * Default constructor that chooses default values for the parameters.
-	 */
-	public SigmaElGamalCommittedValueSimulator() {
-		try {
-			//Create Miracl Koblitz 233 Elliptic curve.
-			dlog = new MiraclDlogECF2m("K-233");
-		} catch (IOException e) {
-			//If there is a problem with the elliptic curves file, create Zp DlogGroup.
-			dlog = new CryptoPpDlogZpSafePrime();
-		}
-		
-		setParameters(dlog, 80, new SecureRandom());
-	}
-	
-	/**
-	 * Creates the underlying simulator and sets the given parameters. 
-	 * @param dlog
-	 * @param t Soundness parameter in BITS.
-	 * @param random
-	 */
-	private void setParameters(DlogGroup dlog, int t, SecureRandom random) {
 		//Creates the underlying SigmaDHSimulator object with the given parameters.
 		dhSim = new SigmaDHSimulator(dlog, t, random);
 		this.dlog = dlog;
@@ -118,21 +90,21 @@ public class SigmaElGamalCommittedValueSimulator implements SigmaSimulator{
 	 * Returns the soundness parameter for this Sigma protocol.
 	 * @return t soundness parameter
 	 */
-	public int getSoundness(){
-		return dhSim.getSoundness();
+	public int getSoundnessParam(){
+		return dhSim.getSoundnessParam();
 	}
 	
 	/**
 	 * Computes the simulator computation.
-	 * @param input MUST be an instance of SigmaElGamalCommittedValueInput.
+	 * @param input MUST be an instance of SigmaElGamalCommittedValueCommonInput.
 	 * @param challenge
 	 * @return the output of the computation - (a, e, z).
 	 * @throws CheatAttemptException if the received challenge's length is not equal to the soundness parameter.
-	 * @throws IllegalArgumentException if the given input is not an instance of SigmaElGamalCommittedValueInput.
+	 * @throws IllegalArgumentException if the given input is not an instance of SigmaElGamalCommittedValueCommonInput.
 	 */
-	public SigmaSimulatorOutput simulate(SigmaProtocolInput in, byte[] challenge) throws CheatAttemptException{
+	public SigmaSimulatorOutput simulate(SigmaCommonInput in, byte[] challenge) throws CheatAttemptException{
 		//Convert the input to an input object for the underlying simulator.
-		SigmaDHInput dhInput = convertInput(in);
+		SigmaDHCommonInput dhInput = convertInput(in);
 		
 		//Delegates the computation to the underlying Sigma DH prover.
 		return dhSim.simulate(dhInput, challenge); 
@@ -144,38 +116,38 @@ public class SigmaElGamalCommittedValueSimulator implements SigmaSimulator{
 	 * @param in
 	 * @return
 	 */
-	private SigmaDHInput convertInput(SigmaProtocolInput in) {
-		if (!(in instanceof SigmaElGamalCommittedValueInput)){
-			throw new IllegalArgumentException("the given input must be an instance of SigmaElGamalCommittedValueInput");
+	private SigmaDHCommonInput convertInput(SigmaCommonInput in) {
+		if (!(in instanceof SigmaElGamalCommittedValueCommonInput)){
+			throw new IllegalArgumentException("the given input must be an instance of SigmaElGamalCommittedValueCommonInput");
 		}
-		SigmaElGamalCommittedValueInput input = (SigmaElGamalCommittedValueInput) in;
+		SigmaElGamalCommittedValueCommonInput params = (SigmaElGamalCommittedValueCommonInput) in;
 		
-		if (!(input.getCommitment().getCipherData() instanceof ElGamalOnGrElSendableData)){
+		if (!(params.getCommitment().getCipherData() instanceof ElGamalOnGrElSendableData)){
 			throw new IllegalArgumentException("the given input must contain an instance of ElGamalOnGrElSendableData");
 		}
 		
 		//Convert input to the underlying DH prover:
 		//(g,h,u,v) = (g,h,c1,c2/x).
-		GroupElement h = dlog.reconstructElement(true, input.getCommitment().getPublicKey().getC());
+		GroupElement h = dlog.reconstructElement(true, params.getCommitment().getPublicKey().getC());
 		//u = c1
-		GroupElement u = dlog.reconstructElement(true, ((ElGamalOnGrElSendableData)input.getCommitment().getCipherData()).getCipher1());
+		GroupElement u = dlog.reconstructElement(true, ((ElGamalOnGrElSendableData)params.getCommitment().getCipherData()).getCipher1());
 		//Calculate v = c2/x = c2*x^(-1)
-		GroupElement c2 = dlog.reconstructElement(true, ((ElGamalOnGrElSendableData)input.getCommitment().getCipherData()).getCipher2());
-		GroupElement xInv = dlog.getInverse(input.getX());
+		GroupElement c2 = dlog.reconstructElement(true, ((ElGamalOnGrElSendableData)params.getCommitment().getCipherData()).getCipher2());
+		GroupElement xInv = dlog.getInverse(params.getX());
 		GroupElement v = dlog.multiplyGroupElements(c2, xInv);
-		SigmaDHInput dhInput = new SigmaDHInput(h, u, v);
+		SigmaDHCommonInput dhInput = new SigmaDHCommonInput(h, u, v);
 		return dhInput;
 	}
 	
 	/**
 	 * Computes the simulator computation.
-	 * @param in MUST be an instance of SigmaElGamalCommittedValueInput.
+	 * @param in MUST be an instance of SigmaElGamalCommittedValueCommonInput.
 	 * @return the output of the computation - (a, e, z).
-	 * @throws IllegalArgumentException if the given input is not an instance of SigmaElGamalCommittedValueInput.
+	 * @throws IllegalArgumentException if the given input is not an instance of SigmaElGamalCommittedValueCommonInput.
 	 */
-	public SigmaSimulatorOutput simulate(SigmaProtocolInput in){
+	public SigmaSimulatorOutput simulate(SigmaCommonInput in){
 		//Convert the input to an input object for the underlying simulator.
-		SigmaDHInput dhInput = convertInput(in);
+		SigmaDHCommonInput dhInput = convertInput(in);
 		
 		//Delegates the computation to the underlying Sigma DH simulator.
 		return dhSim.simulate(dhInput); 
