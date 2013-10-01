@@ -29,8 +29,8 @@ import java.util.ArrayList;
 
 import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaSimulator;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaMultipleMsg;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaSimulatorOutput;
 
@@ -67,7 +67,7 @@ public class SigmaANDSimulator implements SigmaSimulator{
 		
 		//If the given t is different from one of the underlying object's t values, throw exception.
 		for (int i = 0; i < simulators.size(); i++){
-			if (t != simulators.get(i).getSoundness()){
+			if (t != simulators.get(i).getSoundnessParam()){
 				throw new IllegalArgumentException("the given t does not equal to one of the t values in the underlying simulators objects.");
 			}
 		}
@@ -81,28 +81,28 @@ public class SigmaANDSimulator implements SigmaSimulator{
 	 * Returns the soundness parameter for this Sigma protocol.
 	 * @return t soundness parameter
 	 */
-	public int getSoundness(){
+	public int getSoundnessParam(){
 		return t;
 	}
 	
 	/**
 	 * Computes the simulator computation.
-	 * @param input MUST be an instance of SigmaANDInput.
+	 * @param input MUST be an instance of SigmaANDCommonInput.
 	 * @param challenge
 	 * @return the output of the computation - (a, e, z).
 	 * @throws CheatAttemptException if the received challenge's length is not equal to the soundness parameter.
-	 * @throws IllegalArgumentException if the given input is not an instance of SigmaANDInput.
+	 * @throws IllegalArgumentException if the given input is not an instance of SigmaANDCommonInput.
 	 */
-	public SigmaSimulatorOutput simulate(SigmaProtocolInput input, byte[] challenge) throws CheatAttemptException{
+	public SigmaSimulatorOutput simulate(SigmaCommonInput input, byte[] challenge) throws CheatAttemptException{
 		if (!checkChallengeLength(challenge)){
 			throw new CheatAttemptException("the length of the given challenge is differ from the soundness parameter");
 		}
 		
-		if (!(input instanceof SigmaANDInput)){
-			throw new IllegalArgumentException("the given input must be an instance of SigmaANDInput");
+		if (!(input instanceof SigmaANDCommonInput)){
+			throw new IllegalArgumentException("the given input must be an instance of SigmaANDCommonInput");
 		}
-		SigmaANDInput andInput = (SigmaANDInput) input;
-		ArrayList<SigmaProtocolInput> simulatorsInput = andInput.getInputs();
+		SigmaANDCommonInput andInput = (SigmaANDCommonInput) input;
+		ArrayList<SigmaCommonInput> simulatorsInput = andInput.getInputs();
 		int inputLen = simulatorsInput.size();
 		
 		// If number of inputs is not equal to number of provers, throw exception.
@@ -131,11 +131,11 @@ public class SigmaANDSimulator implements SigmaSimulator{
 	
 	/**
 	 * Computes the simulator computation.
-	 * @param input MUST be an instance of SigmaANDInput.
+	 * @param input MUST be an instance of SigmaANDCommonInput.
 	 * @return the output of the computation - (a, e, z).
-	 * @throws IllegalArgumentException if the given input is not an instance of SigmaANDInput.
+	 * @throws IllegalArgumentException if the given input is not an instance of SigmaANDCommonInput.
 	 */
-	public SigmaSimulatorOutput simulate(SigmaProtocolInput input){
+	public SigmaSimulatorOutput simulate(SigmaCommonInput input){
 		//Create a new byte array of size t/8, to get the required byte size.
 		byte[] e = new byte[t/8];
 		//Fill the byte array with random values.
