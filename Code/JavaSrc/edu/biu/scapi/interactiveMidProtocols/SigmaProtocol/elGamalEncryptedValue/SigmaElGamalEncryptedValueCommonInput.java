@@ -24,35 +24,33 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.elGamalEncryptedValue;
 
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ElGamalPublicKey;
 import edu.biu.scapi.midLayer.ciphertext.ElGamalOnGroupElementCiphertext;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**
- * Concrete implementation of SigmaProtocol input, used by the SigmaElGamalEncryptedValueVerifier.<p>
- * 
- * In SigmaElGamalEncryptedValue protocol, the verifier gets a GroupElement x, an ElGamal public key 
- * and the ciphertext of x using the ElGamal encryption scheme. <p>
- * 
+ * Concrete implementation of SigmaProtocol input, used by the SigmaElGamalEncryptedValue verifier and simulator.<p>
  * There are two versions of SigmaElGamalEncryptedValue protocol, depending upon if the prover knows 
  * the secret key or it knows the randomness used to generate the ciphertext.
- * The verifier also need to be aware of the prover's private input type, because he needs to 
- * convert the input differently in each case.
- * We implements this difference in a boolean variable, isRandomness, that is true in case 
- * the prover knows the randomness or false if the prover knows the private key.
+ * This common input contains an ElGamal public Key, the encrypted value x, the ciphertext and 
+ * a boolean indicates is the prover knows the secret key or the random value.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaElGamalEncryptedValueInput implements SigmaProtocolInput{
-
+public class SigmaElGamalEncryptedValueCommonInput implements SigmaCommonInput{
+	
+	private static final long serialVersionUID = 3937743510337152514L;
 	private boolean isRandomness;
 	private GroupElement x;
 	private ElGamalPublicKey publicKey;
 	private ElGamalOnGroupElementCiphertext cipher;
 	
-	public SigmaElGamalEncryptedValueInput(boolean isRandomness, ElGamalOnGroupElementCiphertext cipher, ElGamalPublicKey publicKey, GroupElement x){
+	public SigmaElGamalEncryptedValueCommonInput(boolean isRandomness, ElGamalOnGroupElementCiphertext cipher, ElGamalPublicKey publicKey, GroupElement x){
 		this.isRandomness = isRandomness;
 		this.cipher = cipher;
 		this.publicKey = publicKey;
@@ -74,6 +72,14 @@ public class SigmaElGamalEncryptedValueInput implements SigmaProtocolInput{
 	public ElGamalOnGroupElementCiphertext getCipher() {
 		return cipher;
 	}
+	
+	private void writeObject(ObjectOutputStream out) throws IOException {  
+        
+		out.writeObject(isRandomness);  
+		out.writeObject(x.generateSendableData());  
+		out.writeObject(publicKey.generateSendableData());
+		out.writeObject(cipher.generateSendableData());
+    }  
 
 	
 }
