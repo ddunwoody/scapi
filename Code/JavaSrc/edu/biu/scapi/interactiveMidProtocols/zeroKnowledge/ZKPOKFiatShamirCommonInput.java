@@ -24,21 +24,22 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.zeroKnowledge;
 
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 
-public class ZKPOKFiatShamirInput implements ZeroKnowledgeInput{
+
+public class ZKPOKFiatShamirCommonInput implements ZeroKnowledgeCommonInput{
 	
-	private SigmaProtocolInput input; //Input for the underlying sigma protocol.
-	private byte[] cont;			  //possible context information.
+	private SigmaCommonInput input; //Input for the underlying sigma protocol.
+	private byte[] context;			  //possible context information.
 	
 	/**
 	 * This constructor should be used when the user has a context information.
 	 * @param input
 	 * @param cont
 	 */
-	public ZKPOKFiatShamirInput(SigmaProtocolInput input, byte[] cont){
+	public ZKPOKFiatShamirCommonInput(SigmaCommonInput input, byte[] cont){
 		this.input = input;
-		this.cont = cont;
+		this.context = cont;
 	}
 	
 	/**
@@ -46,17 +47,17 @@ public class ZKPOKFiatShamirInput implements ZeroKnowledgeInput{
 	 * @param input
 	 * @param cont
 	 */
-	public ZKPOKFiatShamirInput(SigmaProtocolInput input){
+	public ZKPOKFiatShamirCommonInput(SigmaCommonInput input){
 		this.input = input;
-		this.cont = null;
+		this.context = null;
 	}
 	
-	public SigmaProtocolInput getSigmaInput(){
+	public SigmaCommonInput getSigmaInput(){
 		return input;
 	}
 	
-	public byte[] getCont(){
-		return cont;
+	public byte[] getContext(){
+		return context;
 	}
 
 }
