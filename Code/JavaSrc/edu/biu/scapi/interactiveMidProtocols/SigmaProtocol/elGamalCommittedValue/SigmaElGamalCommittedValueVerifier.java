@@ -24,21 +24,18 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.elGamalCommittedValue;
 
-import java.io.IOException;
 import java.security.SecureRandom;
 
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.DlogBasedSigma;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaVerifierComputation;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHVerifier;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
 import edu.biu.scapi.midLayer.ciphertext.ElGamalOnGroupElementCiphertext.ElGamalOnGrElSendableData;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
-import edu.biu.scapi.primitives.dlog.cryptopp.CryptoPpDlogZpSafePrime;
-import edu.biu.scapi.primitives.dlog.miracl.MiraclDlogECF2m;
 
 /**
  * Concrete implementation of Sigma Protocol verifier computation. <p>
@@ -69,36 +66,6 @@ public class SigmaElGamalCommittedValueVerifier implements SigmaVerifierComputat
 	 */
 	public SigmaElGamalCommittedValueVerifier(DlogGroup dlog, int t, SecureRandom random) throws InvalidDlogGroupException {
 		
-		setParameters(dlog, t, random);
-	}
-	
-	/**
-	 * Default constructor that chooses default values for the parameters.
-	 */
-	public SigmaElGamalCommittedValueVerifier() {
-		try {
-			//Create Miracl Koblitz 233 Elliptic curve.
-			dlog = new MiraclDlogECF2m("K-233");
-		} catch (IOException e) {
-			//If there is a problem with the elliptic curves file, create Zp DlogGroup.
-			dlog = new CryptoPpDlogZpSafePrime();
-		}
-		
-		try {
-			setParameters(dlog, 80, new SecureRandom());
-		} catch (InvalidDlogGroupException e) {
-			// Can not occur since the DlogGroup is valid.
-		}
-	}
-	
-	/**
-	 * Creates the underlying verifier and set the given parameters.
-	 * @param dlog
-	 * @param t
-	 * @param random
-	 * @throws InvalidDlogGroupException if the given dlog is invalid.
-	 */
-	private void setParameters(DlogGroup dlog, int t, SecureRandom random) throws InvalidDlogGroupException {
 		//Creates the underlying SigmaDHVerifier object with the given parameters.
 		sigmaDH = new SigmaDHVerifier(dlog, t, random);
 		this.dlog = dlog;
@@ -108,37 +75,37 @@ public class SigmaElGamalCommittedValueVerifier implements SigmaVerifierComputat
 	 * Returns the soundness parameter for this Sigma protocol.
 	 * @return t soundness parameter
 	 */
-	public int getSoundness(){
+	public int getSoundnessParam(){
 		//Delegates to the underlying Sigma DH verifier.
-		return sigmaDH.getSoundness();
+		return sigmaDH.getSoundnessParam();
 	}
 
 	/**
-	 * Sets the input for this Sigma protocol
-	 * @param input MUST be an instance of SigmaElGamalCommittedValueInput.
-	 * @throws IllegalArgumentException if input is not an instance of SigmaElGamalCommittedValueInput.
+	 * Converts the input for this Sigma protocol to the underlying protocol.
+	 * @param input MUST be an instance of SigmaElGamalCommittedValueCommonInput.
+	 * @throws IllegalArgumentException if input is not an instance of SigmaElGamalCommittedValueCommonInput.
 	 */
-	public void setInput(SigmaProtocolInput in) {
-		if (!(in instanceof SigmaElGamalCommittedValueInput)){
-			throw new IllegalArgumentException("the given input must be an instance of SigmaElGamalCommittedValueInput");
+	private SigmaDHCommonInput convertInput(SigmaCommonInput in) {
+		if (!(in instanceof SigmaElGamalCommittedValueCommonInput)){
+			throw new IllegalArgumentException("the given input must be an instance of SigmaElGamalCommittedValueCommonInput");
 		}
-		SigmaElGamalCommittedValueInput input = (SigmaElGamalCommittedValueInput) in;
+		SigmaElGamalCommittedValueCommonInput params = (SigmaElGamalCommittedValueCommonInput) in;
 		
-		if (!(input.getCommitment().getCipherData() instanceof ElGamalOnGrElSendableData)){
+		if (!(params.getCommitment().getCipherData() instanceof ElGamalOnGrElSendableData)){
 			throw new IllegalArgumentException("the given input must contain an instance of ElGamalOnGrElSendableData");
 		}
 		
 		//Convert input to the underlying DH prover:
 		//(g,h,u,v) = (g,h,c1,c2/x).
-		GroupElement h = dlog.reconstructElement(true, input.getCommitment().getPublicKey().getC());
+		GroupElement h = dlog.reconstructElement(true, params.getCommitment().getPublicKey().getC());
 		//u = c1
-		GroupElement u = dlog.reconstructElement(true, ((ElGamalOnGrElSendableData)input.getCommitment().getCipherData()).getCipher1());
+		GroupElement u = dlog.reconstructElement(true, ((ElGamalOnGrElSendableData)params.getCommitment().getCipherData()).getCipher1());
 		//Calculate v = c2/x = c2*x^(-1)
-		GroupElement c2 = dlog.reconstructElement(true, ((ElGamalOnGrElSendableData)input.getCommitment().getCipherData()).getCipher2());
-		GroupElement xInv = dlog.getInverse(input.getX());
+		GroupElement c2 = dlog.reconstructElement(true, ((ElGamalOnGrElSendableData)params.getCommitment().getCipherData()).getCipher2());
+		GroupElement xInv = dlog.getInverse(params.getX());
 		GroupElement v = dlog.multiplyGroupElements(c2, xInv);
-		SigmaDHInput dhInput = new SigmaDHInput(h, u, v);
-		sigmaDH.setInput(dhInput);
+
+		return new SigmaDHCommonInput(h, u, v);
 				
 	}
 	
@@ -171,13 +138,16 @@ public class SigmaElGamalCommittedValueVerifier implements SigmaVerifierComputat
 	/**
 	 * Verifies the proof.
 	 * @param z second message from prover
+	 * @param input MUST be an instance of SigmaElGamalCommittedValueCommonInput.
 	 * @return true if the proof has been verified; false, otherwise.
+	 * @throws IllegalArgumentException if input is not an instance of SigmaElGamalCommittedValueCommonInput.
 	 * @throws IllegalArgumentException if the first message of the prover is not an instance of SigmaDHMsg
 	 * @throws IllegalArgumentException if the second message of the prover is not an instance of SigmaBIMsg
 	 */
-	public boolean verify(SigmaProtocolMsg a, SigmaProtocolMsg z) {
+	public boolean verify(SigmaCommonInput in, SigmaProtocolMsg a, SigmaProtocolMsg z) {
+		SigmaDHCommonInput input = convertInput(in);
 		
-		return sigmaDH.verify(a, z);
+		return sigmaDH.verify(input, a, z);
 	}
 
 }
