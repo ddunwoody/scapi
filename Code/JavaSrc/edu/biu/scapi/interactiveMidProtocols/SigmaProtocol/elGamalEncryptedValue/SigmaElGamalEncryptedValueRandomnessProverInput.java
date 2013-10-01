@@ -26,6 +26,7 @@ package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.elGamalEncryptedValu
 
 import java.math.BigInteger;
 
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProverInput;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ElGamalPublicKey;
 import edu.biu.scapi.midLayer.ciphertext.ElGamalOnGroupElementCiphertext;
 import edu.biu.scapi.primitives.dlog.GroupElement;
@@ -42,16 +43,22 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaElGamalEncryptedValueRandomnessProverInput extends SigmaElGamalEncryptedValueInput{
+public class SigmaElGamalEncryptedValueRandomnessProverInput implements SigmaProverInput{
 
+	private SigmaElGamalEncryptedValueCommonInput params;
 	private BigInteger r;
 	
 	public SigmaElGamalEncryptedValueRandomnessProverInput(ElGamalOnGroupElementCiphertext cipher, ElGamalPublicKey pubKey, GroupElement x, BigInteger r){
-		super(true, cipher, pubKey, x);
+		params = new SigmaElGamalEncryptedValueCommonInput(true, cipher, pubKey, x);
 		this.r = r;
 	}
 	
 	public BigInteger getR(){
 		return r;
+	}
+	
+	@Override
+	public SigmaElGamalEncryptedValueCommonInput getCommonParams() {
+		return params;
 	}
 }
