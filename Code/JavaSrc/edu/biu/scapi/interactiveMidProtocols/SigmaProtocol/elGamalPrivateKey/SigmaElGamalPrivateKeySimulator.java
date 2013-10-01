@@ -28,9 +28,9 @@ import java.security.SecureRandom;
 
 import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaSimulator;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog.SigmaDlogInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog.SigmaDlogCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog.SigmaDlogSimulator;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaSimulatorOutput;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 
@@ -63,14 +63,6 @@ public class SigmaElGamalPrivateKeySimulator implements SigmaSimulator{
 	}
 	
 	/**
-	 * Default constructor that chooses default values for the parameters.
-	 */
-	public SigmaElGamalPrivateKeySimulator() {
-		//Creates the underlying SigmaDlogSimulator object with default parameters.
-		dlogSim = new SigmaDlogSimulator();
-	}
-	
-	/**
 	 * Constructor that gets a simulator and sets it.
 	 * In getSimulator function in SigmaElGamalPrivateKeyProver, the prover needs to create an instance of this class.
 	 * The problem is that the prover does not know which Dlog, t and random to give, since they are values of the underlying 
@@ -93,26 +85,26 @@ public class SigmaElGamalPrivateKeySimulator implements SigmaSimulator{
 	 * Returns the soundness parameter for this Sigma protocol.
 	 * @return t soundness parameter
 	 */
-	public int getSoundness(){
-		return dlogSim.getSoundness();
+	public int getSoundnessParam(){
+		return dlogSim.getSoundnessParam();
 	}
 	
 	/**
 	 * Computes the simulator computation.
-	 * @param input MUST be an instance of SigmaElGamalPrivateKeyInput.
+	 * @param input MUST be an instance of SigmaElGamalPrivateKeyCommonInput.
 	 * @param challenge
 	 * @return the output of the computation - (a, e, z).
 	 * @throws CheatAttemptException if the received challenge's length is not equal to the soundness parameter.
-	 * @throws IllegalArgumentException if the given input is not an instance of SigmaElGamalPrivateKeyInput.
+	 * @throws IllegalArgumentException if the given input is not an instance of SigmaElGamalPrivateKeyCommonInput.
 	 */
-	public SigmaSimulatorOutput simulate(SigmaProtocolInput input, byte[] challenge) throws CheatAttemptException{
-		if (!(input instanceof SigmaElGamalPrivateKeyInput)){
-			throw new IllegalArgumentException("the given input must be an instance of SigmaElGamalPrivateKeyInput");
+	public SigmaSimulatorOutput simulate(SigmaCommonInput input, byte[] challenge) throws CheatAttemptException{
+		if (!(input instanceof SigmaElGamalPrivateKeyCommonInput)){
+			throw new IllegalArgumentException("the given input must be an instance of SigmaElGamalPrivateKeyCommonInput");
 		}
-		SigmaElGamalPrivateKeyInput elGamalInput = (SigmaElGamalPrivateKeyInput) input;
+		SigmaElGamalPrivateKeyCommonInput elGamalInput = (SigmaElGamalPrivateKeyCommonInput) input;
 		
 		//Convert the input to match the required SigmaDlogSimulator's input.
-		SigmaDlogInput dlogInput = new SigmaDlogInput(elGamalInput.getPublicKey().getH());
+		SigmaDlogCommonInput dlogInput = new SigmaDlogCommonInput(elGamalInput.getPublicKey().getH());
 		
 		//Delegates the computation to the underlying Sigma Dlog simulator.
 		return dlogSim.simulate(dlogInput, challenge); 
@@ -121,18 +113,18 @@ public class SigmaElGamalPrivateKeySimulator implements SigmaSimulator{
 	
 	/**
 	 * Computes the simulator computation.
-	 * @param input MUST be an instance of SigmaElGamalPrivateKeyInput.
+	 * @param input MUST be an instance of SigmaElGamalPrivateKeyCommonInput.
 	 * @return the output of the computation - (a, e, z).
-	 * @throws IllegalArgumentException if the given input is not an instance of SigmaElGamalPrivateKeyInput.
+	 * @throws IllegalArgumentException if the given input is not an instance of SigmaElGamalPrivateKeyCommonInput.
 	 */
-	public SigmaSimulatorOutput simulate(SigmaProtocolInput input){
-		if (!(input instanceof SigmaElGamalPrivateKeyInput)){
+	public SigmaSimulatorOutput simulate(SigmaCommonInput input){
+		if (!(input instanceof SigmaElGamalPrivateKeyCommonInput)){
 			throw new IllegalArgumentException("the given input must be an instance of SigmaElGamalPrivateKeyInput");
 		}
-		SigmaElGamalPrivateKeyInput elGamalInput = (SigmaElGamalPrivateKeyInput) input;
+		SigmaElGamalPrivateKeyCommonInput elGamalInput = (SigmaElGamalPrivateKeyCommonInput) input;
 		
 		//Convert the input to match the required SigmaDlogSimulator's input.
-		SigmaDlogInput dlogInput = new SigmaDlogInput(elGamalInput.getPublicKey().getH());
+		SigmaDlogCommonInput dlogInput = new SigmaDlogCommonInput(elGamalInput.getPublicKey().getH());
 		
 		//Delegates the computation to the underlying Sigma Dlog simulator.
 		return dlogSim.simulate(dlogInput); 
