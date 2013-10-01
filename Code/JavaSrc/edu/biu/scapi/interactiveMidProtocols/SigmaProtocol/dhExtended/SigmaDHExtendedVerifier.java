@@ -24,7 +24,6 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dhExtended;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -33,13 +32,11 @@ import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.DlogBasedSigma;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaVerifierComputation;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaBIMsg;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
-import edu.biu.scapi.primitives.dlog.cryptopp.CryptoPpDlogZpSafePrime;
-import edu.biu.scapi.primitives.dlog.miracl.MiraclDlogECF2m;
 
 /**
  * Concrete implementation of Sigma Protocol verifier computation. <p>
@@ -61,7 +58,6 @@ public class SigmaDHExtendedVerifier implements SigmaVerifierComputation, DlogBa
 	
 	private DlogGroup dlog;					// Underlying DlogGroup.
 	private int t; 							//Soundness parameter in BITS.
-	private SigmaDHExtendedInput input;		// Contains h.
 	private byte[] e;						//The challenge.
 	private SecureRandom random;
 	
@@ -71,41 +67,10 @@ public class SigmaDHExtendedVerifier implements SigmaVerifierComputation, DlogBa
 	 * @param t Soundness parameter in BITS.
 	 * @param random
 	 * @throws InvalidDlogGroupException if the given dlog is invalid.
+	 * @throws IllegalArgumentException if soundness parameter is invalid.
 	 */
 	public SigmaDHExtendedVerifier(DlogGroup dlog, int t, SecureRandom random) throws InvalidDlogGroupException {
 		
-		// Sets the other parameter 
-		setParameters(dlog, t, random);
-	}
-	
-	/**
-	 * Constructor that chooses default values for the other parameters.
-	 */
-	public SigmaDHExtendedVerifier() {
-		try {
-			//Create Miracl Koblitz 233 Elliptic curve and set default parameters.
-			setParameters(new MiraclDlogECF2m("K-233"), 80, new SecureRandom());
-		} catch (IOException e) {
-			//If there is a problem with the elliptic curves file, create Zp DlogGroup.
-			try {
-				setParameters(new CryptoPpDlogZpSafePrime(), 80, new SecureRandom());
-			} catch (InvalidDlogGroupException e1) {
-				// Can not occur since the DlogGroup is valid.
-			}
-		} catch (InvalidDlogGroupException e) {
-			// Can not occur since the DlogGroup is valid.
-		}
-	}
-
-	/**
-	 * If soundness parameter and DlogGroup are valid, sets the parameters. 
-	 * @param dlog
-	 * @param t soundness parameter in BITS
-	 * @param random
-	 * @throws InvalidDlogGroupException if the given dlog is invalid.
-	 * @throws IllegalArgumentException if soundness parameter is invalid.
-	 */
-	private void setParameters(DlogGroup dlog, int t, SecureRandom random) throws InvalidDlogGroupException {
 		if(!dlog.validateGroup())
 			throw new InvalidDlogGroupException();
 		
@@ -114,7 +79,7 @@ public class SigmaDHExtendedVerifier implements SigmaVerifierComputation, DlogBa
 		this.t = t;
 		
 		//Check the soundness validity.
-		if (!checkSoundness()){
+		if (!checkSoundnessParam()){
 			throw new IllegalArgumentException("soundness parameter t does not satisfy 2^t<q");
 		}
 		
@@ -125,7 +90,7 @@ public class SigmaDHExtendedVerifier implements SigmaVerifierComputation, DlogBa
 	 * Checks the validity of the given soundness parameter.
 	 * @return true if the soundness parameter is valid; false, otherwise.
 	 */
-	private boolean checkSoundness(){
+	private boolean checkSoundnessParam(){
 		//If soundness parameter does not satisfy 2^t<q, throw IllegalArgumentException.
 		BigInteger soundness = new BigInteger("2").pow(t);
 		BigInteger q = dlog.getOrder();
@@ -139,26 +104,8 @@ public class SigmaDHExtendedVerifier implements SigmaVerifierComputation, DlogBa
 	 * Returns the soundness parameter for this Sigma protocol.
 	 * @return t soundness parameter
 	 */
-	public int getSoundness(){
+	public int getSoundnessParam(){
 		return t;
-	}
-
-	/**
-	 * Sets the input for this Sigma protocol
-	 * @param input MUST be an instance of SigmaDHExtendedInput.
-	 * @throws IllegalArgumentException if input is not an instance of SigmaDHExtendedInput.
-	 */
-	public void setInput(SigmaProtocolInput input) {
-		if (!(input instanceof SigmaDHExtendedInput)){
-			throw new IllegalArgumentException("the given input must be an instance of SigmaDHExtendedInput");
-		}
-		
-		SigmaDHExtendedInput dhInput = (SigmaDHExtendedInput) input;
-		if (dhInput.getGArray().size() != dhInput.getHArray().size()){
-			throw new IllegalArgumentException("the given g and h array are not in the same size");
-		}
-		this.input = dhInput;
-		
 	}
 	
 	/**
@@ -191,13 +138,28 @@ public class SigmaDHExtendedVerifier implements SigmaVerifierComputation, DlogBa
 	/**
 	 * Computes the following line from the protocol:
 	 * 	"ACC IFF VALID_PARAMS(G,q,g)=TRUE AND all g1,…,gm in G AND for all i=1,…,m it holds that gi^z = ai*hi^e".     
+	 * @param input MUST be an instance of SigmaDHExtendedCommonInput.
 	 * @param z second message from prover
 	 * @return true if the proof has been verified; false, otherwise.
+	 * @throws IllegalArgumentException if input is not an instance of SigmaDHExtendedCommonInput.
 	 * @throws IllegalArgumentException if the first message of the prover is not an instance of SigmaDHExtendedMsg
 	 * @throws IllegalArgumentException if the second message of the prover is not an instance of SigmaBIMsg
 	 */
-	public boolean verify(SigmaProtocolMsg a, SigmaProtocolMsg z) {
+	public boolean verify(SigmaCommonInput input, SigmaProtocolMsg a, SigmaProtocolMsg z) {
 		//the first check "ACC IFF VALID_PARAMS(G,q,g)=TRUE" is already done in the constructor.
+		
+		//Check the input.
+		if (!(input instanceof SigmaDHExtendedCommonInput)){
+			throw new IllegalArgumentException("the given input must be an instance of SigmaDHExtendedCommonInput");
+		}
+		
+		SigmaDHExtendedCommonInput dhInput = (SigmaDHExtendedCommonInput) input;
+		ArrayList<GroupElement> gArray = dhInput.getGArray();
+		ArrayList<GroupElement> hArray = dhInput.getHArray();
+		
+		if (gArray.size() != hArray.size()){
+			throw new IllegalArgumentException("the given g and h array are not in the same size");
+		}
 		
 		boolean verified = true;
 		
@@ -211,7 +173,6 @@ public class SigmaDHExtendedVerifier implements SigmaVerifierComputation, DlogBa
 		
 		
 		//Get the g array from the input. 
-		ArrayList<GroupElement> gArray = input.getGArray();
 		int len = gArray.size();
 		
 		//Verify that each gi is in the DlogGroup.
@@ -224,7 +185,6 @@ public class SigmaDHExtendedVerifier implements SigmaVerifierComputation, DlogBa
 		//Get the h and a arrays.
 		SigmaDHExtendedMsg firstMsg = (SigmaDHExtendedMsg) a;
 		ArrayList<GroupElementSendableData> aArray = firstMsg.getArray();
-		ArrayList<GroupElement> hArray = input.getHArray();
 		//Get the exponent in the second message from the prover.
 		SigmaBIMsg exponent = (SigmaBIMsg) z;
 		//Convert e to BigInteger.
@@ -232,6 +192,7 @@ public class SigmaDHExtendedVerifier implements SigmaVerifierComputation, DlogBa
 		GroupElement left, right;
 		GroupElement hToe;
 		GroupElement aElement;
+		
 		for (int i=0; i<len; i++){
 			//Verify that gi^z = ai*hi^e:
 			
