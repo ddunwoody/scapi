@@ -24,7 +24,6 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.pedersenCTKnowledge;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
@@ -35,12 +34,10 @@ import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.DlogBasedSigma;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaProverComputation;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaSimulator;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaGroupElementMsg;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProverInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
-import edu.biu.scapi.primitives.dlog.cryptopp.CryptoPpDlogZpSafePrime;
-import edu.biu.scapi.primitives.dlog.miracl.MiraclDlogECF2m;
 
 /**
  * Concrete implementation of Sigma Protocol prover computation.<p>
@@ -70,52 +67,27 @@ public class SigmaPedersenCTKnowledgeProver implements SigmaProverComputation, D
 	 * @param dlog
 	 * @param t Soundness parameter in BITS.
 	 * @param random
-	 */
-	public SigmaPedersenCTKnowledgeProver(DlogGroup dlog, int t, SecureRandom random) {
-		
-		// Sets the given parameters.
-		setParameters(dlog, t, random);
-	}
-	
-	/**
-	 * Default constructor that chooses default values for the parameters.
-	 */
-	public SigmaPedersenCTKnowledgeProver() {
-		try {
-			//Create Miracl Koblitz 233 Elliptic curve and set default parameters.
-			setParameters(new MiraclDlogECF2m("K-233"), 80, new SecureRandom());
-		} catch (IOException e) {
-			//If there is a problem with the elliptic curves file, create Zp DlogGroup.
-			setParameters(new CryptoPpDlogZpSafePrime(), 80, new SecureRandom());
-		}
-	}
-
-	/**
-	 * If soundness parameter is valid, sets the parameters. Else, throw IllegalArgumentException.
-	 * @param dlog
-	 * @param t soundness parameter in BITS
-	 * @param random
 	 * @throws IllegalArgumentException if soundness parameter is invalid.
 	 */
-	private void setParameters(DlogGroup dlog, int t, SecureRandom random) {
+	public SigmaPedersenCTKnowledgeProver(DlogGroup dlog, int t, SecureRandom random) {
 		
 		//Sets the parameters.
 		this.dlog = dlog;
 		this.t = t;
 		
 		//Check the soundness validity.
-		if (!checkSoundness()){
+		if (!checkSoundnessParam()){
 			throw new IllegalArgumentException("soundness parameter t does not satisfy 2^t<q");
 		}
 		
 		this.random = random;
 	}
-	
+
 	/**
 	 * Checks the validity of the given soundness parameter.
 	 * @return true if the soundness parameter is valid; false, otherwise.
 	 */
-	private boolean checkSoundness(){
+	private boolean checkSoundnessParam(){
 		//If soundness parameter does not satisfy 2^t<q, return false.
 		BigInteger soundness = new BigInteger("2").pow(t);
 		BigInteger q = dlog.getOrder();
@@ -129,43 +101,29 @@ public class SigmaPedersenCTKnowledgeProver implements SigmaProverComputation, D
 	 * Returns the soundness parameter for this Sigma protocol.
 	 * @return t soundness parameter
 	 */
-	public int getSoundness(){
+	public int getSoundnessParam(){
 		return t;
 	}
-	
-	/**
-	 * Sets the input for this Sigma protocol
-	 * @param input MUST be an instance of SigmaPedersenCTKnowledgeProverInput.
-	 * @throws IllegalArgumentException if input is not an instance of SigmaPedersenCTKnowledgeProverInput.
-	 */
-	public void setInput(SigmaProtocolInput input) {
-		if (!(input instanceof SigmaPedersenCTKnowledgeProverInput)){
-			throw new IllegalArgumentException("the given input must be an instance of SigmaPedersenCTKnowledgeProverInput");
-		}
-		this.input = (SigmaPedersenCTKnowledgeProverInput) input;
-		
-	}
 
 	/**
-	 * Computes the following line from the protocol:
-	 * "SAMPLE random values alpha, beta <- Zq"
-	 */
-	public void sampleRandomValues() {
-		BigInteger qMinusOne = dlog.getOrder().subtract(BigInteger.ONE);
-		
-		alpha = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
-		beta = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
-	}
-
-	/**
-	 * Computes the following line from the protocol:
-	 * "COMPUTE a = (h^alpha)*(g^beta)". 
+	 * Computes the following lines from the protocol:
+	 * "SAMPLE random values alpha, beta <- Zq
+	 *  COMPUTE a = (h^alpha)*(g^beta)". 
 	 * @return the computed message
 	 */
-	public SigmaProtocolMsg computeFirstMsg() {
+	public SigmaProtocolMsg computeFirstMsg(SigmaProverInput in) {
+		if (!(in instanceof SigmaPedersenCTKnowledgeProverInput)){
+			throw new IllegalArgumentException("the given input must be an instance of SigmaPedersenCTKnowledgeProverInput");
+		}
+		this.input = (SigmaPedersenCTKnowledgeProverInput) in;
+		
+		//Sample random alpha, beta.
+		BigInteger qMinusOne = dlog.getOrder().subtract(BigInteger.ONE);
+		alpha = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
+		beta = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);	
 		
 		//Compute h^alpha
-		GroupElement hToAlpha = dlog.exponentiate(input.getH(), alpha);
+		GroupElement hToAlpha = dlog.exponentiate(input.getCommonParams().getH(), alpha);
 		//Compute g^beta
 		GroupElement gToBeta = dlog.exponentiate(dlog.getGenerator(), beta);
 		//Compute a = (h^alpha)*(g^beta)
