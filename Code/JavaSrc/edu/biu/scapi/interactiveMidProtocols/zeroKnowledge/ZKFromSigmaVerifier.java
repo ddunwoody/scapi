@@ -26,13 +26,14 @@ package edu.biu.scapi.interactiveMidProtocols.zeroKnowledge;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.security.SecureRandom;
 
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.exceptions.CommitValueException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaVerifierComputation;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
@@ -55,6 +56,7 @@ public class ZKFromSigmaVerifier implements ZeroKnowledgeVerifier{
 	private Channel channel;
 	private SigmaVerifierComputation sVerifier; //Underlying verifier that computes the proof of the sigma protocol.
 	private CTCommitter committer;				//Underlying Commitment committer to use.
+	private SecureRandom random;
 	
 	/**
 	 * Constructor that accepts the underlying channel, sigma protocol's verifier and committer to use.
@@ -63,7 +65,7 @@ public class ZKFromSigmaVerifier implements ZeroKnowledgeVerifier{
 	 * @param committer
 	 * @throws SecurityLevelException if the given CTCommitter is not an instance of PerfectlyHidingCT
 	 */
-	public ZKFromSigmaVerifier(Channel channel, SigmaVerifierComputation sVerifier, CTCommitter committer) throws SecurityLevelException{
+	public ZKFromSigmaVerifier(Channel channel, SigmaVerifierComputation sVerifier, CTCommitter committer, SecureRandom random) throws SecurityLevelException{
 		//committer must be an instance of PerfectlyHidingCT
 		if (!(committer instanceof PerfectlyHidingCT)){
 			throw new SecurityLevelException("the given CTCommitter must be an instance of PerfectlyHidingCT");
@@ -76,6 +78,7 @@ public class ZKFromSigmaVerifier implements ZeroKnowledgeVerifier{
 		this.sVerifier = sVerifier;
 		this.committer = committer;
 		this.channel = channel;
+		this.random = random;
 	}
 	
 	/**
@@ -83,24 +86,12 @@ public class ZKFromSigmaVerifier implements ZeroKnowledgeVerifier{
 	 * @param channel
 	 * @param sVerifier
 	 */
-	public ZKFromSigmaVerifier(Channel channel, SigmaVerifierComputation sVerifier){
+	public ZKFromSigmaVerifier(Channel channel, SigmaVerifierComputation sVerifier, SecureRandom random){
 	
 		this.channel = channel;
 		this.sVerifier = sVerifier;
 		this.committer = new PedersenCTCommitter(channel);
-	}
-
-	/**
-	 * Sets the input for this Zero Knowledge protocol.
-	 * @param input must be an instance of SigmaProtocolInput.
-	 * @throws IllegalArgumentException if the given input is not an instance of SigmaProtocolInput
-	 */
-	public void setInput(ZeroKnowledgeInput input){
-		//The given input must be an instance of SigmaProtocolInput.
-		if (!(input instanceof SigmaProtocolInput)){
-			throw new IllegalArgumentException("the given input must be an instance of SigmaProtocolInput");
-		}
-		sVerifier.setInput((SigmaProtocolInput) input);
+		this.random = random;
 	}
 	
 	/**
@@ -117,25 +108,32 @@ public class ZKFromSigmaVerifier implements ZeroKnowledgeVerifier{
      *			OUTPUT ACC
 	 *		 ELSE
      *	 	    OUTPUT REJ
+     * @param input must be an instance of SigmaCommonInput.
+     * @throws IllegalArgumentException if the given input is not an instance of SigmaCommonInput
 	 * @throws IOException if failed to send the message.
 	 * @throws ClassNotFoundException 
 	 * @throws CheatAttemptException 
 	 * @throws CommitValueException 
 	 */
-	public boolean verify() throws ClassNotFoundException, IOException, CommitValueException, CheatAttemptException {
+	public boolean verify(ZeroKnowledgeCommonInput input) throws ClassNotFoundException, IOException, CheatAttemptException, CommitValueException {
+		//The given input must be an instance of SigmaProtocolInput.
+		if (!(input instanceof SigmaCommonInput)){
+			throw new IllegalArgumentException("the given input must be an instance of SigmaCommonInput");
+		}
+		
 		//Sample a random challenge  e <- {0, 1}^t 
 		sVerifier.sampleChallenge();
 		byte[] e = sVerifier.getChallenge();
 		//Run COMMIT.commit as the committer with input e
-		commit(e);
+		long id = commit(e);
 		//Wait for a message a from P
 		SigmaProtocolMsg a = receiveMsgFromProver();
 		//Run COMMIT.decommit as the decommitter
-		decommit();
+		decommit(id);
 		//Wait for a message z from P, 
 		//If transcript (a, e, z) is accepting in sigma on input x, output ACC
 		//Else outupt REJ
-		return proccessVerify(a);
+		return proccessVerify((SigmaCommonInput) input, a);
 	}
 
 	/**
@@ -146,11 +144,12 @@ public class ZKFromSigmaVerifier implements ZeroKnowledgeVerifier{
 	 * @throws CheatAttemptException 
 	 * @throws ClassNotFoundException 
 	 */
-	private void commit(byte[] e) throws CommitValueException, IOException, ClassNotFoundException, CheatAttemptException {
+	private long commit(byte[] e) throws IOException, ClassNotFoundException, CheatAttemptException, CommitValueException {
 		committer.preProcess();
 		CommitValue val = committer.generateCommitValue(e);
-		committer.commit(val, 0);
-		
+		long id = random.nextLong();
+		committer.commit(val, id);
+		return id;
 	}
 	
 	/**
@@ -177,28 +176,30 @@ public class ZKFromSigmaVerifier implements ZeroKnowledgeVerifier{
 
 	/**
 	 * Runs COMMIT.decommit as the decommitter.
+	 * @param id 
 	 * @throws IOException 
 	 * @throws ClassNotFoundException 
 	 * @throws CheatAttemptException 
 	 * @throws CommitValueException 
 	 */
-	private void decommit() throws IOException, CheatAttemptException, ClassNotFoundException, CommitValueException {
-		committer.decommit(0);
+	private void decommit(long id) throws IOException, CheatAttemptException, ClassNotFoundException, CommitValueException {
+		committer.decommit(id);
 		
 	}
 	
 	/**
 	 * Verifies the proof.
+	 * @param input 
 	 * @param a first message from prover.
 	 * @throws IOException if failed to send the message.
 	 * @throws ClassNotFoundException 
 	 */
-	private boolean proccessVerify(SigmaProtocolMsg a) throws ClassNotFoundException, IOException {
+	private boolean proccessVerify(SigmaCommonInput input, SigmaProtocolMsg a) throws ClassNotFoundException, IOException {
 		//Wait for a message z from P, 
 		//If transcript (a, e, z) is accepting in sigma on input x, output ACC
 		//Else outupt REJ
 		
 		SigmaProtocolMsg z = receiveMsgFromProver();
-		return sVerifier.verify(a, z);
+		return sVerifier.verify(input, a, z);
 	}
 }
