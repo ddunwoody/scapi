@@ -28,8 +28,8 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaVerifierComputation;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaMultipleMsg;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
 
 /**
@@ -66,7 +66,7 @@ public class SigmaANDVerifier implements SigmaVerifierComputation{
 	public SigmaANDVerifier(ArrayList<SigmaVerifierComputation> verifiers, int t, SecureRandom random) {
 		//If the given t is different from one of the underlying object's t values, throw exception.
 		for (int i = 0; i < verifiers.size(); i++){
-			if (t != verifiers.get(i).getSoundness()){
+			if (t != verifiers.get(i).getSoundnessParam()){
 				throw new IllegalArgumentException("the given t does not equal to one of the t values in the underlying verifiers objects.");
 			}
 		}
@@ -80,34 +80,29 @@ public class SigmaANDVerifier implements SigmaVerifierComputation{
 	 * Returns the soundness parameter for this Sigma protocol.
 	 * @return t soundness parameter
 	 */
-	public int getSoundness(){
+	public int getSoundnessParam(){
 		return t;
 	}
 
 
 	/**
 	 * Sets the inputs for each one of the underlying verifier.
-	 * @param input MUST be an instance of SigmaANDInput.
-	 * @throws IllegalArgumentException if input is not an instance of SigmaANDInput.
+	 * @param input MUST be an instance of SigmaANDCommonInput.
+	 * @throws IllegalArgumentException if input is not an instance of SigmaANDCommonInput.
 	 * @throws IllegalArgumentException if the number of given inputs is different from the number of underlying verifier.
 	 */
-	public void setInput(SigmaProtocolInput in) {
-		if (!(in instanceof SigmaANDInput)){
-			throw new IllegalArgumentException("the given input must be an instance of SigmaANDInput");
+	private void checkInput(SigmaCommonInput in) {
+		if (!(in instanceof SigmaANDCommonInput)){
+			throw new IllegalArgumentException("the given input must be an instance of SigmaANDCommonInput");
 		}
-		SigmaANDInput input = (SigmaANDInput) in;
-		ArrayList<SigmaProtocolInput> verifiersInput = input.getInputs();
-		int inputLen = verifiersInput.size();
+		SigmaANDCommonInput input = (SigmaANDCommonInput) in;
+		int inputLen = input.getInputs().size();
 		
 		// If number of inputs is not equal to number of verifiers, throw exception.
 		if (inputLen != len) {
 			throw new IllegalArgumentException("number of inputs is different from number of underlying verifiers.");
 		}
-		
-		//Sets the input to each underlying verifier.
-		for (int i = 0; i < len; i++){
-			verifiers.get(i).setInput(verifiersInput.get(i));
-		}
+	
 	}
 	
 	/**
@@ -148,12 +143,18 @@ public class SigmaANDVerifier implements SigmaVerifierComputation{
 	/**
 	 * Computes the following line from the protocol:
 	 * 	"ACC IFF all verifier checks are ACC".
+	 * @param input MUST be an instance of SigmaANDCommonInput.
 	 * @param a first message from prover
 	 * @param z second message from prover
 	 * @return true if the proof has been verified; false, otherwise.
+	 * @throws IllegalArgumentException if input is not an instance of SigmaANDCommonInput.
+	 * @throws IllegalArgumentException if the number of given inputs is different from the number of underlying verifier.
 	 * @throws IllegalArgumentException if the first or second message of the prover is not an instance of SigmaMultipleMsg
 	 */
-	public boolean verify(SigmaProtocolMsg a, SigmaProtocolMsg z) {
+	public boolean verify(SigmaCommonInput in, SigmaProtocolMsg a, SigmaProtocolMsg z) {
+		//Checks that the input is as expected.
+		checkInput(in);
+		ArrayList<SigmaCommonInput> verifiersInput = ((SigmaANDCommonInput) in).getInputs();
 		
 		boolean verified = true;
 		
@@ -171,7 +172,7 @@ public class SigmaANDVerifier implements SigmaVerifierComputation{
 		
 		//Compute all verifier checks.
 		for (int i = 0; i < len; i++){
-			verified = verified && verifiers.get(i).verify(firstMessages.get(i), secondMessages.get(i));
+			verified = verified && verifiers.get(i).verify(verifiersInput.get(i), firstMessages.get(i), secondMessages.get(i));
 		}
 		
 		//Return true if all verifiers returned true; false, otherwise.
