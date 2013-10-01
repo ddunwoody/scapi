@@ -24,23 +24,27 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh;
 
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**
- * Concrete implementation of SigmaProtocol input, used by the SigmaDHVerifier.
- * In SigmaProtocolDH, the verifier gets three GroupElements - h, u, v.
+ * Concrete implementation of SigmaProtocol input, used by the SigmaDH verifier and simulator.
+ * In SigmaProtocolDH, the common input contains three GroupElements - h, u, v.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaDHInput implements SigmaProtocolInput{
-
+public class SigmaDHCommonInput implements SigmaCommonInput{
+	
+	private static final long serialVersionUID = 9103075048136551008L;
 	private GroupElement h;
 	private GroupElement u;
 	private GroupElement v;
 	
-	public SigmaDHInput(GroupElement h, GroupElement u, GroupElement v){
+	public SigmaDHCommonInput(GroupElement h, GroupElement u, GroupElement v){
 		this.h = h;
 		this.u = u;
 		this.v = v;
@@ -57,4 +61,11 @@ public class SigmaDHInput implements SigmaProtocolInput{
 	public GroupElement getV(){
 		return v;
 	}
+	
+	private void writeObject(ObjectOutputStream out) throws IOException {  
+        
+        out.writeObject(h.generateSendableData());  
+        out.writeObject(u.generateSendableData());
+        out.writeObject(v.generateSendableData());
+    }  
 }
