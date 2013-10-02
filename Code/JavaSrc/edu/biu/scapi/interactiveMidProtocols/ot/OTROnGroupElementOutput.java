@@ -28,7 +28,7 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**
  * Concrete implementation of OT receiver (on GroupElement) output.
- * In the GroupElement scenario, the receiver outputs xσ as a GroupElement.
+ * In the GroupElement scenario, the receiver outputs xSigma as a GroupElement.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
