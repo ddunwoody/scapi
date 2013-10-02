@@ -27,7 +27,6 @@ package edu.biu.scapi.interactiveMidProtocols.ot.uc;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
-import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTROnGroupElementOutput;
@@ -36,6 +35,7 @@ import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnGroupElementMessage;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
+import edu.biu.scapi.securityLevel.Malicious;
 
 /**
  * Concrete class for OT receiver based on the DDH assumption that achieves UC security in
@@ -47,23 +47,12 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTReceiverOnGroupElementUC extends OTReceiverDDHUCAbs{
-
-	private GroupElement c0, c1;
+public class OTReceiverOnGroupElementUC extends OTReceiverDDHUCAbs implements Malicious{
 	
 	/**
-	 * Constructor that sets the given channel and choose default values to the other parameters.
-	 * @param channel
-	 */
-	public OTReceiverOnGroupElementUC(Channel channel){
-		super(channel);
-	}
-	
-	/**
-	 * Constructor that sets the given channel, common reference string composed of a DLOG 
+	 * Constructor that sets the given common reference string composed of a DLOG 
 	 * description (G,q,g0) and (g0,g1,h0,h1) which is a randomly chosen non-DDH tuple, 
 	 * kdf and random.
-	 * @param channel
 	 * @param dlog must be DDH secure.
 	 * @param g0 
 	 * @param g1 
@@ -72,9 +61,9 @@ public class OTReceiverOnGroupElementUC extends OTReceiverDDHUCAbs{
 	 * @param random
 	 * @throws SecurityLevelException if the given DlogGroup is not DDH secure.
 	 */
-	public OTReceiverOnGroupElementUC(Channel channel, DlogGroup dlog, GroupElement g0, GroupElement g1, 
+	public OTReceiverOnGroupElementUC(DlogGroup dlog, GroupElement g0, GroupElement g1, 
 			GroupElement h0, GroupElement h1, SecureRandom random) throws SecurityLevelException{
-		super(channel, dlog, g0, g1, h0, h1, random);
+		super(dlog, g0, g1, h0, h1, random);
 		
 	}
 
@@ -83,23 +72,13 @@ public class OTReceiverOnGroupElementUC extends OTReceiverDDHUCAbs{
 	 * "IF  NOT 
 	 *		1. u0, u1, c0, c1 in the DlogGroup
 	 *	REPORT ERROR"
-	 * @param message received from the sender. must be OTSOnGroupElementPrivacyOnlyMessage.
+	 * @param c12 
+	 * @param c02 
+	 * @param u1 
+	 * @param u0 
 	 * @throws CheatAttemptException if there was a cheat attempt during the execution of the protocol.
 	 */
-	protected void checkReceivedTuple(OTSMessage message) throws CheatAttemptException{
-		//If message is not instance of OTSOnGroupElementPrivacyMessage, throw Exception.
-		if(!(message instanceof OTSOnGroupElementMessage)){
-			throw new IllegalArgumentException("message should be instance of OTSOnGroupElementPrivacyOnlyMessage");
-		}
-		
-		OTSOnGroupElementMessage msg = (OTSOnGroupElementMessage)message;
-		
-		//Reconstruct the group elements from the given message.
-		u0 = dlog.reconstructElement(true, msg.getW0());
-		u1 = dlog.reconstructElement(true, msg.getW1());
-		c0 = dlog.reconstructElement(true, msg.getC0());
-		c1 = dlog.reconstructElement(true, msg.getC1());
-		
+	private void checkReceivedTuple(GroupElement u0, GroupElement u1, GroupElement c0, GroupElement c1) throws CheatAttemptException{
 		
 		if (!(dlog.isMember(u0))){
 			throw new CheatAttemptException("u0 element is not a member in the current DlogGroup");
@@ -118,11 +97,33 @@ public class OTReceiverOnGroupElementUC extends OTReceiverDDHUCAbs{
 
 	/**
 	 * Run the following lines from the protocol:
-	 * "COMPUTE xSigma = cSigma * (uSigma)^(-r)"
+	 * "IF  NOT
+	 *		•	u0, u1, c0, c1 in G
+	 *				 REPORT ERROR
+	 * OUTPUT  xSigma = cSigma * (uSigma)^(-r)".
+	 * @param sigma input for the protocol
+	 * @param r random value sampled by the protocol
+	 * @param message received from the sender. MUST be an instance of OTSOnGroupElementMessage.
 	 * @return OTROutput contains xSigma
+	 * @throws CheatAttemptException 
 	 */
-	protected OTROutput computeFinalXSigma() {
+	protected OTROutput checkMessgeAndComputeX(byte sigma, BigInteger r, OTSMessage message) throws CheatAttemptException {
+		//If message is not instance of OTSOnGroupElementPrivacyMessage, throw Exception.
+		if(!(message instanceof OTSOnGroupElementMessage)){
+			throw new IllegalArgumentException("message should be instance of OTSOnGroupElementPrivacyOnlyMessage");
+		}
 		
+		OTSOnGroupElementMessage msg = (OTSOnGroupElementMessage)message;
+		
+		//Reconstruct the group elements from the given message.
+		GroupElement u0 = dlog.reconstructElement(true, msg.getW0());
+		GroupElement u1 = dlog.reconstructElement(true, msg.getW1());
+		GroupElement c0 = dlog.reconstructElement(true, msg.getC0());
+		GroupElement c1 = dlog.reconstructElement(true, msg.getC1());
+			
+		//Compute the validity checks of the given message.
+		checkReceivedTuple(u0, u1, c0, c1);		
+				
 		GroupElement xSigma = null;
 		GroupElement cSigma = null;
 		BigInteger minusR = dlog.getOrder().subtract(r);

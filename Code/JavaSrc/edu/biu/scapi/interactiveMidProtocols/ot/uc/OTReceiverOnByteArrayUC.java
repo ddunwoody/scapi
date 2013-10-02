@@ -24,11 +24,10 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.ot.uc;
 
+import java.math.BigInteger;
 import java.security.SecureRandom;
 
-import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CheatAttemptException;
-import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTROnByteArrayOutput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTROutput;
@@ -37,7 +36,7 @@ import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnByteArrayMessage;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
-import edu.biu.scapi.tools.Factories.KdfFactory;
+import edu.biu.scapi.securityLevel.Malicious;
 
 /**
  * Concrete class for OT receiver based on the DDH assumption that achieves UC security in
@@ -49,29 +48,14 @@ import edu.biu.scapi.tools.Factories.KdfFactory;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTReceiverOnByteArrayUC extends OTReceiverDDHUCAbs{
+public class OTReceiverOnByteArrayUC extends OTReceiverDDHUCAbs implements Malicious{
 
 	private KeyDerivationFunction kdf; //Used in the calculation.
-	private byte[] c0, c1;
 	
 	/**
-	 * Constructor that sets the given channel and choose default values to the other parameters.
-	 * @param channel
-	 */
-	public OTReceiverOnByteArrayUC(Channel channel) {
-		super(channel);
-		try {
-			this.kdf = KdfFactory.getInstance().getObject("HKDF(HMac(SHA-256))");
-		} catch (FactoriesException e) {
-			// will not occur since the given KDF name is valid.
-		}
-	}
-	
-	/**
-	 * Constructor that sets the given channel, common reference string composed of a DLOG 
+	 * Constructor that sets the given common reference string composed of a DLOG 
 	 * description (G,q,g0) and (g0,g1,h0,h1) which is a randomly chosen non-DDH tuple, 
 	 * kdf and random.
-	 * @param channel
 	 * @param dlog must be DDH secure.
 	 * @param g0 
 	 * @param g1 
@@ -81,9 +65,9 @@ public class OTReceiverOnByteArrayUC extends OTReceiverDDHUCAbs{
 	 * @param random
 	 * @throws SecurityLevelException if the given DlogGroup is not DDH secure.
 	 */
-	public OTReceiverOnByteArrayUC(Channel channel, DlogGroup dlog, GroupElement g0, GroupElement g1, 
+	public OTReceiverOnByteArrayUC(DlogGroup dlog, GroupElement g0, GroupElement g1, 
 			GroupElement h0, GroupElement h1, KeyDerivationFunction kdf, SecureRandom random) throws SecurityLevelException{
-		super(channel, dlog, g0, g1, h0, h1, random);
+		super(dlog, g0, g1, h0, h1, random);
 		this.kdf = kdf;
 	}
 	
@@ -93,24 +77,13 @@ public class OTReceiverOnByteArrayUC extends OTReceiverDDHUCAbs{
 	 *		1. u0, u1 in the DlogGroup, AND
 	 *		2. c0, c1 are binary strings of the same length
 	 *	   REPORT ERROR"
-	 * @param message received from the sender. must be OTSOnByteArrayPrivacyOnlyMessage.
+	 * @param c1 
+	 * @param c0 
+	 * @param u1 
+	 * @param u0 
 	 * @throws CheatAttemptException if there was a cheat attempt during the execution of the protocol.
 	 */
-	protected void checkReceivedTuple(OTSMessage message) throws CheatAttemptException{
-		//If message is not instance of OTSOnByteArrayPrivacyMessage, throw Exception.
-		if(!(message instanceof OTSOnByteArrayMessage)){
-			throw new IllegalArgumentException("message should be instance of OTSOnByteArrayPrivacyOnlyMessage");
-		}
-		
-		OTSOnByteArrayMessage msg = (OTSOnByteArrayMessage)message;
-		
-		//Reconstruct the group elements from the given message.
-		u0 = dlog.reconstructElement(true, msg.getW0());
-		u1 = dlog.reconstructElement(true, msg.getW1());
-		
-		//Get the byte arrays from the given message.
-		c0 = msg.getC0();
-		c1 = msg.getC1();
+	private void checkReceivedTuple(GroupElement u0, GroupElement u1, byte[] c0, byte[] c1) throws CheatAttemptException{
 		
 		if (!(dlog.isMember(u0))){
 			throw new CheatAttemptException("u0 element is not a member in the current DlogGroup");
@@ -127,9 +100,30 @@ public class OTReceiverOnByteArrayUC extends OTReceiverDDHUCAbs{
 	/**
 	 * Run the following lines from the protocol:
 	 * "OUTPUT  xSigma = cSigma XOR KDF(|cSigma|,(uSigma)^r)"
+	 * @param sigma input for the protocol
+	 * @param r random value sampled by the protocol
+	 * @param message received from the sender. must be OTSOnByteArrayPrivacyOnlyMessage.
 	 * @return OTROutput contains xSigma
+	 * @throws CheatAttemptException 
 	 */
-	protected OTROutput computeFinalXSigma() {
+	protected OTROutput checkMessgeAndComputeX(byte sigma, BigInteger r, OTSMessage message) throws CheatAttemptException {
+		//If message is not instance of OTSOnByteArrayPrivacyMessage, throw Exception.
+		if(!(message instanceof OTSOnByteArrayMessage)){
+			throw new IllegalArgumentException("message should be instance of OTSOnByteArrayPrivacyOnlyMessage");
+		}
+		
+		OTSOnByteArrayMessage msg = (OTSOnByteArrayMessage)message;
+		
+		//Reconstruct the group elements from the given message.
+		GroupElement u0 = dlog.reconstructElement(true, msg.getW0());
+		GroupElement u1 = dlog.reconstructElement(true, msg.getW1());
+		
+		//Get the byte arrays from the given message.
+		byte[] c0 = msg.getC0();
+		byte[] c1 = msg.getC1();
+			
+		//Compute the validity checks of the given message.
+		checkReceivedTuple(u0, u1, c0, c1);
 		
 		GroupElement kdfInput = null;
 		byte[] cSigma = null;
@@ -140,7 +134,7 @@ public class OTReceiverOnByteArrayUC extends OTReceiverDDHUCAbs{
 			cSigma = c0;
 		} 
 		
-		//If sigma = 0, compute u1^r and set cSigma to c1.
+		//If sigma = 1, compute u1^r and set cSigma to c1.
 		if (sigma == 1) {
 			kdfInput = dlog.exponentiate(u1, r);
 			cSigma = c1;
