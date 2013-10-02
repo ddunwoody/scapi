@@ -33,15 +33,15 @@ package edu.biu.scapi.interactiveMidProtocols.ot;
  */
 public class OTRBasicInput implements OTRInput{
 	
-	//Because java has no bit data type, we decided to hold the given bit in short data type 
+	//Because java has no bit data type, we decided to hold the given bit in the smallest data type - byte. 
 	//in order to use small memory space without use bit manipulation. 
-	private short sigma;
+	private byte sigma;
 	
-	public OTRBasicInput(short sigma){
+	public OTRBasicInput(byte sigma){
 		this.sigma = sigma;
 	}
 	
-	public short getSigma(){
+	public byte getSigma(){
 		return sigma;
 	}
 }
