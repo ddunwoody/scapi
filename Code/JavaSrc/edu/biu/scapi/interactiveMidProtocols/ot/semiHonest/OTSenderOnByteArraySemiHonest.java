@@ -26,13 +26,13 @@ package edu.biu.scapi.interactiveMidProtocols.ot.semiHonest;
 
 import java.security.SecureRandom;
 
-import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnByteArrayInput;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
+import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
 import edu.biu.scapi.securityLevel.SemiHonest;
 import edu.biu.scapi.tools.Factories.KdfFactory;
@@ -48,15 +48,11 @@ import edu.biu.scapi.tools.Factories.KdfFactory;
 public class OTSenderOnByteArraySemiHonest extends OTSenderDDHSemiHonestAbs implements SemiHonest{
 	private KeyDerivationFunction kdf; //Used in the calculation.
 	
-	//Protocol's inputs. ByteArrays.
-	private byte[] x0;
-	private byte[] x1;
-	
 	/**
-	 * Constructor that gets the channel and chooses default values of DlogGroup and SecureRandom.
+	 * Constructor that chooses default values of DlogGroup and SecureRandom.
 	 */
-	public OTSenderOnByteArraySemiHonest(Channel channel){
-		super(channel);
+	public OTSenderOnByteArraySemiHonest(){
+		super();
 		try {
 			this.kdf = KdfFactory.getInstance().getObject("HKDF(HMac(SHA-256))");
 		} catch (FactoriesException e) {
@@ -65,37 +61,15 @@ public class OTSenderOnByteArraySemiHonest extends OTSenderDDHSemiHonestAbs impl
 	}
 	
 	/**
-	 * Constructor that sets the given channel, dlogGroup, kdf and random.
-	 * @param channel
+	 * Constructor that sets the given dlogGroup, kdf and random.
 	 * @param dlog must be DDH secure.
 	 * @param kdf
 	 * @param random
 	 * @throws SecurityLevelException if the given DlogGroup is not DDH secure.
 	 */
-	public OTSenderOnByteArraySemiHonest(Channel channel, DlogGroup dlog, KeyDerivationFunction kdf, SecureRandom random) throws SecurityLevelException{
-		super(channel, dlog, random);
+	public OTSenderOnByteArraySemiHonest(DlogGroup dlog, KeyDerivationFunction kdf, SecureRandom random) throws SecurityLevelException{
+		super(dlog, random);
 		this.kdf = kdf;
-	}
-
-	/**
-	 * Sets the input for this OT sender.
-	 * @param input MUST be OTSOnByteArrayInput with x0, x1 of the same arbitrary length.
-	 */
-	public void setInput(OTSInput input) {
-		//If input is not instance of OTSOnByteArrayInput, throw Exception.
-		if (!(input instanceof OTSOnByteArrayInput)){
-			throw new IllegalArgumentException("x0 and x1 should be binary strings.");
-		}
-		OTSOnByteArrayInput inputStrings = (OTSOnByteArrayInput)input;
-		
-		//If x0, x1 are not of the same length, throw Exception.
-		if (inputStrings.getX0().length != inputStrings.getX1().length){
-			throw new IllegalArgumentException("x0 and x1 should be of the same length.");
-		}
-		
-		//Set x0, x1.
-		this.x0 = inputStrings.getX0();
-		this.x1 = inputStrings.getX1();
 	}
 
 	/**
@@ -103,12 +77,29 @@ public class OTSenderOnByteArraySemiHonest extends OTSenderDDHSemiHonestAbs impl
 	 * "COMPUTE:
 	 *		•	v0 = x0 XOR KDF(|x0|,k0) 
 	 *		•	v1 = x1 XOR KDF(|x1|,k1)"
+	 * @param input MUST be an instance of OTSOnByteArrayInput
+	 * @param k1 
+	 * @param k0 
+	 * @param u 
 	 * @return tuple contains (u, v0, v1) to send to the receiver.
 	 */
-	protected OTSMessage computeTuple() {
+	protected OTSMessage computeTuple(OTSInput input, GroupElement u, GroupElement k0, GroupElement k1) {
+		//If input is not instance of OTSOnByteArrayInput, throw Exception.
+		if (!(input instanceof OTSOnByteArrayInput)){
+			throw new IllegalArgumentException("x0 and x1 should be binary strings.");
+		}
+		
+		byte[] x0 = ((OTSOnByteArrayInput) input).getX0();
+		byte[] x1 = ((OTSOnByteArrayInput) input).getX1();
+		
+		//If x0, x1 are not of the same length, throw Exception.
+		if (x0.length != x1.length){
+			throw new IllegalArgumentException("x0 and x1 should be of the same length.");
+		}
 		
 		//Calculate v0:
 		byte[] k0Bytes = dlog.mapAnyGroupElementToByteArray(k0);
+		
 		int len = x0.length;
 		byte[] v0 = kdf.deriveKey(k0Bytes, 0, k0Bytes.length, len).getEncoded();
 		
