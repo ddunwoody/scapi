@@ -85,7 +85,7 @@ public class ZKPOKFiatShamirFromSigmaProver implements ZKPOKProver{
 	 * @throws IOException if failed to send the message.
 	 * @throws ClassNotFoundException 
 	 */
-	public void prove(ZeroKnowledgeProverInput input) throws IOException, CheatAttemptException, ClassNotFoundException {
+	public void prove(ZKProverInput input) throws IOException, CheatAttemptException, ClassNotFoundException {
 		ZKPOKFiatShamirProof msg = generateFiatShamirProof(input);
 		
 		//Send (a,e,z) to V and output nothing.
@@ -107,7 +107,7 @@ public class ZKPOKFiatShamirFromSigmaProver implements ZKPOKProver{
 	 * @throws CheatAttemptException
 	 * @throws IOException 
 	 */
-	public ZKPOKFiatShamirProof generateFiatShamirProof(ZeroKnowledgeProverInput input) throws CheatAttemptException, IOException{
+	public ZKPOKFiatShamirProof generateFiatShamirProof(ZKProverInput input) throws CheatAttemptException, IOException{
 		//The given input must be an instance of ZKPOKFiatShamirProverInput that holds input for the underlying sigma protocol and possible context information cont.
 		if (!(input instanceof ZKPOKFiatShamirProverInput)){
 			throw new IllegalArgumentException("the given input must be an instance of ZKPOKFiatShamirProverInput");

@@ -40,7 +40,7 @@ import edu.biu.scapi.exceptions.CommitValueException;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public interface ZeroKnowledgeVerifier {
+public interface ZKVerifier {
 
 	/**
 	 * Runs the verifier side of the Zero Knowledge proof.
@@ -51,5 +51,5 @@ public interface ZeroKnowledgeVerifier {
 	 * @throws CheatAttemptException 
 	 * @throws CommitValueException 
 	 */
-	public boolean verify(ZeroKnowledgeCommonInput input) throws  IOException, ClassNotFoundException, CommitValueException, CheatAttemptException;
+	public boolean verify(ZKCommonInput input) throws  IOException, ClassNotFoundException, CommitValueException, CheatAttemptException;
 }

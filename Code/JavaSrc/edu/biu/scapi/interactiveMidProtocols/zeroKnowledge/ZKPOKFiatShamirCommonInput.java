@@ -27,7 +27,7 @@ package edu.biu.scapi.interactiveMidProtocols.zeroKnowledge;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 
 
-public class ZKPOKFiatShamirCommonInput implements ZeroKnowledgeCommonInput{
+public class ZKPOKFiatShamirCommonInput implements ZKCommonInput{
 	
 	private SigmaCommonInput input; //Input for the underlying sigma protocol.
 	private byte[] context;			  //possible context information.

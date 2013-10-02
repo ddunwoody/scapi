@@ -83,7 +83,7 @@ public class ZKPOKFiatShamirFromSigmaVerifier implements ZKPOKVerifier{
 	 * @throws IOException if failed to send the message.
 	 * @throws ClassNotFoundException 
 	 */
-	public boolean verify(ZeroKnowledgeCommonInput input) throws ClassNotFoundException, IOException{
+	public boolean verify(ZKCommonInput input) throws ClassNotFoundException, IOException{
 		
 		//Wait for a message a from P
 		ZKPOKFiatShamirProof msg = receiveMsgFromProver();
@@ -110,7 +110,7 @@ public class ZKPOKFiatShamirFromSigmaVerifier implements ZKPOKVerifier{
 	 * @throws IOException 
 	 * @throws IllegalArgumentException if the given input is not an instance of ZKPOKFiatShamirInput.
 	 */
-	public boolean verifyFiatShamirProof(ZeroKnowledgeCommonInput input, ZKPOKFiatShamirProof msg) throws IOException{
+	public boolean verifyFiatShamirProof(ZKCommonInput input, ZKPOKFiatShamirProof msg) throws IOException{
 		//The given input must be an instance of ZKPOKFiatShamirInput that holds input for the underlying sigma protocol and possible context information cont.
 		if (!(input instanceof ZKPOKFiatShamirCommonInput)){
 			throw new IllegalArgumentException("the given input must be an instance of ZKPOKFiatShamirInput");

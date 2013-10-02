@@ -31,6 +31,6 @@ package edu.biu.scapi.interactiveMidProtocols.zeroKnowledge;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public interface ZKPOKProver extends ZeroKnowledgeProver{
+public interface ZKPOKProver extends ZKProver{
 
 }

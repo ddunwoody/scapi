@@ -24,6 +24,6 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.zeroKnowledge;
 
-public interface ZeroKnowledgeProverInput {
+public interface ZKProverInput {
 
 }

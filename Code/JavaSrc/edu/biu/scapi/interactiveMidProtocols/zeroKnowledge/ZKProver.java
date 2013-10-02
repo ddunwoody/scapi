@@ -40,7 +40,7 @@ import edu.biu.scapi.exceptions.CommitValueException;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public interface ZeroKnowledgeProver {
+public interface ZKProver {
 	
 	/**
 	 * Runs the prover side of the Zero Knowledge proof.
@@ -50,6 +50,6 @@ public interface ZeroKnowledgeProver {
 	 * @throws ClassNotFoundException 
 	 * @throws CommitValueException 
 	 */
-	public void prove(ZeroKnowledgeProverInput input) throws IOException, CheatAttemptException, ClassNotFoundException, CommitValueException;
+	public void prove(ZKProverInput input) throws IOException, CheatAttemptException, ClassNotFoundException, CommitValueException;
 	
 }

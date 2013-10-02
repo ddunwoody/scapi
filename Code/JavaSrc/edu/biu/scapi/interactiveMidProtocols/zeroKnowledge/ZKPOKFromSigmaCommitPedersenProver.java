@@ -88,7 +88,7 @@ public class ZKPOKFromSigmaCommitPedersenProver implements ZKPOKProver{
 	 * @throws CheatAttemptException if the challenge's length is not as expected. 
 	 * @throws ClassNotFoundException 
 	 */
-	public void prove(ZeroKnowledgeProverInput input) throws IOException, CheatAttemptException, ClassNotFoundException {
+	public void prove(ZKProverInput input) throws IOException, CheatAttemptException, ClassNotFoundException {
 		//The given input must be an instance of SigmaProtocolInput.
 		if (!(input instanceof SigmaProverInput)){
 			throw new IllegalArgumentException("the given input must be an instance of SigmaProverInput");

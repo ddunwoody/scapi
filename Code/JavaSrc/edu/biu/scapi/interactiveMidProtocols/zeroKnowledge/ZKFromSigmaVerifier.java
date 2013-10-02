@@ -51,7 +51,7 @@ import edu.biu.scapi.securityLevel.PerfectlyHidingCT;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class ZKFromSigmaVerifier implements ZeroKnowledgeVerifier{
+public class ZKFromSigmaVerifier implements ZKVerifier{
 
 	private Channel channel;
 	private SigmaVerifierComputation sVerifier; //Underlying verifier that computes the proof of the sigma protocol.
@@ -115,7 +115,7 @@ public class ZKFromSigmaVerifier implements ZeroKnowledgeVerifier{
 	 * @throws CheatAttemptException 
 	 * @throws CommitValueException 
 	 */
-	public boolean verify(ZeroKnowledgeCommonInput input) throws ClassNotFoundException, IOException, CheatAttemptException, CommitValueException {
+	public boolean verify(ZKCommonInput input) throws ClassNotFoundException, IOException, CheatAttemptException, CommitValueException {
 		//The given input must be an instance of SigmaProtocolInput.
 		if (!(input instanceof SigmaCommonInput)){
 			throw new IllegalArgumentException("the given input must be an instance of SigmaCommonInput");

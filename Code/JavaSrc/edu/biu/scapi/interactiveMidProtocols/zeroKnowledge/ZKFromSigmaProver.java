@@ -50,7 +50,7 @@ import edu.biu.scapi.securityLevel.PerfectlyHidingCT;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class ZKFromSigmaProver implements ZeroKnowledgeProver{
+public class ZKFromSigmaProver implements ZKProver{
 
 	private Channel channel;
 	private SigmaProverComputation sProver; //Underlying prover that computes the proof of the sigma protocol.
@@ -112,7 +112,7 @@ public class ZKFromSigmaProver implements ZeroKnowledgeProver{
 	 * @throws ClassNotFoundException 
 	 * @throws CommitValueException 
 	 */
-	public void prove(ZeroKnowledgeProverInput input) throws IOException, CheatAttemptException, ClassNotFoundException, CommitValueException {
+	public void prove(ZKProverInput input) throws IOException, CheatAttemptException, ClassNotFoundException, CommitValueException {
 		//The given input must be an instance of SigmaProtocolInput.
 		if (!(input instanceof SigmaProverInput)){
 			throw new IllegalArgumentException("the given input must be an instance of SigmaProverInput");

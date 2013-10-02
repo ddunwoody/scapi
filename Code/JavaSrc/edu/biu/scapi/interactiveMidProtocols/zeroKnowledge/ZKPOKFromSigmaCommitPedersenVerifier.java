@@ -90,7 +90,7 @@ public class ZKPOKFromSigmaCommitPedersenVerifier implements ZKPOKVerifier{
 	 * @throws ClassNotFoundException 
 	 * @throws CheatAttemptException 
 	 */
-	public boolean verify(ZeroKnowledgeCommonInput input) throws ClassNotFoundException, IOException, CheatAttemptException{
+	public boolean verify(ZKCommonInput input) throws ClassNotFoundException, IOException, CheatAttemptException{
 		//The given input must be an instance of SigmaProtocolInput.
 		if (!(input instanceof SigmaCommonInput)){
 			throw new IllegalArgumentException("the given input must be an instance of SigmaCommonInput");
