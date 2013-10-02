@@ -24,24 +24,17 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.zeroKnowledge;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 import edu.biu.scapi.comm.Channel;
-import edu.biu.scapi.exceptions.CheatAttemptException;
-import edu.biu.scapi.exceptions.CommitValueException;
-import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaVerifierComputation;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.OnBigIntegerCommitmentScheme;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.OnByteArrayCommitmentScheme;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.PedersenCTCommitter;
-import edu.biu.scapi.primitives.hash.CryptographicHash;
-import edu.biu.scapi.primitives.hash.cryptopp.CryptoPpSHA1;
-import edu.biu.scapi.securityLevel.PerfectlyHidingCT;
+import edu.biu.scapi.primitives.randomOracle.HKDFBasedRO;
+import edu.biu.scapi.primitives.randomOracle.RandomOracle;
 
 /**
  * Concrete implementation of Zero Knowledge verifier.
@@ -52,28 +45,27 @@ import edu.biu.scapi.securityLevel.PerfectlyHidingCT;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class ZKPOKFiatShamirFromSigmaVerifier implements ZeroKnowledgeVerifier{
+public class ZKPOKFiatShamirFromSigmaVerifier implements ZKPOKVerifier{
 
 	private Channel channel;
 	private SigmaVerifierComputation sVerifier; //Underlying verifier that computes the proof of the sigma protocol.
-	private CryptographicHash hash;			//Underlying hash to use as random oracle.
-	private ZKPOKFiatShamirInput input;		//possible context information cont, given in the input.
+	private RandomOracle ro;					//Underlying random oracle to use.
 	
 	/**
-	 * Constructor that accepts the underlying channel, sigma protocol's verifier and hash to use.
+	 * Constructor that accepts the underlying channel, sigma protocol's verifier and random oracle to use.
 	 * @param channel
 	 * @param sVerifier
-	 * @param hash
+	 * @param ro
 	 */
-	public ZKPOKFiatShamirFromSigmaVerifier(Channel channel, SigmaVerifierComputation sVerifier, CryptographicHash hash) {
+	public ZKPOKFiatShamirFromSigmaVerifier(Channel channel, SigmaVerifierComputation sVerifier, RandomOracle ro) {
 		
 		this.sVerifier = sVerifier;
-		this.hash = hash;
+		this.ro = ro;
 		this.channel = channel;
 	}
 	
 	/**
-	 * Constructor that accepts the underlying channel, sigma protocol's verifier and sets default hash.
+	 * Constructor that accepts the underlying channel, sigma protocol's verifier and sets default random oracle.
 	 * @param channel
 	 * @param sVerifier
 	 */
@@ -81,28 +73,27 @@ public class ZKPOKFiatShamirFromSigmaVerifier implements ZeroKnowledgeVerifier{
 	
 		this.channel = channel;
 		this.sVerifier = sVerifier;
-		this.hash = new CryptoPpSHA1();
-	}
-
-	/**
-	 * Sets the input for this Zero Knowledge protocol.
-	 * @param input must be an instance of ZKPOKFiatShamirInput that holds 
-	 * 				input for the underlying sigma protocol and possible context information cont.
-	 * @throws IllegalArgumentException if the given input is not an instance of ZKPOKFiatShamirInput.
-	 */
-	public void setInput(ZeroKnowledgeInput input){
-		//The given input must be an instance of ZKPOKFiatShamirInput that holds input for the underlying sigma protocol and possible context information cont.
-		if (!(input instanceof ZKPOKFiatShamirInput)){
-			throw new IllegalArgumentException("the given input must be an instance of ZKPOKFiatShamirInput");
-		}
-		this.input = (ZKPOKFiatShamirInput) input;
-		
-		sVerifier.setInput(this.input.getSigmaInput());
+		this.ro = new HKDFBasedRO();
 	}
 	
 	/**
 	 * Runs the verifier side of the Zero Knowledge proof.
-	 * Let (a,e,z) denote the prover1, verifier challenge and prover2 messages of the sigma protocol.
+	 * @param input must be an instance of ZKPOKFiatShamirInput that holds 
+	 * 				input for the underlying sigma protocol and possible context information cont.
+	 * @throws IOException if failed to send the message.
+	 * @throws ClassNotFoundException 
+	 */
+	public boolean verify(ZeroKnowledgeCommonInput input) throws ClassNotFoundException, IOException{
+		
+		//Wait for a message a from P
+		ZKPOKFiatShamirProof msg = receiveMsgFromProver();
+		
+		//verify the proof.
+		return verifyFiatShamirProof(input, msg);
+	}
+	
+	/**
+	 *  Let (a,e,z) denote the prover1, verifier challenge and prover2 messages of the sigma protocol.
 	 * This function computes the following calculations:
 	 *
 	 *		IF
@@ -111,19 +102,28 @@ public class ZKPOKFiatShamirFromSigmaVerifier implements ZeroKnowledgeVerifier{
 	 *     		OUTPUT ACC
 	 *     ELSE
 	 *          OUTPUT REJ
-	 * @throws IOException if failed to send the message.
-	 * @throws ClassNotFoundException 
+	 * @param input must be an instance of ZKPOKFiatShamirInput that holds 
+	 * 				input for the underlying sigma protocol and possible context information cont.
+	 * @param input
+	 * @param msg
+	 * @return true if the proof is valid; false, otherwise.
+	 * @throws IOException 
+	 * @throws IllegalArgumentException if the given input is not an instance of ZKPOKFiatShamirInput.
 	 */
-	public boolean verify() throws ClassNotFoundException, IOException{
+	public boolean verifyFiatShamirProof(ZeroKnowledgeCommonInput input, ZKPOKFiatShamirProof msg) throws IOException{
+		//The given input must be an instance of ZKPOKFiatShamirInput that holds input for the underlying sigma protocol and possible context information cont.
+		if (!(input instanceof ZKPOKFiatShamirCommonInput)){
+			throw new IllegalArgumentException("the given input must be an instance of ZKPOKFiatShamirInput");
+		}
 		
-		//Wait for a message a from P
-		SigmaProtocolMsg a = receiveMsgFromProver();
+		//get the given a
+		SigmaProtocolMsg a = msg.getA();
 		
 		//Compute e=H(x,a,cont)
-		byte[] computedE = computeChallenge(a);
+		byte[] computedE = computeChallenge((ZKPOKFiatShamirCommonInput) input, a);
 		
-		//Wait for a message e from P, 
-		byte[] receivedE = receiveChallengeFromProver();
+		//get the given challenge.
+		byte[] receivedE = msg.getE();
 		
 		//check that e=H(x,a,cont):
 		boolean valid = true;
@@ -139,25 +139,23 @@ public class ZKPOKFiatShamirFromSigmaVerifier implements ZeroKnowledgeVerifier{
 			}
 		}
 			
-		//Wait for a message z from P
-		SigmaProtocolMsg z = receiveMsgFromProver();
+		//get the received z
+		SigmaProtocolMsg z = msg.getZ();
 		
 		//If transcript (a, e, z) is accepting in sigma on input x, output ACC
 		//Else outupt REJ
-		valid = valid && proccessVerify(a, computedE, z);
+		valid = valid && proccessVerify(((ZKPOKFiatShamirCommonInput) input).getSigmaInput(), a, computedE, z);
 		
 		return valid;
 	}
 	
-
-	
 	/**
 	 * Waits for a message a from the prover.
 	 * @return the received message
 	 * @throws ClassNotFoundException
 	 * @throws IOException if failed to send the message.
 	 */
-	private SigmaProtocolMsg receiveMsgFromProver() throws ClassNotFoundException, IOException {
+	private ZKPOKFiatShamirProof receiveMsgFromProver() throws ClassNotFoundException, IOException {
 		Serializable msg = null;
 		try {
 			//receive the mesage.
@@ -166,77 +164,69 @@ public class ZKPOKFiatShamirFromSigmaVerifier implements ZeroKnowledgeVerifier{
 			throw new IOException("failed to receive the a message. The thrown message is: " + e.getMessage());
 		}
 		//If the given message is not an instance of SigmaProtocolMsg, throw exception.
-		if (!(msg instanceof SigmaProtocolMsg)){
-			throw new IllegalArgumentException("the given message should be an instance of SigmaProtocolMsg");
+		if (!(msg instanceof ZKPOKFiatShamirProof)){
+			throw new IllegalArgumentException("the given message should be an instance of ZKPOKFiatShamirMessage");
 		}
 		//Return the given message.
-		return (SigmaProtocolMsg) msg;
-	}
-	
-	/**
-	 * Waits for a message a from the prover.
-	 * @return the received message
-	 * @throws ClassNotFoundException
-	 * @throws IOException if failed to send the message.
-	 */
-	private byte[] receiveChallengeFromProver() throws ClassNotFoundException, IOException {
-		Serializable msg = null;
-		try {
-			//receive the mesage.
-			msg = channel.receive();
-		} catch (IOException e) {
-			throw new IOException("failed to receive the a message. The thrown message is: " + e.getMessage());
-		}
-		//If the given message is not an instance of SigmaProtocolMsg, throw exception.
-		if (!(msg instanceof byte[])){
-			throw new IllegalArgumentException("the given message should be a byte[]");
-		}
-		//Return the given message.
-		return (byte[]) msg;
+		return (ZKPOKFiatShamirProof) msg;
 	}
 	
 	/**
 	 * Run the following line from the protocol:
 	 * "COMPUTE e=H(x,a,cont)".
+	 * @param input 
 	 * @param a first message of the sigma protocol.
 	 * @return the computed challenge
+	 * @throws IOException 
 	 */
-	private byte[] computeChallenge(SigmaProtocolMsg a) {
-		byte[] inputArray = input.getSigmaInput().toByteArray();
-		byte[] messageArray = a.toByteArray();
-		byte[] cont = input.getCont();
+	private byte[] computeChallenge(ZKPOKFiatShamirCommonInput input, SigmaProtocolMsg a) throws IOException {
+		byte[] inputArray = convertToBytes(input.getSigmaInput());
+		byte[] messageArray = convertToBytes(a);
+		byte[] cont = input.getContext();
 		
-		byte[] input = null;
+		byte[] inputToRO = null;
 		
 		if (cont != null){
-			input = new byte[inputArray.length + messageArray.length + cont.length];
-			System.arraycopy(cont, 0, input, inputArray.length + messageArray.length, cont.length);
+			inputToRO = new byte[inputArray.length + messageArray.length + cont.length];
+			System.arraycopy(cont, 0, inputToRO, inputArray.length + messageArray.length, cont.length);
 		} else{
-			input = new byte[inputArray.length + messageArray.length];
+			inputToRO = new byte[inputArray.length + messageArray.length];
 		}
-		System.arraycopy(inputArray, 0, input, 0, inputArray.length);
-		System.arraycopy(messageArray, 0, input, inputArray.length, messageArray.length);
+		System.arraycopy(inputArray, 0, inputToRO, 0, inputArray.length);
+		System.arraycopy(messageArray, 0, inputToRO, inputArray.length, messageArray.length);
 		
-		hash.update(input, 0, input.length);
-		//challenge should be of size t - how can we do this?
-		byte[] challenge = new byte[hash.getHashedMsgSize()];
-		hash.hashFinal(challenge, 0);
-		return challenge;
+		return ro.compute(inputToRO, 0, inputToRO.length, sVerifier.getSoundnessParam()/8);
+	}
+	
+	/**
+	 * Converts the given data to byte array using serialization mechanism.
+	 * @param data to convert.
+	 * @return the converted bytes.
+	 * @throws IOException
+	 */
+	private byte[] convertToBytes(Serializable data) throws IOException{
+		ByteArrayOutputStream bOut = new ByteArrayOutputStream();  
+	    ObjectOutputStream oOut  = new ObjectOutputStream(bOut);
+		oOut.writeObject(data);  
+		oOut.close();
+		
+		return bOut.toByteArray();
 	}
 	
 	/**
 	 * Verifies the proof.
+	 * @param input2 
 	 * @param a first message from prover.
 	 * @throws IOException if failed to send the message.
 	 * @throws ClassNotFoundException 
 	 */
-	private boolean proccessVerify(SigmaProtocolMsg a, byte[] challenge, SigmaProtocolMsg z) {
+	private boolean proccessVerify(SigmaCommonInput input, SigmaProtocolMsg a, byte[] challenge, SigmaProtocolMsg z) {
 		//If transcript (a, e, z) is accepting in sigma on input x, output ACC
 		//Else outupt REJ
 		
 		sVerifier.setChallenge(challenge);
 		
-		return sVerifier.verify(a, z);
+		return sVerifier.verify(input, a, z);
 	}
 }
 
