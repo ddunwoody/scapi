@@ -24,6 +24,8 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.ot.fullSimulation;
 
+import java.io.IOException;
+import java.math.BigInteger;
 import java.security.SecureRandom;
 
 import edu.biu.scapi.comm.Channel;
@@ -38,25 +40,32 @@ import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnByteArrayMessage;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
+import edu.biu.scapi.securityLevel.Malicious;
 import edu.biu.scapi.tools.Factories.KdfFactory;
 
 /**
- * Concrete class for OT DDH with full simulation receiver ON BYTE ARRAY.
+ * Concrete implementation of the receiver side in oblivious transfer based on the DDH assumption that achieves full simulation.
+ * This implementation can also be used as batch OT that achieves full simulation. In batch oblivious transfer, 
+ * the parties run an initialization phase and then can carry out concrete OTs later whenever they have new inputs and wish to carry out an OT. <p>
+ * 
  * This class derived from OTReceiverDDHFullSimAbs and implements the functionality 
  * related to the byte array inputs.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTReceiverOnByteArrayFullSim extends OTReceiverDDHFullSimAbs{
+public class OTReceiverOnByteArrayFullSim extends OTReceiverDDHFullSimAbs implements Malicious{
 
 	private KeyDerivationFunction kdf; //Used in the calculation.
-	private byte[] c0, c1;
 	
 	/**
 	 * Constructor that gets the channel and chooses default values of DlogGroup and SecureRandom.
+	 * @param channel
+	 * @throws ClassNotFoundException 
+	 * @throws CheatAttemptException 
+	 * @throws IOException 
 	 */
-	public OTReceiverOnByteArrayFullSim(Channel channel){
+	public OTReceiverOnByteArrayFullSim(Channel channel) throws IOException, CheatAttemptException, ClassNotFoundException{
 		super(channel);
 		try {
 			this.kdf = KdfFactory.getInstance().getObject("HKDF(HMac(SHA-256))");
@@ -73,8 +82,11 @@ public class OTReceiverOnByteArrayFullSim extends OTReceiverDDHFullSimAbs{
 	 * @param random
 	 * @throws SecurityLevelException if the given DlogGroup is not DDH secure.
 	 * @throws InvalidDlogGroupException if the given dlog is invalid.
+	 * @throws ClassNotFoundException 
+	 * @throws CheatAttemptException 
+	 * @throws IOException 
 	 */
-	public OTReceiverOnByteArrayFullSim(Channel channel, DlogGroup dlog, KeyDerivationFunction kdf, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException{
+	public OTReceiverOnByteArrayFullSim(Channel channel, DlogGroup dlog, KeyDerivationFunction kdf, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException, IOException, CheatAttemptException, ClassNotFoundException{
 		
 		super(channel, dlog, random);
 		this.kdf = kdf;
@@ -86,24 +98,13 @@ public class OTReceiverOnByteArrayFullSim extends OTReceiverDDHFullSimAbs{
 	 *		1. u0, u1 in the DlogGroup, AND
 	 *		2. c0, c1 are binary strings of the same length
 	 *	   REPORT ERROR"
-	 * @param message received from the sender. must be OTSOnByteArrayPrivacyOnlyMessage.
+	 * @param c1 
+	 * @param c0 
+	 * @param u1 
+	 * @param u0 
 	 * @throws CheatAttemptException if there was a cheat attempt during the execution of the protocol.
 	 */
-	protected void checkReceivedTuple(OTSMessage message) throws CheatAttemptException{
-		//If message is not instance of OTSOnByteArrayPrivacyMessage, throw Exception.
-		if(!(message instanceof OTSOnByteArrayMessage)){
-			throw new IllegalArgumentException("message should be instance of OTSOnByteArrayPrivacyOnlyMessage");
-		}
-		
-		OTSOnByteArrayMessage msg = (OTSOnByteArrayMessage)message;
-		
-		//Reconstruct the group elements from the given message.
-		u0 = dlog.reconstructElement(true, msg.getW0());
-		u1 = dlog.reconstructElement(true, msg.getW1());
-		
-		//Get the byte arrays from the given message.
-		c0 = msg.getC0();
-		c1 = msg.getC1();
+	private void checkReceivedTuple(GroupElement u0, GroupElement u1, byte[] c0, byte[] c1) throws CheatAttemptException{
 		
 		if (!(dlog.isMember(u0))){
 			throw new CheatAttemptException("u0 element is not a member in the current DlogGroup");
@@ -119,10 +120,34 @@ public class OTReceiverOnByteArrayFullSim extends OTReceiverDDHFullSimAbs{
 
 	/**
 	 * Run the following lines from the protocol:
-	 * "OUTPUT  xSigma = cSigma XOR KDF(|cSigma|,(uSigma)^r)"
+	 * "IF  NOT 
+	 *		1. w0, w1 in the DlogGroup, AND
+	 *		2. c0, c1 are binary strings of the same length
+	 *		REPORT ERROR
+	 *	OUTPUT  xSigma = cSigma XOR KDF(|cSigma|,(uSigma)^r)"
+	 * @param sigma input of the protocol
+	 * @param r random value sampled in the protocol
+	 * @param message received from the sender
 	 * @return OTROutput contains xSigma
+	 * @throws CheatAttemptException 
 	 */
-	protected OTROutput computeFinalXSigma() {
+	protected OTROutput checkMessgeAndComputeX(byte sigma, BigInteger r, OTSMessage message) throws CheatAttemptException {
+		//If message is not instance of OTSOnByteArrayPrivacyMessage, throw Exception.
+		if(!(message instanceof OTSOnByteArrayMessage)){
+			throw new IllegalArgumentException("message should be instance of OTSOnByteArrayPrivacyOnlyMessage");
+		}
+		OTSOnByteArrayMessage msg = (OTSOnByteArrayMessage)message;
+		
+		//Reconstruct the group elements from the given message.
+		GroupElement u0 = dlog.reconstructElement(true, msg.getW0());
+		GroupElement u1 = dlog.reconstructElement(true, msg.getW1());
+		
+		//Get the byte arrays from the given message.
+		byte[] c0 = msg.getC0();
+		byte[] c1 = msg.getC1();
+		
+		//Compute the validity checks of the given message.		
+		checkReceivedTuple(u0, u1, c0, c1);
 		
 		GroupElement kdfInput = null;
 		byte[] cSigma = null;
@@ -133,7 +158,7 @@ public class OTReceiverOnByteArrayFullSim extends OTReceiverDDHFullSimAbs{
 			cSigma = c0;
 		} 
 		
-		//If sigma = 0, compute u1^r and set cSigma to c1.
+		//If sigma = 1, compute u1^r and set cSigma to c1.
 		if (sigma == 1) {
 			kdfInput = dlog.exponentiate(u1, r);
 			cSigma = c1;

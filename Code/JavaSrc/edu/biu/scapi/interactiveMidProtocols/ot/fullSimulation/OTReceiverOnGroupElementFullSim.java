@@ -24,6 +24,7 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.ot.fullSimulation;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
@@ -37,23 +38,29 @@ import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnGroupElementMessage;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
+import edu.biu.scapi.securityLevel.Malicious;
 
 /**
- * Concrete class for OT with full simulation receiver ON GROUP ELEMENT.
+ * Concrete implementation of the receiver side in oblivious transfer based on the DDH assumption that achieves full simulation.
+ * This implementation can also be used as batch OT that achieves full simulation. In batch oblivious transfer, 
+ * the parties run an initialization phase and then can carry out concrete OTs later whenever they have new inputs and wish to carry out an OT. <p>
+ * 
  * This class derived from OTReceiverDDHFullSimAbs and implements the functionality 
  * related to the GroupElement inputs.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTReceiverOnGroupElementFullSim extends OTReceiverDDHFullSimAbs{
-
-	private GroupElement c0, c1;
+public class OTReceiverOnGroupElementFullSim extends OTReceiverDDHFullSimAbs implements Malicious{
 	
 	/**
 	 * Constructor that gets the channel and choose default values of DlogGroup and SecureRandom.
+	 * @param channel
+	 * @throws ClassNotFoundException 
+	 * @throws CheatAttemptException 
+	 * @throws IOException 
 	 */
-	public OTReceiverOnGroupElementFullSim(Channel channel){
+	public OTReceiverOnGroupElementFullSim(Channel channel) throws IOException, CheatAttemptException, ClassNotFoundException{
 		super(channel);
 	}
 	
@@ -64,8 +71,11 @@ public class OTReceiverOnGroupElementFullSim extends OTReceiverDDHFullSimAbs{
 	 * @param random
 	 * @throws SecurityLevelException if the given DlogGroup is not DDH secure.
 	 * @throws InvalidDlogGroupException if the given dlog is invalid.
+	 * @throws ClassNotFoundException 
+	 * @throws CheatAttemptException 
+	 * @throws IOException 
 	 */
-	public OTReceiverOnGroupElementFullSim(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException{
+	public OTReceiverOnGroupElementFullSim(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException, IOException, CheatAttemptException, ClassNotFoundException{
 		
 		super(channel, dlog, random);
 	}
@@ -75,23 +85,13 @@ public class OTReceiverOnGroupElementFullSim extends OTReceiverDDHFullSimAbs{
 	 * "IF  NOT 
 	 *		1. u0, u1, c0, c1 in the DlogGroup
 	 *	REPORT ERROR"
-	 * @param message received from the sender. must be OTSOnGroupElementPrivacyOnlyMessage.
+	 * @param c1 
+	 * @param c0 
+	 * @param u1 
+	 * @param u0 
 	 * @throws CheatAttemptException if there was a cheat attempt during the execution of the protocol.
 	 */
-	protected void checkReceivedTuple(OTSMessage message) throws CheatAttemptException{
-		//If message is not instance of OTSOnGroupElementPrivacyMessage, throw Exception.
-		if(!(message instanceof OTSOnGroupElementMessage)){
-			throw new IllegalArgumentException("message should be instance of OTSOnGroupElementPrivacyOnlyMessage");
-		}
-		
-		OTSOnGroupElementMessage msg = (OTSOnGroupElementMessage)message;
-		
-		//Reconstruct the group elements from the given message.
-		u0 = dlog.reconstructElement(true, msg.getW0());
-		u1 = dlog.reconstructElement(true, msg.getW1());
-		c0 = dlog.reconstructElement(true, msg.getC0());
-		c1 = dlog.reconstructElement(true, msg.getC1());
-		
+	protected void checkReceivedTuple(GroupElement u0, GroupElement u1, GroupElement c0, GroupElement c1) throws CheatAttemptException{
 		
 		if (!(dlog.isMember(u0))){
 			throw new CheatAttemptException("u0 element is not a member in the current DlogGroup");
@@ -111,10 +111,29 @@ public class OTReceiverOnGroupElementFullSim extends OTReceiverDDHFullSimAbs{
 	/**
 	 * Run the following lines from the protocol:
 	 * "COMPUTE xSigma = cSigma * (uSigma)^(-r)"
+	 * @param sigma input of the protocol
+	 * @param r random value sampled in the protocol
+	 * @param message received from the sender
 	 * @return OTROutput contains xSigma
+	 * @throws CheatAttemptException 
 	 */
-	protected OTROutput computeFinalXSigma() {
+	protected OTROutput checkMessgeAndComputeX(byte sigma, BigInteger r, OTSMessage message) throws CheatAttemptException {
+		//If message is not instance of OTSOnGroupElementMessage, throw Exception.
+		if(!(message instanceof OTSOnGroupElementMessage)){
+			throw new IllegalArgumentException("message should be instance of OTSOnGroupElementMessage");
+		}
 		
+		OTSOnGroupElementMessage msg = (OTSOnGroupElementMessage)message;
+		
+		//Reconstruct the group elements from the given message.
+		GroupElement u0 = dlog.reconstructElement(true, msg.getW0());
+		GroupElement u1 = dlog.reconstructElement(true, msg.getW1());
+		GroupElement c0 = dlog.reconstructElement(true, msg.getC0());
+		GroupElement c1 = dlog.reconstructElement(true, msg.getC1());
+				
+		//Compute the validity checks of the given message.		
+		checkReceivedTuple(u0, u1, c0, c1);
+				
 		GroupElement xSigma = null;
 		GroupElement cSigma = null;
 		BigInteger minusR = dlog.getOrder().subtract(r);
@@ -125,7 +144,7 @@ public class OTReceiverOnGroupElementFullSim extends OTReceiverDDHFullSimAbs{
 			cSigma = c0;
 		} 
 		
-		//If sigma = 0, compute w1^beta and set cSigma to c1.
+		//If sigma = 1, compute w1^beta and set cSigma to c1.
 		if (sigma == 1) {
 			xSigma = dlog.exponentiate(u1, minusR);
 			cSigma = c1;
