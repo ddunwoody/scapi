@@ -27,7 +27,6 @@ package edu.biu.scapi.interactiveMidProtocols.ot.privacyOnly;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
-import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
@@ -49,49 +48,38 @@ import edu.biu.scapi.securityLevel.PrivacyOnly;
  */
 public class OTReceiverOnGroupElementPrivacyOnly extends OTReceiverDDHPrivacyOnlyAbs implements PrivacyOnly{
 
-	private GroupElement c0, c1;
 	/**
-	 * Constructor that gets the channel and choose default values of DlogGroup and SecureRandom.
+	 * Constructor that chooses default values of DlogGroup and SecureRandom.
 	 */
-	public OTReceiverOnGroupElementPrivacyOnly(Channel channel){
-		super(channel);
+	public OTReceiverOnGroupElementPrivacyOnly(){
+		super();
 	}
 	
 	/**
-	 * Constructor that sets the given channel, dlogGroup and random.
-	 * @param channel
+	 * Constructor that sets the given dlogGroup and random.
 	 * @param dlog must be DDH secure.
 	 * @param random
 	 * @throws SecurityLevelException if the given DlogGroup is not DDH secure.
 	 * @throws InvalidDlogGroupException if the given dlog is invalid.
 	 */
-	public OTReceiverOnGroupElementPrivacyOnly(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException{
+	public OTReceiverOnGroupElementPrivacyOnly(DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException{
 		
-		super(channel, dlog, random);
+		super(dlog, random);
 	}
 
 	/**
 	 * Run the following line from the protocol:
-	 * "IF  NOT 
-	 *		1. w0, w1, c0, c1 in the DlogGroup
-	 *	REPORT ERROR"
-	 * @param message received from the sender. must be OTSOnGroupElementPrivacyOnlyMessage.
+	 * "IF  NOT w0, w1, c0, c1 in the DlogGroup
+	 *     REPORT ERROR
+	 *  COMPUTE (kSigma)^(-1) = (wSigma)^(-beta)
+	 *	OUTPUT  xSigma = cSigma * (kSigma)^(-1)"
+	 * @param c1 
+	 * @param c0 
+	 * @param w1 
+	 * @param w0 
 	 * @throws CheatAttemptException if there was a cheat attempt during the execution of the protocol.
 	 */
-	protected void checkReceivedTuple(OTSMessage message) throws CheatAttemptException{
-		//If message is not instance of OTSOnGroupElementPrivacyMessage, throw Exception.
-		if(!(message instanceof OTSOnGroupElementMessage)){
-			throw new IllegalArgumentException("message should be instance of OTSOnGroupElementPrivacyOnlyMessage");
-		}
-		
-		OTSOnGroupElementMessage msg = (OTSOnGroupElementMessage)message;
-		
-		//Reconstruct the group elements from the given message.
-		w0 = dlog.reconstructElement(true, msg.getW0());
-		w1 = dlog.reconstructElement(true, msg.getW1());
-		c0 = dlog.reconstructElement(true, msg.getC0());
-		c1 = dlog.reconstructElement(true, msg.getC1());
-		
+	private void checkReceivedTuple(GroupElement w0, GroupElement w1, GroupElement c0, GroupElement c1) throws CheatAttemptException{
 		
 		if (!(dlog.isMember(w0))){
 			throw new CheatAttemptException("w0 element is not a member in the current DlogGroup");
@@ -112,9 +100,28 @@ public class OTReceiverOnGroupElementPrivacyOnly extends OTReceiverDDHPrivacyOnl
 	 * Run the following lines from the protocol:
 	 * "COMPUTE (kSigma)^(-1) = (wSigma)^(-beta)
 	 *	OUTPUT  xSigma = cSigma * (kSigma)^(-1)"
+	 *  @param sigma input of the protocol
+	 * @param beta random value sampled in the protocol
+	 * @param message received from the sender
 	 * @return OTROutput contains xSigma
+	 * @throws CheatAttemptException 
 	 */
-	protected OTROutput computeFinalXSigma() {
+	protected OTROutput checkMessgeAndComputeX(byte sigma, BigInteger beta, OTSMessage message) throws CheatAttemptException {
+		//If message is not instance of OTSOnGroupElementMessage, throw Exception.
+		if(!(message instanceof OTSOnGroupElementMessage)){
+			throw new IllegalArgumentException("message should be instance of OTSOnGroupElementMessage");
+		}
+		
+		OTSOnGroupElementMessage msg = (OTSOnGroupElementMessage)message;
+		
+		//Reconstruct the group elements from the given message.
+		GroupElement w0 = dlog.reconstructElement(true, msg.getW0());
+		GroupElement w1 = dlog.reconstructElement(true, msg.getW1());
+		GroupElement c0 = dlog.reconstructElement(true, msg.getC0());
+		GroupElement c1 = dlog.reconstructElement(true, msg.getC1());
+				
+		//Compute the validity checks of the given message. 
+		checkReceivedTuple(w0, w1, c0, c1);
 		
 		GroupElement kSigma = null;
 		GroupElement cSigma = null;
