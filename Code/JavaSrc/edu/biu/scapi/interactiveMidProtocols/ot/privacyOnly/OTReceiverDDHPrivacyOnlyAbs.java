@@ -33,18 +33,20 @@ import org.bouncycastle.util.BigIntegers;
 
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CheatAttemptException;
+import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
+import edu.biu.scapi.generals.ScapiDefaultConfiguration;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTRBasicInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTRInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTROutput;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTRGrElQuadMessage;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTReceiver;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
-import edu.biu.scapi.primitives.dlog.cryptopp.CryptoPpDlogZpSafePrime;
-import edu.biu.scapi.primitives.dlog.miracl.MiraclDlogECF2m;
 import edu.biu.scapi.securityLevel.DDH;
+import edu.biu.scapi.tools.Factories.DlogGroupFactory;
 
 /**
  * Abstract class for OT Privacy assuming DDH receiver.
@@ -55,11 +57,13 @@ import edu.biu.scapi.securityLevel.DDH;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public abstract class OTReceiverDDHPrivacyOnlyAbs implements OTReceiver{
+abstract class OTReceiverDDHPrivacyOnlyAbs implements OTReceiver{
 
 	/*	
 	 	This class runs the following protocol:
-			SAMPLE random values alpha, beta, gamma in {0, . . . , q-1} 
+			IF NOT VALID_PARAMS(G,q,g)
+	    		REPORT ERROR and HALT
+	    	SAMPLE random values alpha, beta, gamma in {0, . . . , q-1} 
 			COMPUTE a as follows:
 			1.	If sigma = 0 then a = (g^alpha, g^beta, g^(alpha*beta), g^gamma)
 			2.	If sigma = 1 then a = (g^alpha, g^beta, g^gamma, g^(alpha*beta))
@@ -81,63 +85,57 @@ public abstract class OTReceiverDDHPrivacyOnlyAbs implements OTReceiver{
 
 	*/	
 	
-	private Channel channel;
 	protected DlogGroup dlog;
 	private SecureRandom random;
 	private BigInteger qMinusOne; 
 	
-	//Values required for calculations:
-	protected short sigma;
-	private BigInteger alpha, gamma;
-	protected BigInteger beta;
-	private GroupElement gAlpha, gBeta, gGamma, gAlphaBeta;
-	protected GroupElement w0, w1;
-	
 	/**
-	 * Constructor that gets the channel and chooses default values of DlogGroup and SecureRandom.
+	 * Constructor that chooses default values of DlogGroup and SecureRandom.
 	 */
-	public OTReceiverDDHPrivacyOnlyAbs(Channel channel) {
-		try{
-			try {
-				//Uses Miracl Koblitz 233 Elliptic curve.
-				setMembers(channel, new MiraclDlogECF2m("K-233"), new SecureRandom());
-			} catch (IOException e) {
-				//If there is a problem with the elliptic curves file, create Zp DlogGroup.
-				
-					setMembers(channel, new CryptoPpDlogZpSafePrime(), new SecureRandom());
-			} catch (IllegalArgumentException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		} catch (SecurityLevelException e) {
-			// Can not occur since the DlogGroup is DDH secure
+	OTReceiverDDHPrivacyOnlyAbs() {
+		//Read the default DlogGroup name from a configuration file.
+		String dlogName = ScapiDefaultConfiguration.getInstance().getProperty("DDHDlogGroup");
+		DlogGroup dlog = null;
+		try {
+			//Create the default DlogGroup by the factory.
+			dlog = DlogGroupFactory.getInstance().getObject(dlogName);
+			System.out.println(dlog.getGroupType());
+		} catch (FactoriesException e1) {
+			// Should not occur since the dlog name in the configuration file is valid.
+		}
+		
+		try {
+			doConstruct(dlog, new SecureRandom());
+		} catch (SecurityLevelException e1) {
+			// Should not occur since the dlog in the configuration file is as secure as needed.
 		} catch (InvalidDlogGroupException e) {
-			// Can not occur since the DlogGroup is valid.
+			// Should not occur since the dlog in the configuration file is valid.
 		}
 	}
 	
 	/**
-	 * Constructor that sets the given channel, dlogGroup and random.
-	 * @param channel
+	 * Constructor that sets the given dlogGroup and random.
 	 * @param dlog must be DDH secure.
 	 * @param random
 	 * @throws SecurityLevelException if the given dlog is not DDH secure
 	 * @throws InvalidDlogGroupException if the given DlogGroup is not valid.
 	 */
-	public OTReceiverDDHPrivacyOnlyAbs(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException{
+	OTReceiverDDHPrivacyOnlyAbs(DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException{
 		
-		setMembers(channel, dlog, random);
+		doConstruct(dlog, random);
 	}
 	
 	/**
 	 * Sets the given members.
-	 * @param channel
+	 * Runs the following line from the protocol:
+	 * "IF NOT VALID_PARAMS(G,q,g)
+	 *   		REPORT ERROR and HALT".
 	 * @param dlog must be DDH secure.
 	 * @param random
 	 * @throws SecurityLevelException if the given dlog is not DDH secure
 	 * @throws InvalidDlogGroupException if the given DlogGroup is not valid.
 	 */
-	private void setMembers(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException {
+	private void doConstruct(DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException {
 		//The underlying dlog group must be DDH secure.
 		if (!(dlog instanceof DDH)){
 			throw new SecurityLevelException("DlogGroup should have DDH security level");
@@ -151,144 +149,120 @@ public abstract class OTReceiverDDHPrivacyOnlyAbs implements OTReceiver{
 		if(!dlog.validateGroup())
 			throw new InvalidDlogGroupException();
 		
-		this.channel = channel;
 		this.dlog = dlog;
 		this.random = random;
 		qMinusOne =  dlog.getOrder().subtract(BigInteger.ONE);
 		
-	}
-	
-	/**
-	 * Runs the part of the protocol where the receiver input is not yet necessary.
-	 */
-	public void preProcess(){
-		/* Run the following part of the protocol:
-				SAMPLE random values alpha, beta, gamma in [0, . . . , q-1] 
-				COMPUTE:
-				g^alpha, g^beta, g^(alpha*beta), g^gamma.
-		*/
-		
-		//Sample random values.
-		sampleRandomValues();
-		
-		//Calculate tuple elements
-		computeElementsForTuple();
-	}
-
-	/**
-	 * Sets the input for this OT receiver.
-	 * @param input MUST be OTRBasicInput.
-	 */
-	public void setInput(OTRInput input) {
-		//If input is not instance of OTRBasicInput, throw Exception.
-		if (!(input instanceof OTRBasicInput)){
-			throw new IllegalArgumentException("input shoud contain sigma.");
-		}
-		
-		//The given sigma should be 0 or 1.
-		if ((sigma != 0) && (sigma!= 1)){
-			throw new IllegalArgumentException("Sigma should be 0 or 1");
-		}
-		//Set sigma.
-		this.sigma = ((OTRBasicInput) input).getSigma();
+		// This protocol has no pre process stage.
 	}
 	
 	/**
 	 * Runs the part of the protocol where the receiver input is necessary.
+	 * The transfer stage of OT protocol which can be called several times in parallel.
+	 * In order to enable the parallel calls, each transfer call should use a different channel to send and receive messages.
+	 * This way the parallel executions of the function will not block each other.
+	 * The parameters given in the input must match the DlogGroup member of this class, which given in the constructor.
+	 * @param channel
+	 * @param input MUST be OTRBasicInput.
 	 * @return OTROutput, the output of the protocol.
 	 * @throws CheatAttemptException if there was a cheat attempt during the execution of the protocol.
 	 * @throws IOException if the send or receive functions failed.
 	 * @throws ClassNotFoundException if the receive failed.
 	 */
-	public OTROutput transfer() throws CheatAttemptException, IOException, ClassNotFoundException{
-		/* Run the following part of the protocol:
-				COMPUTE a as follows:
-				1.	If  sigma = 0 then a = (g^alpha, g^beta, g^(alpha*beta), g^gamma)
-				2.	If  sigma = 1 then a = (g^alpha, g^beta, g^gamma, g^(alpha*beta))
-				SEND a to S
-				WAIT for message pairs (w0, c0) and (w1, c1)  from S
-				In ByteArray scenario:
-					IF  NOT 
-						1. w0, w1 in the DlogGroup, AND
-						2. c0, c1 are binary strings of the same length
-					   REPORT ERROR
-					COMPUTE kSigma = (wSigma)^beta
-					OUTPUT  xSigma = cSigma XOR KDF(|cSigma|,kSigma)
-				In GroupElement scenario:
-					IF  NOT 
-						1. w0, w1, c0, c1 in the DlogGroup
-					   REPORT ERROR
-					COMPUTE (kSigma)^(-1) = (wSigma)^(-beta)
-					OUTPUT  xSigma = cSigma * (kSigma)^(-1)
-
-		*/
+	public OTROutput transfer(Channel channel, OTRInput input) throws CheatAttemptException, IOException, ClassNotFoundException{
 		
-		try{
-			//Compute tuple for sender.
-			OTRPrivacyOnlyMessage a = computeTuple();
-			
-			//Send tuple to sender.
-			sendTupleToSender(a);
-			
-			//Wait for message from sender.
-			OTSMessage message = waitForMessageFromSender();
-			
-			//checked the received message.
-			checkReceivedTuple(message);
-			
-			//Compute the final calculations to get xSigma.
-			return computeFinalXSigma();
-			
-		}catch(NullPointerException e){
-			throw new IllegalStateException("preProcess function should be called before transfer atleast once");
+		//check if the input is valid.
+		//If input is not instance of OTRBasicInput, throw Exception.
+		if (!(input instanceof OTRBasicInput)){
+			throw new IllegalArgumentException("input shoud contain sigma.");
 		}
 		
+		byte sigma = ((OTRBasicInput) input).getSigma();
+		//The given sigma should be 0 or 1.
+		if ((sigma != 0) && (sigma!= 1)){
+			throw new IllegalArgumentException("Sigma should be 0 or 1");
+		}
 		
-	}
-
-	/**
-	 * Runs the following line from the protocol:
-	 * "SAMPLE random values alpha, beta, gamma in [0, . . . , q-1]". 
-	 */
-	private void sampleRandomValues() {
-		//Sample random values.
+		/*
+		 * Run the following lines from the protocol:
+		    SAMPLE random values alpha, beta, gamma in {0, . . . , q-1} 
+			COMPUTE a as follows:
+			1.	If sigma = 0 then a = (g^alpha, g^beta, g^(alpha*beta), g^gamma)
+			2.	If sigma = 1 then a = (g^alpha, g^beta, g^gamma, g^(alpha*beta))
+			SEND a to S
+			WAIT for message pairs (w0, c0) and (w1, c1)  from S
+			In ByteArray scenario:
+				IF  NOT 
+					1. w0, w1 in the DlogGroup, AND
+					2. c0, c1 are binary strings of the same length
+				   REPORT ERROR
+				COMPUTE kSigma = (wSigma)^beta
+				OUTPUT  xSigma = cSigma XOR KDF(|cSigma|,kSigma)
+			In GroupElement scenario:
+				IF  NOT 
+					1. w0, w1, c0, c1 in the DlogGroup
+				   REPORT ERROR
+				COMPUTE (kSigma)^(-1) = (wSigma)^(-beta)
+				OUTPUT  xSigma = cSigma * (kSigma)^(-1)
+		 */
 		
-		alpha = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
-		beta = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
-		gamma = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
+		//Values required for calculations:
+		BigInteger beta = sampleRandomBeta();
+		
+		//Compute tuple for sender.
+		OTRGrElQuadMessage a = computeTuple(sigma, beta);
+		
+		//Send tuple to sender.
+		sendTupleToSender(channel, a);
+		
+		//Wait for message from sender.
+		OTSMessage message = waitForMessageFromSender(channel);
+		
+		//Compute the final calculations to get xSigma.
+		return checkMessgeAndComputeX(sigma, beta, message);
+		
 	}
 	
 	/**
-	 * Calculates g^alpha, g^beta, g^(alpha*beta), g^gamma.
-	 * These values are necessary to the message tuple
+	 * Samples random beta in [0,...,q-1].
+	 * @return the sampled beta.
 	 */
-	private void computeElementsForTuple() {
-		GroupElement g = dlog.getGenerator();
-		
-		gAlpha = dlog.exponentiate(g, alpha);
-		gBeta = dlog.exponentiate(g, beta);
-		gGamma = dlog.exponentiate(g, gamma);
-		gAlphaBeta = dlog.exponentiate(g, alpha.multiply(beta));
-		
+	private BigInteger sampleRandomBeta(){
+		return BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
 	}
 	
 	/**
 	 * Runs the following lines from the protocol:
-	 * "COMPUTE a as follows:
-	 *			1.	If sigma = 0 then a = (g^alpha, g^beta, g^(alpha*beta), g^gamma)
-				2.	If sigma = 1 then a = (g^alpha, g^beta, g^gamma, g^(alpha*beta))"
+	 * "SAMPLE random values alpha, gamma in [0, . . . , q-1]
+	 * COMPUTE a as follows:
+	 *		1.	If sigma = 0 then a = (g^alpha, g^beta, g^(alpha*beta), g^gamma)
+	 *		2.	If sigma = 1 then a = (g^alpha, g^beta, g^gamma, g^(alpha*beta))"
+	 * @param sigma input of the protocol
+	 * @param beta random value sampled by the protocol
 	 * @return OTRSemiHonestMessage contains the tuple (h0, h1).
 	 */
-	private OTRPrivacyOnlyMessage computeTuple() {
+	private OTRGrElQuadMessage computeTuple(byte sigma, BigInteger beta) {
 
+		//Sample random values.
+		BigInteger alpha = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
+		BigInteger gamma = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
+		
+		//Calculates g^alpha, g^beta, g^(alpha*beta), g^gamma.
+		GroupElement g = dlog.getGenerator();
+		
+		GroupElement gAlpha = dlog.exponentiate(g, alpha);
+		GroupElement gBeta = dlog.exponentiate(g, beta);
+		GroupElement gGamma = dlog.exponentiate(g, gamma);
+		GroupElement gAlphaBeta = dlog.exponentiate(g, alpha.multiply(beta));
+		
 		if (sigma == 0){
-			return new OTRPrivacyOnlyMessage(gAlpha.generateSendableData(), 
+			return new OTRGrElQuadMessage(gAlpha.generateSendableData(), 
 										 gBeta.generateSendableData(), 
 										 gAlphaBeta.generateSendableData(), 
 										 gGamma.generateSendableData());
 		}
 		else {
-			return new OTRPrivacyOnlyMessage(gAlpha.generateSendableData(), 
+			return new OTRGrElQuadMessage(gAlpha.generateSendableData(), 
 										 gBeta.generateSendableData(), 
 										 gGamma.generateSendableData(), 
 										 gAlphaBeta.generateSendableData());
@@ -298,10 +272,11 @@ public abstract class OTReceiverDDHPrivacyOnlyAbs implements OTReceiver{
 	/**
 	 * Runs the following line from the protocol:
 	 * "SEND a to S"
+	 * @param channel 
 	 * @param a the tuple to send to the sender.
 	 * @throws IOException 
 	 */
-	private void sendTupleToSender(OTRPrivacyOnlyMessage a) throws IOException {
+	private void sendTupleToSender(Channel channel, OTRGrElQuadMessage a) throws IOException {
 		try {
 			channel.send(a);
 		} catch (IOException e) {
@@ -313,11 +288,12 @@ public abstract class OTReceiverDDHPrivacyOnlyAbs implements OTReceiver{
 	/**
 	 * Runs the following line from the protocol:
 	 * "WAIT for message pairs (w0, c0) and (w1, c1)  from S"
+	 * @param channel 
 	 * @return OTSMessage contains (w0, c0, w1, c1)
 	 * @throws IOException if failed to receive.
 	 * @throws ClassNotFoundException
 	 */
-	private OTSMessage waitForMessageFromSender() throws IOException, ClassNotFoundException {
+	private OTSMessage waitForMessageFromSender(Channel channel) throws IOException, ClassNotFoundException {
 		Serializable message = null;
 		try {
 			message =  channel.receive();
@@ -331,7 +307,7 @@ public abstract class OTReceiverDDHPrivacyOnlyAbs implements OTReceiver{
 	}
 	
 	/**
-	 * Runs the following line from the protocol:
+	 * Runs the following lines from the protocol:
 	 * "In ByteArray scenario:
 	 *		IF  NOT 
 	 *			1. w0, w1 in the DlogGroup, AND
@@ -340,21 +316,18 @@ public abstract class OTReceiverDDHPrivacyOnlyAbs implements OTReceiver{
 	 *	In GroupElement scenario:
 	 *		IF  NOT 
 	 *			1. w0, w1, c0, c1 in the DlogGroup
-	 *		   REPORT ERROR"		
-	 * @param message
-	 * @throws CheatAttemptException 
-	 */
-	protected abstract void checkReceivedTuple(OTSMessage message) throws CheatAttemptException;
-	
-	/**
-	 * Runs the following lines from the protocol:
-	 * "In ByteArray scenario:
+	 *		   REPORT ERROR
+	 * In ByteArray scenario:
 	 *		COMPUTE kSigma = (wSigma)^beta
 	 *		OUTPUT  xSigma = cSigma XOR KDF(|cSigma|,kSigma)
 	 *	In GroupElement scenario:
 	 *		COMPUTE (kSigma)^(-1) = (wSigma)^(-beta)
 	 *		OUTPUT  xSigma = cSigma * (kSigma)^(-1)"
+	 *  @param sigma input of the protocol
+	 * @param beta random value sampled in the protocol
+	 * @param message received from the sender
 	 * @return OTROutput contains xSigma
+	 * @throws CheatAttemptException 
 	 */
-	protected abstract OTROutput computeFinalXSigma();
+	protected abstract OTROutput checkMessgeAndComputeX(byte sigma, BigInteger beta, OTSMessage message) throws CheatAttemptException;
 }
