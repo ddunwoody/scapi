@@ -32,6 +32,12 @@ import org.bouncycastle.util.BigIntegers;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
+/**
+ * Utility class used by OT implementations.
+ * 
+ * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
+ *
+ */
 public class OTUtil {
 
 	public OTUtil(){
