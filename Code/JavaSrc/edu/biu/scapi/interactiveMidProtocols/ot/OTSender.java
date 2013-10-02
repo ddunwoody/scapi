@@ -26,7 +26,9 @@ package edu.biu.scapi.interactiveMidProtocols.ot;
 
 import java.io.IOException;
 
+import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CheatAttemptException;
+import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 
 /**
  * Marker interface. Every class that implements it is signed as Oblivious Transfer sender.
@@ -41,23 +43,22 @@ import edu.biu.scapi.exceptions.CheatAttemptException;
  */
 public interface OTSender {
 	
-	/**
-	 * Run the part of the protocol where the sender input is not yet necessary.
-	 * @throws CheatAttemptException if there was a cheat attempt during the execution of the protocol.
-	 * @throws ClassNotFoundException
-	 * @throws IOException if failed to receive a message.
-	 */
-	public void preProcess() throws CheatAttemptException, IOException, ClassNotFoundException;
+	// Some OT protocols have a pre-process stage before the transfer. 
+	// Usually, pre process is done once at the beginning of the protocol and will not be executed later, 
+	// then the transfer function could be called multiple times.
+	// We implement the pre process stage at construction time. 
+	// A protocol that needs to call pre process after the construction time, should create a new instance.
 	
 	/**
-	 * Sets the input for this OT sender.
-	 * @param input
-	 */
-	public void setInput(OTSInput input);
-	
-	/**
-	 * Run the part of the protocol where the sender input is necessary.
+	 * The transfer stage of OT protocol which can be called several times in parallel.
+	 * In order to enable the parallel calls, each transfer call should use a different channel to send and receive messages.
+	 * This way the parallel executions of the function will not block each other.
+	 * @param channel each call should get a different one.
+	 * @param input The parameters given in the input must match the DlogGroup member of this class, which given in the constructor.
 	 * @throws IOException if failed to send the message.
+	 * @throws ClassNotFoundException 
+	 * @throws CheatAttemptException
+	 * @throws InvalidDlogGroupException 
 	 */
-	public void transfer() throws IOException;
+	public void transfer(Channel channel, OTSInput input) throws IOException, ClassNotFoundException, CheatAttemptException, InvalidDlogGroupException;
 }
