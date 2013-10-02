@@ -41,10 +41,10 @@ import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHProverCompu
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHProverInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTRBasicInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTRInput;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTRMessage;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTRMsg;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTROutput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTReceiver;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
 import edu.biu.scapi.interactiveMidProtocols.zeroKnowledge.ZKPOKFromSigmaCommitPedersenProver;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
@@ -63,7 +63,7 @@ import edu.biu.scapi.tools.Factories.DlogGroupFactory;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-abstract class OTReceiverDDHFullSimAbs implements OTReceiver{
+abstract class OTFullSimDDHReceiverAbs implements OTReceiver{
 
 	/*	
 	 	This class runs the following protocol:
@@ -115,7 +115,7 @@ abstract class OTReceiverDDHFullSimAbs implements OTReceiver{
 	 * @throws CheatAttemptException 
 	 * @throws IOException 
 	 */
-	OTReceiverDDHFullSimAbs(Channel channel) throws IOException, CheatAttemptException, ClassNotFoundException{
+	OTFullSimDDHReceiverAbs(Channel channel) throws IOException, CheatAttemptException, ClassNotFoundException{
 		//Read the default DlogGroup name from a configuration file.
 		String dlogName = ScapiDefaultConfiguration.getInstance().getProperty("DDHDlogGroup");
 		DlogGroup dlog = null;
@@ -146,7 +146,7 @@ abstract class OTReceiverDDHFullSimAbs implements OTReceiver{
 	 * @throws CheatAttemptException 
 	 * @throws IOException 
 	 */
-	OTReceiverDDHFullSimAbs(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException, IOException, CheatAttemptException, ClassNotFoundException{
+	OTFullSimDDHReceiverAbs(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException, IOException, CheatAttemptException, ClassNotFoundException{
 		
 		doConstruct(channel, dlog, random);
 	}
@@ -216,7 +216,7 @@ abstract class OTReceiverDDHFullSimAbs implements OTReceiver{
 		alpha1 = alpha0.add(BigInteger.ONE);
 		
 		//Calculate tuple elements
-		OTRFullSimMessage tuple = computeFirstTuple();
+		OTFullSimDDHReceiverMessage tuple = computeFirstTuple();
 				
 		//Send tuple to sender.
 		sendTupleToSender(channel, tuple);
@@ -282,13 +282,13 @@ abstract class OTReceiverDDHFullSimAbs implements OTReceiver{
 		BigInteger r = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
 		
 		//Compute tuple (g,h) for sender.
-		OTRMessage a = computeSecondTuple(sigma, r);
+		OTRMsg a = computeSecondTuple(sigma, r);
 		
 		//Send tuple to sender.
 		sendTupleToSender(channel, a);
 		
 		//Wait for message from sender.
-		OTSMessage message = waitForMessageFromSender(channel);
+		OTSMsg message = waitForMessageFromSender(channel);
 		
 		//Compute the final calculations to get xSigma.
 		return checkMessgeAndComputeX(sigma, r, message);
@@ -314,14 +314,14 @@ abstract class OTReceiverDDHFullSimAbs implements OTReceiver{
 			3.	h1 = (g1)^(alpha1)".
 	 * These values are necessary to the message tuple.
 	 */
-	private OTRFullSimMessage computeFirstTuple() {
+	private OTFullSimDDHReceiverMessage computeFirstTuple() {
 		GroupElement g0 = dlog.getGenerator();
 		
 		g1 = dlog.exponentiate(g0, y);
 		h0 = dlog.exponentiate(g0, alpha0);
 		h1 = dlog.exponentiate(g1, alpha1);
 		
-		return new OTRFullSimMessage(g1.generateSendableData(), h0.generateSendableData(), h1.generateSendableData());
+		return new OTFullSimDDHReceiverMessage(g1.generateSendableData(), h0.generateSendableData(), h1.generateSendableData());
 	}
 	
 	/**
@@ -333,7 +333,7 @@ abstract class OTReceiverDDHFullSimAbs implements OTReceiver{
 	 * @param r random value sampled in the protocol
 	 * @return OTRFullSimMessage contains the tuple (g,h).
 	 */
-	private OTRMessage computeSecondTuple(byte sigma, BigInteger r) {
+	private OTRMsg computeSecondTuple(byte sigma, BigInteger r) {
 		GroupElement g, h;
 		
 		if (sigma == 0){
@@ -345,7 +345,7 @@ abstract class OTReceiverDDHFullSimAbs implements OTReceiver{
 			h = dlog.exponentiate(h1, r);
 		}
 		
-		return new OTRMessage(g.generateSendableData(), h.generateSendableData());
+		return new OTRMsg(g.generateSendableData(), h.generateSendableData());
 	}
 	
 	/**
@@ -388,17 +388,17 @@ abstract class OTReceiverDDHFullSimAbs implements OTReceiver{
 	 * @throws IOException if failed to receive.
 	 * @throws ClassNotFoundException
 	 */
-	private OTSMessage waitForMessageFromSender(Channel channel) throws IOException, ClassNotFoundException {
+	private OTSMsg waitForMessageFromSender(Channel channel) throws IOException, ClassNotFoundException {
 		Serializable message = null;
 		try {
 			message =  channel.receive();
 		} catch (IOException e) {
 			throw new IOException("failed to receive message. The thrown message is: " + e.getMessage());
 		}
-		if (!(message instanceof OTSMessage)){
+		if (!(message instanceof OTSMsg)){
 			throw new IllegalArgumentException("the given message should be an instance of OTSMessage");
 		}
-		return (OTSMessage) message;
+		return (OTSMsg) message;
 	}
 	
 	/**
@@ -420,7 +420,7 @@ abstract class OTReceiverDDHFullSimAbs implements OTReceiver{
 	 * @return OTROutput contains xSigma
 	 * @throws CheatAttemptException 
 	 */
-	protected abstract OTROutput checkMessgeAndComputeX(byte sigma, BigInteger r, OTSMessage message) throws CheatAttemptException;
+	protected abstract OTROutput checkMessgeAndComputeX(byte sigma, BigInteger r, OTSMsg message) throws CheatAttemptException;
 
 
 }

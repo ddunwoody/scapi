@@ -33,9 +33,9 @@ import edu.biu.scapi.exceptions.CommitValueException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSInput;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnGroupElementInput;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnGroupElementMessage;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnGroupElementMsg;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.securityLevel.Malicious;
@@ -51,7 +51,7 @@ import edu.biu.scapi.securityLevel.Malicious;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTSenderOnGroupElementFullSim extends OTSenderDDHFullSimAbs implements Malicious{
+public class OTFullSimDDHOnGroupElementSender extends OTFullSimDDHSenderAbs implements Malicious{
 	
 	/**
 	 * Constructor that gets the channel and chooses default values of DlogGroup and SecureRandom.
@@ -61,7 +61,7 @@ public class OTSenderOnGroupElementFullSim extends OTSenderDDHFullSimAbs impleme
 	 * @throws ClassNotFoundException 
 	 * @throws CommitValueException 
 	 */
-	public OTSenderOnGroupElementFullSim(Channel channel) throws ClassNotFoundException, IOException, CheatAttemptException, CommitValueException{
+	public OTFullSimDDHOnGroupElementSender(Channel channel) throws ClassNotFoundException, IOException, CheatAttemptException, CommitValueException{
 		super(channel);
 	}
 	
@@ -77,7 +77,7 @@ public class OTSenderOnGroupElementFullSim extends OTSenderDDHFullSimAbs impleme
 	 * @throws ClassNotFoundException 
 	 * @throws CommitValueException 
 	 */
-	public OTSenderOnGroupElementFullSim(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException, ClassNotFoundException, IOException, CheatAttemptException, CommitValueException{
+	public OTFullSimDDHOnGroupElementSender(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException, ClassNotFoundException, IOException, CheatAttemptException, CommitValueException{
 		super(channel, dlog, random);
 	}
 	
@@ -93,7 +93,7 @@ public class OTSenderOnGroupElementFullSim extends OTSenderDDHFullSimAbs impleme
 	 * @param v1
 	 * @return tuple contains (u0, c0, u1, c1) to send to the receiver.
 	 */
-	protected OTSMessage computeTuple(OTSInput input, GroupElement u0, GroupElement u1, GroupElement v0, GroupElement v1) {
+	protected OTSMsg computeTuple(OTSInput input, GroupElement u0, GroupElement u1, GroupElement v0, GroupElement v1) {
 		//If input is not instance of OTSOnGroupElementInput, throw Exception.
 		if (!(input instanceof OTSOnGroupElementInput)){
 			throw new IllegalArgumentException("x0 and x1 should be DlogGroup elements.");
@@ -111,7 +111,7 @@ public class OTSenderOnGroupElementFullSim extends OTSenderDDHFullSimAbs impleme
 		GroupElement c1 = dlog.multiplyGroupElements(x1, v1);
 		
 		//Create and return sender message.
-		return new OTSOnGroupElementMessage(u0.generateSendableData(), 
+		return new OTSOnGroupElementMsg(u0.generateSendableData(), 
 				c0.generateSendableData(), u1.generateSendableData(), c1.generateSendableData());
 	}
 

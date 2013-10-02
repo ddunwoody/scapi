@@ -37,9 +37,9 @@ import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.generals.ScapiDefaultConfiguration;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHVerifierComputation;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTRMessage;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTRMsg;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSInput;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSender;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTUtil;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTUtil.RandOutput;
@@ -61,7 +61,7 @@ import edu.biu.scapi.tools.Factories.DlogGroupFactory;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-abstract class OTSenderDDHFullSimAbs implements OTSender{
+abstract class OTFullSimDDHSenderAbs implements OTSender{
 
 	/*	
 	  This class runs the following protocol:
@@ -102,7 +102,7 @@ abstract class OTSenderDDHFullSimAbs implements OTSender{
 	 * @throws CommitValueException 
 	
 	 */
-	OTSenderDDHFullSimAbs(Channel channel) throws ClassNotFoundException, IOException, CheatAttemptException, CommitValueException{
+	OTFullSimDDHSenderAbs(Channel channel) throws ClassNotFoundException, IOException, CheatAttemptException, CommitValueException{
 		//Read the default DlogGroup name from a configuration file.
 		String dlogName = ScapiDefaultConfiguration.getInstance().getProperty("DDHDlogGroup");
 		DlogGroup dlog = null;
@@ -134,7 +134,7 @@ abstract class OTSenderDDHFullSimAbs implements OTSender{
 	 * @throws ClassNotFoundException 
 	 * @throws CommitValueException 
 	 */
-	OTSenderDDHFullSimAbs(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException, ClassNotFoundException, IOException, CheatAttemptException, CommitValueException{
+	OTFullSimDDHSenderAbs(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException, ClassNotFoundException, IOException, CheatAttemptException, CommitValueException{
 
 		doConstruct(channel, dlog, random);
 	}
@@ -196,7 +196,7 @@ abstract class OTSenderDDHFullSimAbs implements OTSender{
 	private void preProcess(Channel channel) throws ClassNotFoundException, IOException, CheatAttemptException, CommitValueException{
 		
 		//Wait for message from R
-		OTRFullSimMessage message = waitForFullSimMessageFromReceiver(channel);
+		OTFullSimDDHReceiverMessage message = waitForFullSimMessageFromReceiver(channel);
 		
 		g1 = dlog.reconstructElement(true, message.getG1());
 		h0 = dlog.reconstructElement(true, message.getH0());
@@ -234,7 +234,7 @@ abstract class OTSenderDDHFullSimAbs implements OTSender{
 	public void transfer(Channel channel, OTSInput input) throws IOException, ClassNotFoundException{
 		
 		//Wait for message from R
-		OTRMessage message = waitForMessageFromReceiver(channel);
+		OTRMsg message = waitForMessageFromReceiver(channel);
 				
 		GroupElement g = dlog.reconstructElement(true, message.getFirstGE());
 		GroupElement h = dlog.reconstructElement(true, message.getSecondGE());
@@ -250,7 +250,7 @@ abstract class OTSenderDDHFullSimAbs implements OTSender{
 		GroupElement v1 = tuple1.getV();
 		
 		//Compute c0, c1.
-		OTSMessage tuple = computeTuple(input, u0, u1, v0, v1);
+		OTSMsg tuple = computeTuple(input, u0, u1, v0, v1);
 		
 		//Send the tuple for the receiver.
 		sendTupleToReceiver(channel, tuple);
@@ -265,17 +265,17 @@ abstract class OTSenderDDHFullSimAbs implements OTSender{
 	 * @throws ClassNotFoundException 
 	 * @throws IOException if failed to receive a message.
 	 */
-	private OTRFullSimMessage waitForFullSimMessageFromReceiver(Channel channel) throws ClassNotFoundException, IOException{
+	private OTFullSimDDHReceiverMessage waitForFullSimMessageFromReceiver(Channel channel) throws ClassNotFoundException, IOException{
 		Serializable message = null;
 		try {
 			message = channel.receive();
 		} catch (IOException e) {
 			throw new IOException("Failed to receive message. The thrown message is: " + e.getMessage());
 		}
-		if (!(message instanceof OTRFullSimMessage)){
+		if (!(message instanceof OTFullSimDDHReceiverMessage)){
 			throw new IllegalArgumentException("The received message should be an instance of OTRFullSimMessage");
 		}
-		return (OTRFullSimMessage) message;
+		return (OTFullSimDDHReceiverMessage) message;
 	}
 	
 	/**
@@ -286,17 +286,17 @@ abstract class OTSenderDDHFullSimAbs implements OTSender{
 	 * @throws ClassNotFoundException 
 	 * @throws IOException if failed to receive a message.
 	 */
-	private OTRMessage waitForMessageFromReceiver(Channel channel) throws ClassNotFoundException, IOException{
+	private OTRMsg waitForMessageFromReceiver(Channel channel) throws ClassNotFoundException, IOException{
 		Serializable message = null;
 		try {
 			message = channel.receive();
 		} catch (IOException e) {
 			throw new IOException("Failed to receive message. The thrown message is: " + e.getMessage());
 		}
-		if (!(message instanceof OTRMessage)){
+		if (!(message instanceof OTRMsg)){
 			throw new IllegalArgumentException("The received message should be an instance of OTRMessage");
 		}
-		return (OTRMessage) message;
+		return (OTRMsg) message;
 	}
 	
 	/**
@@ -340,7 +340,7 @@ abstract class OTSenderDDHFullSimAbs implements OTSender{
 	 * @param u0 
 	 * @return tuple contains (u, v0, v1) to send to the receiver.
 	 */
-	protected abstract OTSMessage computeTuple(OTSInput input, GroupElement u0, GroupElement u1, GroupElement v0, GroupElement v1);
+	protected abstract OTSMsg computeTuple(OTSInput input, GroupElement u0, GroupElement u1, GroupElement v0, GroupElement v1);
 
 	/**
 	 * Runs the following lines from the protocol:
@@ -349,7 +349,7 @@ abstract class OTSenderDDHFullSimAbs implements OTSender{
 	 * @param message to send to the receiver
 	 * @throws IOException if failed to send the message.
 	 */
-	private void sendTupleToReceiver(Channel channel, OTSMessage message) throws IOException {
+	private void sendTupleToReceiver(Channel channel, OTSMsg message) throws IOException {
 
 		try {
 			//Send the message by the channel.

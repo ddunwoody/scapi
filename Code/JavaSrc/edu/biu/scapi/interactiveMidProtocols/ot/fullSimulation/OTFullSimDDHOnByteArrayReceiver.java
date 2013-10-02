@@ -35,8 +35,8 @@ import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTROnByteArrayOutput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTROutput;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnByteArrayMessage;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnByteArrayMsg;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
@@ -54,7 +54,7 @@ import edu.biu.scapi.tools.Factories.KdfFactory;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTReceiverOnByteArrayFullSim extends OTReceiverDDHFullSimAbs implements Malicious{
+public class OTFullSimDDHOnByteArrayReceiver extends OTFullSimDDHReceiverAbs implements Malicious{
 
 	private KeyDerivationFunction kdf; //Used in the calculation.
 	
@@ -65,7 +65,7 @@ public class OTReceiverOnByteArrayFullSim extends OTReceiverDDHFullSimAbs implem
 	 * @throws CheatAttemptException 
 	 * @throws IOException 
 	 */
-	public OTReceiverOnByteArrayFullSim(Channel channel) throws IOException, CheatAttemptException, ClassNotFoundException{
+	public OTFullSimDDHOnByteArrayReceiver(Channel channel) throws IOException, CheatAttemptException, ClassNotFoundException{
 		super(channel);
 		try {
 			this.kdf = KdfFactory.getInstance().getObject("HKDF(HMac(SHA-256))");
@@ -86,7 +86,7 @@ public class OTReceiverOnByteArrayFullSim extends OTReceiverDDHFullSimAbs implem
 	 * @throws CheatAttemptException 
 	 * @throws IOException 
 	 */
-	public OTReceiverOnByteArrayFullSim(Channel channel, DlogGroup dlog, KeyDerivationFunction kdf, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException, IOException, CheatAttemptException, ClassNotFoundException{
+	public OTFullSimDDHOnByteArrayReceiver(Channel channel, DlogGroup dlog, KeyDerivationFunction kdf, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException, IOException, CheatAttemptException, ClassNotFoundException{
 		
 		super(channel, dlog, random);
 		this.kdf = kdf;
@@ -131,12 +131,12 @@ public class OTReceiverOnByteArrayFullSim extends OTReceiverDDHFullSimAbs implem
 	 * @return OTROutput contains xSigma
 	 * @throws CheatAttemptException 
 	 */
-	protected OTROutput checkMessgeAndComputeX(byte sigma, BigInteger r, OTSMessage message) throws CheatAttemptException {
+	protected OTROutput checkMessgeAndComputeX(byte sigma, BigInteger r, OTSMsg message) throws CheatAttemptException {
 		//If message is not instance of OTSOnByteArrayPrivacyMessage, throw Exception.
-		if(!(message instanceof OTSOnByteArrayMessage)){
+		if(!(message instanceof OTSOnByteArrayMsg)){
 			throw new IllegalArgumentException("message should be instance of OTSOnByteArrayPrivacyOnlyMessage");
 		}
-		OTSOnByteArrayMessage msg = (OTSOnByteArrayMessage)message;
+		OTSOnByteArrayMsg msg = (OTSOnByteArrayMsg)message;
 		
 		//Reconstruct the group elements from the given message.
 		GroupElement u0 = dlog.reconstructElement(true, msg.getW0());

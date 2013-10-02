@@ -34,8 +34,8 @@ import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTROnGroupElementOutput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTROutput;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnGroupElementMessage;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnGroupElementMsg;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.securityLevel.Malicious;
@@ -51,7 +51,7 @@ import edu.biu.scapi.securityLevel.Malicious;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTReceiverOnGroupElementFullSim extends OTReceiverDDHFullSimAbs implements Malicious{
+public class OTFullSimDDHOnGroupElementReceiver extends OTFullSimDDHReceiverAbs implements Malicious{
 	
 	/**
 	 * Constructor that gets the channel and choose default values of DlogGroup and SecureRandom.
@@ -60,7 +60,7 @@ public class OTReceiverOnGroupElementFullSim extends OTReceiverDDHFullSimAbs imp
 	 * @throws CheatAttemptException 
 	 * @throws IOException 
 	 */
-	public OTReceiverOnGroupElementFullSim(Channel channel) throws IOException, CheatAttemptException, ClassNotFoundException{
+	public OTFullSimDDHOnGroupElementReceiver(Channel channel) throws IOException, CheatAttemptException, ClassNotFoundException{
 		super(channel);
 	}
 	
@@ -75,7 +75,7 @@ public class OTReceiverOnGroupElementFullSim extends OTReceiverDDHFullSimAbs imp
 	 * @throws CheatAttemptException 
 	 * @throws IOException 
 	 */
-	public OTReceiverOnGroupElementFullSim(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException, IOException, CheatAttemptException, ClassNotFoundException{
+	public OTFullSimDDHOnGroupElementReceiver(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException, IOException, CheatAttemptException, ClassNotFoundException{
 		
 		super(channel, dlog, random);
 	}
@@ -117,13 +117,13 @@ public class OTReceiverOnGroupElementFullSim extends OTReceiverDDHFullSimAbs imp
 	 * @return OTROutput contains xSigma
 	 * @throws CheatAttemptException 
 	 */
-	protected OTROutput checkMessgeAndComputeX(byte sigma, BigInteger r, OTSMessage message) throws CheatAttemptException {
+	protected OTROutput checkMessgeAndComputeX(byte sigma, BigInteger r, OTSMsg message) throws CheatAttemptException {
 		//If message is not instance of OTSOnGroupElementMessage, throw Exception.
-		if(!(message instanceof OTSOnGroupElementMessage)){
+		if(!(message instanceof OTSOnGroupElementMsg)){
 			throw new IllegalArgumentException("message should be instance of OTSOnGroupElementMessage");
 		}
 		
-		OTSOnGroupElementMessage msg = (OTSOnGroupElementMessage)message;
+		OTSOnGroupElementMsg msg = (OTSOnGroupElementMsg)message;
 		
 		//Reconstruct the group elements from the given message.
 		GroupElement u0 = dlog.reconstructElement(true, msg.getW0());

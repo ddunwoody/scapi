@@ -34,9 +34,9 @@ import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSInput;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnByteArrayInput;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnByteArrayMessage;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnByteArrayMsg;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
@@ -54,7 +54,7 @@ import edu.biu.scapi.tools.Factories.KdfFactory;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTSenderOnByteArrayFullSim extends OTSenderDDHFullSimAbs implements Malicious{
+public class OTFullSimDDHOnByteArraySender extends OTFullSimDDHSenderAbs implements Malicious{
 	
 	private KeyDerivationFunction kdf; //Used in the calculation.
 	
@@ -66,7 +66,7 @@ public class OTSenderOnByteArrayFullSim extends OTSenderDDHFullSimAbs implements
 	 * @throws ClassNotFoundException 
 	 * @throws CommitValueException 
 	 */
-	public OTSenderOnByteArrayFullSim(Channel channel) throws ClassNotFoundException, IOException, CheatAttemptException, CommitValueException {
+	public OTFullSimDDHOnByteArraySender(Channel channel) throws ClassNotFoundException, IOException, CheatAttemptException, CommitValueException {
 		super(channel);
 		try {
 			this.kdf = KdfFactory.getInstance().getObject("HKDF(HMac(SHA-256))");
@@ -88,7 +88,7 @@ public class OTSenderOnByteArrayFullSim extends OTSenderDDHFullSimAbs implements
 	 * @throws ClassNotFoundException 
 	 * @throws CommitValueException 
 	 */
-	public OTSenderOnByteArrayFullSim(Channel channel, DlogGroup dlog, KeyDerivationFunction kdf, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException, ClassNotFoundException, IOException, CheatAttemptException, CommitValueException{
+	public OTFullSimDDHOnByteArraySender(Channel channel, DlogGroup dlog, KeyDerivationFunction kdf, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException, ClassNotFoundException, IOException, CheatAttemptException, CommitValueException{
 		super(channel, dlog, random);
 		this.kdf = kdf;
 	}
@@ -105,7 +105,7 @@ public class OTSenderOnByteArrayFullSim extends OTSenderDDHFullSimAbs implements
 	 * @param v1
 	 * @return tuple contains (u0, c0, u1, c1) to send to the receiver.
 	 */
-	protected OTSMessage computeTuple(OTSInput input, GroupElement u0, GroupElement u1, GroupElement v0, GroupElement v1) {
+	protected OTSMsg computeTuple(OTSInput input, GroupElement u0, GroupElement u1, GroupElement v0, GroupElement v1) {
 		//If input is not instance of OTSOnByteArrayInput, throw Exception.
 		if (!(input instanceof OTSOnByteArrayInput)){
 			throw new IllegalArgumentException("x0 and x1 should be binary strings.");
@@ -141,7 +141,7 @@ public class OTSenderOnByteArrayFullSim extends OTSenderDDHFullSimAbs implements
 		}
 		
 		//Create and return sender message.
-		return new OTSOnByteArrayMessage(u0.generateSendableData(), c0, u1.generateSendableData(), c1);
+		return new OTSOnByteArrayMsg(u0.generateSendableData(), c0, u1.generateSendableData(), c1);
 	}
 
 }
