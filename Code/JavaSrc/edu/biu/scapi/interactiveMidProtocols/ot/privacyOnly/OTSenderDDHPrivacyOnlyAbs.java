@@ -33,15 +33,18 @@ import org.bouncycastle.util.BigIntegers;
 
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CheatAttemptException;
+import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
+import edu.biu.scapi.generals.ScapiDefaultConfiguration;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTRGrElQuadMessage;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTSInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSender;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
-import edu.biu.scapi.primitives.dlog.cryptopp.CryptoPpDlogZpSafePrime;
-import edu.biu.scapi.primitives.dlog.miracl.MiraclDlogECF2m;
 import edu.biu.scapi.securityLevel.DDH;
+import edu.biu.scapi.tools.Factories.DlogGroupFactory;
 
 /**
  * Abstract class for OT Privacy assuming DDH sender.
@@ -52,11 +55,13 @@ import edu.biu.scapi.securityLevel.DDH;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public abstract class OTSenderDDHPrivacyOnlyAbs implements OTSender{
+abstract class OTSenderDDHPrivacyOnlyAbs implements OTSender{
 
 	/*	
 	  This class runs the following protocol:
-			WAIT for message a from R
+			IF NOT VALID_PARAMS(G,q,g)
+	    		REPORT ERROR and HALT
+	    	WAIT for message a from R
 			DENOTE the tuple a received by S by (x, y, z0, z1)
 			IF NOT
 			•	z0 != z1
@@ -78,60 +83,57 @@ public abstract class OTSenderDDHPrivacyOnlyAbs implements OTSender{
 			OUTPUT nothing
 	*/	 
 
-	private Channel channel;
 	protected DlogGroup dlog;
 	private SecureRandom random;
 	private BigInteger qMinusOne;
 	
-	//will be given in the receiver's message.
-	private GroupElement x, y, z0, z1;
-	
-	//Values required for calculations:
-	private BigInteger u0, u1, v0, v1;
-	protected GroupElement w0, w1, k0, k1;
-	
 	/**
-	 * Constructor that gets the channel and chooses default values of DlogGroup and SecureRandom.
+	 * Constructor that chooses default values of DlogGroup and SecureRandom.
 	 */
-	public OTSenderDDHPrivacyOnlyAbs(Channel channel){
-		try{
-			
-			try {
-				//Uses Miracl Koblitz 233 Elliptic curve.
-				setMembers(channel, new MiraclDlogECF2m("K-233"), new SecureRandom());
-			} catch (IOException e) {
-				//If there is a problem with the elliptic curves file, create Zp DlogGroup.
-				setMembers(channel, new CryptoPpDlogZpSafePrime(), new SecureRandom());
-			}
-		} catch (SecurityLevelException e) {
-			// Can not occur since the DlogGroup is DDH secure
+	OTSenderDDHPrivacyOnlyAbs(){
+		//Read the default DlogGroup name from a configuration file.
+		String dlogName = ScapiDefaultConfiguration.getInstance().getProperty("DDHDlogGroup");
+		DlogGroup dlog = null;
+		try {
+			//Create the default DlogGroup by the factory.
+			dlog = DlogGroupFactory.getInstance().getObject(dlogName);
+			System.out.println(dlog.getGroupType());
+		} catch (FactoriesException e1) {
+			// Should not occur since the dlog name in the configuration file is valid.
+		}
+		
+		try {
+			doConstruct(dlog, new SecureRandom());
+		} catch (SecurityLevelException e1) {
+			// Should not occur since the dlog in the configuration file is as secure as needed.
 		} catch (InvalidDlogGroupException e) {
-			// Can not occur since the DlogGroup is valid.
+			// Should not occur since the dlog in the configuration file is valid.
 		}
 	}
 	
 	/**
-	 * Constructor that sets the given channel, dlogGroup and random.
-	 * @param channel
+	 * Constructor that sets the given dlogGroup and random.
 	 * @param dlog must be DDH secure.
 	 * @param random
 	 * @throws SecurityLevelException if the given dlog is not DDH secure
 	 * @throws InvalidDlogGroupException if the given DlogGroup is not valid.
 	 */
-	public OTSenderDDHPrivacyOnlyAbs(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException{
+	OTSenderDDHPrivacyOnlyAbs(DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException{
 		
-		setMembers(channel, dlog, random);
+		doConstruct(dlog, random);
 	}
 	
 	/**
 	 * Sets the given members.
-	 * @param channel
+	 * Runs the following line from the protocol:
+	 * "IF NOT VALID_PARAMS(G,q,g)
+	 *   		REPORT ERROR and HALT".
 	 * @param dlog must be DDH secure.
 	 * @param random
 	 * @throws SecurityLevelException if the given dlog is not DDH secure
 	 * @throws InvalidDlogGroupException if the given DlogGroup is not valid.
 	 */
-	private void setMembers(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException {
+	private void doConstruct(DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException {
 		//The underlying dlog group must be DDH secure.
 		if (!(dlog instanceof DDH)){
 			throw new SecurityLevelException("DlogGroup should have DDH security level");
@@ -140,21 +142,29 @@ public abstract class OTSenderDDHPrivacyOnlyAbs implements OTSender{
 		if(!dlog.validateGroup())
 			throw new InvalidDlogGroupException();
 		
-		this.channel = channel;
 		this.dlog = dlog;
 		this.random = random;
 		qMinusOne =  dlog.getOrder().subtract(BigInteger.ONE);
 		
+		// This protocol has no pre process stage.
+		
 	}
-	
+
 	/**
-	 * Runs the part of the protocol where the sender input is not yet necessary.
-	 * @throws CheatAttemptException if there was a cheat attempt during the execution of the protocol.
+	 * Runs the part of the protocol where the sender input is necessary.
+	 * The transfer stage of OT protocol which can be called several times in parallel.
+	 * In order to enable the parallel calls, each transfer call should use a different channel to send and receive messages.
+	 * This way the parallel executions of the function will not block each other.
+	 * The parameters given in the input must match the DlogGroup member of this class, which given in the constructor.
+	 * @param channel
+	 * @param input
+	 * @throws IOException if failed to send the message.
 	 * @throws ClassNotFoundException 
-	 * @throws IOException if failed to receive a message.
+	 * @throws CheatAttemptException 
 	 */
-	public void preProcess() throws CheatAttemptException, IOException, ClassNotFoundException{
-		/* Runs the following part of the protocol:
+	public void transfer(Channel channel, OTSInput input) throws IOException, ClassNotFoundException, CheatAttemptException{
+		/*	
+		  Execute the following lins from the protocol:
 				WAIT for message a from R
 				DENOTE the tuple a received by S by (x, y, z0, z1)
 				IF NOT
@@ -167,55 +177,72 @@ public abstract class OTSenderDDHPrivacyOnlyAbs implements OTSender{
 				•	k0 = (z0)^u0 • y^v0
 				•	w1 = x^u1 • g^v1
 				•	k1 = (z1)^u1 • y^v1 
-		*/
-		OTRPrivacyOnlyMessage message = waitForMessageFromReceiver();
-		checkReceivedTuple(message);
-		sampleRandomValues();
-		computePreProcessValues();
-	}
-
-	/**
-	 * Runs the part of the protocol where the sender input is necessary.
-	 * @throws IOException if failed to send the message.
-	 */
-	public void transfer() throws IOException{
-		/* Runs the following part of the protocol:
-				COMPUTE: in byteArray scenario:
-				•	c0 = x0 XOR KDF(|x0|,k0)
-				•	c1 = x1 XOR KDF(|x1|,k1) 
+				in byteArray scenario:
+					•	c0 = x0 XOR KDF(|x0|,k0)
+					•	c1 = x1 XOR KDF(|x1|,k1) 
 				OR in GroupElement scenario:
-				•	c0 = x0 * k0
-				•	c1 = x1 * k1
+					•	c0 = x0 * k0
+					•	c1 = x1 * k1
 				SEND (w0, c0) and (w1, c1) to R
 				OUTPUT nothing
-		*/
-		try{
-			
-			OTSMessage message = computeTuple();
-			sendTupleToReceiver(message);
-		}catch(NullPointerException e){
-			throw new IllegalStateException("preProcess function should be called before transfer atleast once");
-		}
-	}
+		*/	
+		
+		//Wait for message a from R
+		OTRGrElQuadMessage message = waitForMessageFromReceiver(channel);
+		
+		//Reconstruct the group elements from the given message.
+		GroupElement x = dlog.reconstructElement(true, message.getX());
+		GroupElement y = dlog.reconstructElement(true, message.getY());
+		GroupElement z0 = dlog.reconstructElement(true, message.getZ0());
+		GroupElement z1 = dlog.reconstructElement(true, message.getZ1());
+		
+		//Check the received message
+		checkReceivedTuple(x, y, z0, z1);
+		
+		//Sample random values u0,u1,v0,v1 in  {0, . . . , q-1}
+		BigInteger u0 = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
+		BigInteger u1 = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
+		BigInteger v0 = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
+		BigInteger v1 = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
+		
+		GroupElement g = dlog.getGenerator(); //Get the group generator.
+		
+		//Calculates w0 = x^u0 • g^v0
+		GroupElement w0 = dlog.multiplyGroupElements(dlog.exponentiate(x, u0), dlog.exponentiate(g, v0));
+		//Calculates k0 = (z0)^u0 • y^v0
+		GroupElement k0 = dlog.multiplyGroupElements(dlog.exponentiate(z0, u0), dlog.exponentiate(y, v0));
+		
+		//Calculates w1 = x^u1 • g^v1
+		GroupElement w1 = dlog.multiplyGroupElements(dlog.exponentiate(x, u1), dlog.exponentiate(g, v1));
+		//Calculates k1 = (z1)^u1 • y^v1
+		GroupElement k1 = dlog.multiplyGroupElements(dlog.exponentiate(z1, u1), dlog.exponentiate(y, v1));
 
+		//compute c0,c1
+		OTSMessage messageToSend = computeTuple(input, w0, w1, k0, k1);
+		
+		sendTupleToReceiver(channel, messageToSend);
+		
+	}
+	
 	/**
 	 * Runs the following line from the protocol:
 	 * "WAIT for message (h0,h1) from R"
+	 * @param channel
 	 * @return the received message.
 	 * @throws IOException if failed to receive a message.
 	 * @throws ClassNotFoundException 
 	 */
-	private OTRPrivacyOnlyMessage waitForMessageFromReceiver() throws IOException, ClassNotFoundException{
+	private OTRGrElQuadMessage waitForMessageFromReceiver(Channel channel) throws IOException, ClassNotFoundException{
 		Serializable message = null;
 		try {
 			message = channel.receive();
 		} catch (IOException e) {
 			throw new IOException("failed to receive message. The thrown message is: " + e.getMessage());
 		}
-		if (!(message instanceof OTRPrivacyOnlyMessage)){
+		if (!(message instanceof OTRGrElQuadMessage)){
 			throw new IllegalArgumentException("the given message should be an instance of OTRPrivacyOnlyMessage");
 		}
-		return (OTRPrivacyOnlyMessage) message;
+		return (OTRGrElQuadMessage) message;
 	}
 	
 	/**
@@ -224,15 +251,14 @@ public abstract class OTSenderDDHPrivacyOnlyAbs implements OTSender{
 	 *	•	z0 != z1
 	 *	•	x, y, z0, z1 in the DlogGroup
 	 *	REPORT ERROR (cheat attempt)"
-	 * @return the received message.
+	 * @param z1 
+	 * @param z0 
+	 * @param y 
+	 * @param x 
 	 * @throws CheatAttemptException 
 	 */
-	private void checkReceivedTuple(OTRPrivacyOnlyMessage message) throws CheatAttemptException {
-		//Reconstruct the group elements from the given message.
-		x = dlog.reconstructElement(true, message.getX());
-		y = dlog.reconstructElement(true, message.getY());
-		z0 = dlog.reconstructElement(true, message.getZ0());
-		z1 = dlog.reconstructElement(true, message.getZ1());
+	private void checkReceivedTuple(GroupElement x, GroupElement y, GroupElement z0, GroupElement z1) throws CheatAttemptException {
+		
 		
 		if (!(dlog.isMember(x))){
 			throw new CheatAttemptException("x element is not a member of the current DlogGroup");
@@ -254,44 +280,6 @@ public abstract class OTSenderDDHPrivacyOnlyAbs implements OTSender{
 	}
 	
 	/**
-	 * Runs the following line from the protocol:
-	 * "SAMPLE random values u0,u1,v0,v1 in  {0, . . . , q-1} "
-	 */
-	private void sampleRandomValues() {
-		
-		
-		//Save the random chosen values a s class members. 
-		u0 = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
-		u1 = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
-		v0 = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
-		v1 = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
-	}
-	
-	/**
-	 * Runs the following lines from the protocol:
-	 * "COMPUTE:
-	 *	•	w0 = x^u0 • g^v0
-	 *	•	k0 = (z0)^u0 • y^v0
-	 *	•	w1 = x^u1 • g^v1
-	 *	•	k1 = (z1)^u1 • y^v1
-	 * 
-	 */
-	private void computePreProcessValues() {
-		GroupElement g = dlog.getGenerator(); //Get the group generator.
-		
-		//Calculates w0 = x^u0 • g^v0
-		w0 = dlog.multiplyGroupElements(dlog.exponentiate(x, u0), dlog.exponentiate(g, v0));
-		//Calculates k0 = (z0)^u0 • y^v0
-		k0 = dlog.multiplyGroupElements(dlog.exponentiate(z0, u0), dlog.exponentiate(y, v0));
-		
-		//Calculates w1 = x^u1 • g^v1
-		w1 = dlog.multiplyGroupElements(dlog.exponentiate(x, u1), dlog.exponentiate(g, v1));
-		//Calculates k1 = (z1)^u1 • y^v1
-		k1 = dlog.multiplyGroupElements(dlog.exponentiate(z1, u1), dlog.exponentiate(y, v1));
-		
-	}
-	
-	/**
 	 * Runs the following lines from the protocol:
 	 * "COMPUTE: in byteArray scenario:
 	 *	•	c0 = x0 XOR KDF(|x0|,k0)
@@ -299,17 +287,23 @@ public abstract class OTSenderDDHPrivacyOnlyAbs implements OTSender{
 	 *	OR in GroupElement scenario:
 	 *	•	c0 = x0 * k0
 	 *	•	c1 = x1 * k1"
+	 * @param input 
+	 * @param k1 
+	 * @param k0 
+	 * @param w1 
+	 * @param w0 
 	 * @return tuple contains (w0, c0, w1, c1) to send to the receiver.
 	 */
-	protected abstract OTSMessage computeTuple();
+	protected abstract OTSMessage computeTuple(OTSInput input, GroupElement w0, GroupElement w1, GroupElement k0, GroupElement k1);
 		
 	/**
 	 * Runs the following lines from the protocol:
 	 * "SEND (w0, c0) and (w1, c1) to R"
+	 * @param channel 
 	 * @param message to send to the receiver
 	 * @throws IOException if failed to send the message.
 	 */
-	private void sendTupleToReceiver(OTSMessage message) throws IOException {
+	private void sendTupleToReceiver(Channel channel, OTSMessage message) throws IOException {
 		
 		try {
 			//Send the message by the channel.
