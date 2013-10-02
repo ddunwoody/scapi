@@ -24,9 +24,10 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.ot.oneSidedSimulation;
 
+import java.io.IOException;
 import java.security.SecureRandom;
 
-import edu.biu.scapi.comm.Channel;
+import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
@@ -35,30 +36,34 @@ import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnByteArrayInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnByteArrayMessage;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
+import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
+import edu.biu.scapi.securityLevel.OneSidedSimulation;
 import edu.biu.scapi.tools.Factories.KdfFactory;
 
 /**
- * Concrete class for OT DDH one sided simulation sender ON BYTE ARRAY.
+ * Concrete implementation of the sender side in oblivious transfer based on the DDH assumption that achieves 
+ * privacy for the case that the sender is corrupted and simulation in the case that the receiver 
+ * is corrupted.
+ * 
  * This class derived from OTSenderDDHOneSidedSimAbs and implements the functionality 
  * related to the byte array inputs.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTSenderOnByteArrayOneSidedSim extends OTSenderDDHOneSidedSimAbs{
+public class OTSenderOnByteArrayOneSidedSim extends OTSenderDDHOneSidedSimAbs implements OneSidedSimulation{
 
-private KeyDerivationFunction kdf; //Used in the calculation.
-	
-	//Protocol's inputs. ByteArrays.
-	private byte[] x0;
-	private byte[] x1;
+	private KeyDerivationFunction kdf; //Used in the calculation.
 	
 	/**
-	 * Constructor that gets the channel and chooses default values of DlogGroup and SecureRandom.
+	 * Constructor that chooses default values of DlogGroup and SecureRandom.
+	 * @throws CheatAttemptException 
+	 * @throws ClassNotFoundException 
+	 * @throws IOException if failed to receive a message during pre process.
 	 */
-	public OTSenderOnByteArrayOneSidedSim(Channel channel){
-		super(channel);
+	public OTSenderOnByteArrayOneSidedSim() throws IOException, ClassNotFoundException, CheatAttemptException {
+		super();
 		try {
 			this.kdf = KdfFactory.getInstance().getObject("HKDF(HMac(SHA-256))");
 		} catch (FactoriesException e) {
@@ -67,24 +72,34 @@ private KeyDerivationFunction kdf; //Used in the calculation.
 	}
 	
 	/**
-	 * Constructor that sets the given channel, dlogGroup, kdf and random.
-	 * @param channel
+	 * Constructor that sets the given dlogGroup, kdf and random.
 	 * @param dlog must be DDH secure.
 	 * @param kdf
 	 * @param random
 	 * @throws SecurityLevelException if the given DlogGroup is not DDH secure.
 	 * @throws InvalidDlogGroupException if the given dlog is invalid.
+	 * @throws CheatAttemptException 
+	 * @throws ClassNotFoundException 
+	 * @throws IOException if failed to receive a message during pre process.
 	 */
-	public OTSenderOnByteArrayOneSidedSim(Channel channel, DlogGroup dlog, KeyDerivationFunction kdf, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException{
-		super(channel, dlog, random);
+	public OTSenderOnByteArrayOneSidedSim(DlogGroup dlog, KeyDerivationFunction kdf, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException, IOException, ClassNotFoundException, CheatAttemptException{
+		super(dlog, random);
 		this.kdf = kdf;
 	}
 
 	/**
-	 * Sets the input for this OT sender.
-	 * @param input MUST be OTSOnByteArrayInput with x0, x1 of the same arbitrary length.
+	 * Runs the following lines from the protocol:
+	 * "COMPUTE:
+	 *		•	c0 = x0 XOR KDF(|x0|,k0)
+	 *		•	c1 = x1 XOR KDF(|x1|,k1)"
+	 * @param  iput NUST be an instance of OTSOnByteArrayInput.
+	 * @param w0
+	 * @param w1
+	 * @param k0
+	 * @param k1
+	 * @return tuple contains (u, v0, v1) to send to the receiver.
 	 */
-	public void setInput(OTSInput input) {
+	protected OTSMessage computeTuple(OTSInput input, GroupElement w0, GroupElement w1, GroupElement k0, GroupElement k1) {
 		//If input is not instance of OTSOnByteArrayInput, throw Exception.
 		if (!(input instanceof OTSOnByteArrayInput)){
 			throw new IllegalArgumentException("x0 and x1 should be binary strings.");
@@ -96,20 +111,10 @@ private KeyDerivationFunction kdf; //Used in the calculation.
 			throw new IllegalArgumentException("x0 and x1 should be of the same length.");
 		}
 		
-		//Set x0, x1.
-		this.x0 = inputStrings.getX0();
-		this.x1 = inputStrings.getX1();
-	}
-
-	/**
-	 * Runs the following lines from the protocol:
-	 * "COMPUTE:
-	 *		•	c0 = x0 XOR KDF(|x0|,k0)
-	 *		•	c1 = x1 XOR KDF(|x1|,k1)"
-	 * @return tuple contains (u, v0, v1) to send to the receiver.
-	 */
-	protected OTSMessage computeTuple() {
-		
+		//Get x0, x1.
+		byte[] x0 = inputStrings.getX0();
+		byte[] x1 = inputStrings.getX1();
+				
 		//Calculate c0:
 		byte[] k0Bytes = dlog.mapAnyGroupElementToByteArray(k0);
 		int len = x0.length;
