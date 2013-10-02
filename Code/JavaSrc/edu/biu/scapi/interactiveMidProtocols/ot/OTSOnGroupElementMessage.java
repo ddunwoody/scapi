@@ -29,6 +29,9 @@ import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
 /**
  * Concrete implementation of OT Privacy sender (on GroupElement) message.
  * In the GroupElement scenario, the sender sends four GroupElements - w0, w1, c0 and c1.
+ * This class is used by most of OT implementations. 
+ * An OT protocol that does not use this class (like OT SemiHonest) will create a separate 
+ * class that matches what it needs.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
