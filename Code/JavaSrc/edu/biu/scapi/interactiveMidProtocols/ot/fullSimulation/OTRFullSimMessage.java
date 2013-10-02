@@ -30,37 +30,29 @@ import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
 
 /**
  * Concrete implementation of OT with full simulation receiver message. This implementation is common for OT on byteArray and on GroupElement.
- * The message contains tuple of five GroupElements - (g, h, h0, h1, g1).
+ * The message contains tuple of three GroupElements - (h0, h1, g1).
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTRFullSimMessage implements Serializable{
+class OTRFullSimMessage implements Serializable{
 	
 	
 	private static final long serialVersionUID = 694486245423097492L;
 	
-	private GroupElementSendableData g;
-	private GroupElementSendableData h;
+	
 	private GroupElementSendableData h0;
 	private GroupElementSendableData h1;
 	private GroupElementSendableData g1;
 	
 	public OTRFullSimMessage(GroupElementSendableData g1, GroupElementSendableData h0, 
-			GroupElementSendableData h1, GroupElementSendableData g, GroupElementSendableData h){
-		this.g = g;
-		this.h = h;
+			GroupElementSendableData h1){
 		this.h0 = h0;
 		this.h1 = h1;
 		this.g1 = g1;
 	}
 	
-	public GroupElementSendableData getG() {
-		return g;
-	}
-	public GroupElementSendableData getH() {
-		return h;
-	}
+	
 	public GroupElementSendableData getH0() {
 		return h0;
 	}
