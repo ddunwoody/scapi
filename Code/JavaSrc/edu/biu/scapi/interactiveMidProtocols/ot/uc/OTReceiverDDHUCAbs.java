@@ -42,8 +42,6 @@ import edu.biu.scapi.interactiveMidProtocols.ot.OTReceiver;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
-import edu.biu.scapi.primitives.dlog.cryptopp.CryptoPpDlogZpSafePrime;
-import edu.biu.scapi.primitives.dlog.miracl.MiraclDlogECF2m;
 import edu.biu.scapi.securityLevel.DDH;
 import edu.biu.scapi.securityLevel.UC;
 
@@ -57,7 +55,7 @@ import edu.biu.scapi.securityLevel.UC;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public abstract class OTReceiverDDHUCAbs implements OTReceiver, UC{
+abstract class OTReceiverDDHUCAbs implements OTReceiver, UC{
 	/*	
  	This class runs the following protocol:
 	 	SAMPLE a random value r <- {0, . . . , q-1} 
@@ -77,83 +75,29 @@ public abstract class OTReceiverDDHUCAbs implements OTReceiver, UC{
 			OUTPUT  xSigma = cSigma * (uSigma)^(-r)
 	*/
 	
-	private Channel channel;
 	protected DlogGroup dlog;
 	private SecureRandom random;
 	private BigInteger qMinusOne;
-	private GroupElement g0, g1, h0, h1;
-	
-	//Values required for calculations:
-	protected short sigma;
-	protected BigInteger r;
-	protected GroupElement u0, u1;
+	private GroupElement g0, g1, h0, h1; //Common reference string
 	
 	/**
-	 * Constructor that sets the given channel and choose default values to the other parameters.
-	 * @param channel
-	 */
-	public OTReceiverDDHUCAbs(Channel channel){
-		
-		
-			DlogGroup dlog;
-			try {
-				//Uses Miracl Koblitz 233 Elliptic curve.
-				dlog = new MiraclDlogECF2m("K-233");
-			} catch (IOException e) {
-				dlog = new CryptoPpDlogZpSafePrime();
-			} 
-		
-		GroupElement g0 = dlog.getGenerator();
-		GroupElement g1 = dlog.createRandomElement();
-		GroupElement h0 = dlog.createRandomElement();
-		GroupElement h1 = dlog.createRandomElement();
-		try {
-			setMembers(channel, dlog, g0, g1, h0, h1, new SecureRandom());
-		} catch (SecurityLevelException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	/**
-	 * Constructor that sets the given channel, common reference string composed of a DLOG 
-	 * description (G,q,g0) and (g0,g1,h0,h1) which is a randomly chosen non-DDH tuple, 
-	 * kdf and random.
-	 * @param channel
+	 * Constructor that sets the given common reference string composed of a DLOG 
+	 * description (G,q,g0) and (g0,g1,h0,h1) which is a randomly chosen non-DDH tuple and random.
 	 * @param dlog must be DDH secure.
 	 * @param g0 
 	 * @param g1 
 	 * @param h0 
 	 * @param h1 
-	 * @param kdf
 	 * @param random
 	 * @throws SecurityLevelException if the given dlog is not DDH secure.
 	 */
-	public OTReceiverDDHUCAbs(Channel channel, DlogGroup dlog, GroupElement g0, GroupElement g1, 
+	OTReceiverDDHUCAbs(DlogGroup dlog, GroupElement g0, GroupElement g1, 
 			GroupElement h0, GroupElement h1, SecureRandom random) throws SecurityLevelException{
-		setMembers(channel, dlog, g0, g1, h0, h1, random);
-		
-	}
-	
-	/**
-	 * Sets the given parameters.
-	 * @param channel
-	 * @param dlog must be DDH secure.
-	 * @param g0
-	 * @param g1
-	 * @param h0
-	 * @param h1
-	 * @param random
-	 * @throws SecurityLevelException if the given dlog is not DDH secure.
-	 */
-	private void setMembers(Channel channel, DlogGroup dlog, GroupElement g0, 
-			GroupElement g1, GroupElement h0, GroupElement h1, SecureRandom random) throws SecurityLevelException{
 		//The underlying dlog group must be DDH secure.
 		if (!(dlog instanceof DDH)){
 			throw new SecurityLevelException("DlogGroup should have DDH security level");
 		}
 		
-		this.channel = channel;
 		this.dlog = dlog;
 		this.random = random;
 		qMinusOne =  dlog.getOrder().subtract(BigInteger.ONE);
@@ -161,41 +105,16 @@ public abstract class OTReceiverDDHUCAbs implements OTReceiver, UC{
 		this.g1 = g1;
 		this.h0 = h0;
 		this.h1 = h1;
-	}
-	
-	/**
-	 * Runs the part of the protocol where the receiver input is not yet necessary as follows:
-	 * "SAMPLE a random value r <- {0, . . . , q-1}".
-	 */
-	public void preProcess(){
 		
-		//Sample random value r.
-		sampleRandomValues();
-	}
-	
-	/**
-	 * Sets the input for this OT receiver.
-	 * @param input MUST be OTRBasicInput.
-	 */
-	public void setInput(OTRInput input) {
-		//If input is not instance of OTRBasicInput, throw Exception.
-		if (!(input instanceof OTRBasicInput)){
-			throw new IllegalArgumentException("input shoud contain sigma.");
-		}
-		
-		//The given sigma should be 0 or 1.
-		if ((sigma != 0) && (sigma!= 1)){
-			throw new IllegalArgumentException("Sigma should be 0 or 1");
-		}
-		//Set sigma.
-		this.sigma = ((OTRBasicInput) input).getSigma();
+		// This protocol has no pre process stage.		
 	}
 	
 	/**
 	 * Runs the part of the protocol where the receiver input is necessary as follows:
-	 * "COMPUTE g = (gSigma)^r and h = (hSigma)^r
-	 * SEND (g,h) to S
-	 * WAIT for messages (u0,c0) and (u1,c1) from S
+	 * "SAMPLE a random value r <- {0, . . . , q-1}
+	 *  COMPUTE g = (gSigma)^r and h = (hSigma)^r
+	 *  SEND (g,h) to S
+	 *  WAIT for messages (u0,c0) and (u1,c1) from S
 	 *	In Byte Array scenario:
 	 *		IF  NOT
 	 *		•	u0, u1 in G, AND
@@ -207,50 +126,55 @@ public abstract class OTReceiverDDHUCAbs implements OTReceiver, UC{
 	 *		•	u0, u1, c0, c1 in G
 	 *				 REPORT ERROR
 	 *		OUTPUT  xSigma = cSigma * (uSigma)^(-r)".
+	 * The transfer stage of OT protocol which can be called several times in parallel.
+	 * In order to enable the parallel calls, each transfer call should use a different channel to send and receive messages.
+	 * This way the parallel executions of the function will not block each other.
+	 * The parameters given in the input must match the DlogGroup member of this class, which given in the constructor.
+	 * @param channel
+	 * @param input MUST be OTRBasicInput.
 	 * @return OTROutput, the output of the protocol.
 	 * @throws IOException if failed to send or receive a message.
 	 * @throws ClassNotFoundException
 	 * @throws CheatAttemptException 
 	 */
-	public OTROutput transfer() throws IOException, ClassNotFoundException, CheatAttemptException{
-		
-		try{
-			//Compute tuple for sender.
-			OTRMessage a = computeTuple();
-			
-			//Send tuple to sender.
-			sendTupleToSender(a);
-			
-			//Wait for message from sender.
-			OTSMessage message = waitForMessageFromSender();
-			
-			//checked the received message.
-			checkReceivedTuple(message);
-			
-			//Compute the final calculations to get xSigma.
-			return computeFinalXSigma();
-			
-		}catch(NullPointerException e){
-			throw new IllegalStateException("preProcess function should be called before transfer atleast once");
+	public OTROutput transfer(Channel channel, OTRInput input) throws IOException, ClassNotFoundException, CheatAttemptException{
+		//check if the input is valid.
+		//If input is not instance of OTRBasicInput, throw Exception.
+		if (!(input instanceof OTRBasicInput)){
+			throw new IllegalArgumentException("input shoud contain sigma.");
 		}
 		
-	}
-	
-	/**
-	 * Runs the following lines from the protocol:
-	 * "SAMPLE a random value r <- {0, . . . , q-1} ". 
-	 */
-	private void sampleRandomValues() {
-		//Sample random r.
-		r = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
+		byte sigma = ((OTRBasicInput) input).getSigma();
+		
+		//The given sigma should be 0 or 1.
+		if ((sigma != 0) && (sigma!= 1)){
+			throw new IllegalArgumentException("Sigma should be 0 or 1");
+		}
+		
+		//Sample a random value r <- {0, . . . , q-1}
+		BigInteger r = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
+				
+		//Compute tuple for sender.
+		OTRMessage a = computeTuple(sigma, r);
+		
+		//Send tuple to sender.
+		sendTupleToSender(channel, a);
+		
+		//Wait for message from sender.
+		OTSMessage message = waitForMessageFromSender(channel);
+		
+		//Compute the final calculations to get xSigma.
+		return checkMessgeAndComputeX(sigma, r, message);
 	}
 	
 	/**
 	 * Runs the following lines from the protocol:
 	 * "COMPUTE g = (gSigma)^r and h = (hSigma)^r"
+	 * @param r random value sampled by the protocol
+	 * @param sigma input for the protocol
 	 * @return OTRSemiHonestMessage contains the tuple (h0, h1).
 	 */
-	private OTRMessage computeTuple() {
+	private OTRMessage computeTuple(byte sigma, BigInteger r) {
 		GroupElement g = null;
 		GroupElement h = null;
 		if (sigma == 0){
@@ -267,10 +191,11 @@ public abstract class OTReceiverDDHUCAbs implements OTReceiver, UC{
 	/**
 	 * Runs the following line from the protocol:
 	 * "SEND (h0,h1) to S"
+	 * @param channel 
 	 * @param tuple to send to the sender
 	 * @throws IOException if failed to send the message.
 	 */
-	private void sendTupleToSender(OTRMessage tuple) throws IOException {
+	private void sendTupleToSender(Channel channel, OTRMessage tuple) throws IOException {
 		try {
 			channel.send(tuple);
 		} catch (IOException e) {
@@ -282,11 +207,12 @@ public abstract class OTReceiverDDHUCAbs implements OTReceiver, UC{
 	/**
 	 * Runs the following line from the protocol:
 	 * "WAIT for the message (u, v0,v1) from S"
+	 * @param channel 
 	 * @return OTSMessage contains (u, v0,v1)
 	 * @throws ClassNotFoundException
 	 * @throws IOException if failed to receive a message.
 	 */
-	private OTSMessage waitForMessageFromSender() throws ClassNotFoundException, IOException {
+	private OTSMessage waitForMessageFromSender(Channel channel) throws ClassNotFoundException, IOException {
 		Serializable message;
 		try {
 			message = channel.receive();
@@ -300,30 +226,26 @@ public abstract class OTReceiverDDHUCAbs implements OTReceiver, UC{
 	}
 	
 	/**
-	 * Runs the following line from the protocol:
+	 * Runs the following lines from the protocol:
 	 * "In Byte Array scenario:
 	 *		IF  NOT
 	 *		•	u0, u1 in G, AND
 	 *		•	c0, c1 are binary strings of the same length
 	 *			     REPORT ERROR
-	 *		
 	 *	In GroupElement scenario:
 	 *		IF  NOT
 	 *		•	u0, u1, c0, c1 in G
-	 *				 REPORT ERROR"		
-	 * @param message
-	 * @throws CheatAttemptException 
-	 */
-	protected abstract void checkReceivedTuple(OTSMessage message) throws CheatAttemptException;
-	
-	/**
-	 * Runs the following lines from the protocol:
-	 * "In Byte Array scenario:
+	 *				 REPORT ERROR
+	 * In Byte Array scenario:
 	 *		OUTPUT  xSigma = cSigma XOR KDF(|cSigma|,(uSigma)^r)
 	 *	In GroupElement scenario:
 	 *		OUTPUT  xSigma = cSigma * (uSigma)^(-r)".
+	 * @param sigma input for the protocol
+	 * @param r random value sampled by the protocol
+	 * @param message received from the sender
 	 * @return OTROutput contains xSigma
+	 * @throws CheatAttemptException 
 	 */
-	protected abstract OTROutput computeFinalXSigma();
+	protected abstract OTROutput checkMessgeAndComputeX(byte sigma, BigInteger r, OTSMessage message) throws CheatAttemptException;
 
 }
