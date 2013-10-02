@@ -27,7 +27,6 @@ package edu.biu.scapi.interactiveMidProtocols.ot.semiHonest;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
-import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTROnGroupElementOutput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTROutput;
@@ -47,32 +46,33 @@ import edu.biu.scapi.securityLevel.SemiHonest;
 public class OTReceiverOnGroupElementSemiHonest extends OTReceiverDDHSemiHonestAbs implements SemiHonest{
 	
 	/**
-	 * Constructor that gets the channel and choose default values of DlogGroup and SecureRandom.
+	 * Constructor that chooses default values of DlogGroup and SecureRandom.
 	 */
-	public OTReceiverOnGroupElementSemiHonest(Channel channel){
-		super(channel);
+	public OTReceiverOnGroupElementSemiHonest(){
+		super();
 	}
 	
 	/**
-	 * Constructor that sets the given channel, dlogGroup and random.
-	 * @param channel
+	 * Constructor that sets the given dlogGroup and random.
 	 * @param dlog must be DDH secure.
 	 * @param random
 	 * @throws SecurityLevelException if the given DlogGroup is not DDH secure.
 	 */
-	public OTReceiverOnGroupElementSemiHonest(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException{
+	public OTReceiverOnGroupElementSemiHonest(DlogGroup dlog, SecureRandom random) throws SecurityLevelException{
 		
-		super(channel, dlog, random);
+		super(dlog, random);
 	}
 
 	/**
 	 * Runs the following lines from the protocol:
 	 * "COMPUTE (kSigma)^(-1) = u^(-alpha)			
 	 *	OUTPUT  xSigma = vSigma * (kSigma)^(-1)" 		
+	 * @param sigma input for the protocol
+	 * @param alpha random value sampled by the protocol
 	 * @param message received from the sender. must be OTSOnGroupElementSemiHonestMessage
 	 * @return OTROutput contains xSigma
 	 */
-	protected OTROutput computeFinalXSigma(OTSMessage message) {
+	protected OTROutput computeFinalXSigma(byte sigma, BigInteger alpha, OTSMessage message) {
 		//If message is not instance of OTSOnGroupElementSemiHonestMessage, throw Exception.
 		if(!(message instanceof OTSOnGroupElementSemiHonestMessage)){
 			throw new IllegalArgumentException("message should be instance of OTSOnGroupElementSemiHonestMessage");

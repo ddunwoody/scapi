@@ -24,9 +24,9 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.ot.semiHonest;
 
+import java.math.BigInteger;
 import java.security.SecureRandom;
 
-import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTROnByteArrayOutput;
@@ -50,10 +50,10 @@ public class OTReceiverOnByteArraySemiHonest extends OTReceiverDDHSemiHonestAbs 
 	private KeyDerivationFunction kdf; //Used in the calculation.
 	
 	/**
-	 * Constructor that gets the channel and chooses default values of DlogGroup and SecureRandom.
+	 * Constructor that chooses default values of DlogGroup and SecureRandom.
 	 */
-	public OTReceiverOnByteArraySemiHonest(Channel channel){
-		super(channel);
+	public OTReceiverOnByteArraySemiHonest(){
+		super();
 		try {
 			this.kdf = KdfFactory.getInstance().getObject("HKDF(HMac(SHA-256))");
 		} catch (FactoriesException e) {
@@ -62,16 +62,15 @@ public class OTReceiverOnByteArraySemiHonest extends OTReceiverDDHSemiHonestAbs 
 	}
 	
 	/**
-	 * Constructor that sets the given channel, dlogGroup, kdf and random.
-	 * @param channel
+	 * Constructor that sets the given dlogGroup, kdf and random.
 	 * @param dlog must be DDH secure.
 	 * @param kdf
 	 * @param random
 	 * @throws SecurityLevelException if the given DlogGroup is not DDH secure.
 	 */
-	public OTReceiverOnByteArraySemiHonest(Channel channel, DlogGroup dlog, KeyDerivationFunction kdf, SecureRandom random) throws SecurityLevelException{
+	public OTReceiverOnByteArraySemiHonest(DlogGroup dlog, KeyDerivationFunction kdf, SecureRandom random) throws SecurityLevelException{
 		
-		super(channel, dlog, random);
+		super(dlog, random);
 		this.kdf = kdf;
 	}
 
@@ -79,10 +78,12 @@ public class OTReceiverOnByteArraySemiHonest extends OTReceiverDDHSemiHonestAbs 
 	 * Runs the following lines from the protocol:
 	 * "COMPUTE kSigma = (u)^alpha						
 	 *	OUTPUT  xSigma = vSigma XOR KDF(|cSigma|,kSigma)"	
+	 * @param sigma input for the protocol
+	 * @param alpha random value sampled by the protocol
 	 * @param message received from the sender. must be OTSOnByteArraySemiHonestMessage.
 	 * @return OTROutput contains xSigma
 	 */
-	protected OTROutput computeFinalXSigma(OTSMessage message) {
+	protected OTROutput computeFinalXSigma(byte sigma, BigInteger alpha, OTSMessage message) {
 		//If message is not instance of OTSOnByteArraySemiHonestMessage, throw Exception.
 		if(!(message instanceof OTSOnByteArraySemiHonestMessage)){
 			throw new IllegalArgumentException("message should be instance of OTSOnByteArraySemiHonestMessage");
