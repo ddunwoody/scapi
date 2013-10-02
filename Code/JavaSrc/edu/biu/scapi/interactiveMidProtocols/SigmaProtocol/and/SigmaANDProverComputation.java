@@ -43,7 +43,7 @@ import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocol
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaANDProver implements SigmaProverComputation{
+public class SigmaANDProverComputation implements SigmaProverComputation{
 
 	/*	
 	  This class computes the following calculations:
@@ -63,7 +63,7 @@ public class SigmaANDProver implements SigmaProverComputation{
 	 * @param t soundness parameter. t MUST be equal to all t values of the underlying provers object.
 	 * @throws IllegalArgumentException if the given t is not equal to all t values of the underlying provers object.
 	 */
-	public SigmaANDProver(ArrayList<SigmaProverComputation> provers, int t, SecureRandom random) {
+	public SigmaANDProverComputation(ArrayList<SigmaProverComputation> provers, int t, SecureRandom random) {
 		//If the given t is different from one of the underlying object's t values, throw exception.
 		for (int i = 0; i < provers.size(); i++){
 			if (t != provers.get(i).getSoundnessParam()){
