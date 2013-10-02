@@ -26,8 +26,6 @@ package edu.biu.scapi.interactiveMidProtocols.ot.uc;
 
 import java.security.SecureRandom;
 
-import edu.biu.scapi.comm.Channel;
-import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
@@ -36,7 +34,7 @@ import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnByteArrayMessage;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
-import edu.biu.scapi.tools.Factories.KdfFactory;
+import edu.biu.scapi.securityLevel.Malicious;
 
 /**
  * Concrete class for OT sender based on the DDH assumption that achieves UC security in
@@ -48,32 +46,14 @@ import edu.biu.scapi.tools.Factories.KdfFactory;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTSenderOnByteArrayUC extends OTSenderDDHUCAbs{
+public class OTSenderOnByteArrayUC extends OTSenderDDHUCAbs implements Malicious{
 	
 	private KeyDerivationFunction kdf; //Used in the calculation.
 	
-	//Protocol's inputs. ByteArrays.
-	private byte[] x0;
-	private byte[] x1;
-	
 	/**
-	 * Constructor that sets the given channel and choose default values to the other parameters.
-	 * @param channel
-	 */
-	public OTSenderOnByteArrayUC(Channel channel) {
-		super(channel);
-		try {
-			this.kdf = KdfFactory.getInstance().getObject("HKDF(HMac(SHA-256))");
-		} catch (FactoriesException e) {
-			// will not occur since the given KDF name is valid.
-		}
-	}
-	
-	/**
-	 * Constructor that sets the given channel, common reference string composed of a DLOG 
+	 * Constructor that sets the given common reference string composed of a DLOG 
 	 * description (G,q,g0) and (g0,g1,h0,h1) which is a randomly chosen non-DDH tuple, 
 	 * kdf and random.
-	 * @param channel
 	 * @param dlog must be DDH secure.
 	 * @param g0 
 	 * @param g1 
@@ -81,19 +61,27 @@ public class OTSenderOnByteArrayUC extends OTSenderDDHUCAbs{
 	 * @param h1 
 	 * @param kdf
 	 * @param random
-	 * @throws SecurityLevelException if the given DlogGroup is not DDH secure.
+	 * @throws SecurityLevelException if the given DlogGroup is not DDH secure. 
 	 */
-	public OTSenderOnByteArrayUC(Channel channel, DlogGroup dlog, GroupElement g0, GroupElement g1, 
+	public OTSenderOnByteArrayUC(DlogGroup dlog, GroupElement g0, GroupElement g1, 
 			GroupElement h0, GroupElement h1, KeyDerivationFunction kdf, SecureRandom random) throws SecurityLevelException{
-		super(channel, dlog, g0, g1, h0, h1, random);
+		super(dlog, g0, g1, h0, h1, random);
 		this.kdf = kdf;
 	}
 
 	/**
-	 * Sets the input for this OT sender.
+	 * Runs the following lines from the protocol:
+	 * "COMPUTE:
+	 *		•	c0 = x0 XOR KDF(|x0|,v0)
+	 *		•   c1 = x1 XOR KDF(|x1|,v1)"
 	 * @param input MUST be OTSOnByteArrayInput with x0, x1 of the same arbitrary length.
+	 * @param v1 
+	 * @param v0 
+	 * @param u1 
+	 * @param u0 
+	 * @return tuple contains (u0,c0) and (u1,c1) to send to the receiver.
 	 */
-	public void setInput(OTSInput input) {
+	protected OTSMessage computeTuple(OTSInput input, GroupElement u0, GroupElement u1, GroupElement v0, GroupElement v1) {
 		//If input is not instance of OTSOnByteArrayInput, throw Exception.
 		if (!(input instanceof OTSOnByteArrayInput)){
 			throw new IllegalArgumentException("x0 and x1 should be binary strings.");
@@ -106,18 +94,8 @@ public class OTSenderOnByteArrayUC extends OTSenderDDHUCAbs{
 		}
 		
 		//Set x0, x1.
-		this.x0 = inputStrings.getX0();
-		this.x1 = inputStrings.getX1();
-	}
-
-	/**
-	 * Runs the following lines from the protocol:
-	 * "COMPUTE:
-	 *		•	c0 = x0 XOR KDF(|x0|,v0)
-	 *		•   c1 = x1 XOR KDF(|x1|,v1)"
-	 * @return tuple contains (u0,c0) and (u1,c1) to send to the receiver.
-	 */
-	protected OTSMessage computeTuple() {
+		byte[] x0 = inputStrings.getX0();
+		byte[] x1 = inputStrings.getX1();
 		
 		//Calculate c0:
 		byte[] v0Bytes = dlog.mapAnyGroupElementToByteArray(v0);

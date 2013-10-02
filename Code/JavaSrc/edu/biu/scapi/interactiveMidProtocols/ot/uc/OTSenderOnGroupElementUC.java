@@ -26,7 +26,6 @@ package edu.biu.scapi.interactiveMidProtocols.ot.uc;
 
 import java.security.SecureRandom;
 
-import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
@@ -34,6 +33,7 @@ import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnGroupElementInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnGroupElementMessage;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
+import edu.biu.scapi.securityLevel.Malicious;
 
 /**
  * Concrete class for OT sender based on the DDH assumption that achieves UC security in
@@ -46,25 +46,12 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTSenderOnGroupElementUC extends OTSenderDDHUCAbs{
-	
-	//Protocol's inputs. GroupElements.
-	private GroupElement x0;
-	private GroupElement x1;
+public class OTSenderOnGroupElementUC extends OTSenderDDHUCAbs implements Malicious{
 	
 	/**
-	 * Constructor that sets the given channel and choose default values to the other parameters.
-	 * @param channel
-	 */
-	public OTSenderOnGroupElementUC(Channel channel) {
-		super(channel);
-	}
-	
-	/**
-	 * Constructor that sets the given channel, common reference string composed of a DLOG 
+	 * Constructor that sets the given common reference string composed of a DLOG 
 	 * description (G,q,g0) and (g0,g1,h0,h1) which is a randomly chosen non-DDH tuple, 
 	 * kdf and random.
-	 * @param channel
 	 * @param dlog must be DDH secure.
 	 * @param g0 
 	 * @param g1 
@@ -74,25 +61,9 @@ public class OTSenderOnGroupElementUC extends OTSenderDDHUCAbs{
 	 * @param random
 	 * @throws SecurityLevelException if the given DlogGroup is not DDH secure.
 	 */
-	public OTSenderOnGroupElementUC(Channel channel, DlogGroup dlog, GroupElement g0, 
+	public OTSenderOnGroupElementUC(DlogGroup dlog, GroupElement g0, 
 			GroupElement g1, GroupElement h0, GroupElement h1, SecureRandom random) throws SecurityLevelException{
-		super(channel, dlog, g0, g1, h0, h1, random);
-	}
-	
-	/**
-	 * Sets the input for this OT sender.
-	 * @param input MUST be OTSOnGroupElementInput.
-	 */
-	public void setInput(OTSInput input) {
-		//If input is not instance of OTSOnGroupElementInput, throw Exception.
-		if (!(input instanceof OTSOnGroupElementInput)){
-			throw new IllegalArgumentException("x0 and x1 should be DlogGroup elements.");
-		}
-		OTSOnGroupElementInput inputElements = (OTSOnGroupElementInput)input;
-		
-		//Set x0, x1.
-		this.x0 = inputElements.getX0();
-		this.x1 = inputElements.getX1();
+		super(dlog, g0, g1, h0, h1, random);
 	}
 	
 	/**
@@ -100,9 +71,23 @@ public class OTSenderOnGroupElementUC extends OTSenderDDHUCAbs{
 	 * "COMPUTE:
 	 *		•	c0 = x0 * v0<p>
 	 *		•	c1 = x1 * v1"
+	 * @param input MUST be OTSOnGroupElementInput.
+	 * @param v1 
+	 * @param v0 
+	 * @param u1 
+	 * @param u0 
 	 * @return tuple contains (u0,c0) and (u1,c1) to send to the receiver.
 	 */
-	protected OTSMessage computeTuple() {
+	protected OTSMessage computeTuple(OTSInput input, GroupElement u0, GroupElement u1, GroupElement v0, GroupElement v1) {
+		//If input is not instance of OTSOnGroupElementInput, throw Exception.
+		if (!(input instanceof OTSOnGroupElementInput)){
+			throw new IllegalArgumentException("x0 and x1 should be DlogGroup elements.");
+		}
+		OTSOnGroupElementInput inputElements = (OTSOnGroupElementInput)input;
+		
+		//Set x0, x1.
+		GroupElement x0 = inputElements.getX0();
+		GroupElement x1 = inputElements.getX1();
 		
 		//Calculate c0:
 		GroupElement c0 = dlog.multiplyGroupElements(x0, v0);
