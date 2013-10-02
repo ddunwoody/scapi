@@ -24,9 +24,12 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.ot.fullSimulation;
 
+import java.io.IOException;
 import java.security.SecureRandom;
 
 import edu.biu.scapi.comm.Channel;
+import edu.biu.scapi.exceptions.CheatAttemptException;
+import edu.biu.scapi.exceptions.CommitValueException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSInput;
@@ -35,25 +38,30 @@ import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnGroupElementInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnGroupElementMessage;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
+import edu.biu.scapi.securityLevel.Malicious;
 
 /**
- * Concrete class for OT DDH with full simulation sender ON GroupElement.
+ * Concrete implementation of the sender side in oblivious transfer based on the DDH assumption that achieves full simulation.
+ * This implementation can also be used as batch OT that achieves full simulation. In batch oblivious transfer, 
+ * the parties run an initialization phase and then can carry out concrete OTs later whenever they have new inputs and wish to carry out an OT. <p>
+ * 
  * This class derived from OTSenderDDHFullSimAbs and implements the functionality 
  * related to the GroupElement inputs.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTSenderOnGroupElementFullSim extends OTSenderDDHFullSimAbs{
-	
-	//Protocol's inputs. GroupElements.
-	private GroupElement x0;
-	private GroupElement x1;
+public class OTSenderOnGroupElementFullSim extends OTSenderDDHFullSimAbs implements Malicious{
 	
 	/**
 	 * Constructor that gets the channel and chooses default values of DlogGroup and SecureRandom.
+	 * @param channel
+	 * @throws CheatAttemptException 
+	 * @throws IOException if failed to receive a message during pre process.
+	 * @throws ClassNotFoundException 
+	 * @throws CommitValueException 
 	 */
-	public OTSenderOnGroupElementFullSim(Channel channel){
+	public OTSenderOnGroupElementFullSim(Channel channel) throws ClassNotFoundException, IOException, CheatAttemptException, CommitValueException{
 		super(channel);
 	}
 	
@@ -64,25 +72,13 @@ public class OTSenderOnGroupElementFullSim extends OTSenderDDHFullSimAbs{
 	 * @param random
 	 * @throws SecurityLevelException if the given DlogGroup is not DDH secure.
 	 * @throws InvalidDlogGroupException if the given dlog is invalid.
+	 * @throws CheatAttemptException 
+	 * @throws IOException if failed to receive a message during pre process.
+	 * @throws ClassNotFoundException 
+	 * @throws CommitValueException 
 	 */
-	public OTSenderOnGroupElementFullSim(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException{
+	public OTSenderOnGroupElementFullSim(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException, ClassNotFoundException, IOException, CheatAttemptException, CommitValueException{
 		super(channel, dlog, random);
-	}
-	
-	/**
-	 * Sets the input for this OT sender.
-	 * @param input MUST be OTSOnGroupElementInput.
-	 */
-	public void setInput(OTSInput input) {
-		//If input is not instance of OTSOnGroupElementInput, throw Exception.
-		if (!(input instanceof OTSOnGroupElementInput)){
-			throw new IllegalArgumentException("x0 and x1 should be DlogGroup elements.");
-		}
-		OTSOnGroupElementInput inputElements = (OTSOnGroupElementInput)input;
-		
-		//Set x0, x1.
-		this.x0 = inputElements.getX0();
-		this.x1 = inputElements.getX1();
 	}
 	
 	/**
@@ -90,10 +86,24 @@ public class OTSenderOnGroupElementFullSim extends OTSenderDDHFullSimAbs{
 	 * "COMPUTE:
 	 *		c0 = x0 * v0
 	 *		c1 = x1 * v1"
+	 * @param input MUST be OTSOnGroupElementInput.
+	 * @param u0
+	 * @param u1
+	 * @param v0
+	 * @param v1
 	 * @return tuple contains (u0, c0, u1, c1) to send to the receiver.
 	 */
-	protected OTSMessage computeTuple() {
+	protected OTSMessage computeTuple(OTSInput input, GroupElement u0, GroupElement u1, GroupElement v0, GroupElement v1) {
+		//If input is not instance of OTSOnGroupElementInput, throw Exception.
+		if (!(input instanceof OTSOnGroupElementInput)){
+			throw new IllegalArgumentException("x0 and x1 should be DlogGroup elements.");
+		}
+		OTSOnGroupElementInput inputElements = (OTSOnGroupElementInput)input;
 		
+		//Get x0, x1.
+		GroupElement x0 = inputElements.getX0();
+		GroupElement x1 = inputElements.getX1();
+				
 		//Calculate c0:
 		GroupElement c0 = dlog.multiplyGroupElements(x0, v0);
 		

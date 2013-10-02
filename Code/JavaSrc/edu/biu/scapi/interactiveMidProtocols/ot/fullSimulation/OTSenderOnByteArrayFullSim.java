@@ -24,9 +24,12 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.ot.fullSimulation;
 
+import java.io.IOException;
 import java.security.SecureRandom;
 
 import edu.biu.scapi.comm.Channel;
+import edu.biu.scapi.exceptions.CheatAttemptException;
+import edu.biu.scapi.exceptions.CommitValueException;
 import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
@@ -35,29 +38,35 @@ import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnByteArrayInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnByteArrayMessage;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
+import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
+import edu.biu.scapi.securityLevel.Malicious;
 import edu.biu.scapi.tools.Factories.KdfFactory;
 
 /**
- * Concrete class for OT DDH with full simulation sender ON BYTE ARRAY.
+ * Concrete implementation of the sender side in oblivious transfer based on the DDH assumption that achieves full simulation.
+ * This implementation can also be used as batch OT that achieves full simulation. In batch oblivious transfer, 
+ * the parties run an initialization phase and then can carry out concrete OTs later whenever they have new inputs and wish to carry out an OT. <p>
+ * 
  * This class derived from OTSenderDDHFullSimAbs and implements the functionality 
  * related to the byte array inputs.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTSenderOnByteArrayFullSim extends OTSenderDDHFullSimAbs{
+public class OTSenderOnByteArrayFullSim extends OTSenderDDHFullSimAbs implements Malicious{
 	
 	private KeyDerivationFunction kdf; //Used in the calculation.
 	
-	//Protocol's inputs. ByteArrays.
-	private byte[] x0;
-	private byte[] x1;
-	
 	/**
 	 * Constructor that gets the channel and chooses default values of DlogGroup and SecureRandom.
+	 * @param channel
+	 * @throws CheatAttemptException 
+	 * @throws IOException if failed to receive a message during pre process.
+	 * @throws ClassNotFoundException 
+	 * @throws CommitValueException 
 	 */
-	public OTSenderOnByteArrayFullSim(Channel channel){
+	public OTSenderOnByteArrayFullSim(Channel channel) throws ClassNotFoundException, IOException, CheatAttemptException, CommitValueException {
 		super(channel);
 		try {
 			this.kdf = KdfFactory.getInstance().getObject("HKDF(HMac(SHA-256))");
@@ -74,17 +83,29 @@ public class OTSenderOnByteArrayFullSim extends OTSenderDDHFullSimAbs{
 	 * @param random
 	 * @throws SecurityLevelException if the given DlogGroup is not DDH secure.
 	 * @throws InvalidDlogGroupException if the given dlog is invalid.
+	 * @throws CheatAttemptException 
+	 * @throws IOException if failed to receive a message during pre process.
+	 * @throws ClassNotFoundException 
+	 * @throws CommitValueException 
 	 */
-	public OTSenderOnByteArrayFullSim(Channel channel, DlogGroup dlog, KeyDerivationFunction kdf, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException{
+	public OTSenderOnByteArrayFullSim(Channel channel, DlogGroup dlog, KeyDerivationFunction kdf, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException, ClassNotFoundException, IOException, CheatAttemptException, CommitValueException{
 		super(channel, dlog, random);
 		this.kdf = kdf;
 	}
 
 	/**
-	 * Sets the input for this OT sender.
-	 * @param input MUST be OTSOnByteArrayInput with x0, x1 of the same arbitrary length.
+	 * Runs the following lines from the protocol:
+	 * "COMPUTE:
+	 *		COMPUTE c0 = x0 XOR KDF(|x0|,v0)
+	 *		COMPUTE c1 = x1 XOR KDF(|x1|,v1)"
+	 * @param input must be a OTSOnByteArrayInput.
+	 * @param u0
+	 * @param u1
+	 * @param v0
+	 * @param v1
+	 * @return tuple contains (u0, c0, u1, c1) to send to the receiver.
 	 */
-	public void setInput(OTSInput input) {
+	protected OTSMessage computeTuple(OTSInput input, GroupElement u0, GroupElement u1, GroupElement v0, GroupElement v1) {
 		//If input is not instance of OTSOnByteArrayInput, throw Exception.
 		if (!(input instanceof OTSOnByteArrayInput)){
 			throw new IllegalArgumentException("x0 and x1 should be binary strings.");
@@ -96,20 +117,10 @@ public class OTSenderOnByteArrayFullSim extends OTSenderDDHFullSimAbs{
 			throw new IllegalArgumentException("x0 and x1 should be of the same length.");
 		}
 		
-		//Set x0, x1.
-		this.x0 = inputStrings.getX0();
-		this.x1 = inputStrings.getX1();
-	}
-
-	/**
-	 * Runs the following lines from the protocol:
-	 * "COMPUTE:
-	 *		COMPUTE c0 = x0 XOR KDF(|x0|,v0)
-	 *		COMPUTE c1 = x1 XOR KDF(|x1|,v1)"
-	 * @return tuple contains (u0, c0, u1, c1) to send to the receiver.
-	 */
-	protected OTSMessage computeTuple() {
-		
+		//Get x0, x1.
+		byte[] x0 = inputStrings.getX0();
+		byte[] x1 = inputStrings.getX1();
+				
 		//Calculate c0:
 		byte[] v0Bytes = dlog.mapAnyGroupElementToByteArray(v0);
 		int len = x0.length;
