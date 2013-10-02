@@ -26,7 +26,6 @@ package edu.biu.scapi.interactiveMidProtocols.ot.privacyOnly;
 
 import java.security.SecureRandom;
 
-import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSInput;
@@ -46,44 +45,23 @@ import edu.biu.scapi.securityLevel.PrivacyOnly;
  *
  */
 public class OTSenderOnGroupElementPrivacyOnly extends OTSenderDDHPrivacyOnlyAbs implements PrivacyOnly{
-
-	//Protocol's inputs. GroupElements.
-	private GroupElement x0;
-	private GroupElement x1;
 	
 	/**
-	 * Constructor that gets the channel and chooses default values of DlogGroup and SecureRandom.
+	 * Constructor that chooses default values of DlogGroup and SecureRandom.
 	 */
-	public OTSenderOnGroupElementPrivacyOnly(Channel channel){
-		super(channel);
+	public OTSenderOnGroupElementPrivacyOnly() {
+		super();
 	}
 	
 	/**
-	 * Constructor that sets the given channel, dlogGroup and random.
-	 * @param channel
+	 * Constructor that sets the given dlogGroup and random.
 	 * @param dlog must be DDH secure.
 	 * @param random
 	 * @throws SecurityLevelException if the given DlogGroup is not DDH secure.
 	 * @throws InvalidDlogGroupException if the given dlog is invalid.
 	 */
-	public OTSenderOnGroupElementPrivacyOnly(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException{
-		super(channel, dlog, random);
-	}
-	
-	/**
-	 * Sets the input for this OT sender.
-	 * @param input MUST be OTSOnGroupElementInput.
-	 */
-	public void setInput(OTSInput input) {
-		//If input is not instance of OTSOnGroupElementInput, throw Exception.
-		if (!(input instanceof OTSOnGroupElementInput)){
-			throw new IllegalArgumentException("x0 and x1 should be DlogGroup elements.");
-		}
-		OTSOnGroupElementInput inputElements = (OTSOnGroupElementInput)input;
-		
-		//Set x0, x1.
-		this.x0 = inputElements.getX0();
-		this.x1 = inputElements.getX1();
+	public OTSenderOnGroupElementPrivacyOnly(DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException{
+		super(dlog, random);
 	}
 	
 	/**
@@ -91,10 +69,24 @@ public class OTSenderOnGroupElementPrivacyOnly extends OTSenderDDHPrivacyOnlyAbs
 	 * "COMPUTE:
 	 *		•	c0 = x0 * k0
 	 *		•	c1 = x1 * k1"
+	 * @param input MUST be OTSOnGroupElementInput.
+	 * @param k1 
+	 * @param k0 
+	 * @param w1 
+	 * @param w0 
 	 * @return tuple contains (u, v0, v1) to send to the receiver.
 	 */
-	protected OTSMessage computeTuple() {
+	protected OTSMessage computeTuple(OTSInput input, GroupElement w0, GroupElement w1, GroupElement k0, GroupElement k1) {
+		//If input is not instance of OTSOnGroupElementInput, throw Exception.
+		if (!(input instanceof OTSOnGroupElementInput)){
+			throw new IllegalArgumentException("x0 and x1 should be DlogGroup elements.");
+		}
+		OTSOnGroupElementInput inputElements = (OTSOnGroupElementInput)input;
 		
+		//Get x0, x1.
+		GroupElement x0 = inputElements.getX0();
+		GroupElement x1 = inputElements.getX1();
+				
 		//Calculate c0:
 		GroupElement c0 = dlog.multiplyGroupElements(x0, k0);
 		
