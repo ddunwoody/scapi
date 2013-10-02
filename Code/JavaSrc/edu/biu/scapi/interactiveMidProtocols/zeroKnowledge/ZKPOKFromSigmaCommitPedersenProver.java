@@ -30,8 +30,8 @@ import java.io.Serializable;
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaProverComputation;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProverInput;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersenTrapdoor.PedersenTrapdoorCTReceiver;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.ReceiverCommitPhaseOutput;
@@ -45,7 +45,7 @@ import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.ReceiverCommitPhas
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class ZKPOKFromSigmaPedersenProver implements ZeroKnowledgeProver{
+public class ZKPOKFromSigmaCommitPedersenProver implements ZKPOKProver{
 
 	private Channel channel;
 	private SigmaProverComputation sProver; //Underlying prover that computes the proof of the sigma protocol.
@@ -59,24 +59,11 @@ public class ZKPOKFromSigmaPedersenProver implements ZeroKnowledgeProver{
 	 * @param sProver
 	 * @param receiver
 	 */
-	public ZKPOKFromSigmaPedersenProver(Channel channel, SigmaProverComputation sProver){
+	public ZKPOKFromSigmaCommitPedersenProver(Channel channel, SigmaProverComputation sProver){
 		
 		this.sProver = sProver;
 		this.receiver = new PedersenTrapdoorCTReceiver(channel);
 		this.channel = channel;
-	}
-	
-	/**
-	 * Sets the input for this Zero Knowledge protocol.
-	 * @param input must be an instance of SigmaProtocolInput.
-	 * @throws IllegalArgumentException if the given input is not an instance of SigmaProtocolInput
-	 */
-	public void setInput(ZeroKnowledgeInput input){
-		//The given input must be an instance of SigmaProtocolInput.
-		if (!(input instanceof SigmaProtocolInput)){
-			throw new IllegalArgumentException("the given input must be an instance of SigmaProtocolInput");
-		}
-		sProver.setInput((SigmaProtocolInput) input);
 	}
 	
 	/**
@@ -95,19 +82,26 @@ public class ZKPOKFromSigmaPedersenProver implements ZeroKnowledgeProver{
 	 *		 ELSE (IF COMMIT.decommit returns INVALID)
      *			  OUTPUT ERROR (CHEAT_ATTEMPT_BY_V)
      *
+     * @param input must be an instance of SigmaProverInput.
+     * @throws IllegalArgumentException if the given input is not an instance of SigmaProverInput
 	 * @throws IOException if failed to send the message.
 	 * @throws CheatAttemptException if the challenge's length is not as expected. 
 	 * @throws ClassNotFoundException 
 	 */
-	public void prove() throws IOException, CheatAttemptException, ClassNotFoundException {
+	public void prove(ZeroKnowledgeProverInput input) throws IOException, CheatAttemptException, ClassNotFoundException {
+		//The given input must be an instance of SigmaProtocolInput.
+		if (!(input instanceof SigmaProverInput)){
+			throw new IllegalArgumentException("the given input must be an instance of SigmaProverInput");
+		}
+				
 		//Run the receiver in TRAP_COMMIT.commit 
-		ReceiverCommitPhaseOutput trap = commit();
+		ReceiverCommitPhaseOutput trap = receiveCommit();
 		//Compute the first message a in sigma, using (x,w) as input and 
 		//Send a to V
-		processFirstMsg();
+		processFirstMsg((SigmaProverInput) input);
 		//Run the receiver in TRAP_COMMIT.decommit 
 		//If decommit returns INVALID output ERROR (CHEAT_ATTEMPT_BY_V)
-		byte[] e = decommit();
+		byte[] e = receiveDecommit(trap.getCommitmentId());
 		//IF decommit returns some e, compute the response z to (a,e) according to sigma, 
 	    //Send z to V and output nothing
 		processSecondMsg(e, trap);
@@ -119,7 +113,7 @@ public class ZKPOKFromSigmaPedersenProver implements ZeroKnowledgeProver{
 	 * @throws IOException 
 	 * @throws ClassNotFoundException 
 	 */
-	private ReceiverCommitPhaseOutput commit() throws IOException, ClassNotFoundException{
+	private ReceiverCommitPhaseOutput receiveCommit() throws IOException, ClassNotFoundException{
 		receiver.preProcess();
 		return receiver.receiveCommitment();
 	}
@@ -128,14 +122,13 @@ public class ZKPOKFromSigmaPedersenProver implements ZeroKnowledgeProver{
 	 * Processes the first message of the Zero Knowledge protocol:
 	 *  "COMPUTE the first message a in sigma, using (x,w) as input
 	 *	SEND a to V".
+	 * @param input 
 	 * @throws IOException if failed to send the message.
 	 */
-	private void processFirstMsg() throws IOException{
+	private void processFirstMsg(SigmaProverInput input) throws IOException{
 		
-		//Sample random values for the protocol by the underlying proverComputation.
-		sProver.sampleRandomValues();
 		//Compute the first message by the underlying proverComputation.
-		SigmaProtocolMsg a = sProver.computeFirstMsg();
+		SigmaProtocolMsg a = sProver.computeFirstMsg(input);
 		//Send the first message.
 		sendMsgToVerifier(a);
 		
@@ -144,14 +137,15 @@ public class ZKPOKFromSigmaPedersenProver implements ZeroKnowledgeProver{
 	/**
 	 * Runs the receiver in TRAP_COMMIT.decommit.
 	 * If decommit returns INVALID output ERROR (CHEAT_ATTEMPT_BY_V)
+	 * @param id 
 	 * @param ctOutput
 	 * @return
 	 * @throws IOException 
 	 * @throws CheatAttemptException if decommit phase returned invalid.
 	 * @throws ClassNotFoundException 
 	 */
-	private byte[] decommit() throws IOException, CheatAttemptException, ClassNotFoundException{
-		CommitValue val = receiver.receiveDecommitment(0);
+	private byte[] receiveDecommit(long id) throws IOException, CheatAttemptException, ClassNotFoundException{
+		CommitValue val = receiver.receiveDecommitment(id);
 		if (val == null){
 			throw new CheatAttemptException("Decommit phase returned invalid");
 		}
