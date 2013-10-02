@@ -26,7 +26,7 @@ package edu.biu.scapi.interactiveMidProtocols.ot;
 
 /**
  * Concrete implementation of OT receiver (on byteArray) output.
- * In the byteArray scenario, the receiver outputs xσ as a byte array.
+ * In the byteArray scenario, the receiver outputs xSigma as a byte array.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
