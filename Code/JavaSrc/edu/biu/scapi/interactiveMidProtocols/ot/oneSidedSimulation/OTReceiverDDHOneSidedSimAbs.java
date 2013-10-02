@@ -33,22 +33,23 @@ import org.bouncycastle.util.BigIntegers;
 
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CheatAttemptException;
+import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
+import edu.biu.scapi.generals.ScapiDefaultConfiguration;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog.SigmaDlogProver;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog.SigmaDlogProverInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTRBasicInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTRInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTROutput;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTRGrElQuadMessage;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTReceiver;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
-import edu.biu.scapi.interactiveMidProtocols.ot.privacyOnly.OTRPrivacyOnlyMessage;
-import edu.biu.scapi.interactiveMidProtocols.zeroKnowledge.ZKPOKFromSigmaPedersenProver;
+import edu.biu.scapi.interactiveMidProtocols.zeroKnowledge.ZKPOKFromSigmaCommitPedersenProver;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
-import edu.biu.scapi.primitives.dlog.cryptopp.CryptoPpDlogZpSafePrime;
-import edu.biu.scapi.primitives.dlog.miracl.MiraclDlogECF2m;
 import edu.biu.scapi.securityLevel.DDH;
+import edu.biu.scapi.tools.Factories.DlogGroupFactory;
 
 /**
  * Abstract class for OT with one sided simulation receiver.
@@ -63,7 +64,7 @@ import edu.biu.scapi.securityLevel.DDH;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public abstract class OTReceiverDDHOneSidedSimAbs implements OTReceiver{
+abstract class OTReceiverDDHOneSidedSimAbs implements OTReceiver{
 
 	/*	
 	 	This class runs the following protocol:
@@ -92,64 +93,57 @@ public abstract class OTReceiverDDHOneSidedSimAbs implements OTReceiver{
 
 	*/	
 	
-	private Channel channel;
 	protected DlogGroup dlog;
 	private SecureRandom random;
-	private ZKPOKFromSigmaPedersenProver zkProver;
+	private ZKPOKFromSigmaCommitPedersenProver zkProver;
 	private BigInteger qMinusOne; 
 	
-	//Values required for calculations:
-	protected short sigma;
-	private BigInteger alpha, gamma;
-	protected BigInteger beta;
-	private GroupElement gAlpha, gBeta, gGamma, gAlphaBeta;
-	protected GroupElement w0, w1;
-	
 	/**
-	 * Constructor that gets the channel and chooses default values of DlogGroup and SecureRandom.
+	 * Constructor that chooses default values of DlogGroup and SecureRandom.
 	 */
-	public OTReceiverDDHOneSidedSimAbs(Channel channel) {
-		try{
-			try {
-				//Uses Miracl Koblitz 233 Elliptic curve.
-				setMembers(channel, new MiraclDlogECF2m("K-233"), new SecureRandom());
-			} catch (IOException e) {
-				//If there is a problem with the elliptic curves file, create Zp DlogGroup.
-				
-					setMembers(channel, new CryptoPpDlogZpSafePrime(), new SecureRandom());
-			} catch (IllegalArgumentException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		} catch (SecurityLevelException e) {
-			// Can not occur since the DlogGroup is DDH secure
+	OTReceiverDDHOneSidedSimAbs() {
+		//Read the default DlogGroup name from a configuration file.
+		String dlogName = ScapiDefaultConfiguration.getInstance().getProperty("DDHDlogGroup");
+		DlogGroup dlog = null;
+		try {
+			//Create the default DlogGroup by the factory.
+			dlog = DlogGroupFactory.getInstance().getObject(dlogName);
+		} catch (FactoriesException e1) {
+			// Should not occur since the dlog name in the configuration file is valid.
+		}
+		
+		try {
+			doConstruct(dlog, new SecureRandom());
+		} catch (SecurityLevelException e1) {
+			// Should not occur since the dlog in the configuration file is as secure as needed.
 		} catch (InvalidDlogGroupException e) {
-			// Can not occur since the DlogGroup is valid.
+			// Should not occur since the dlog in the configuration file is valid.
 		}
 	}
 	
 	/**
-	 * Constructor that sets the given channel, dlogGroup and random.
-	 * @param channel
+	 * Constructor that sets the given dlogGroup and random.
 	 * @param dlog must be DDH secure.
 	 * @param random
 	 * @throws SecurityLevelException if the given dlog is not DDH secure
 	 * @throws InvalidDlogGroupException if the given DlogGroup is not valid.
 	 */
-	public OTReceiverDDHOneSidedSimAbs(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException{
+	OTReceiverDDHOneSidedSimAbs(DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException{
 		
-		setMembers(channel, dlog, random);
+		doConstruct(dlog, random);
 	}
 	
 	/**
 	 * Sets the given members.
-	 * @param channel
+	 * Runs the following line from the protocol:
+	 * "IF NOT VALID_PARAMS(G,q,g)
+	 *   		REPORT ERROR and HALT".
 	 * @param dlog must be DDH secure.
 	 * @param random
 	 * @throws SecurityLevelException if the given dlog is not DDH secure
 	 * @throws InvalidDlogGroupException if the given DlogGroup is not valid.
 	 */
-	private void setMembers(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException {
+	private void doConstruct(DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException {
 		//The underlying dlog group must be DDH secure.
 		if (!(dlog instanceof DDH)){
 			throw new SecurityLevelException("DlogGroup should have DDH security level");
@@ -163,148 +157,118 @@ public abstract class OTReceiverDDHOneSidedSimAbs implements OTReceiver{
 		if(!dlog.validateGroup())
 			throw new InvalidDlogGroupException();
 		
-		this.channel = channel;
 		this.dlog = dlog;
 		this.random = random;
-		//Creates the underlying ZKPOK
-		zkProver = new ZKPOKFromSigmaPedersenProver(channel, new SigmaDlogProver(dlog, 80, random));
 		qMinusOne =  dlog.getOrder().subtract(BigInteger.ONE);
 		
-	}
-	
-	/**
-	 * Runs the part of the protocol where the receiver input is not yet necessary.
-	 */
-	public void preProcess(){
-		/* Run the following part of the protocol:
-				SAMPLE random values alpha, beta, gamma in [0, . . . , q-1] 
-				COMPUTE:
-				g^alpha, g^beta, g^(alpha*beta), g^gamma.
-		*/
-		
-		//Sample random values.
-		sampleRandomValues();
-		
-		//Calculate tuple elements
-		computeElementsForTuple();
-	}
-
-	/**
-	 * Sets the input for this OT receiver.
-	 * @param input MUST be OTRBasicInput.
-	 */
-	public void setInput(OTRInput input) {
-		//If input is not instance of OTRBasicInput, throw Exception.
-		if (!(input instanceof OTRBasicInput)){
-			throw new IllegalArgumentException("input shoud contain sigma.");
-		}
-		
-		//The given sigma should be 0 or 1.
-		if ((sigma != 0) && (sigma!= 1)){
-			throw new IllegalArgumentException("Sigma should be 0 or 1");
-		}
-		//Set sigma.
-		this.sigma = ((OTRBasicInput) input).getSigma();
+		// This protocol has no pre process stage.
 	}
 	
 	/**
 	 * Runs the part of the protocol where the receiver input is necessary.
+	 * The transfer stage of OT protocol which can be called several times in parallel.
+	 * In order to enable the parallel calls, each transfer call should use a different channel to send and receive messages.
+	 * This way the parallel executions of the function will not block each other.
+	 * The parameters given in the input must match the DlogGroup member of this class, which given in the constructor.
+	 * @param channel
+	 * @param input MUST be OTRBasicInput.
 	 * @return OTROutput, the output of the protocol.
 	 * @throws CheatAttemptException if there was a cheat attempt during the execution of the protocol.
 	 * @throws IOException if the send or receive functions failed.
 	 * @throws ClassNotFoundException if the receive failed.
 	 */
-	public OTROutput transfer() throws CheatAttemptException, IOException, ClassNotFoundException{
+	public OTROutput transfer(Channel channel, OTRInput input) throws CheatAttemptException, IOException, ClassNotFoundException{
+		//check if the input is valid.
+		//If input is not instance of OTRBasicInput, throw Exception.
+		if (!(input instanceof OTRBasicInput)){
+			throw new IllegalArgumentException("input shoud contain sigma.");
+		}
+		
+		byte sigma = ((OTRBasicInput) input).getSigma();
+		
+		//The given sigma should be 0 or 1.
+		if ((sigma != 0) && (sigma!= 1)){
+			throw new IllegalArgumentException("Sigma should be 0 or 1");
+		}
+	
 		/* Run the following part of the protocol:
-				COMPUTE a as follows:
-				1.	If sigma = 0 then a = (g^alpha, g^beta, g^(alpha*beta), g^gamma)
-				2.	If sigma = 1 then a = (g^alpha, g^beta, g^gamma, g^(alpha*beta))
-				SEND a to S
-				Run the prover in ZKPOK_FROM_SIGMA with Sigma protocol SIGMA_DLOG. Use gAlpha and private input alpha.
-				WAIT for message pairs (w0, c0) and (w1, c1)  from S
-				In ByteArray scenario:
-					IF  NOT 
-						1. w0, w1 in the DlogGroup, AND
-						2. c0, c1 are binary strings of the same length
-					   REPORT ERROR
-					COMPUTE kSigma = (wSigma)^beta
-					OUTPUT  xSigma = cSigma XOR KDF(|cSigma|,kSigma)
-				In GroupElement scenario:
-					IF  NOT 
-						1. w0, w1, c0, c1 in the DlogGroup
-					   REPORT ERROR
-					COMPUTE (kSigma)^(-1) = (wSigma)^(-beta)
-					OUTPUT  xSigma = cSigma * (kSigma)^(-1)
+			SAMPLE random values alpha, beta, gamma in [0, . . . , q-1] 
+			COMPUTE a as follows:
+			1.	If sigma = 0 then a = (g^alpha, g^beta, g^(alpha*beta), g^gamma)
+			2.	If sigma = 1 then a = (g^alpha, g^beta, g^gamma, g^(alpha*beta))
+			SEND a to S
+			Run the prover in ZKPOK_FROM_SIGMA with Sigma protocol SIGMA_DLOG. Use gAlpha and private input alpha.
+			WAIT for message pairs (w0, c0) and (w1, c1)  from S
+			In ByteArray scenario:
+				IF  NOT 
+					1. w0, w1 in the DlogGroup, AND
+					2. c0, c1 are binary strings of the same length
+				   REPORT ERROR
+				COMPUTE kSigma = (wSigma)^beta
+				OUTPUT  xSigma = cSigma XOR KDF(|cSigma|,kSigma)
+			In GroupElement scenario:
+				IF  NOT 
+					1. w0, w1, c0, c1 in the DlogGroup
+				   REPORT ERROR
+				COMPUTE (kSigma)^(-1) = (wSigma)^(-beta)
+				OUTPUT  xSigma = cSigma * (kSigma)^(-1)
 
 		*/
 		
-		try{
-			//Compute tuple for sender.
-			OTRPrivacyOnlyMessage a = computeTuple();
-			
-			//Send tuple to sender.
-			sendTupleToSender(a);
-			
-			//Run the prover in ZKPOK_FROM_SIGMA with Sigma protocol SIGMA_DLOG.
-			runZKPOK();
-			
-			//Wait for message from sender.
-			OTSMessage message = waitForMessageFromSender();
-			
-			//checked the received message.
-			checkReceivedTuple(message);
-			
-			//Compute the final calculations to get xSigma.
-			return computeFinalXSigma();
-			
-		}catch(NullPointerException e){
-			throw new IllegalStateException("preProcess function should be called before transfer atleast once");
-		}	
+		//Sample random values alpha, beta in [0, . . . , q-1]
+		BigInteger alpha = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
+		BigInteger beta = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
+				
+		//Compute g^alpha
+		GroupElement g = dlog.getGenerator();
+		GroupElement gAlpha = dlog.exponentiate(g, alpha);
+		
+		//complete calculations for tuple and create tuple for sender.
+		OTRGrElQuadMessage a = computeTuple(sigma, alpha, beta, gAlpha);
+		
+		//Send tuple to sender.
+		sendTupleToSender(channel, a);
+		
+		//Run the prover in ZKPOK_FROM_SIGMA with Sigma protocol SIGMA_DLOG.
+		runZKPOK(channel, gAlpha, alpha);
+		
+		//Wait for message from sender.
+		OTSMessage message = waitForMessageFromSender(channel);
+		
+		//Compute the final calculations to get xSigma.
+		return checkMessgeAndComputeX(sigma, beta, message);	
 	}
 
-	/**
-	 * Runs the following line from the protocol:
-	 * "SAMPLE random values alpha, beta, gamma in [0, . . . , q-1]". 
-	 */
-	private void sampleRandomValues() {
-		//Sample random values.
-		
-		alpha = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
-		beta = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
-		gamma = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
-	}
-	
-	/**
-	 * Calculates g^alpha, g^beta, g^(alpha*beta), g^gamma.
-	 * These values are necessary to the message tuple
-	 */
-	private void computeElementsForTuple() {
-		GroupElement g = dlog.getGenerator();
-		
-		gAlpha = dlog.exponentiate(g, alpha);
-		gBeta = dlog.exponentiate(g, beta);
-		gGamma = dlog.exponentiate(g, gamma);
-		gAlphaBeta = dlog.exponentiate(g, alpha.multiply(beta));
-		
-	}
-	
 	/**
 	 * Runs the following lines from the protocol:
 	 * "COMPUTE a as follows:
 	 *			1.	If sigma = 0 then a = (g^alpha, g^beta, g^(alpha*beta), g^gamma)
-				2.	If sigma = 1 then a = (g^alpha, g^beta, g^gamma, g^(alpha*beta))"
-	 * @return OTRSemiHonestMessage contains the tuple (h0, h1).
+	 *			2.	If sigma = 1 then a = (g^alpha, g^beta, g^gamma, g^(alpha*beta))"
+	 * @param sigma input for the protocol
+	 * @param alpha random value sampled in the protocol
+	 * @param beta random value sampled in the protocol
+	 * @param gAlpha g^alpha
+	 * @return OTRPrivacyOnlyMessage contains the tuple (x, y, z0, z1).
 	 */
-	private OTRPrivacyOnlyMessage computeTuple() {
-
+	private OTRGrElQuadMessage computeTuple(byte sigma, BigInteger alpha, BigInteger beta, GroupElement gAlpha) {
+		//Sample random value gamma in [0, . . . , q-1]
+		BigInteger gamma = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
+		
+		//Calculates g^beta, g^(alpha*beta), g^gamma.
+		GroupElement g = dlog.getGenerator();
+		GroupElement gBeta = dlog.exponentiate(g, beta);
+		GroupElement gGamma = dlog.exponentiate(g, gamma);
+		GroupElement gAlphaBeta = dlog.exponentiate(g, alpha.multiply(beta));
+		
+		//Create the tuple.
 		if (sigma == 0){
-			return new OTRPrivacyOnlyMessage(gAlpha.generateSendableData(), 
+			return new OTRGrElQuadMessage(gAlpha.generateSendableData(), 
 										 gBeta.generateSendableData(), 
 										 gAlphaBeta.generateSendableData(), 
 										 gGamma.generateSendableData());
 		}
 		else {
-			return new OTRPrivacyOnlyMessage(gAlpha.generateSendableData(), 
+			return new OTRGrElQuadMessage(gAlpha.generateSendableData(), 
 										 gBeta.generateSendableData(), 
 										 gGamma.generateSendableData(), 
 										 gAlphaBeta.generateSendableData());
@@ -314,10 +278,11 @@ public abstract class OTReceiverDDHOneSidedSimAbs implements OTReceiver{
 	/**
 	 * Runs the following line from the protocol:
 	 * "SEND a to S"
+	 * @param channel 
 	 * @param a the tuple to send to the sender.
 	 * @throws IOException 
 	 */
-	private void sendTupleToSender(OTRPrivacyOnlyMessage a) throws IOException {
+	private void sendTupleToSender(Channel channel, OTRGrElQuadMessage a) throws IOException {
 		try {
 			channel.send(a);
 		} catch (IOException e) {
@@ -330,23 +295,33 @@ public abstract class OTReceiverDDHOneSidedSimAbs implements OTReceiver{
 	 * Runs the following lines from the protocol:
 	 * "Run the prover in ZKPOK_FROM_SIGMA with Sigma protocol SIGMA_DLOG. 
 	 * Use gAlpha and private input alpha."
+	 * @param channel
+	 * @param gAlpha 
+	 * @param alpha
 	 * @throws IOException
 	 * @throws CheatAttemptException
 	 * @throws ClassNotFoundException
 	 */
-	private void runZKPOK() throws IOException, CheatAttemptException, ClassNotFoundException {
-		zkProver.setInput(new SigmaDlogProverInput(gAlpha, alpha));
-		zkProver.prove();
+	private void runZKPOK(Channel channel, GroupElement gAlpha, BigInteger alpha) throws IOException, CheatAttemptException, ClassNotFoundException {
+		//read the default statistical parameter used in sigma protocols from a configuration file.
+		String statisticalParameter = ScapiDefaultConfiguration.getInstance().getProperty("StatisticalParameter");
+		int t = Integer.parseInt(statisticalParameter);
+				
+		//Creates the underlying ZKPOK
+		zkProver = new ZKPOKFromSigmaCommitPedersenProver(channel, new SigmaDlogProver(dlog, t, random));
+		
+		zkProver.prove(new SigmaDlogProverInput(gAlpha, alpha));
 	}
 	
 	/**
 	 * Runs the following line from the protocol:
 	 * "WAIT for message pairs (w0, c0) and (w1, c1)  from S"
+	 * @param channel 
 	 * @return OTSMessage contains (w0, c0, w1, c1)
 	 * @throws IOException if failed to receive.
 	 * @throws ClassNotFoundException
 	 */
-	private OTSMessage waitForMessageFromSender() throws IOException, ClassNotFoundException {
+	private OTSMessage waitForMessageFromSender(Channel channel) throws IOException, ClassNotFoundException {
 		Serializable message = null;
 		try {
 			message =  channel.receive();
@@ -360,7 +335,7 @@ public abstract class OTReceiverDDHOneSidedSimAbs implements OTReceiver{
 	}
 	
 	/**
-	 * Runs the following line from the protocol:
+	 * Runs the following lines from the protocol:
 	 * "In ByteArray scenario:
 	 *		IF  NOT 
 	 *			1. w0, w1 in the DlogGroup, AND
@@ -369,22 +344,19 @@ public abstract class OTReceiverDDHOneSidedSimAbs implements OTReceiver{
 	 *	In GroupElement scenario:
 	 *		IF  NOT 
 	 *			1. w0, w1, c0, c1 in the DlogGroup
-	 *		   REPORT ERROR"		
-	 * @param message
-	 * @throws CheatAttemptException 
-	 */
-	protected abstract void checkReceivedTuple(OTSMessage message) throws CheatAttemptException;
-	
-	/**
-	 * Runs the following lines from the protocol:
-	 * "In ByteArray scenario:
+	 *		   REPORT ERROR
+	 * In ByteArray scenario:
 	 *		COMPUTE kSigma = (wSigma)^beta
 	 *		OUTPUT  xSigma = cSigma XOR KDF(|cSigma|,kSigma)
 	 *	In GroupElement scenario:
 	 *		COMPUTE (kSigma)^(-1) = (wSigma)^(-beta)
 	 *		OUTPUT  xSigma = cSigma * (kSigma)^(-1)"
+	 * @param sigma input of the protocol
+	 * @param beta random value sampled in the protocol
+	 * @param message received from the sender
 	 * @return OTROutput contains xSigma
+	 * @throws CheatAttemptException 
 	 */
-	protected abstract OTROutput computeFinalXSigma();
+	protected abstract OTROutput checkMessgeAndComputeX(byte sigma, BigInteger beta, OTSMessage message) throws CheatAttemptException;
 
 }
