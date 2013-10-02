@@ -37,7 +37,7 @@ import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.generals.ScapiDefaultConfiguration;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog.SigmaDlogProver;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog.SigmaDlogProverComputation;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog.SigmaDlogProverInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTRBasicInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTRInput;
@@ -308,7 +308,7 @@ abstract class OTReceiverDDHOneSidedSimAbs implements OTReceiver{
 		int t = Integer.parseInt(statisticalParameter);
 				
 		//Creates the underlying ZKPOK
-		zkProver = new ZKPOKFromSigmaCommitPedersenProver(channel, new SigmaDlogProver(dlog, t, random));
+		zkProver = new ZKPOKFromSigmaCommitPedersenProver(channel, new SigmaDlogProverComputation(dlog, t, random));
 		
 		zkProver.prove(new SigmaDlogProverInput(gAlpha, alpha));
 	}

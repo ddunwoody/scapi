@@ -38,7 +38,7 @@ import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.generals.ScapiDefaultConfiguration;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog.SigmaDlogCommonInput;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog.SigmaDlogVerifier;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog.SigmaDlogVerifierComputation;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTRGrElQuadMessage;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
@@ -278,7 +278,7 @@ abstract class OTSenderDDHOneSidedSimAbs implements OTSender{
 		int t = Integer.parseInt(statisticalParameter);
 				
 		//Create the underlying ZKPOK
-		zkVerifier = new ZKPOKFromSigmaCommitPedersenVerifier(channel, new SigmaDlogVerifier(dlog, t, random), random);
+		zkVerifier = new ZKPOKFromSigmaCommitPedersenVerifier(channel, new SigmaDlogVerifierComputation(dlog, t, random), random);
 				
 		//If the output of the Zero Knowledge Proof Of Knowledge is REJ, throw CheatAttempException.
 		if (!zkVerifier.verify(new SigmaDlogCommonInput(h))){
