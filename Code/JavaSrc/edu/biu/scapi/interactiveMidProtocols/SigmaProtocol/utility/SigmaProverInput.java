@@ -24,7 +24,7 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility;
 
-import edu.biu.scapi.interactiveMidProtocols.zeroKnowledge.ZeroKnowledgeProverInput;
+import edu.biu.scapi.interactiveMidProtocols.zeroKnowledge.ZKProverInput;
 
 /**
  * Every Sigma protocol prover needs inputs during the protocol execution, but every concrete 
@@ -35,7 +35,7 @@ import edu.biu.scapi.interactiveMidProtocols.zeroKnowledge.ZeroKnowledgeProverIn
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public interface SigmaProverInput extends ZeroKnowledgeProverInput{
+public interface SigmaProverInput extends ZKProverInput{
 
 	/**
 	 * @return the common parameters of the prover and the verifier.

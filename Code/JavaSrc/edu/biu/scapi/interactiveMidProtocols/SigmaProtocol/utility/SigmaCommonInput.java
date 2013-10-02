@@ -26,7 +26,7 @@ package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility;
 
 import java.io.Serializable;
 
-import edu.biu.scapi.interactiveMidProtocols.zeroKnowledge.ZeroKnowledgeCommonInput;
+import edu.biu.scapi.interactiveMidProtocols.zeroKnowledge.ZKCommonInput;
 
 /**
  * Marker interface for common input of Sigma Protocols.
@@ -35,6 +35,6 @@ import edu.biu.scapi.interactiveMidProtocols.zeroKnowledge.ZeroKnowledgeCommonIn
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public interface SigmaCommonInput extends ZeroKnowledgeCommonInput, Serializable{
+public interface SigmaCommonInput extends ZKCommonInput, Serializable{
 
 }
