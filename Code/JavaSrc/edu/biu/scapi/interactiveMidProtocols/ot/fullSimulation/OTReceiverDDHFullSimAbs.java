@@ -37,7 +37,7 @@ import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.generals.ScapiDefaultConfiguration;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHProver;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHProverComputation;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHProverInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTRBasicInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTRInput;
@@ -226,7 +226,7 @@ abstract class OTReceiverDDHFullSimAbs implements OTReceiver{
 		int t = Integer.parseInt(statisticalParameter);
 		
 		//Creates the underlying ZKPOK. 
-		zkProver = new ZKPOKFromSigmaCommitPedersenProver(channel, new SigmaDHProver(dlog, t, random));
+		zkProver = new ZKPOKFromSigmaCommitPedersenProver(channel, new SigmaDHProverComputation(dlog, t, random));
 		
 		//Run the prover in ZKPOK_FROM_SIGMA with Sigma protocol SIGMA_DH.
 		runZKPOK();

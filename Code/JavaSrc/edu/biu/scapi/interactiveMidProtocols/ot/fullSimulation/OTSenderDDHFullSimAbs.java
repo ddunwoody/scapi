@@ -36,7 +36,7 @@ import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.generals.ScapiDefaultConfiguration;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHCommonInput;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHVerifier;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHVerifierComputation;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTRMessage;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
@@ -171,7 +171,7 @@ abstract class OTSenderDDHFullSimAbs implements OTSender{
 		int t = Integer.parseInt(statisticalParameter);
 		
 		//Create the underlying ZKPOK
-		zkVerifier = new ZKPOKFromSigmaCommitPedersenVerifier(channel, new SigmaDHVerifier(dlog, t, random), random);
+		zkVerifier = new ZKPOKFromSigmaCommitPedersenVerifier(channel, new SigmaDHVerifierComputation(dlog, t, random), random);
 		
 		// Some OT protocols have a pre-process stage before the transfer. 
 		// Usually, pre process is done once at the beginning of the protocol and will not be executed later, 
