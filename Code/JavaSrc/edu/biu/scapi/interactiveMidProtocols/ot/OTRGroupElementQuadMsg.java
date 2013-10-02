@@ -36,7 +36,7 @@ import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTRGrElQuadMessage implements Serializable{
+public class OTRGroupElementQuadMsg implements Serializable{
 	
 	private static final long serialVersionUID = 8620542140745898146L;
 	
@@ -45,7 +45,7 @@ public class OTRGrElQuadMessage implements Serializable{
 	private GroupElementSendableData z0;
 	private GroupElementSendableData z1;
 	
-	public OTRGrElQuadMessage(GroupElementSendableData x, GroupElementSendableData y, 
+	public OTRGroupElementQuadMsg(GroupElementSendableData x, GroupElementSendableData y, 
 							 GroupElementSendableData z0, GroupElementSendableData z1){
 		this.x = x;
 		this.y = y;

@@ -35,6 +35,6 @@ import java.io.Serializable;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public interface OTSMessage extends Serializable{
+public interface OTSMsg extends Serializable{
 
 }
