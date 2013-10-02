@@ -26,11 +26,12 @@ package edu.biu.scapi.interactiveMidProtocols.zeroKnowledge;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.security.SecureRandom;
 
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaVerifierComputation;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolInput;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.ReceiverCommitPhaseOutput;
@@ -45,12 +46,12 @@ import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersenTrapdoor.P
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class ZKPOKFromSigmaPedersenVerifier implements ZeroKnowledgeVerifier{
+public class ZKPOKFromSigmaCommitPedersenVerifier implements ZKPOKVerifier{
 
 	private Channel channel;
 	private SigmaVerifierComputation sVerifier; //Underlying verifier that computes the proof of the sigma protocol.
 	private PedersenTrapdoorCTCommitter committer;				//Underlying Commitment committer to use.
-	
+	private SecureRandom random;
 	
 	
 	/**
@@ -58,24 +59,12 @@ public class ZKPOKFromSigmaPedersenVerifier implements ZeroKnowledgeVerifier{
 	 * @param channel
 	 * @param sVerifier
 	 */
-	public ZKPOKFromSigmaPedersenVerifier(Channel channel, SigmaVerifierComputation sVerifier){
+	public ZKPOKFromSigmaCommitPedersenVerifier(Channel channel, SigmaVerifierComputation sVerifier, SecureRandom random){
 	
 		this.channel = channel;
 		this.sVerifier = sVerifier;
 		this.committer = new PedersenTrapdoorCTCommitter(channel);
-	}
-
-	/**
-	 * Sets the input for this Zero Knowledge protocol.
-	 * @param input must be an instance of SigmaProtocolInput.
-	 * @throws IllegalArgumentException if the given input is not an instance of SigmaProtocolInput
-	 */
-	public void setInput(ZeroKnowledgeInput input){
-		//The given input must be an instance of SigmaProtocolInput.
-		if (!(input instanceof SigmaProtocolInput)){
-			throw new IllegalArgumentException("the given input must be an instance of SigmaProtocolInput");
-		}
-		sVerifier.setInput((SigmaProtocolInput) input);
+		this.random = random;
 	}
 	
 	/**
@@ -95,22 +84,29 @@ public class ZKPOKFromSigmaPedersenVerifier implements ZeroKnowledgeVerifier{
 	 *       ELSE 	
 	 *          OUTPUT REJ
 
+	 * @param input must be an instance of SigmaCommonInput.
+	 * @throws IllegalArgumentException if the given input is not an instance of SigmaCommonInput
 	 * @throws IOException if failed to send the message.
 	 * @throws ClassNotFoundException 
 	 * @throws CheatAttemptException 
 	 */
-	public boolean verify() throws ClassNotFoundException, IOException, CheatAttemptException{
+	public boolean verify(ZeroKnowledgeCommonInput input) throws ClassNotFoundException, IOException, CheatAttemptException{
+		//The given input must be an instance of SigmaProtocolInput.
+		if (!(input instanceof SigmaCommonInput)){
+			throw new IllegalArgumentException("the given input must be an instance of SigmaCommonInput");
+		}
+				
 		//Sample a random challenge  e <- {0, 1}^t 
 		sVerifier.sampleChallenge();
 		byte[] e = sVerifier.getChallenge();
 		
 		//Run TRAP_COMMIT.commit as the committer with input e,
-		commit(e);
+		long id = commit(e);
 		//Wait for a message a from P
 		SigmaProtocolMsg a = receiveMsgFromProver();
 		
 		//Run COMMIT.decommit as the decommitter
-		committer.decommit(0);
+		committer.decommit(id);
 		
 		boolean valid = true;
 		
@@ -123,23 +119,25 @@ public class ZKPOKFromSigmaPedersenVerifier implements ZeroKnowledgeVerifier{
 		valid = valid && committer.validate(trap);
 		
 		//Run transcript (a, e, z) is accepting in sigma on input x
-		valid = valid && proccessVerify(a, z);
+		valid = valid && proccessVerify((SigmaCommonInput) input, a, z);
 		
 		//If decommit and sigma verify returned true, return ACCEPT. Else, return REJECT.
 		return valid;
 	}
 
 	/**
-	 * Runs COMMIT.commit as the committer with input e
+	 * Runs COMMIT.commit as the committer with input e.
 	 * @param e
 	 * @throws IOException 
 	 * @throws CheatAttemptException 
 	 * @throws ClassNotFoundException 
 	 */
-	private void commit(byte[] e) throws IOException, ClassNotFoundException, CheatAttemptException {
+	private long commit(byte[] e) throws IOException, ClassNotFoundException, CheatAttemptException {
 		committer.preProcess();
 		CommitValue val = committer.generateCommitValue(e);
-		committer.commit(val, 0);
+		long id = random.nextLong();
+		committer.commit(val, id);
+		return id;
 		
 	}
 	
@@ -189,13 +187,14 @@ public class ZKPOKFromSigmaPedersenVerifier implements ZeroKnowledgeVerifier{
 	
 	/**
 	 * Verifies the proof.
+	 * @param input 
 	 * @param a first message from prover.
 	 * @param z second message from prover.
 	 */
-	private boolean proccessVerify(SigmaProtocolMsg a, SigmaProtocolMsg z){
+	private boolean proccessVerify(SigmaCommonInput input, SigmaProtocolMsg a, SigmaProtocolMsg z){
 		
 		//Run transcript (a, e, z) is accepting in sigma on input x
-		return sVerifier.verify(a, z);
+		return sVerifier.verify(input, a, z);
 	}
 
 }
