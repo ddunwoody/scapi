@@ -31,7 +31,7 @@ import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.generals.ScapiDefaultConfiguration;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaSimulator;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.damgardJurikEncryptedZero.SigmaDJEncryptedZeroCommonInput;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.damgardJurikEncryptedZero.SigmaDamgardJurikEncryptedZeroSimulator;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.damgardJurikEncryptedZero.SigmaDJEncryptedZeroSimulator;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaSimulatorOutput;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.DamgardJurikPublicKey;
@@ -46,14 +46,14 @@ import edu.biu.scapi.midLayer.plaintext.BigIntegerPlainText;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaDamgardJurikEncryptedValueSimulator implements SigmaSimulator{
+public class SigmaDJEncryptedValueSimulator implements SigmaSimulator{
 
 	/*	
 	  This class uses an instance of SigmaDamgardJurikEncryptedZeroSimulator with:
 	  	•	Common input: (n,c’) where c’=c*(1+n)^(-x) mod N'
 	*/
 	
-	private SigmaDamgardJurikEncryptedZeroSimulator djSim; // Underlying SigmaDamgardJurikEncryptedZeroSimulator to use.
+	private SigmaDJEncryptedZeroSimulator djSim; // Underlying SigmaDamgardJurikEncryptedZeroSimulator to use.
 	private int lengthParameter; 						   // Used in converting the input to the underlying input.
 	
 	/**
@@ -62,7 +62,7 @@ public class SigmaDamgardJurikEncryptedValueSimulator implements SigmaSimulator{
 	 * @param lengthParameter length parameter in BITS.
 	 * @param random
 	 */
-	public SigmaDamgardJurikEncryptedValueSimulator(int t, int lengthParameter, SecureRandom random) {
+	public SigmaDJEncryptedValueSimulator(int t, int lengthParameter, SecureRandom random) {
 		
 		doConstruct(t, lengthParameter, random);
 	}
@@ -70,7 +70,7 @@ public class SigmaDamgardJurikEncryptedValueSimulator implements SigmaSimulator{
 	/**
 	 * Default constructor that chooses default values for the parameters.
 	 */
-	public SigmaDamgardJurikEncryptedValueSimulator() {
+	public SigmaDJEncryptedValueSimulator() {
 		
 		//read the default statistical parameter used in sigma protocols from a configuration file.
 		String statisticalParameter = ScapiDefaultConfiguration.getInstance().getProperty("StatisticalParameter");
@@ -87,7 +87,7 @@ public class SigmaDamgardJurikEncryptedValueSimulator implements SigmaSimulator{
 	 */
 	private void doConstruct(int t, int lengthParameter, SecureRandom random){
 		//Creates the underlying sigmaDamgardJurik object with the given parameters.
-		djSim = new SigmaDamgardJurikEncryptedZeroSimulator(t, lengthParameter, random);
+		djSim = new SigmaDJEncryptedZeroSimulator(t, lengthParameter, random);
 		this.lengthParameter = lengthParameter;
 	}
 	
@@ -102,13 +102,13 @@ public class SigmaDamgardJurikEncryptedValueSimulator implements SigmaSimulator{
 	 * @param simulator MUST be an instance of SigmaDamgardJurikEncryptedZeroSimulator.
 	 * @throws IllegalArgumentException if the given simulator is not an instance of SigmaDamgardJurikEncryptedZeroSimulator.
 	 */
-	SigmaDamgardJurikEncryptedValueSimulator(SigmaSimulator simulator) {
+	SigmaDJEncryptedValueSimulator(SigmaSimulator simulator) {
 		
-		if (!(simulator instanceof SigmaDamgardJurikEncryptedZeroSimulator)){
+		if (!(simulator instanceof SigmaDJEncryptedZeroSimulator)){
 			throw new IllegalArgumentException("The given simulator is not an instance of SigmaDamgardJurikEncryptedZeroSimulator");
 		}
 		//Sets the given object to the underlying SigmaDamgardJurikEncryptedZeroSimulator.
-		djSim = (SigmaDamgardJurikEncryptedZeroSimulator) simulator;
+		djSim = (SigmaDJEncryptedZeroSimulator) simulator;
 	}
 	
 	/**

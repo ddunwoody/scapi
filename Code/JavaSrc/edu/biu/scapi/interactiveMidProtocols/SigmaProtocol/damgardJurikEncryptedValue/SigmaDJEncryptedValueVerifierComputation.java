@@ -31,7 +31,7 @@ import edu.biu.scapi.generals.ScapiDefaultConfiguration;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.DJBasedSigma;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaVerifierComputation;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.damgardJurikEncryptedZero.SigmaDJEncryptedZeroCommonInput;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.damgardJurikEncryptedZero.SigmaDamgardJurikEncryptedZeroVerifier;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.damgardJurikEncryptedZero.SigmaDJEncryptedZeroVerifierComputation;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.DamgardJurikPublicKey;
@@ -46,7 +46,7 @@ import edu.biu.scapi.midLayer.plaintext.BigIntegerPlainText;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaDamgardJurikEncryptedValueVerifier implements SigmaVerifierComputation, DJBasedSigma {
+public class SigmaDJEncryptedValueVerifierComputation implements SigmaVerifierComputation, DJBasedSigma {
 
 	/*	
 	  This class uses an instance of SigmaDamgardJurikEncryptedZeroVerifier with:
@@ -54,7 +54,7 @@ public class SigmaDamgardJurikEncryptedValueVerifier implements SigmaVerifierCom
 	
 	*/	
 	
-	private SigmaDamgardJurikEncryptedZeroVerifier sigmaDamgardJurik;	//underlying SigmaDamgardJurikVerifier to use.
+	private SigmaDJEncryptedZeroVerifierComputation sigmaDamgardJurik;	//underlying SigmaDamgardJurikVerifier to use.
 	private int lengthParameter;										// length parameter in BITS.
 	
 	
@@ -64,7 +64,7 @@ public class SigmaDamgardJurikEncryptedValueVerifier implements SigmaVerifierCom
 	 * @param t Soundness parameter in BITS.
 	 * @param random
 	 */
-	public SigmaDamgardJurikEncryptedValueVerifier(int t, int lengthParameter, SecureRandom random) {
+	public SigmaDJEncryptedValueVerifierComputation(int t, int lengthParameter, SecureRandom random) {
 		
 		doConstruct(t, lengthParameter, random);
 	}
@@ -72,7 +72,7 @@ public class SigmaDamgardJurikEncryptedValueVerifier implements SigmaVerifierCom
 	/**
 	 * Default constructor that chooses default values for the parameters.
 	 */
-	public SigmaDamgardJurikEncryptedValueVerifier() {
+	public SigmaDJEncryptedValueVerifierComputation() {
 		
 		//read the default statistical parameter used in sigma protocols from a configuration file.
 		String statisticalParameter = ScapiDefaultConfiguration.getInstance().getProperty("StatisticalParameter");
@@ -90,7 +90,7 @@ public class SigmaDamgardJurikEncryptedValueVerifier implements SigmaVerifierCom
 	private void doConstruct(int t, int lengthParameter, SecureRandom random){
 		
 		//Creates the underlying sigmaDamgardJurik object with the given parameters.
-		sigmaDamgardJurik = new SigmaDamgardJurikEncryptedZeroVerifier(t, lengthParameter, random);
+		sigmaDamgardJurik = new SigmaDJEncryptedZeroVerifierComputation(t, lengthParameter, random);
 		this.lengthParameter = lengthParameter;
 	}
 	

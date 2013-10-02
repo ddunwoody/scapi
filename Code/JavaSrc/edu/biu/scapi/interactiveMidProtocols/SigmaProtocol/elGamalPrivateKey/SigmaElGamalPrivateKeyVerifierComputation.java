@@ -30,7 +30,7 @@ import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.DlogBasedSigma;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaVerifierComputation;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog.SigmaDlogCommonInput;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog.SigmaDlogVerifier;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog.SigmaDlogVerifierComputation;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
@@ -43,7 +43,7 @@ import edu.biu.scapi.primitives.dlog.DlogGroup;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaElGamalPrivateKeyVerifier implements SigmaVerifierComputation, DlogBasedSigma{
+public class SigmaElGamalPrivateKeyVerifierComputation implements SigmaVerifierComputation, DlogBasedSigma{
 
 	/*	
 	  This class uses an instance of SigmaDlogVerifier with:
@@ -52,7 +52,7 @@ public class SigmaElGamalPrivateKeyVerifier implements SigmaVerifierComputation,
 	
 	*/	
 	
-	private SigmaDlogVerifier sigmaDlog;		//underlying SigmaDlogVerifier to use.
+	private SigmaDlogVerifierComputation sigmaDlog;		//underlying SigmaDlogVerifier to use.
 	
 	
 	/**
@@ -62,10 +62,10 @@ public class SigmaElGamalPrivateKeyVerifier implements SigmaVerifierComputation,
 	 * @param random
 	 * @throws InvalidDlogGroupException if the given dlog is invalid.
 	 */
-	public SigmaElGamalPrivateKeyVerifier(DlogGroup dlog, int t, SecureRandom random) throws InvalidDlogGroupException {
+	public SigmaElGamalPrivateKeyVerifierComputation(DlogGroup dlog, int t, SecureRandom random) throws InvalidDlogGroupException {
 		
 		//Creates the underlying SigmaDlogVerifier object with the given parameters.
-		sigmaDlog = new SigmaDlogVerifier(dlog, t, random);
+		sigmaDlog = new SigmaDlogVerifierComputation(dlog, t, random);
 	}
 	
 	/**

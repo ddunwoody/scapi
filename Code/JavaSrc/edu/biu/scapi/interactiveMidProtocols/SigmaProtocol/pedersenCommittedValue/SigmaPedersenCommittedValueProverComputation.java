@@ -31,7 +31,7 @@ import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.DlogBasedSigma;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaProverComputation;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaSimulator;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog.SigmaDlogProver;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog.SigmaDlogProverComputation;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog.SigmaDlogProverInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProverInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
@@ -46,7 +46,7 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaPedersenCommittedValueProver implements SigmaProverComputation, DlogBasedSigma {
+public class SigmaPedersenCommittedValueProverComputation implements SigmaProverComputation, DlogBasedSigma {
 	
 	/*	
 	  Since c = g^r*h^x, it suffices to prove knowledge of r s.t. g^r = c*h^(-x). This is just a DLOG Sigma protocol.
@@ -57,7 +57,7 @@ public class SigmaPedersenCommittedValueProver implements SigmaProverComputation
 		•	P’s private input: a value r in Zq such that h’ = g^r
 	*/	
 
-	private SigmaDlogProver sigmaDlog;	//underlying SigmaDlogProver to use.
+	private SigmaDlogProverComputation sigmaDlog;	//underlying SigmaDlogProver to use.
 	private DlogGroup dlog;				//We need the DlogGroup instance in order to calculate the input for the underlying SigmaDlogProver
 	
 	/**
@@ -66,10 +66,10 @@ public class SigmaPedersenCommittedValueProver implements SigmaProverComputation
 	 * @param t Soundness parameter in BITS.
 	 * @param random
 	 */
-	public SigmaPedersenCommittedValueProver(DlogGroup dlog, int t, SecureRandom random) {
+	public SigmaPedersenCommittedValueProverComputation(DlogGroup dlog, int t, SecureRandom random) {
 		
 		//Create the underlying SigmaDlogProver object with the given parameters.
-		sigmaDlog = new SigmaDlogProver(dlog, t, random);
+		sigmaDlog = new SigmaDlogProverComputation(dlog, t, random);
 		this.dlog = dlog;
 	}
 

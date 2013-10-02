@@ -45,7 +45,7 @@ import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocol
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaDamgardJurikProductProver implements SigmaProverComputation, DJBasedSigma{
+public class SigmaDJProductProverComputation implements SigmaProverComputation, DJBasedSigma{
 	/*	
 	  This class computes the following calculations:
 		  	SAMPLE random values d <- ZN, rd <- Z*n, rdb <- Z*n 
@@ -67,7 +67,7 @@ public class SigmaDamgardJurikProductProver implements SigmaProverComputation, D
 	 * @param lengthParameter length parameter in BITS.
 	 * @param random
 	 */
-	public SigmaDamgardJurikProductProver(int t, int lengthParameter, SecureRandom random) {
+	public SigmaDJProductProverComputation(int t, int lengthParameter, SecureRandom random) {
 		
 		doConstruct(t, lengthParameter, random);
 	}
@@ -75,7 +75,7 @@ public class SigmaDamgardJurikProductProver implements SigmaProverComputation, D
 	/**
 	 * Default constructor that chooses default values for the parameters.
 	 */
-	public SigmaDamgardJurikProductProver() {
+	public SigmaDJProductProverComputation() {
 		//read the default statistical parameter used in sigma protocols from a configuration file.
 		String statisticalParameter = ScapiDefaultConfiguration.getInstance().getProperty("StatisticalParameter");
 		int t = Integer.parseInt(statisticalParameter);
@@ -246,6 +246,6 @@ public class SigmaDamgardJurikProductProver implements SigmaProverComputation, D
 	 * @return SigmaDamgardJurikProductSimulator
 	 */
 	public SigmaSimulator getSimulator(){
-		return new SigmaDamgardJurikProductSimulator(t, lengthParameter, random);
+		return new SigmaDJProductSimulator(t, lengthParameter, random);
 	}
 }

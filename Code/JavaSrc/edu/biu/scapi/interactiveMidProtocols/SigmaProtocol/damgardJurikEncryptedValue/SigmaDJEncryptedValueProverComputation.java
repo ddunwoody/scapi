@@ -33,7 +33,7 @@ import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.DJBasedSigma;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaProverComputation;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaSimulator;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.damgardJurikEncryptedZero.SigmaDJEncryptedZeroProverInput;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.damgardJurikEncryptedZero.SigmaDamgardJurikEncryptedZeroProver;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.damgardJurikEncryptedZero.SigmaDJEncryptedZeroProverComputation;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProverInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.DamgardJurikPublicKey;
@@ -48,7 +48,7 @@ import edu.biu.scapi.midLayer.plaintext.BigIntegerPlainText;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaDamgardJurikEncryptedValueProver implements SigmaProverComputation, DJBasedSigma{
+public class SigmaDJEncryptedValueProverComputation implements SigmaProverComputation, DJBasedSigma{
 
 	/*	
 	  This class uses an instance of SigmaDamgardJurikEncryptedZeroProver with:
@@ -56,7 +56,7 @@ public class SigmaDamgardJurikEncryptedValueProver implements SigmaProverComputa
 		•	P’s private input: a value r <- Zq such that c’=r^N mod N’.
 	*/	 
 	
-	private SigmaDamgardJurikEncryptedZeroProver sigmaDamgardJurik;	//underlying SigmaDamgardJurikProver to use.
+	private SigmaDJEncryptedZeroProverComputation sigmaDamgardJurik;	//underlying SigmaDamgardJurikProver to use.
 	private int lengthParameter;									// length parameter in BITS.
 	
 	/**
@@ -65,7 +65,7 @@ public class SigmaDamgardJurikEncryptedValueProver implements SigmaProverComputa
 	 * @param lengthParameter length parameter in BITS.
 	 * @param random
 	 */
-	public SigmaDamgardJurikEncryptedValueProver(int t, int lengthParameter, SecureRandom random) {
+	public SigmaDJEncryptedValueProverComputation(int t, int lengthParameter, SecureRandom random) {
 		
 		doConstruct(t, lengthParameter, random);
 	}
@@ -73,7 +73,7 @@ public class SigmaDamgardJurikEncryptedValueProver implements SigmaProverComputa
 	/**
 	 * Default constructor that chooses default values for the parameters.
 	 */
-	public SigmaDamgardJurikEncryptedValueProver() {
+	public SigmaDJEncryptedValueProverComputation() {
 		
 		//read the default statistical parameter used in sigma protocols from a configuration file.
 		String statisticalParameter = ScapiDefaultConfiguration.getInstance().getProperty("StatisticalParameter");
@@ -91,7 +91,7 @@ public class SigmaDamgardJurikEncryptedValueProver implements SigmaProverComputa
 	 */
 	private void doConstruct(int t, int lengthParameter, SecureRandom random){
 		//Creates the underlying sigmaDamgardJurik object with the given parameters.
-		sigmaDamgardJurik = new SigmaDamgardJurikEncryptedZeroProver(t, lengthParameter, random);
+		sigmaDamgardJurik = new SigmaDJEncryptedZeroProverComputation(t, lengthParameter, random);
 		this.lengthParameter = lengthParameter;
 	}
 
@@ -164,7 +164,7 @@ public class SigmaDamgardJurikEncryptedValueProver implements SigmaProverComputa
 	 * @return SigmaDamgardJurikEncryptedValueSimulator
 	 */
 	public SigmaSimulator getSimulator(){
-		return new SigmaDamgardJurikEncryptedValueSimulator(sigmaDamgardJurik.getSimulator());
+		return new SigmaDJEncryptedValueSimulator(sigmaDamgardJurik.getSimulator());
 	}
 
 }

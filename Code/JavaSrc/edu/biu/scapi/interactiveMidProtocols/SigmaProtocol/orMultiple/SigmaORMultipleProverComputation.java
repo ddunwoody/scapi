@@ -47,7 +47,7 @@ import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaSimulato
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaORMultipleProver implements SigmaProverComputation{
+public class SigmaORMultipleProverComputation implements SigmaProverComputation{
 	
 	/*	
 	 * Let (ai,ei,zi) denote the steps of a Sigma protocol SigmaI for proving that xi is in LRi 
@@ -107,7 +107,7 @@ public class SigmaORMultipleProver implements SigmaProverComputation{
 	 * @param t soundness parameter. t MUST be equal to all t values of the underlying provers object.
 	 * @throws IllegalArgumentException if the given t is not equal to all t values of the underlying provers object.
 	 */
-	public SigmaORMultipleProver(Hashtable<Integer, SigmaProverComputation> provers, Hashtable<Integer, SigmaSimulator> simulators, int t, SecureRandom random) {
+	public SigmaORMultipleProverComputation(Hashtable<Integer, SigmaProverComputation> provers, Hashtable<Integer, SigmaSimulator> simulators, int t, SecureRandom random) {
 		//If the given t is different from one of the underlying object's t values, throw exception.
 		
 		Enumeration<SigmaProverComputation> proversEl = provers.elements();

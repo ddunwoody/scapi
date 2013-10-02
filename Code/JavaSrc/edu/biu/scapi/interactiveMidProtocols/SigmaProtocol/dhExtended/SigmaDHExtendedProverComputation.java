@@ -49,7 +49,7 @@ import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaDHExtendedProver implements SigmaProverComputation, DlogBasedSigma{
+public class SigmaDHExtendedProverComputation implements SigmaProverComputation, DlogBasedSigma{
 	
 	/*	
 	  This class computes the following calculations:
@@ -71,7 +71,7 @@ public class SigmaDHExtendedProver implements SigmaProverComputation, DlogBasedS
 	 * @param random
 	 * @throws IllegalArgumentException if soundness parameter is invalid.
 	 */
-	public SigmaDHExtendedProver(DlogGroup dlog, int t, SecureRandom random) {
+	public SigmaDHExtendedProverComputation(DlogGroup dlog, int t, SecureRandom random) {
 		
 		//Sets the parameters.
 		this.dlog = dlog;

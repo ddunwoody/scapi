@@ -32,7 +32,7 @@ import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.DlogBasedSigma;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaVerifierComputation;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dhExtended.SigmaDHExtendedCommonInput;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dhExtended.SigmaDHExtendedVerifier;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dhExtended.SigmaDHExtendedVerifierComputation;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.CramerShoupPublicKey;
@@ -51,7 +51,7 @@ import edu.biu.scapi.primitives.hash.CryptographicHash;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaCramerShoupEncryptedValueVerifier implements SigmaVerifierComputation, DlogBasedSigma{
+public class SigmaCramerShoupEncryptedValueVerifierComputation implements SigmaVerifierComputation, DlogBasedSigma{
 
 	/*	
 	  This class uses an instance of SigmaDHExtendedVerifier with:
@@ -60,7 +60,7 @@ public class SigmaCramerShoupEncryptedValueVerifier implements SigmaVerifierComp
 			•	Common input: (g1,g2,g3,g4,h1,h2,h3,h4) = (g1,g2,h,cd^w,u1,u2,e/x,v)
 	*/	
 	
-	private SigmaDHExtendedVerifier sigmaDH;		//underlying SigmaDHExtendedVerifier to use.
+	private SigmaDHExtendedVerifierComputation sigmaDH;		//underlying SigmaDHExtendedVerifier to use.
 	private DlogGroup dlog;							//We save the dlog because we need it to calculate the input for the underlying Sigma verifier.
 	private CryptographicHash hash;					//Underlying hash function that used in the CramerShoup cryptosystem.
 	
@@ -72,10 +72,10 @@ public class SigmaCramerShoupEncryptedValueVerifier implements SigmaVerifierComp
 	 * @param random
 	 * @throws InvalidDlogGroupException if the given dlog is invalid.
 	 */
-	public SigmaCramerShoupEncryptedValueVerifier(DlogGroup dlog, CryptographicHash hash, int t, SecureRandom random) throws InvalidDlogGroupException {
+	public SigmaCramerShoupEncryptedValueVerifierComputation(DlogGroup dlog, CryptographicHash hash, int t, SecureRandom random) throws InvalidDlogGroupException {
 		
 		//Creates the underlying SigmaDHExtendedVerifier object with the given parameters.
-		sigmaDH = new SigmaDHExtendedVerifier(dlog, t, random);
+		sigmaDH = new SigmaDHExtendedVerifierComputation(dlog, t, random);
 		this.dlog = dlog;
 		this.hash = hash;
 	}

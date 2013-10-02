@@ -41,7 +41,7 @@ import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocol
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaDamgardJurikProductVerifier implements SigmaVerifierComputation, DJBasedSigma{
+public class SigmaDJProductVerifierComputation implements SigmaVerifierComputation, DJBasedSigma{
 
 	/*	
 	  This class computes the following calculations:
@@ -63,7 +63,7 @@ public class SigmaDamgardJurikProductVerifier implements SigmaVerifierComputatio
 	 * @param lengthParameter length parameter in BITS.
 	 * @param random
 	 */
-	public SigmaDamgardJurikProductVerifier(int t, int lengthParameter, SecureRandom random) {
+	public SigmaDJProductVerifierComputation(int t, int lengthParameter, SecureRandom random) {
 		
 		doConstruct(t, lengthParameter, random);
 	}
@@ -71,7 +71,7 @@ public class SigmaDamgardJurikProductVerifier implements SigmaVerifierComputatio
 	/**
 	 * Default constructor that chooses default values for the parameters.
 	 */
-	public SigmaDamgardJurikProductVerifier() {
+	public SigmaDJProductVerifierComputation() {
 		//read the default statistical parameter used in sigma protocols from a configuration file.
 		String statisticalParameter = ScapiDefaultConfiguration.getInstance().getProperty("StatisticalParameter");
 		int t = Integer.parseInt(statisticalParameter);

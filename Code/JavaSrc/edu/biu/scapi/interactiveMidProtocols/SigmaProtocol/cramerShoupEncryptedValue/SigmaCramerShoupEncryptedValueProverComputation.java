@@ -32,7 +32,7 @@ import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.DlogBasedSigma;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaProverComputation;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaSimulator;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dhExtended.SigmaDHExtendedProver;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dhExtended.SigmaDHExtendedProverComputation;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dhExtended.SigmaDHExtendedProverInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProverInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
@@ -52,7 +52,7 @@ import edu.biu.scapi.primitives.hash.CryptographicHash;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaCramerShoupEncryptedValueProver implements SigmaProverComputation, DlogBasedSigma{
+public class SigmaCramerShoupEncryptedValueProverComputation implements SigmaProverComputation, DlogBasedSigma{
 
 	/*	
 	  This class uses an instance of SigmaDHExtendedProver with:
@@ -63,7 +63,7 @@ public class SigmaCramerShoupEncryptedValueProver implements SigmaProverComputat
 
 	*/	 
 	
-	private SigmaDHExtendedProver sigmaDH;	//underlying SigmaDHExtendedProver to use.
+	private SigmaDHExtendedProverComputation sigmaDH;	//underlying SigmaDHExtendedProver to use.
 	private DlogGroup dlog;					//We save the dlog because we need it to calculate the input for the underlying Sigma prover.
 	private CryptographicHash hash;			//Underlying hash function that used in the CramerShoup cryptosystem.
 	
@@ -74,10 +74,10 @@ public class SigmaCramerShoupEncryptedValueProver implements SigmaProverComputat
 	 * @param t Soundness parameter in BITS.
 	 * @param random
 	 */
-	public SigmaCramerShoupEncryptedValueProver(DlogGroup dlog, CryptographicHash hash, int t, SecureRandom random) {
+	public SigmaCramerShoupEncryptedValueProverComputation(DlogGroup dlog, CryptographicHash hash, int t, SecureRandom random) {
 		
 		//Creates the underlying SigmaDHExtendedProver object with the given parameters.
-		sigmaDH = new SigmaDHExtendedProver(dlog, t, random);
+		sigmaDH = new SigmaDHExtendedProverComputation(dlog, t, random);
 		this.dlog = dlog;
 		this.hash = hash;
 	}

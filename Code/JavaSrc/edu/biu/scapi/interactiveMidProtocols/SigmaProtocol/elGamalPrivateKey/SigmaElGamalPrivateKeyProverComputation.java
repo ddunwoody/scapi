@@ -30,7 +30,7 @@ import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.DlogBasedSigma;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaProverComputation;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaSimulator;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog.SigmaDlogProver;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog.SigmaDlogProverComputation;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog.SigmaDlogProverInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProverInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
@@ -44,7 +44,7 @@ import edu.biu.scapi.primitives.dlog.DlogGroup;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaElGamalPrivateKeyProver implements SigmaProverComputation, DlogBasedSigma{
+public class SigmaElGamalPrivateKeyProverComputation implements SigmaProverComputation, DlogBasedSigma{
 	
 	/*	
 	  This class uses an instance of SigmaDlogProver with:
@@ -53,7 +53,7 @@ public class SigmaElGamalPrivateKeyProver implements SigmaProverComputation, Dlo
 	
 	*/	 
 	
-	private SigmaDlogProver sigmaDlog;	//underlying SigmaDlogProver to use.
+	private SigmaDlogProverComputation sigmaDlog;	//underlying SigmaDlogProver to use.
 	
 	/**
 	 * Constructor that gets the underlying DlogGroup, soundness parameter and SecureRandom.
@@ -61,10 +61,10 @@ public class SigmaElGamalPrivateKeyProver implements SigmaProverComputation, Dlo
 	 * @param t Soundness parameter in BITS.
 	 * @param random
 	 */
-	public SigmaElGamalPrivateKeyProver(DlogGroup dlog, int t, SecureRandom random) {
+	public SigmaElGamalPrivateKeyProverComputation(DlogGroup dlog, int t, SecureRandom random) {
 		
 		//Creates the underlying SigmaDlogProver object with the given parameters.
-		sigmaDlog = new SigmaDlogProver(dlog, t, random);
+		sigmaDlog = new SigmaDlogProverComputation(dlog, t, random);
 	}
 	
 	/**

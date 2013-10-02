@@ -30,7 +30,7 @@ import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.DlogBasedSigma;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaProverComputation;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaSimulator;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog.SigmaDlogProver;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog.SigmaDlogProverComputation;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog.SigmaDlogProverInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProverInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
@@ -45,7 +45,7 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaElGamalCTKnowledgeProver implements SigmaProverComputation, DlogBasedSigma{
+public class SigmaElGamalCTKnowledgeProverComputation implements SigmaProverComputation, DlogBasedSigma{
 
 	/*	
 	  This class uses an instance of SigmaDlogProver with:
@@ -54,7 +54,7 @@ public class SigmaElGamalCTKnowledgeProver implements SigmaProverComputation, Dl
 		•	P’s private input: a value w in Zq such that h = g^w (given w can decrypt and so this proves knowledge of committed value).	
 	*/	 
 	
-	private SigmaDlogProver sigmaDlog;	//underlying SigmaDlogProver to use.
+	private SigmaDlogProverComputation sigmaDlog;	//underlying SigmaDlogProver to use.
 	private DlogGroup dlog;				//We need the DlogGroup instance in order to calculate the input for the underlying SigmaDlogProver
 	
 	/**
@@ -63,10 +63,10 @@ public class SigmaElGamalCTKnowledgeProver implements SigmaProverComputation, Dl
 	 * @param t Soundness parameter in BITS.
 	 * @param random
 	 */
-	public SigmaElGamalCTKnowledgeProver(DlogGroup dlog, int t, SecureRandom random) {
+	public SigmaElGamalCTKnowledgeProverComputation(DlogGroup dlog, int t, SecureRandom random) {
 		
 		//Creates the underlying SigmaDlogProver object with the given parameters.
-		sigmaDlog = new SigmaDlogProver(dlog, t, random);
+		sigmaDlog = new SigmaDlogProverComputation(dlog, t, random);
 		this.dlog = dlog;
 	}
 	

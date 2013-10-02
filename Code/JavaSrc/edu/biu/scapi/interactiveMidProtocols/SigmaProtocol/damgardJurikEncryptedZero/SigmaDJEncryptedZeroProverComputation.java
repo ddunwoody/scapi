@@ -46,7 +46,7 @@ import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocol
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaDamgardJurikEncryptedZeroProver implements SigmaProverComputation, DJBasedSigma{
+public class SigmaDJEncryptedZeroProverComputation implements SigmaProverComputation, DJBasedSigma{
 
 	/*	
 	  This class computes the following calculations:
@@ -69,7 +69,7 @@ public class SigmaDamgardJurikEncryptedZeroProver implements SigmaProverComputat
 	 * @param lengthParameter length parameter in BITS.
 	 * @param random
 	 */
-	public SigmaDamgardJurikEncryptedZeroProver(int t, int lengthParameter, SecureRandom random) {
+	public SigmaDJEncryptedZeroProverComputation(int t, int lengthParameter, SecureRandom random) {
 		
 		doConstruct(t, lengthParameter, random);
 	}
@@ -77,7 +77,7 @@ public class SigmaDamgardJurikEncryptedZeroProver implements SigmaProverComputat
 	/**
 	 * Default constructor that chooses default values for the parameters.
 	 */
-	public SigmaDamgardJurikEncryptedZeroProver() {
+	public SigmaDJEncryptedZeroProverComputation() {
 		//read the default statistical parameter used in sigma protocols from a configuration file.
 		String statisticalParameter = ScapiDefaultConfiguration.getInstance().getProperty("StatisticalParameter");
 		int t = Integer.parseInt(statisticalParameter);
@@ -198,7 +198,7 @@ public class SigmaDamgardJurikEncryptedZeroProver implements SigmaProverComputat
 	 * @return SigmaDamgardJurikEncryptedZeroSimulator
 	 */
 	public SigmaSimulator getSimulator(){
-		return new SigmaDamgardJurikEncryptedZeroSimulator(t, lengthParameter, random);
+		return new SigmaDJEncryptedZeroSimulator(t, lengthParameter, random);
 	}
 	
 }

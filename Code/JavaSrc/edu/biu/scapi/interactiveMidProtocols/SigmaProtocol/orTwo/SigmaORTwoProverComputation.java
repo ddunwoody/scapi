@@ -42,7 +42,7 @@ import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaSimulato
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaORTwoProver implements SigmaProverComputation{
+public class SigmaORTwoProverComputation implements SigmaProverComputation{
 	/*	
 	  Let (ai,ei,zi) denote the steps of a Sigma protocol SigmaI for proving that xi is in LRi (i=0,1)
 	  This class computes the following calculations:
@@ -72,7 +72,7 @@ public class SigmaORTwoProver implements SigmaProverComputation{
 	 * @throws IllegalArgumentException if the given t is not equal to both t values of the underlying provers.
 	 * @throws IllegalArgumentException if the given provers array does not contains two objects.
 	 */
-	public SigmaORTwoProver(SigmaProverComputation prover, SigmaSimulator simulator, int t, SecureRandom random) {
+	public SigmaORTwoProverComputation(SigmaProverComputation prover, SigmaSimulator simulator, int t, SecureRandom random) {
 		
 		//If the given t is different from one of the underlying object's t values, throw exception.
 		if ((t != prover.getSoundnessParam()) || (t != simulator.getSoundnessParam())){

@@ -30,7 +30,7 @@ import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.DlogBasedSigma;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaVerifierComputation;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHCommonInput;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHVerifier;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHVerifierComputation;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
@@ -44,7 +44,7 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaElGamalEncryptedValueVerifier implements SigmaVerifierComputation, DlogBasedSigma{
+public class SigmaElGamalEncryptedValueVerifierComputation implements SigmaVerifierComputation, DlogBasedSigma{
 
 	/*	
 	  There are two versions of SigmaElGamalEncryptedValue protocol, depending upon if the prover knows 
@@ -61,7 +61,7 @@ public class SigmaElGamalEncryptedValueVerifier implements SigmaVerifierComputat
 			•	P’s private input: a value r <- Zq such that c1=g^r and c2/x =h^r.
 	*/	
 	
-	private SigmaDHVerifier sigmaDH;	//underlying SigmaDHVerifier to use.
+	private SigmaDHVerifierComputation sigmaDH;	//underlying SigmaDHVerifier to use.
 	private DlogGroup dlog;				//We save the dlog because we need it to calculate the input for the underlying Sigma verifier.
 	
 	/**
@@ -71,10 +71,10 @@ public class SigmaElGamalEncryptedValueVerifier implements SigmaVerifierComputat
 	 * @param random
 	 * @throws InvalidDlogGroupException if the given dlog is invalid.
 	 */
-	public SigmaElGamalEncryptedValueVerifier(DlogGroup dlog, int t, SecureRandom random) throws InvalidDlogGroupException {
+	public SigmaElGamalEncryptedValueVerifierComputation(DlogGroup dlog, int t, SecureRandom random) throws InvalidDlogGroupException {
 		
 		//Creates the underlying SigmaDHVerifier object with the given parameters.
-		sigmaDH = new SigmaDHVerifier(dlog, t, random);
+		sigmaDH = new SigmaDHVerifierComputation(dlog, t, random);
 		this.dlog = dlog;
 	}
 	

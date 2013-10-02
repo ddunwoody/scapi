@@ -31,7 +31,7 @@ import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.DlogBasedSigma;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaVerifierComputation;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog.SigmaDlogCommonInput;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog.SigmaDlogVerifier;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog.SigmaDlogVerifierComputation;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
@@ -45,7 +45,7 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaPedersenCommittedValueVerifier implements SigmaVerifierComputation, DlogBasedSigma{
+public class SigmaPedersenCommittedValueVerifierComputation implements SigmaVerifierComputation, DlogBasedSigma{
 	/*	
 	  Since c = g^r*h^x, it suffices to prove knowledge of r s.t. g^r = c*h^(-x). This is just a DLOG Sigma protocol.
 	  
@@ -54,7 +54,7 @@ public class SigmaPedersenCommittedValueVerifier implements SigmaVerifierComputa
 		•	Common input: h’ = c*h^(-x) 
 	*/
 	
-	private SigmaDlogVerifier sigmaDlog;	//underlying SigmaDlogVerifier to use.
+	private SigmaDlogVerifierComputation sigmaDlog;	//underlying SigmaDlogVerifier to use.
 	private DlogGroup dlog;					//We need the DlogGroup instance in order to calculate the input for the underlying SigmaDlogVerifier.
 	
 	/**
@@ -64,10 +64,10 @@ public class SigmaPedersenCommittedValueVerifier implements SigmaVerifierComputa
 	 * @param random
 	 * @throws InvalidDlogGroupException if the given dlog is invalid.
 	 */
-	public SigmaPedersenCommittedValueVerifier(DlogGroup dlog, int t, SecureRandom random) throws InvalidDlogGroupException {
+	public SigmaPedersenCommittedValueVerifierComputation(DlogGroup dlog, int t, SecureRandom random) throws InvalidDlogGroupException {
 		
 		//Creates the underlying SigmaDlogVerifier object with the given parameters.
-		sigmaDlog = new SigmaDlogVerifier(dlog, t, random);
+		sigmaDlog = new SigmaDlogVerifierComputation(dlog, t, random);
 		this.dlog = dlog;
 	}
 	

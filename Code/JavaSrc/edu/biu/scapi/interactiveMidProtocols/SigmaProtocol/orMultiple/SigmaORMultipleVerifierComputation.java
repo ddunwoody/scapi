@@ -41,7 +41,7 @@ import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocol
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaORMultipleVerifier implements SigmaVerifierComputation{
+public class SigmaORMultipleVerifierComputation implements SigmaVerifierComputation{
 
 	/*	
 	  Let (ai,ei,zi) denote the steps of a Sigma protocol Sigmai for proving that xi is in LRi 
@@ -79,7 +79,7 @@ public class SigmaORMultipleVerifier implements SigmaVerifierComputation{
 	 * @param random source of randomness
 	 * @throws IllegalArgumentException if the given t is not equal to all t values of the underlying verifiers object.
 	 */
-	public SigmaORMultipleVerifier(ArrayList<SigmaVerifierComputation> verifiers, int t, SecureRandom random) {
+	public SigmaORMultipleVerifierComputation(ArrayList<SigmaVerifierComputation> verifiers, int t, SecureRandom random) {
 		//If the given t is different from one of the underlying object's t values, throw exception.
 		for (int i = 0; i < verifiers.size(); i++){
 			if (t != verifiers.get(i).getSoundnessParam()){

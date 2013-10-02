@@ -31,7 +31,7 @@ import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.DlogBasedSigma;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaProverComputation;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaSimulator;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHProver;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHProverComputation;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHProverInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProverInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
@@ -46,7 +46,7 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaElGamalEncryptedValueProver implements SigmaProverComputation, DlogBasedSigma{
+public class SigmaElGamalEncryptedValueProverComputation implements SigmaProverComputation, DlogBasedSigma{
 
 	/*	
 	  There are two versions of SigmaElGamalEncryptedValue protocol, depending upon if the prover knows 
@@ -63,7 +63,7 @@ public class SigmaElGamalEncryptedValueProver implements SigmaProverComputation,
 			•	P’s private input: a value r <- Zq such that c1=g^r and c2/x =h^r.
 	*/	 
 	
-	private SigmaDHProver sigmaDH;	//underlying SigmaDHProver to use.
+	private SigmaDHProverComputation sigmaDH;	//underlying SigmaDHProver to use.
 	private DlogGroup dlog;			//We save the dlog because we need it to calculate the input for the underlying Sigma prover.
 	
 	/**
@@ -72,10 +72,10 @@ public class SigmaElGamalEncryptedValueProver implements SigmaProverComputation,
 	 * @param t Soundness parameter in BITS.
 	 * @param random
 	 */
-	public SigmaElGamalEncryptedValueProver(DlogGroup dlog, int t, SecureRandom random) {
+	public SigmaElGamalEncryptedValueProverComputation(DlogGroup dlog, int t, SecureRandom random) {
 		
 		//Creates the underlying SigmaDHProver object with the given parameters.
-		sigmaDH = new SigmaDHProver(dlog, t, random);
+		sigmaDH = new SigmaDHProverComputation(dlog, t, random);
 		this.dlog = dlog;
 	}
 	

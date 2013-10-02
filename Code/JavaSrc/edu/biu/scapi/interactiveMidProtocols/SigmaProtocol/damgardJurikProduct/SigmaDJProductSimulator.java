@@ -43,7 +43,7 @@ import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaSimulato
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaDamgardJurikProductSimulator implements SigmaSimulator{
+public class SigmaDJProductSimulator implements SigmaSimulator{
 	
 	/*	
 	  This class computes the following calculations:
@@ -63,7 +63,7 @@ public class SigmaDamgardJurikProductSimulator implements SigmaSimulator{
 	 * @param lengthParameter length parameter in BITS.
 	 * @param random
 	 */
-	public SigmaDamgardJurikProductSimulator(int t, int lengthParameter, SecureRandom random) {
+	public SigmaDJProductSimulator(int t, int lengthParameter, SecureRandom random) {
 		
 		doConstruct(t, lengthParameter, random);
 	}
@@ -71,7 +71,7 @@ public class SigmaDamgardJurikProductSimulator implements SigmaSimulator{
 	/**
 	 * Default constructor that chooses default values for the parameters.
 	 */
-	public SigmaDamgardJurikProductSimulator() {
+	public SigmaDJProductSimulator() {
 		//read the default statistical parameter used in sigma protocols from a configuration file.
 		String statisticalParameter = ScapiDefaultConfiguration.getInstance().getProperty("StatisticalParameter");
 		int t = Integer.parseInt(statisticalParameter);

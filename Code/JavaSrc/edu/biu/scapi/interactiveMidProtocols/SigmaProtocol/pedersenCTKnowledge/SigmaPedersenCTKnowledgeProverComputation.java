@@ -47,7 +47,7 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaPedersenCTKnowledgeProver implements SigmaProverComputation, DlogBasedSigma{
+public class SigmaPedersenCTKnowledgeProverComputation implements SigmaProverComputation, DlogBasedSigma{
 	
 	/*	
 	  This class computes the following calculations:
@@ -69,7 +69,7 @@ public class SigmaPedersenCTKnowledgeProver implements SigmaProverComputation, D
 	 * @param random
 	 * @throws IllegalArgumentException if soundness parameter is invalid.
 	 */
-	public SigmaPedersenCTKnowledgeProver(DlogGroup dlog, int t, SecureRandom random) {
+	public SigmaPedersenCTKnowledgeProverComputation(DlogGroup dlog, int t, SecureRandom random) {
 		
 		//Sets the parameters.
 		this.dlog = dlog;

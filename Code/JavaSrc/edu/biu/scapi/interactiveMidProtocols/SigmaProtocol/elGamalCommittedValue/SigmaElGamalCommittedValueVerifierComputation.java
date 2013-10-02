@@ -30,7 +30,7 @@ import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.DlogBasedSigma;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaVerifierComputation;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHCommonInput;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHVerifier;
+import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHVerifierComputation;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
 import edu.biu.scapi.midLayer.ciphertext.ElGamalOnGroupElementCiphertext.ElGamalOnGrElSendableData;
@@ -45,7 +45,7 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaElGamalCommittedValueVerifier implements SigmaVerifierComputation, DlogBasedSigma{
+public class SigmaElGamalCommittedValueVerifierComputation implements SigmaVerifierComputation, DlogBasedSigma{
 
 	/*	
 	  This class uses an instance of SigmaDHVerifier with:
@@ -53,7 +53,7 @@ public class SigmaElGamalCommittedValueVerifier implements SigmaVerifierComputat
 		•	Common input: (g,h,u,v) = (g,h,c1,c2/x)
 	*/	
 	
-	private SigmaDHVerifier sigmaDH;	//underlying SigmaDHVerifier to use.
+	private SigmaDHVerifierComputation sigmaDH;	//underlying SigmaDHVerifier to use.
 	private DlogGroup dlog;				//We need the DlogGroup instance in order to calculate the input for the underlying SigmaDlogProver
 	
 	
@@ -64,10 +64,10 @@ public class SigmaElGamalCommittedValueVerifier implements SigmaVerifierComputat
 	 * @param random
 	 * @throws InvalidDlogGroupException if the given dlog is invalid.
 	 */
-	public SigmaElGamalCommittedValueVerifier(DlogGroup dlog, int t, SecureRandom random) throws InvalidDlogGroupException {
+	public SigmaElGamalCommittedValueVerifierComputation(DlogGroup dlog, int t, SecureRandom random) throws InvalidDlogGroupException {
 		
 		//Creates the underlying SigmaDHVerifier object with the given parameters.
-		sigmaDH = new SigmaDHVerifier(dlog, t, random);
+		sigmaDH = new SigmaDHVerifierComputation(dlog, t, random);
 		this.dlog = dlog;
 	}
 	

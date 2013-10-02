@@ -44,7 +44,7 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaPedersenCTKnowledgeVerifier implements SigmaVerifierComputation, DlogBasedSigma{
+public class SigmaPedersenCTKnowledgeVerifierComputation implements SigmaVerifierComputation, DlogBasedSigma{
 	
 	/*	
 	  This class computes the following calculations:
@@ -65,7 +65,7 @@ public class SigmaPedersenCTKnowledgeVerifier implements SigmaVerifierComputatio
 	 * @throws InvalidDlogGroupException if the given DlogGroup is not valid.
 	 * @throws IllegalArgumentException if soundness parameter is invalid.
 	 */
-	public SigmaPedersenCTKnowledgeVerifier(DlogGroup dlog, int t, SecureRandom random) throws InvalidDlogGroupException {
+	public SigmaPedersenCTKnowledgeVerifierComputation(DlogGroup dlog, int t, SecureRandom random) throws InvalidDlogGroupException {
 		
 		if(!dlog.validateGroup())
 			throw new InvalidDlogGroupException();

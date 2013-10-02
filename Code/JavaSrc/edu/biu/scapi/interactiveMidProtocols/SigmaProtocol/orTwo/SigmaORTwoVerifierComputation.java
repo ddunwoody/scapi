@@ -39,7 +39,7 @@ import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocol
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaORTwoVerifier implements SigmaVerifierComputation{
+public class SigmaORTwoVerifierComputation implements SigmaVerifierComputation{
 	
 	/*		
 	  Let (ai,ei,zi) denote the steps of a Sigma protocol SigmaI for proving that xi is in LRi (i=0,1)
@@ -60,7 +60,7 @@ public class SigmaORTwoVerifier implements SigmaVerifierComputation{
 	 * @throws IllegalArgumentException if the given t is not equal to both t values of the underlying verifiers.
 	 * @throws IllegalArgumentException if the given verifiers array does not contains two objects.
 	 */
-	public SigmaORTwoVerifier(SigmaVerifierComputation[] verifiers, int t, SecureRandom random) {
+	public SigmaORTwoVerifierComputation(SigmaVerifierComputation[] verifiers, int t, SecureRandom random) {
 		if (verifiers.length != 2){
 			throw new IllegalArgumentException("The given verifiers array must contains two objects.");
 		}
