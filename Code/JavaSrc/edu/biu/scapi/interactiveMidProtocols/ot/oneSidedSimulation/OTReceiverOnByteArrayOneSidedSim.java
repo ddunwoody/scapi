@@ -24,9 +24,9 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.ot.oneSidedSimulation;
 
+import java.math.BigInteger;
 import java.security.SecureRandom;
 
-import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
@@ -38,26 +38,29 @@ import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnByteArrayMessage;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
+import edu.biu.scapi.securityLevel.OneSidedSimulation;
 import edu.biu.scapi.tools.Factories.KdfFactory;
 
 /**
- * Concrete class for OT with ione sided simulation receiver ON BYTE ARRAY.
+ * Concrete implementation of the receiver side in oblivious transfer based on the DDH assumption that achieves 
+ * privacy for the case that the sender is corrupted and simulation in the case that the receiver 
+ * is corrupted.
+ * 
  * This class derived from OTReceiverDDHPrivacyAbs and implements the functionality 
  * related to the byte array inputs.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTReceiverOnByteArrayOneSidedSim extends OTReceiverDDHOneSidedSimAbs{
+public class OTReceiverOnByteArrayOneSidedSim extends OTReceiverDDHOneSidedSimAbs implements OneSidedSimulation{
 	
 	private KeyDerivationFunction kdf; //Used in the calculation.
-	private byte[] c0, c1;
 	
 	/**
-	 * Constructor that gets the channel and chooses default values of DlogGroup and SecureRandom.
+	 * Constructor that chooses default values of DlogGroup and SecureRandom.
 	 */
-	public OTReceiverOnByteArrayOneSidedSim(Channel channel){
-		super(channel);
+	public OTReceiverOnByteArrayOneSidedSim(){
+		super();
 		try {
 			this.kdf = KdfFactory.getInstance().getObject("HKDF(HMac(SHA-256))");
 		} catch (FactoriesException e) {
@@ -66,17 +69,16 @@ public class OTReceiverOnByteArrayOneSidedSim extends OTReceiverDDHOneSidedSimAb
 	}
 	
 	/**
-	 * Constructor that sets the given channel, dlogGroup, kdf and random.
-	 * @param channel
+	 * Constructor that sets the given dlogGroup, kdf and random.
 	 * @param dlog must be DDH secure.
 	 * @param kdf
 	 * @param random
 	 * @throws SecurityLevelException if the given DlogGroup is not DDH secure.
 	 * @throws InvalidDlogGroupException if the given dlog is invalid.
 	 */
-	public OTReceiverOnByteArrayOneSidedSim(Channel channel, DlogGroup dlog, KeyDerivationFunction kdf, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException{
+	public OTReceiverOnByteArrayOneSidedSim(DlogGroup dlog, KeyDerivationFunction kdf, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException{
 		
-		super(channel, dlog, random);
+		super(dlog, random);
 		this.kdf = kdf;
 	}
 	
@@ -86,24 +88,13 @@ public class OTReceiverOnByteArrayOneSidedSim extends OTReceiverDDHOneSidedSimAb
 	 *		1. w0, w1 in the DlogGroup, AND
 	 *		2. c0, c1 are binary strings of the same length
 	 *	   REPORT ERROR"
-	 * @param message received from the sender. must be OTSOnByteArrayPrivacyOnlyMessage.
+	 * @param w0
+	 * @param w1
+	 * @param c0
+	 * @param c1
 	 * @throws CheatAttemptException if there was a cheat attempt during the execution of the protocol.
 	 */
-	protected void checkReceivedTuple(OTSMessage message) throws CheatAttemptException{
-		//If message is not instance of OTSOnByteArrayPrivacyMessage, throw Exception.
-		if(!(message instanceof OTSOnByteArrayMessage)){
-			throw new IllegalArgumentException("message should be instance of OTSOnByteArrayPrivacyOnlyMessage");
-		}
-		
-		OTSOnByteArrayMessage msg = (OTSOnByteArrayMessage)message;
-		
-		//Reconstruct the group elements from the given message.
-		w0 = dlog.reconstructElement(true, msg.getW0());
-		w1 = dlog.reconstructElement(true, msg.getW1());
-		
-		//Get the byte arrays from the given message.
-		c0 = msg.getC0();
-		c1 = msg.getC1();
+	private void checkReceivedTuple(GroupElement w0, GroupElement w1, byte[] c0, byte[] c1) throws CheatAttemptException{
 		
 		if (!(dlog.isMember(w0))){
 			throw new CheatAttemptException("w0 element is not a member in the current DlogGroup");
@@ -119,12 +110,36 @@ public class OTReceiverOnByteArrayOneSidedSim extends OTReceiverDDHOneSidedSimAb
 
 	/**
 	 * Run the following lines from the protocol:
-	 * "COMPUTE kSigma = (wSigma)^beta
-	 *	OUTPUT  xSigma = cSigma XOR KDF(|cSigma|,kSigma)"
+	 * "IF  NOT 
+	 *			1. w0, w1 in the DlogGroup, AND
+	 *			2. c0, c1 are binary strings of the same length
+	 *		   REPORT ERROR
+	 * COMPUTE kSigma = (wSigma)^beta
+	 * OUTPUT  xSigma = cSigma XOR KDF(|cSigma|,kSigma)"
+	 * @param sigma input of the protocol
+	 * @param beta random value sampled in the protocol
+	 * @param message received from the sender
 	 * @return OTROutput contains xSigma
+	 * @throws CheatAttemptException 
 	 */
-	protected OTROutput computeFinalXSigma() {
+	protected OTROutput checkMessgeAndComputeX(byte sigma, BigInteger beta, OTSMessage message) throws CheatAttemptException {
+		//If message is not instance of OTSOnByteArrayMessage, throw Exception.
+		if(!(message instanceof OTSOnByteArrayMessage)){
+			throw new IllegalArgumentException("message should be instance of OTSOnByteArrayMessage");
+		}
 		
+		OTSOnByteArrayMessage msg = (OTSOnByteArrayMessage)message;
+		
+		//Reconstruct the group elements from the given message.
+		GroupElement w0 = dlog.reconstructElement(true, msg.getW0());
+		GroupElement w1 = dlog.reconstructElement(true, msg.getW1());
+		//Get the byte arrays from the given message.
+		byte[] c0 = msg.getC0();
+		byte[] c1 = msg.getC1();
+			
+		//Compute the validity checks of the given message.
+		checkReceivedTuple(w0, w1, c0, c1);
+				
 		GroupElement kSigma = null;
 		byte[] cSigma = null;
 		
@@ -134,7 +149,7 @@ public class OTReceiverOnByteArrayOneSidedSim extends OTReceiverDDHOneSidedSimAb
 			cSigma = c0;
 		} 
 		
-		//If sigma = 0, compute w1^beta and set cSigma to c1.
+		//If sigma = 1, compute w1^beta and set cSigma to c1.
 		if (sigma == 1) {
 			kSigma = dlog.exponentiate(w1, beta);
 			cSigma = c1;
