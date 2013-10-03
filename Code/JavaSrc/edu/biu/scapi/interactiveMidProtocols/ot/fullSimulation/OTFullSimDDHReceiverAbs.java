@@ -41,7 +41,7 @@ import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHProverCompu
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHProverInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTRBasicInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTRInput;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTRMsg;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTRGroupElementPairMsg;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTROutput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTReceiver;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
@@ -56,7 +56,7 @@ import edu.biu.scapi.tools.Factories.DlogGroupFactory;
  * This implementation can also be used as batch OT that achieves full simulation. In batch oblivious transfer, 
  * the parties run an initialization phase and then can carry out concrete OTs later whenever they have new inputs and wish to carry out an OT. <p>
  * 
- * OT with one sided simulation have two modes: one is on ByteArray and the second is on GroupElement.
+ * OT with one sided simulation has two modes: one is on ByteArray and the second is on GroupElement.
  * The different is in the input and output types and the way to process them. 
  * In spite that, there is a common behavior for both modes which this class is implementing.
  * 
@@ -216,7 +216,7 @@ abstract class OTFullSimDDHReceiverAbs implements OTReceiver{
 		alpha1 = alpha0.add(BigInteger.ONE);
 		
 		//Calculate tuple elements
-		OTFullSimDDHReceiverMessage tuple = computeFirstTuple();
+		OTFullSimDDHReceiverMsg tuple = computeFirstTuple();
 				
 		//Send tuple to sender.
 		sendTupleToSender(channel, tuple);
@@ -282,7 +282,7 @@ abstract class OTFullSimDDHReceiverAbs implements OTReceiver{
 		BigInteger r = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
 		
 		//Compute tuple (g,h) for sender.
-		OTRMsg a = computeSecondTuple(sigma, r);
+		OTRGroupElementPairMsg a = computeSecondTuple(sigma, r);
 		
 		//Send tuple to sender.
 		sendTupleToSender(channel, a);
@@ -314,14 +314,14 @@ abstract class OTFullSimDDHReceiverAbs implements OTReceiver{
 			3.	h1 = (g1)^(alpha1)".
 	 * These values are necessary to the message tuple.
 	 */
-	private OTFullSimDDHReceiverMessage computeFirstTuple() {
+	private OTFullSimDDHReceiverMsg computeFirstTuple() {
 		GroupElement g0 = dlog.getGenerator();
 		
 		g1 = dlog.exponentiate(g0, y);
 		h0 = dlog.exponentiate(g0, alpha0);
 		h1 = dlog.exponentiate(g1, alpha1);
 		
-		return new OTFullSimDDHReceiverMessage(g1.generateSendableData(), h0.generateSendableData(), h1.generateSendableData());
+		return new OTFullSimDDHReceiverMsg(g1.generateSendableData(), h0.generateSendableData(), h1.generateSendableData());
 	}
 	
 	/**
@@ -333,7 +333,7 @@ abstract class OTFullSimDDHReceiverAbs implements OTReceiver{
 	 * @param r random value sampled in the protocol
 	 * @return OTRFullSimMessage contains the tuple (g,h).
 	 */
-	private OTRMsg computeSecondTuple(byte sigma, BigInteger r) {
+	private OTRGroupElementPairMsg computeSecondTuple(byte sigma, BigInteger r) {
 		GroupElement g, h;
 		
 		if (sigma == 0){
@@ -345,7 +345,7 @@ abstract class OTFullSimDDHReceiverAbs implements OTReceiver{
 			h = dlog.exponentiate(h1, r);
 		}
 		
-		return new OTRMsg(g.generateSendableData(), h.generateSendableData());
+		return new OTRGroupElementPairMsg(g.generateSendableData(), h.generateSendableData());
 	}
 	
 	/**

@@ -35,7 +35,7 @@ import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-class OTFullSimDDHReceiverMessage implements Serializable{
+class OTFullSimDDHReceiverMsg implements Serializable{
 	
 	
 	private static final long serialVersionUID = 694486245423097492L;
@@ -45,7 +45,7 @@ class OTFullSimDDHReceiverMessage implements Serializable{
 	private GroupElementSendableData h1;
 	private GroupElementSendableData g1;
 	
-	public OTFullSimDDHReceiverMessage(GroupElementSendableData g1, GroupElementSendableData h0, 
+	public OTFullSimDDHReceiverMsg(GroupElementSendableData g1, GroupElementSendableData h0, 
 			GroupElementSendableData h1){
 		this.h0 = h0;
 		this.h1 = h1;

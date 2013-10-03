@@ -37,7 +37,7 @@ import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.generals.ScapiDefaultConfiguration;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHVerifierComputation;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTRMsg;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTRGroupElementPairMsg;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSender;
@@ -196,7 +196,7 @@ abstract class OTFullSimDDHSenderAbs implements OTSender{
 	private void preProcess(Channel channel) throws ClassNotFoundException, IOException, CheatAttemptException, CommitValueException{
 		
 		//Wait for message from R
-		OTFullSimDDHReceiverMessage message = waitForFullSimMessageFromReceiver(channel);
+		OTFullSimDDHReceiverMsg message = waitForFullSimMessageFromReceiver(channel);
 		
 		g1 = dlog.reconstructElement(true, message.getG1());
 		h0 = dlog.reconstructElement(true, message.getH0());
@@ -234,7 +234,7 @@ abstract class OTFullSimDDHSenderAbs implements OTSender{
 	public void transfer(Channel channel, OTSInput input) throws IOException, ClassNotFoundException{
 		
 		//Wait for message from R
-		OTRMsg message = waitForMessageFromReceiver(channel);
+		OTRGroupElementPairMsg message = waitForMessageFromReceiver(channel);
 				
 		GroupElement g = dlog.reconstructElement(true, message.getFirstGE());
 		GroupElement h = dlog.reconstructElement(true, message.getSecondGE());
@@ -265,17 +265,17 @@ abstract class OTFullSimDDHSenderAbs implements OTSender{
 	 * @throws ClassNotFoundException 
 	 * @throws IOException if failed to receive a message.
 	 */
-	private OTFullSimDDHReceiverMessage waitForFullSimMessageFromReceiver(Channel channel) throws ClassNotFoundException, IOException{
+	private OTFullSimDDHReceiverMsg waitForFullSimMessageFromReceiver(Channel channel) throws ClassNotFoundException, IOException{
 		Serializable message = null;
 		try {
 			message = channel.receive();
 		} catch (IOException e) {
 			throw new IOException("Failed to receive message. The thrown message is: " + e.getMessage());
 		}
-		if (!(message instanceof OTFullSimDDHReceiverMessage)){
+		if (!(message instanceof OTFullSimDDHReceiverMsg)){
 			throw new IllegalArgumentException("The received message should be an instance of OTRFullSimMessage");
 		}
-		return (OTFullSimDDHReceiverMessage) message;
+		return (OTFullSimDDHReceiverMsg) message;
 	}
 	
 	/**
@@ -286,17 +286,17 @@ abstract class OTFullSimDDHSenderAbs implements OTSender{
 	 * @throws ClassNotFoundException 
 	 * @throws IOException if failed to receive a message.
 	 */
-	private OTRMsg waitForMessageFromReceiver(Channel channel) throws ClassNotFoundException, IOException{
+	private OTRGroupElementPairMsg waitForMessageFromReceiver(Channel channel) throws ClassNotFoundException, IOException{
 		Serializable message = null;
 		try {
 			message = channel.receive();
 		} catch (IOException e) {
 			throw new IOException("Failed to receive message. The thrown message is: " + e.getMessage());
 		}
-		if (!(message instanceof OTRMsg)){
+		if (!(message instanceof OTRGroupElementPairMsg)){
 			throw new IllegalArgumentException("The received message should be an instance of OTRMessage");
 		}
-		return (OTRMsg) message;
+		return (OTRGroupElementPairMsg) message;
 	}
 	
 	/**
