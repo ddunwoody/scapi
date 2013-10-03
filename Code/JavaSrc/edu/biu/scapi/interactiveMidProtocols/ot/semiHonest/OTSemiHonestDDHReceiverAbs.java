@@ -36,7 +36,7 @@ import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.generals.ScapiDefaultConfiguration;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTRBasicInput;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTRMsg;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTRGroupElementPairMsg;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTRInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTROutput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTReceiver;
@@ -168,7 +168,7 @@ abstract class OTSemiHonestDDHReceiverAbs implements OTReceiver{
 		BigInteger alpha = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
 		
 		//Compute h0, h1
-		OTRMsg tuple = computeTuple(alpha, sigma);
+		OTRGroupElementPairMsg tuple = computeTuple(alpha, sigma);
 		
 		//Send the tuple to sender
 		sendTupleToSender(channel, tuple);
@@ -190,7 +190,7 @@ abstract class OTSemiHonestDDHReceiverAbs implements OTReceiver{
 	 * @param sigma input for the protocol
 	 * @return OTRSemiHonestMessage contains the tuple (h0, h1).
 	 */
-	private OTRMsg computeTuple(BigInteger alpha, byte sigma) {
+	private OTRGroupElementPairMsg computeTuple(BigInteger alpha, byte sigma) {
 		
 		//Sample random h.
 		GroupElement h = dlog.createRandomElement();
@@ -209,7 +209,7 @@ abstract class OTSemiHonestDDHReceiverAbs implements OTReceiver{
 			h0 = h;
 			h1 = gAlpha;
 		}
-		return new OTRMsg(h0.generateSendableData(), h1.generateSendableData());
+		return new OTRGroupElementPairMsg(h0.generateSendableData(), h1.generateSendableData());
 	}
 	
 	/**
@@ -219,7 +219,7 @@ abstract class OTSemiHonestDDHReceiverAbs implements OTReceiver{
 	 * @param tuple contains (h0,h1)
 	 * @throws IOException if failed to send the message.
 	 */
-	private void sendTupleToSender(Channel channel, OTRMsg tuple) throws IOException {
+	private void sendTupleToSender(Channel channel, OTRGroupElementPairMsg tuple) throws IOException {
 		try {
 			channel.send(tuple);
 		} catch (IOException e) {
