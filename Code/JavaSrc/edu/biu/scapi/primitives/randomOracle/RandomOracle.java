@@ -37,6 +37,12 @@ package edu.biu.scapi.primitives.randomOracle;
 public interface RandomOracle {
 
 	/**
+	 * 
+	 * @return the name of this Random Oracle algorithm.
+	 */
+	public String getAlgorithmName();
+	
+	/**
 	 * Computes the random oracle function on the given input.
 	 * @param input input to compute the random oracle function on.
 	 * @param inOffset offset within the input to take the bytes from.

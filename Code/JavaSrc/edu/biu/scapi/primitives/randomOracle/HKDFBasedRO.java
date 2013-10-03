@@ -84,4 +84,10 @@ public class HKDFBasedRO implements RandomOracle{
 		SecretKey key = hkdf.deriveKey(input, inOffset, inLen, outLen, "RandomOracle".getBytes());
 		return key.getEncoded();
 	}
+	
+	@Override
+	public String getAlgorithmName() {
+		
+		return "HKDFBasedRO";
+	}
 }

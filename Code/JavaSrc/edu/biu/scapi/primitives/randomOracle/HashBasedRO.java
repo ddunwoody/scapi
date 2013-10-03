@@ -94,4 +94,11 @@ public class HashBasedRO implements RandomOracle{
 		return output;
 	}
 
+
+	@Override
+	public String getAlgorithmName() {
+		
+		return "HashBasedRO";
+	}
+
 }
