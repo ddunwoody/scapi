@@ -29,9 +29,9 @@ import java.security.SecureRandom;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSInput;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnGroupElementInput;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnGroupElementMessage;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnGroupElementMsg;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.securityLevel.PrivacyOnly;
@@ -44,12 +44,12 @@ import edu.biu.scapi.securityLevel.PrivacyOnly;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTSenderOnGroupElementPrivacyOnly extends OTSenderDDHPrivacyOnlyAbs implements PrivacyOnly{
+public class OTPrivacyOnlyDDHOnGroupElementSender extends OTPrivacyOnlyDDHSenderAbs implements PrivacyOnly{
 	
 	/**
 	 * Constructor that chooses default values of DlogGroup and SecureRandom.
 	 */
-	public OTSenderOnGroupElementPrivacyOnly() {
+	public OTPrivacyOnlyDDHOnGroupElementSender() {
 		super();
 	}
 	
@@ -60,7 +60,7 @@ public class OTSenderOnGroupElementPrivacyOnly extends OTSenderDDHPrivacyOnlyAbs
 	 * @throws SecurityLevelException if the given DlogGroup is not DDH secure.
 	 * @throws InvalidDlogGroupException if the given dlog is invalid.
 	 */
-	public OTSenderOnGroupElementPrivacyOnly(DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException{
+	public OTPrivacyOnlyDDHOnGroupElementSender(DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException{
 		super(dlog, random);
 	}
 	
@@ -76,7 +76,7 @@ public class OTSenderOnGroupElementPrivacyOnly extends OTSenderDDHPrivacyOnlyAbs
 	 * @param w0 
 	 * @return tuple contains (u, v0, v1) to send to the receiver.
 	 */
-	protected OTSMessage computeTuple(OTSInput input, GroupElement w0, GroupElement w1, GroupElement k0, GroupElement k1) {
+	protected OTSMsg computeTuple(OTSInput input, GroupElement w0, GroupElement w1, GroupElement k0, GroupElement k1) {
 		//If input is not instance of OTSOnGroupElementInput, throw Exception.
 		if (!(input instanceof OTSOnGroupElementInput)){
 			throw new IllegalArgumentException("x0 and x1 should be DlogGroup elements.");
@@ -94,7 +94,7 @@ public class OTSenderOnGroupElementPrivacyOnly extends OTSenderDDHPrivacyOnlyAbs
 		GroupElement c1 = dlog.multiplyGroupElements(x1, k1);
 		
 		//Create and return sender message.
-		return new OTSOnGroupElementMessage(w0.generateSendableData(), 
+		return new OTSOnGroupElementMsg(w0.generateSendableData(), 
 				c0.generateSendableData(), w1.generateSendableData(), c1.generateSendableData());
 	}
 }

@@ -40,9 +40,9 @@ import edu.biu.scapi.generals.ScapiDefaultConfiguration;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTRBasicInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTRInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTROutput;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTRGrElQuadMessage;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTRGroupElementQuadMsg;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTReceiver;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.securityLevel.DDH;
@@ -57,7 +57,7 @@ import edu.biu.scapi.tools.Factories.DlogGroupFactory;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-abstract class OTReceiverDDHPrivacyOnlyAbs implements OTReceiver{
+abstract class OTPrivacyOnlyDDHReceiverAbs implements OTReceiver{
 
 	/*	
 	 	This class runs the following protocol:
@@ -92,7 +92,7 @@ abstract class OTReceiverDDHPrivacyOnlyAbs implements OTReceiver{
 	/**
 	 * Constructor that chooses default values of DlogGroup and SecureRandom.
 	 */
-	OTReceiverDDHPrivacyOnlyAbs() {
+	OTPrivacyOnlyDDHReceiverAbs() {
 		//Read the default DlogGroup name from a configuration file.
 		String dlogName = ScapiDefaultConfiguration.getInstance().getProperty("DDHDlogGroup");
 		DlogGroup dlog = null;
@@ -120,7 +120,7 @@ abstract class OTReceiverDDHPrivacyOnlyAbs implements OTReceiver{
 	 * @throws SecurityLevelException if the given dlog is not DDH secure
 	 * @throws InvalidDlogGroupException if the given DlogGroup is not valid.
 	 */
-	OTReceiverDDHPrivacyOnlyAbs(DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException{
+	OTPrivacyOnlyDDHReceiverAbs(DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException{
 		
 		doConstruct(dlog, random);
 	}
@@ -210,13 +210,13 @@ abstract class OTReceiverDDHPrivacyOnlyAbs implements OTReceiver{
 		BigInteger beta = sampleRandomBeta();
 		
 		//Compute tuple for sender.
-		OTRGrElQuadMessage a = computeTuple(sigma, beta);
+		OTRGroupElementQuadMsg a = computeTuple(sigma, beta);
 		
 		//Send tuple to sender.
 		sendTupleToSender(channel, a);
 		
 		//Wait for message from sender.
-		OTSMessage message = waitForMessageFromSender(channel);
+		OTSMsg message = waitForMessageFromSender(channel);
 		
 		//Compute the final calculations to get xSigma.
 		return checkMessgeAndComputeX(sigma, beta, message);
@@ -241,7 +241,7 @@ abstract class OTReceiverDDHPrivacyOnlyAbs implements OTReceiver{
 	 * @param beta random value sampled by the protocol
 	 * @return OTRSemiHonestMessage contains the tuple (h0, h1).
 	 */
-	private OTRGrElQuadMessage computeTuple(byte sigma, BigInteger beta) {
+	private OTRGroupElementQuadMsg computeTuple(byte sigma, BigInteger beta) {
 
 		//Sample random values.
 		BigInteger alpha = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
@@ -256,13 +256,13 @@ abstract class OTReceiverDDHPrivacyOnlyAbs implements OTReceiver{
 		GroupElement gAlphaBeta = dlog.exponentiate(g, alpha.multiply(beta));
 		
 		if (sigma == 0){
-			return new OTRGrElQuadMessage(gAlpha.generateSendableData(), 
+			return new OTRGroupElementQuadMsg(gAlpha.generateSendableData(), 
 										 gBeta.generateSendableData(), 
 										 gAlphaBeta.generateSendableData(), 
 										 gGamma.generateSendableData());
 		}
 		else {
-			return new OTRGrElQuadMessage(gAlpha.generateSendableData(), 
+			return new OTRGroupElementQuadMsg(gAlpha.generateSendableData(), 
 										 gBeta.generateSendableData(), 
 										 gGamma.generateSendableData(), 
 										 gAlphaBeta.generateSendableData());
@@ -276,7 +276,7 @@ abstract class OTReceiverDDHPrivacyOnlyAbs implements OTReceiver{
 	 * @param a the tuple to send to the sender.
 	 * @throws IOException 
 	 */
-	private void sendTupleToSender(Channel channel, OTRGrElQuadMessage a) throws IOException {
+	private void sendTupleToSender(Channel channel, OTRGroupElementQuadMsg a) throws IOException {
 		try {
 			channel.send(a);
 		} catch (IOException e) {
@@ -293,17 +293,17 @@ abstract class OTReceiverDDHPrivacyOnlyAbs implements OTReceiver{
 	 * @throws IOException if failed to receive.
 	 * @throws ClassNotFoundException
 	 */
-	private OTSMessage waitForMessageFromSender(Channel channel) throws IOException, ClassNotFoundException {
+	private OTSMsg waitForMessageFromSender(Channel channel) throws IOException, ClassNotFoundException {
 		Serializable message = null;
 		try {
 			message =  channel.receive();
 		} catch (IOException e) {
 			throw new IOException("failed to receive message. The thrown message is: " + e.getMessage());
 		}
-		if (!(message instanceof OTSMessage)){
+		if (!(message instanceof OTSMsg)){
 			throw new IllegalArgumentException("the given message should be an instance of OTSMessage");
 		}
-		return (OTSMessage) message;
+		return (OTSMsg) message;
 	}
 	
 	/**
@@ -329,5 +329,5 @@ abstract class OTReceiverDDHPrivacyOnlyAbs implements OTReceiver{
 	 * @return OTROutput contains xSigma
 	 * @throws CheatAttemptException 
 	 */
-	protected abstract OTROutput checkMessgeAndComputeX(byte sigma, BigInteger beta, OTSMessage message) throws CheatAttemptException;
+	protected abstract OTROutput checkMessgeAndComputeX(byte sigma, BigInteger beta, OTSMsg message) throws CheatAttemptException;
 }

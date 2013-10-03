@@ -30,9 +30,9 @@ import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSInput;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnByteArrayInput;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnByteArrayMessage;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnByteArrayMsg;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
@@ -47,14 +47,14 @@ import edu.biu.scapi.tools.Factories.KdfFactory;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTSenderOnByteArrayPrivacyOnly extends OTSenderDDHPrivacyOnlyAbs implements PrivacyOnly{
+public class OTPrivacyOnlyDDHOnByteArraySender extends OTPrivacyOnlyDDHSenderAbs implements PrivacyOnly{
 
 	private KeyDerivationFunction kdf; //Used in the calculation.
 	
 	/**
 	 * Constructor that chooses default values of DlogGroup and SecureRandom.
 	 */
-	public OTSenderOnByteArrayPrivacyOnly(){
+	public OTPrivacyOnlyDDHOnByteArraySender(){
 		super();
 		try {
 			this.kdf = KdfFactory.getInstance().getObject("HKDF(HMac(SHA-256))");
@@ -71,7 +71,7 @@ public class OTSenderOnByteArrayPrivacyOnly extends OTSenderDDHPrivacyOnlyAbs im
 	 * @throws SecurityLevelException if the given DlogGroup is not DDH secure.
 	 * @throws InvalidDlogGroupException if the given dlog is invalid.
 	 */
-	public OTSenderOnByteArrayPrivacyOnly(DlogGroup dlog, KeyDerivationFunction kdf, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException {
+	public OTPrivacyOnlyDDHOnByteArraySender(DlogGroup dlog, KeyDerivationFunction kdf, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException {
 		super(dlog, random);
 		this.kdf = kdf;
 	}
@@ -88,7 +88,7 @@ public class OTSenderOnByteArrayPrivacyOnly extends OTSenderDDHPrivacyOnlyAbs im
 	 * @param w0  
 	 * @return tuple contains (u, v0, v1) to send to the receiver.
 	 */
-	protected OTSMessage computeTuple(OTSInput input, GroupElement w0, GroupElement w1, GroupElement k0, GroupElement k1) {
+	protected OTSMsg computeTuple(OTSInput input, GroupElement w0, GroupElement w1, GroupElement k0, GroupElement k1) {
 		//If input is not instance of OTSOnByteArrayInput, throw Exception.
 		if (!(input instanceof OTSOnByteArrayInput)){
 			throw new IllegalArgumentException("x0 and x1 should be binary strings.");
@@ -123,6 +123,6 @@ public class OTSenderOnByteArrayPrivacyOnly extends OTSenderDDHPrivacyOnlyAbs im
 		}
 		
 		//Create and return sender message.
-		return new OTSOnByteArrayMessage(w0.generateSendableData(), c0, w1.generateSendableData(), c1);
+		return new OTSOnByteArrayMsg(w0.generateSendableData(), c0, w1.generateSendableData(), c1);
 	}
 }

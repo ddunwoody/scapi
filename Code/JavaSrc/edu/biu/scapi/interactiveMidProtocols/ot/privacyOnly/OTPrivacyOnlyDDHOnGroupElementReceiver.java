@@ -32,8 +32,8 @@ import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTROnGroupElementOutput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTROutput;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnGroupElementMessage;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnGroupElementMsg;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.securityLevel.PrivacyOnly;
@@ -46,12 +46,12 @@ import edu.biu.scapi.securityLevel.PrivacyOnly;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTReceiverOnGroupElementPrivacyOnly extends OTReceiverDDHPrivacyOnlyAbs implements PrivacyOnly{
+public class OTPrivacyOnlyDDHOnGroupElementReceiver extends OTPrivacyOnlyDDHReceiverAbs implements PrivacyOnly{
 
 	/**
 	 * Constructor that chooses default values of DlogGroup and SecureRandom.
 	 */
-	public OTReceiverOnGroupElementPrivacyOnly(){
+	public OTPrivacyOnlyDDHOnGroupElementReceiver(){
 		super();
 	}
 	
@@ -62,7 +62,7 @@ public class OTReceiverOnGroupElementPrivacyOnly extends OTReceiverDDHPrivacyOnl
 	 * @throws SecurityLevelException if the given DlogGroup is not DDH secure.
 	 * @throws InvalidDlogGroupException if the given dlog is invalid.
 	 */
-	public OTReceiverOnGroupElementPrivacyOnly(DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException{
+	public OTPrivacyOnlyDDHOnGroupElementReceiver(DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException{
 		
 		super(dlog, random);
 	}
@@ -106,13 +106,13 @@ public class OTReceiverOnGroupElementPrivacyOnly extends OTReceiverDDHPrivacyOnl
 	 * @return OTROutput contains xSigma
 	 * @throws CheatAttemptException 
 	 */
-	protected OTROutput checkMessgeAndComputeX(byte sigma, BigInteger beta, OTSMessage message) throws CheatAttemptException {
+	protected OTROutput checkMessgeAndComputeX(byte sigma, BigInteger beta, OTSMsg message) throws CheatAttemptException {
 		//If message is not instance of OTSOnGroupElementMessage, throw Exception.
-		if(!(message instanceof OTSOnGroupElementMessage)){
+		if(!(message instanceof OTSOnGroupElementMsg)){
 			throw new IllegalArgumentException("message should be instance of OTSOnGroupElementMessage");
 		}
 		
-		OTSOnGroupElementMessage msg = (OTSOnGroupElementMessage)message;
+		OTSOnGroupElementMsg msg = (OTSOnGroupElementMsg)message;
 		
 		//Reconstruct the group elements from the given message.
 		GroupElement w0 = dlog.reconstructElement(true, msg.getW0());
