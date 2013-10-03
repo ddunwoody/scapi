@@ -35,14 +35,14 @@ import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTRMsg implements Serializable{
+public class OTRGroupElementPairMsg implements Serializable{
 
 	private static final long serialVersionUID = 8620542140745898146L;
 	
 	private GroupElementSendableData h0;
 	private GroupElementSendableData h1;
 	
-	public OTRMsg(GroupElementSendableData h0, GroupElementSendableData h1){
+	public OTRGroupElementPairMsg(GroupElementSendableData h0, GroupElementSendableData h1){
 		this.h0 = h0;
 		this.h1 = h1;
 	}
