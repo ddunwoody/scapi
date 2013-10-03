@@ -29,7 +29,7 @@ import java.security.SecureRandom;
 import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSInput;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnByteArrayInput;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
@@ -45,13 +45,13 @@ import edu.biu.scapi.tools.Factories.KdfFactory;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTSenderOnByteArraySemiHonest extends OTSenderDDHSemiHonestAbs implements SemiHonest{
+public class OTSemiHonestDDHOnByteArraySender extends OTSemiHonestDDHSenderAbs implements SemiHonest{
 	private KeyDerivationFunction kdf; //Used in the calculation.
 	
 	/**
 	 * Constructor that chooses default values of DlogGroup and SecureRandom.
 	 */
-	public OTSenderOnByteArraySemiHonest(){
+	public OTSemiHonestDDHOnByteArraySender(){
 		super();
 		try {
 			this.kdf = KdfFactory.getInstance().getObject("HKDF(HMac(SHA-256))");
@@ -67,7 +67,7 @@ public class OTSenderOnByteArraySemiHonest extends OTSenderDDHSemiHonestAbs impl
 	 * @param random
 	 * @throws SecurityLevelException if the given DlogGroup is not DDH secure.
 	 */
-	public OTSenderOnByteArraySemiHonest(DlogGroup dlog, KeyDerivationFunction kdf, SecureRandom random) throws SecurityLevelException{
+	public OTSemiHonestDDHOnByteArraySender(DlogGroup dlog, KeyDerivationFunction kdf, SecureRandom random) throws SecurityLevelException{
 		super(dlog, random);
 		this.kdf = kdf;
 	}
@@ -83,7 +83,7 @@ public class OTSenderOnByteArraySemiHonest extends OTSenderDDHSemiHonestAbs impl
 	 * @param u 
 	 * @return tuple contains (u, v0, v1) to send to the receiver.
 	 */
-	protected OTSMessage computeTuple(OTSInput input, GroupElement u, GroupElement k0, GroupElement k1) {
+	protected OTSMsg computeTuple(OTSInput input, GroupElement u, GroupElement k0, GroupElement k1) {
 		//If input is not instance of OTSOnByteArrayInput, throw Exception.
 		if (!(input instanceof OTSOnByteArrayInput)){
 			throw new IllegalArgumentException("x0 and x1 should be binary strings.");
@@ -118,7 +118,7 @@ public class OTSenderOnByteArraySemiHonest extends OTSenderDDHSemiHonestAbs impl
 		}
 		
 		//Create and return sender message.
-		return new OTSOnByteArraySemiHonestMessage(u.generateSendableData(), v0, v1);
+		return new OTSemiHonestDDHOnByteArraySenderMsg(u.generateSendableData(), v0, v1);
 	}
 
 }

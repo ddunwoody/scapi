@@ -24,7 +24,7 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.ot.semiHonest;
 
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
 import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
 
 /**
@@ -34,14 +34,14 @@ import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-class OTSOnGroupElementSemiHonestMessage implements OTSMessage{
+class OTSemiHonestDDHOnGroupElementSenderMsg implements OTSMsg{
 	
 	private static final long serialVersionUID = -5540829944975370558L;
 	private GroupElementSendableData u;
 	private GroupElementSendableData v0;
 	private GroupElementSendableData v1;
 	
-	public OTSOnGroupElementSemiHonestMessage(GroupElementSendableData u, GroupElementSendableData v0, GroupElementSendableData v1){
+	public OTSemiHonestDDHOnGroupElementSenderMsg(GroupElementSendableData u, GroupElementSendableData v0, GroupElementSendableData v1){
 		this.u = u;
 		this.v0 = v0;
 		this.v1 = v1;

@@ -28,7 +28,7 @@ import java.security.SecureRandom;
 
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSInput;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnGroupElementInput;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
@@ -42,12 +42,12 @@ import edu.biu.scapi.securityLevel.SemiHonest;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTSenderOnGroupElementSemiHonest extends OTSenderDDHSemiHonestAbs implements SemiHonest{
+public class OTSemiHonestDDHOnGroupElementSender extends OTSemiHonestDDHSenderAbs implements SemiHonest{
 	
 	/**
 	 * Constructor that chooses default values of DlogGroup and SecureRandom.
 	 */
-	public OTSenderOnGroupElementSemiHonest(){
+	public OTSemiHonestDDHOnGroupElementSender(){
 		super();
 	}
 	
@@ -57,7 +57,7 @@ public class OTSenderOnGroupElementSemiHonest extends OTSenderDDHSemiHonestAbs i
 	 * @param random
 	 * @throws SecurityLevelException if the given DlogGroup is not DDH secure.
 	 */
-	public OTSenderOnGroupElementSemiHonest(DlogGroup dlog, SecureRandom random) throws SecurityLevelException{
+	public OTSemiHonestDDHOnGroupElementSender(DlogGroup dlog, SecureRandom random) throws SecurityLevelException{
 		super(dlog, random);
 	}
 	
@@ -72,7 +72,7 @@ public class OTSenderOnGroupElementSemiHonest extends OTSenderDDHSemiHonestAbs i
 	 * @param u 
 	 * @return tuple contains (u, v0, v1) to send to the receiver.
 	 */
-	protected OTSMessage computeTuple(OTSInput input, GroupElement u, GroupElement k0, GroupElement k1) {
+	protected OTSMsg computeTuple(OTSInput input, GroupElement u, GroupElement k0, GroupElement k1) {
 		//If input is not instance of OTSOnGroupElementInput, throw Exception.
 		if (!(input instanceof OTSOnGroupElementInput)){
 			throw new IllegalArgumentException("x0 and x1 should be DlogGroup elements.");
@@ -89,6 +89,6 @@ public class OTSenderOnGroupElementSemiHonest extends OTSenderDDHSemiHonestAbs i
 		GroupElement v1 = dlog.multiplyGroupElements(x1, k1);
 		
 		//Create and return sender message.
-		return new OTSOnGroupElementSemiHonestMessage(u.generateSendableData(), v0.generateSendableData(), v1.generateSendableData());
+		return new OTSemiHonestDDHOnGroupElementSenderMsg(u.generateSendableData(), v0.generateSendableData(), v1.generateSendableData());
 	}
 }

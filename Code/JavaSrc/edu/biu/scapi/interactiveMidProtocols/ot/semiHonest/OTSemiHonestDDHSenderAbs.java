@@ -35,9 +35,9 @@ import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.generals.ScapiDefaultConfiguration;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTRMessage;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTRMsg;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSInput;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSender;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
@@ -53,7 +53,7 @@ import edu.biu.scapi.tools.Factories.DlogGroupFactory;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-abstract class OTSenderDDHSemiHonestAbs implements OTSender{
+abstract class OTSemiHonestDDHSenderAbs implements OTSender{
 
 	/*	
 	  This class runs the following protocol:
@@ -78,7 +78,7 @@ abstract class OTSenderDDHSemiHonestAbs implements OTSender{
 	/**
 	 * Constructor that chooses default values of DlogGroup and SecureRandom.
 	 */
-	OTSenderDDHSemiHonestAbs() {
+	OTSemiHonestDDHSenderAbs() {
 		//Read the default DlogGroup name from a configuration file.
 		String dlogName = ScapiDefaultConfiguration.getInstance().getProperty("DDHDlogGroup");
 		DlogGroup dlog = null;
@@ -103,7 +103,7 @@ abstract class OTSenderDDHSemiHonestAbs implements OTSender{
 	 * @param random
 	 * @throws SecurityLevelException if the given dlog is not DDH secure
 	 */
-	OTSenderDDHSemiHonestAbs(DlogGroup dlog, SecureRandom random) throws SecurityLevelException{
+	OTSemiHonestDDHSenderAbs(DlogGroup dlog, SecureRandom random) throws SecurityLevelException{
 
 		doConstruct(dlog, random);
 	}
@@ -156,7 +156,7 @@ abstract class OTSenderDDHSemiHonestAbs implements OTSender{
 	public void transfer(Channel channel, OTSInput input) throws IOException, NullPointerException, ClassNotFoundException{
 		
 		//WAIT for message (h0,h1) from R
-		OTRMessage message = waitForMessageFromReceiver(channel);
+		OTRMsg message = waitForMessageFromReceiver(channel);
 		
 		//SAMPLE a random value r in  [0, . . . , q-1] 
 		BigInteger r = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
@@ -166,7 +166,7 @@ abstract class OTSenderDDHSemiHonestAbs implements OTSender{
 		GroupElement k0 = computeK0(r, message);
 		GroupElement k1 = computeK1(r, message);
 		
-		OTSMessage messageToSend = computeTuple(input, u, k0, k1);
+		OTSMsg messageToSend = computeTuple(input, u, k0, k1);
 		sendTupleToReceiver(channel, messageToSend);
 	}
 
@@ -178,17 +178,17 @@ abstract class OTSenderDDHSemiHonestAbs implements OTSender{
 	 * @throws ClassNotFoundException 
 	 * @throws IOException if failed to receive a message.
 	 */
-	private OTRMessage waitForMessageFromReceiver(Channel channel) throws ClassNotFoundException, IOException{
+	private OTRMsg waitForMessageFromReceiver(Channel channel) throws ClassNotFoundException, IOException{
 		Serializable message = null;
 		try {
 			message = channel.receive();
 		} catch (IOException e) {
 			throw new IOException("Failed to receive message. The thrown message is: " + e.getMessage());
 		}
-		if (!(message instanceof OTRMessage)){
+		if (!(message instanceof OTRMsg)){
 			throw new IllegalArgumentException("The received message should be an instance of OTRMessage");
 		}
-		return (OTRMessage) message;
+		return (OTRMsg) message;
 	}
 
 	/**
@@ -211,7 +211,7 @@ abstract class OTSenderDDHSemiHonestAbs implements OTSender{
 	 * @param message contains h0
 	 * @return the computed k0
 	 */
-	private GroupElement computeK0(BigInteger r, OTRMessage message) {
+	private GroupElement computeK0(BigInteger r, OTRMsg message) {
 
 		//Recreate h0 from the data in the received message.
 		GroupElement h0 = dlog.reconstructElement(true, message.getFirstGE());
@@ -227,7 +227,7 @@ abstract class OTSenderDDHSemiHonestAbs implements OTSender{
 	 * @param message contains h1
 	 * @return the computed k1
 	 */
-	private GroupElement computeK1(BigInteger r, OTRMessage message) {
+	private GroupElement computeK1(BigInteger r, OTRMsg message) {
 		
 		//Recreate h0, h1 from the data in the received message.
 		GroupElement h1 = dlog.reconstructElement(true, message.getSecondGE());
@@ -250,7 +250,7 @@ abstract class OTSenderDDHSemiHonestAbs implements OTSender{
 	 * @param u 
 	 * @return tuple contains (u, v0, v1) to send to the receiver.
 	 */
-	protected abstract OTSMessage computeTuple(OTSInput input, GroupElement u, GroupElement k0, GroupElement k1);
+	protected abstract OTSMsg computeTuple(OTSInput input, GroupElement u, GroupElement k0, GroupElement k1);
 
 	/**
 	 * Runs the following lines from the protocol:
@@ -259,7 +259,7 @@ abstract class OTSenderDDHSemiHonestAbs implements OTSender{
 	 * @param message to send to the receiver
 	 * @throws IOException if failed to send the message.
 	 */
-	private void sendTupleToReceiver(Channel channel, OTSMessage message) throws IOException {
+	private void sendTupleToReceiver(Channel channel, OTSMsg message) throws IOException {
 
 		try {
 			//Send the message by the channel.

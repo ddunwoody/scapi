@@ -31,7 +31,7 @@ import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTROnByteArrayOutput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTROutput;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
@@ -46,13 +46,13 @@ import edu.biu.scapi.tools.Factories.KdfFactory;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTReceiverOnByteArraySemiHonest extends OTReceiverDDHSemiHonestAbs implements SemiHonest{
+public class OTSemiHonestDDHOnByteArrayReceiver extends OTSemiHonestDDHReceiverAbs implements SemiHonest{
 	private KeyDerivationFunction kdf; //Used in the calculation.
 	
 	/**
 	 * Constructor that chooses default values of DlogGroup and SecureRandom.
 	 */
-	public OTReceiverOnByteArraySemiHonest(){
+	public OTSemiHonestDDHOnByteArrayReceiver(){
 		super();
 		try {
 			this.kdf = KdfFactory.getInstance().getObject("HKDF(HMac(SHA-256))");
@@ -68,7 +68,7 @@ public class OTReceiverOnByteArraySemiHonest extends OTReceiverDDHSemiHonestAbs 
 	 * @param random
 	 * @throws SecurityLevelException if the given DlogGroup is not DDH secure.
 	 */
-	public OTReceiverOnByteArraySemiHonest(DlogGroup dlog, KeyDerivationFunction kdf, SecureRandom random) throws SecurityLevelException{
+	public OTSemiHonestDDHOnByteArrayReceiver(DlogGroup dlog, KeyDerivationFunction kdf, SecureRandom random) throws SecurityLevelException{
 		
 		super(dlog, random);
 		this.kdf = kdf;
@@ -83,13 +83,13 @@ public class OTReceiverOnByteArraySemiHonest extends OTReceiverDDHSemiHonestAbs 
 	 * @param message received from the sender. must be OTSOnByteArraySemiHonestMessage.
 	 * @return OTROutput contains xSigma
 	 */
-	protected OTROutput computeFinalXSigma(byte sigma, BigInteger alpha, OTSMessage message) {
+	protected OTROutput computeFinalXSigma(byte sigma, BigInteger alpha, OTSMsg message) {
 		//If message is not instance of OTSOnByteArraySemiHonestMessage, throw Exception.
-		if(!(message instanceof OTSOnByteArraySemiHonestMessage)){
+		if(!(message instanceof OTSemiHonestDDHOnByteArraySenderMsg)){
 			throw new IllegalArgumentException("message should be instance of OTSOnByteArraySemiHonestMessage");
 		}
 		
-		OTSOnByteArraySemiHonestMessage msg = (OTSOnByteArraySemiHonestMessage)message;
+		OTSemiHonestDDHOnByteArraySenderMsg msg = (OTSemiHonestDDHOnByteArraySenderMsg)message;
 		
 		//Compute kSigma:
 		GroupElement u = dlog.reconstructElement(true, msg.getU());

@@ -30,7 +30,7 @@ import java.security.SecureRandom;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTROnGroupElementOutput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTROutput;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.securityLevel.SemiHonest;
@@ -43,12 +43,12 @@ import edu.biu.scapi.securityLevel.SemiHonest;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTReceiverOnGroupElementSemiHonest extends OTReceiverDDHSemiHonestAbs implements SemiHonest{
+public class OTSemiHonestDDHOnGroupElementReceiver extends OTSemiHonestDDHReceiverAbs implements SemiHonest{
 	
 	/**
 	 * Constructor that chooses default values of DlogGroup and SecureRandom.
 	 */
-	public OTReceiverOnGroupElementSemiHonest(){
+	public OTSemiHonestDDHOnGroupElementReceiver(){
 		super();
 	}
 	
@@ -58,7 +58,7 @@ public class OTReceiverOnGroupElementSemiHonest extends OTReceiverDDHSemiHonestA
 	 * @param random
 	 * @throws SecurityLevelException if the given DlogGroup is not DDH secure.
 	 */
-	public OTReceiverOnGroupElementSemiHonest(DlogGroup dlog, SecureRandom random) throws SecurityLevelException{
+	public OTSemiHonestDDHOnGroupElementReceiver(DlogGroup dlog, SecureRandom random) throws SecurityLevelException{
 		
 		super(dlog, random);
 	}
@@ -72,13 +72,13 @@ public class OTReceiverOnGroupElementSemiHonest extends OTReceiverDDHSemiHonestA
 	 * @param message received from the sender. must be OTSOnGroupElementSemiHonestMessage
 	 * @return OTROutput contains xSigma
 	 */
-	protected OTROutput computeFinalXSigma(byte sigma, BigInteger alpha, OTSMessage message) {
+	protected OTROutput computeFinalXSigma(byte sigma, BigInteger alpha, OTSMsg message) {
 		//If message is not instance of OTSOnGroupElementSemiHonestMessage, throw Exception.
-		if(!(message instanceof OTSOnGroupElementSemiHonestMessage)){
+		if(!(message instanceof OTSemiHonestDDHOnGroupElementSenderMsg)){
 			throw new IllegalArgumentException("message should be instance of OTSOnGroupElementSemiHonestMessage");
 		}
 		
-		OTSOnGroupElementSemiHonestMessage msg = (OTSOnGroupElementSemiHonestMessage)message;
+		OTSemiHonestDDHOnGroupElementSenderMsg msg = (OTSemiHonestDDHOnGroupElementSenderMsg)message;
 		
 		//Compute (kSigma)^(-1) = u^(-alpha):
 		GroupElement u = dlog.reconstructElement(true, msg.getU());	//Get u

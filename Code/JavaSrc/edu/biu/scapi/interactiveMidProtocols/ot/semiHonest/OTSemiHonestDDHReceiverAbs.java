@@ -36,11 +36,11 @@ import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.generals.ScapiDefaultConfiguration;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTRBasicInput;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTRMessage;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTRMsg;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTRInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTROutput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTReceiver;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.securityLevel.DDH;
@@ -55,7 +55,7 @@ import edu.biu.scapi.tools.Factories.DlogGroupFactory;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-abstract class OTReceiverDDHSemiHonestAbs implements OTReceiver{
+abstract class OTSemiHonestDDHReceiverAbs implements OTReceiver{
 	/*	
 	 	This class runs the following protocol:
 		 	SAMPLE random values alpha in Zq and h in the DlogGroup 
@@ -77,7 +77,7 @@ abstract class OTReceiverDDHSemiHonestAbs implements OTReceiver{
 	/**
 	 * Constructor that chooses default values of DlogGroup and SecureRandom.
 	 */
-	OTReceiverDDHSemiHonestAbs(){
+	OTSemiHonestDDHReceiverAbs(){
 		//Read the default DlogGroup name from a configuration file.
 		String dlogName = ScapiDefaultConfiguration.getInstance().getProperty("DDHDlogGroup");
 		DlogGroup dlog = null;
@@ -102,7 +102,7 @@ abstract class OTReceiverDDHSemiHonestAbs implements OTReceiver{
 	 * @param random
 	 * @throws SecurityLevelException if the given dlog is not DDH secure.
 	 */
-	OTReceiverDDHSemiHonestAbs(DlogGroup dlog, SecureRandom random) throws SecurityLevelException{
+	OTSemiHonestDDHReceiverAbs(DlogGroup dlog, SecureRandom random) throws SecurityLevelException{
 		
 		doConstruct(dlog, random);
 	}
@@ -168,13 +168,13 @@ abstract class OTReceiverDDHSemiHonestAbs implements OTReceiver{
 		BigInteger alpha = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
 		
 		//Compute h0, h1
-		OTRMessage tuple = computeTuple(alpha, sigma);
+		OTRMsg tuple = computeTuple(alpha, sigma);
 		
 		//Send the tuple to sender
 		sendTupleToSender(channel, tuple);
 		
 		//Wait for message from sender
-		OTSMessage message = waitForMessageFromSender(channel);
+		OTSMsg message = waitForMessageFromSender(channel);
 		
 		//Compute xSigma
 		return computeFinalXSigma(sigma, alpha, message);
@@ -190,7 +190,7 @@ abstract class OTReceiverDDHSemiHonestAbs implements OTReceiver{
 	 * @param sigma input for the protocol
 	 * @return OTRSemiHonestMessage contains the tuple (h0, h1).
 	 */
-	private OTRMessage computeTuple(BigInteger alpha, byte sigma) {
+	private OTRMsg computeTuple(BigInteger alpha, byte sigma) {
 		
 		//Sample random h.
 		GroupElement h = dlog.createRandomElement();
@@ -209,7 +209,7 @@ abstract class OTReceiverDDHSemiHonestAbs implements OTReceiver{
 			h0 = h;
 			h1 = gAlpha;
 		}
-		return new OTRMessage(h0.generateSendableData(), h1.generateSendableData());
+		return new OTRMsg(h0.generateSendableData(), h1.generateSendableData());
 	}
 	
 	/**
@@ -219,7 +219,7 @@ abstract class OTReceiverDDHSemiHonestAbs implements OTReceiver{
 	 * @param tuple contains (h0,h1)
 	 * @throws IOException if failed to send the message.
 	 */
-	private void sendTupleToSender(Channel channel, OTRMessage tuple) throws IOException {
+	private void sendTupleToSender(Channel channel, OTRMsg tuple) throws IOException {
 		try {
 			channel.send(tuple);
 		} catch (IOException e) {
@@ -236,17 +236,17 @@ abstract class OTReceiverDDHSemiHonestAbs implements OTReceiver{
 	 * @throws ClassNotFoundException
 	 * @throws IOException if failed to receive a message.
 	 */
-	private OTSMessage waitForMessageFromSender(Channel channel) throws ClassNotFoundException, IOException {
+	private OTSMsg waitForMessageFromSender(Channel channel) throws ClassNotFoundException, IOException {
 		Serializable message;
 		try {
 			message = channel.receive();
 		} catch (IOException e) {
 			throw new IOException("failed to receive message. The thrown message is: " + e.getMessage());
 		}
-		if (!(message instanceof OTSMessage)){
+		if (!(message instanceof OTSMsg)){
 			throw new IllegalArgumentException("the given message should be an instance of OTSMessage");
 		}
-		return (OTSMessage) message;
+		return (OTSMsg) message;
 	}
 	
 	/**
@@ -260,5 +260,5 @@ abstract class OTReceiverDDHSemiHonestAbs implements OTReceiver{
 	 * @param message received from the sender
 	 * @return OTROutput contains XSigma
 	 */
-	protected abstract OTROutput computeFinalXSigma(byte sigma, BigInteger alpha, OTSMessage message);
+	protected abstract OTROutput computeFinalXSigma(byte sigma, BigInteger alpha, OTSMsg message);
 }
