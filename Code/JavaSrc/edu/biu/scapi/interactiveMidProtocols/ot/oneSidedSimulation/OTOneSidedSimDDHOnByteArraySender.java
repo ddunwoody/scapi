@@ -32,9 +32,9 @@ import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSInput;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnByteArrayInput;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnByteArrayMessage;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnByteArrayMsg;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
@@ -52,7 +52,7 @@ import edu.biu.scapi.tools.Factories.KdfFactory;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTSenderOnByteArrayOneSidedSim extends OTSenderDDHOneSidedSimAbs implements OneSidedSimulation{
+public class OTOneSidedSimDDHOnByteArraySender extends OTOneSidedSimDDHSenderAbs implements OneSidedSimulation{
 
 	private KeyDerivationFunction kdf; //Used in the calculation.
 	
@@ -62,7 +62,7 @@ public class OTSenderOnByteArrayOneSidedSim extends OTSenderDDHOneSidedSimAbs im
 	 * @throws ClassNotFoundException 
 	 * @throws IOException if failed to receive a message during pre process.
 	 */
-	public OTSenderOnByteArrayOneSidedSim() throws IOException, ClassNotFoundException, CheatAttemptException {
+	public OTOneSidedSimDDHOnByteArraySender() throws IOException, ClassNotFoundException, CheatAttemptException {
 		super();
 		try {
 			this.kdf = KdfFactory.getInstance().getObject("HKDF(HMac(SHA-256))");
@@ -82,7 +82,7 @@ public class OTSenderOnByteArrayOneSidedSim extends OTSenderDDHOneSidedSimAbs im
 	 * @throws ClassNotFoundException 
 	 * @throws IOException if failed to receive a message during pre process.
 	 */
-	public OTSenderOnByteArrayOneSidedSim(DlogGroup dlog, KeyDerivationFunction kdf, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException, IOException, ClassNotFoundException, CheatAttemptException{
+	public OTOneSidedSimDDHOnByteArraySender(DlogGroup dlog, KeyDerivationFunction kdf, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException, IOException, ClassNotFoundException, CheatAttemptException{
 		super(dlog, random);
 		this.kdf = kdf;
 	}
@@ -99,7 +99,7 @@ public class OTSenderOnByteArrayOneSidedSim extends OTSenderDDHOneSidedSimAbs im
 	 * @param k1
 	 * @return tuple contains (u, v0, v1) to send to the receiver.
 	 */
-	protected OTSMessage computeTuple(OTSInput input, GroupElement w0, GroupElement w1, GroupElement k0, GroupElement k1) {
+	protected OTSMsg computeTuple(OTSInput input, GroupElement w0, GroupElement w1, GroupElement k0, GroupElement k1) {
 		//If input is not instance of OTSOnByteArrayInput, throw Exception.
 		if (!(input instanceof OTSOnByteArrayInput)){
 			throw new IllegalArgumentException("x0 and x1 should be binary strings.");
@@ -135,6 +135,6 @@ public class OTSenderOnByteArrayOneSidedSim extends OTSenderDDHOneSidedSimAbs im
 		}
 		
 		//Create and return sender message.
-		return new OTSOnByteArrayMessage(w0.generateSendableData(), c0, w1.generateSendableData(), c1);
+		return new OTSOnByteArrayMsg(w0.generateSendableData(), c0, w1.generateSendableData(), c1);
 	}
 }

@@ -39,9 +39,9 @@ import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.generals.ScapiDefaultConfiguration;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog.SigmaDlogCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog.SigmaDlogVerifierComputation;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTRGrElQuadMessage;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTRGroupElementQuadMsg;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSInput;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSender;
 import edu.biu.scapi.interactiveMidProtocols.zeroKnowledge.ZKPOKFromSigmaCommitPedersenVerifier;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
@@ -62,7 +62,7 @@ import edu.biu.scapi.tools.Factories.DlogGroupFactory;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-abstract class OTSenderDDHOneSidedSimAbs implements OTSender{
+abstract class OTOneSidedSimDDHSenderAbs implements OTSender{
 	/*	
 	  This class runs the following protocol:
 			IF NOT VALID_PARAMS(G,q,g)
@@ -96,7 +96,7 @@ abstract class OTSenderDDHOneSidedSimAbs implements OTSender{
 	/**
 	 * Constructor that chooses default values of DlogGroup and SecureRandom.
 	 */
-	OTSenderDDHOneSidedSimAbs(){
+	OTOneSidedSimDDHSenderAbs(){
 		//Read the default DlogGroup name from a configuration file.
 		String dlogName = ScapiDefaultConfiguration.getInstance().getProperty("DDHDlogGroup");
 		DlogGroup dlog = null;
@@ -124,7 +124,7 @@ abstract class OTSenderDDHOneSidedSimAbs implements OTSender{
 	 * @throws SecurityLevelException if the given dlog is not DDH secure
 	 * @throws InvalidDlogGroupException if the given DlogGroup is not valid.
 	 */
-	OTSenderDDHOneSidedSimAbs(DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException{
+	OTOneSidedSimDDHSenderAbs(DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException{
 		
 		doConstruct(dlog, random);
 	}
@@ -197,7 +197,7 @@ abstract class OTSenderDDHOneSidedSimAbs implements OTSender{
 		 */
 
 		//Wait for message a from R
-		OTRGrElQuadMessage message = waitForMessageFromReceiver(channel);
+		OTRGroupElementQuadMsg message = waitForMessageFromReceiver(channel);
 		
 		//Reconstruct the group elements from the given message.
 		GroupElement x = dlog.reconstructElement(true, message.getX());
@@ -231,7 +231,7 @@ abstract class OTSenderDDHOneSidedSimAbs implements OTSender{
 		GroupElement k1 = dlog.multiplyGroupElements(dlog.exponentiate(z1, u1), dlog.exponentiate(y, v1));
 		
 		//Compute c0, c1		
-		OTSMessage messageToSend = computeTuple(input, w0, w1, k0, k1);
+		OTSMsg messageToSend = computeTuple(input, w0, w1, k0, k1);
 		
 		sendTupleToReceiver(channel, messageToSend);
 		
@@ -245,17 +245,17 @@ abstract class OTSenderDDHOneSidedSimAbs implements OTSender{
 	 * @throws IOException if failed to receive a message.
 	 * @throws ClassNotFoundException 
 	 */
-	private OTRGrElQuadMessage waitForMessageFromReceiver(Channel channel) throws IOException, ClassNotFoundException{
+	private OTRGroupElementQuadMsg waitForMessageFromReceiver(Channel channel) throws IOException, ClassNotFoundException{
 		Serializable message = null;
 		try {
 			message = channel.receive();
 		} catch (IOException e) {
 			throw new IOException("failed to receive message. The thrown message is: " + e.getMessage());
 		}
-		if (!(message instanceof OTRGrElQuadMessage)){
+		if (!(message instanceof OTRGroupElementQuadMsg)){
 			throw new IllegalArgumentException("the given message should be an instance of OTRPrivacyOnlyMessage");
 		}
-		return (OTRGrElQuadMessage) message;
+		return (OTRGroupElementQuadMsg) message;
 	}
 	
 	/**
@@ -335,7 +335,7 @@ abstract class OTSenderDDHOneSidedSimAbs implements OTSender{
 	 * @param input 
 	 * @return tuple contains (w0, c0, w1, c1) to send to the receiver.
 	 */
-	protected abstract OTSMessage computeTuple(OTSInput input, GroupElement w0, GroupElement w1, GroupElement k0, GroupElement k1);
+	protected abstract OTSMsg computeTuple(OTSInput input, GroupElement w0, GroupElement w1, GroupElement k0, GroupElement k1);
 		
 	/**
 	 * Runs the following lines from the protocol:
@@ -344,7 +344,7 @@ abstract class OTSenderDDHOneSidedSimAbs implements OTSender{
 	 * @param message to send to the receiver
 	 * @throws IOException if failed to send the message.
 	 */
-	private void sendTupleToReceiver(Channel channel, OTSMessage message) throws IOException {
+	private void sendTupleToReceiver(Channel channel, OTSMsg message) throws IOException {
 		
 		try {
 			//Send the message by the channel.
