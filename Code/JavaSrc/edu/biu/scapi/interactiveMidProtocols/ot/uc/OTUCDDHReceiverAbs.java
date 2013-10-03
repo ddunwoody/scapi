@@ -36,7 +36,7 @@ import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTRBasicInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTRInput;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTRMsg;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTRGroupElementPairMsg;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTROutput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTReceiver;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
@@ -155,7 +155,7 @@ abstract class OTUCDDHReceiverAbs implements OTReceiver, UC{
 		BigInteger r = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
 				
 		//Compute tuple for sender.
-		OTRMsg a = computeTuple(sigma, r);
+		OTRGroupElementPairMsg a = computeTuple(sigma, r);
 		
 		//Send tuple to sender.
 		sendTupleToSender(channel, a);
@@ -174,7 +174,7 @@ abstract class OTUCDDHReceiverAbs implements OTReceiver, UC{
 	 * @param sigma input for the protocol
 	 * @return OTRSemiHonestMessage contains the tuple (h0, h1).
 	 */
-	private OTRMsg computeTuple(byte sigma, BigInteger r) {
+	private OTRGroupElementPairMsg computeTuple(byte sigma, BigInteger r) {
 		GroupElement g = null;
 		GroupElement h = null;
 		if (sigma == 0){
@@ -185,7 +185,7 @@ abstract class OTUCDDHReceiverAbs implements OTReceiver, UC{
 			g = dlog.exponentiate(g1, r);
 			h = dlog.exponentiate(h1, r);
 		}
-		return new OTRMsg(g.generateSendableData(), h.generateSendableData());
+		return new OTRGroupElementPairMsg(g.generateSendableData(), h.generateSendableData());
 	}
 	
 	/**
@@ -195,7 +195,7 @@ abstract class OTUCDDHReceiverAbs implements OTReceiver, UC{
 	 * @param tuple to send to the sender
 	 * @throws IOException if failed to send the message.
 	 */
-	private void sendTupleToSender(Channel channel, OTRMsg tuple) throws IOException {
+	private void sendTupleToSender(Channel channel, OTRGroupElementPairMsg tuple) throws IOException {
 		try {
 			channel.send(tuple);
 		} catch (IOException e) {

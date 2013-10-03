@@ -30,7 +30,7 @@ import java.security.SecureRandom;
 
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.SecurityLevelException;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTRMsg;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTRGroupElementPairMsg;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSender;
@@ -121,7 +121,7 @@ abstract class OTUCDDHSenderAbs implements OTSender, UC{
 	 */
 	public void transfer(Channel channel, OTSInput input) throws IOException, NullPointerException, ClassNotFoundException{
 		//Wait for message (g,h) from R
-		OTRMsg message = waitForMessageFromReceiver(channel);
+		OTRGroupElementPairMsg message = waitForMessageFromReceiver(channel);
 		GroupElement g = dlog.reconstructElement(true, message.getFirstGE());
 		GroupElement h = dlog.reconstructElement(true, message.getSecondGE());
 		
@@ -149,17 +149,17 @@ abstract class OTUCDDHSenderAbs implements OTSender, UC{
 	 * @throws ClassNotFoundException 
 	 * @throws IOException if failed to receive a message.
 	 */
-	private OTRMsg waitForMessageFromReceiver(Channel channel) throws ClassNotFoundException, IOException{
+	private OTRGroupElementPairMsg waitForMessageFromReceiver(Channel channel) throws ClassNotFoundException, IOException{
 		Serializable message = null;
 		try {
 			message = channel.receive();
 		} catch (IOException e) {
 			throw new IOException("Failed to receive message. The thrown message is: " + e.getMessage());
 		}
-		if (!(message instanceof OTRMsg)){
+		if (!(message instanceof OTRGroupElementPairMsg)){
 			throw new IllegalArgumentException("The received message should be an instance of OTSMessage");
 		}
-		return (OTRMsg) message;
+		return (OTRGroupElementPairMsg) message;
 	}
 
 	/**
