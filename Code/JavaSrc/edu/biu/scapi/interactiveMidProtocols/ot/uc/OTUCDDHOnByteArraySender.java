@@ -28,9 +28,9 @@ import java.security.SecureRandom;
 
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSInput;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnByteArrayInput;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnByteArrayMessage;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnByteArrayMsg;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
@@ -46,7 +46,7 @@ import edu.biu.scapi.securityLevel.Malicious;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTSenderOnByteArrayUC extends OTSenderDDHUCAbs implements Malicious{
+public class OTUCDDHOnByteArraySender extends OTUCDDHSenderAbs implements Malicious{
 	
 	private KeyDerivationFunction kdf; //Used in the calculation.
 	
@@ -63,7 +63,7 @@ public class OTSenderOnByteArrayUC extends OTSenderDDHUCAbs implements Malicious
 	 * @param random
 	 * @throws SecurityLevelException if the given DlogGroup is not DDH secure. 
 	 */
-	public OTSenderOnByteArrayUC(DlogGroup dlog, GroupElement g0, GroupElement g1, 
+	public OTUCDDHOnByteArraySender(DlogGroup dlog, GroupElement g0, GroupElement g1, 
 			GroupElement h0, GroupElement h1, KeyDerivationFunction kdf, SecureRandom random) throws SecurityLevelException{
 		super(dlog, g0, g1, h0, h1, random);
 		this.kdf = kdf;
@@ -81,7 +81,7 @@ public class OTSenderOnByteArrayUC extends OTSenderDDHUCAbs implements Malicious
 	 * @param u0 
 	 * @return tuple contains (u0,c0) and (u1,c1) to send to the receiver.
 	 */
-	protected OTSMessage computeTuple(OTSInput input, GroupElement u0, GroupElement u1, GroupElement v0, GroupElement v1) {
+	protected OTSMsg computeTuple(OTSInput input, GroupElement u0, GroupElement u1, GroupElement v0, GroupElement v1) {
 		//If input is not instance of OTSOnByteArrayInput, throw Exception.
 		if (!(input instanceof OTSOnByteArrayInput)){
 			throw new IllegalArgumentException("x0 and x1 should be binary strings.");
@@ -117,7 +117,7 @@ public class OTSenderOnByteArrayUC extends OTSenderDDHUCAbs implements Malicious
 		}
 		
 		//Create and return sender message.
-		return new OTSOnByteArrayMessage(u0.generateSendableData(), c0, u1.generateSendableData(), c1);
+		return new OTSOnByteArrayMsg(u0.generateSendableData(), c0, u1.generateSendableData(), c1);
 	}
 	
 

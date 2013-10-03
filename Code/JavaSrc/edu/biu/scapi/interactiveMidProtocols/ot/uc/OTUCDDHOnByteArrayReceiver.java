@@ -31,8 +31,8 @@ import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTROnByteArrayOutput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTROutput;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnByteArrayMessage;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnByteArrayMsg;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
@@ -48,7 +48,7 @@ import edu.biu.scapi.securityLevel.Malicious;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTReceiverOnByteArrayUC extends OTReceiverDDHUCAbs implements Malicious{
+public class OTUCDDHOnByteArrayReceiver extends OTUCDDHReceiverAbs implements Malicious{
 
 	private KeyDerivationFunction kdf; //Used in the calculation.
 	
@@ -65,7 +65,7 @@ public class OTReceiverOnByteArrayUC extends OTReceiverDDHUCAbs implements Malic
 	 * @param random
 	 * @throws SecurityLevelException if the given DlogGroup is not DDH secure.
 	 */
-	public OTReceiverOnByteArrayUC(DlogGroup dlog, GroupElement g0, GroupElement g1, 
+	public OTUCDDHOnByteArrayReceiver(DlogGroup dlog, GroupElement g0, GroupElement g1, 
 			GroupElement h0, GroupElement h1, KeyDerivationFunction kdf, SecureRandom random) throws SecurityLevelException{
 		super(dlog, g0, g1, h0, h1, random);
 		this.kdf = kdf;
@@ -106,13 +106,13 @@ public class OTReceiverOnByteArrayUC extends OTReceiverDDHUCAbs implements Malic
 	 * @return OTROutput contains xSigma
 	 * @throws CheatAttemptException 
 	 */
-	protected OTROutput checkMessgeAndComputeX(byte sigma, BigInteger r, OTSMessage message) throws CheatAttemptException {
+	protected OTROutput checkMessgeAndComputeX(byte sigma, BigInteger r, OTSMsg message) throws CheatAttemptException {
 		//If message is not instance of OTSOnByteArrayPrivacyMessage, throw Exception.
-		if(!(message instanceof OTSOnByteArrayMessage)){
+		if(!(message instanceof OTSOnByteArrayMsg)){
 			throw new IllegalArgumentException("message should be instance of OTSOnByteArrayPrivacyOnlyMessage");
 		}
 		
-		OTSOnByteArrayMessage msg = (OTSOnByteArrayMessage)message;
+		OTSOnByteArrayMsg msg = (OTSOnByteArrayMsg)message;
 		
 		//Reconstruct the group elements from the given message.
 		GroupElement u0 = dlog.reconstructElement(true, msg.getW0());

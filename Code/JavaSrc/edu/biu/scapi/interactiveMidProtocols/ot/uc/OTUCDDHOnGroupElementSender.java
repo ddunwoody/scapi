@@ -28,9 +28,9 @@ import java.security.SecureRandom;
 
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSInput;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnGroupElementInput;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnGroupElementMessage;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnGroupElementMsg;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.securityLevel.Malicious;
@@ -46,7 +46,7 @@ import edu.biu.scapi.securityLevel.Malicious;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTSenderOnGroupElementUC extends OTSenderDDHUCAbs implements Malicious{
+public class OTUCDDHOnGroupElementSender extends OTUCDDHSenderAbs implements Malicious{
 	
 	/**
 	 * Constructor that sets the given common reference string composed of a DLOG 
@@ -61,7 +61,7 @@ public class OTSenderOnGroupElementUC extends OTSenderDDHUCAbs implements Malici
 	 * @param random
 	 * @throws SecurityLevelException if the given DlogGroup is not DDH secure.
 	 */
-	public OTSenderOnGroupElementUC(DlogGroup dlog, GroupElement g0, 
+	public OTUCDDHOnGroupElementSender(DlogGroup dlog, GroupElement g0, 
 			GroupElement g1, GroupElement h0, GroupElement h1, SecureRandom random) throws SecurityLevelException{
 		super(dlog, g0, g1, h0, h1, random);
 	}
@@ -78,7 +78,7 @@ public class OTSenderOnGroupElementUC extends OTSenderDDHUCAbs implements Malici
 	 * @param u0 
 	 * @return tuple contains (u0,c0) and (u1,c1) to send to the receiver.
 	 */
-	protected OTSMessage computeTuple(OTSInput input, GroupElement u0, GroupElement u1, GroupElement v0, GroupElement v1) {
+	protected OTSMsg computeTuple(OTSInput input, GroupElement u0, GroupElement u1, GroupElement v0, GroupElement v1) {
 		//If input is not instance of OTSOnGroupElementInput, throw Exception.
 		if (!(input instanceof OTSOnGroupElementInput)){
 			throw new IllegalArgumentException("x0 and x1 should be DlogGroup elements.");
@@ -96,7 +96,7 @@ public class OTSenderOnGroupElementUC extends OTSenderDDHUCAbs implements Malici
 		GroupElement c1 = dlog.multiplyGroupElements(x1, v1);
 		
 		//Create and return sender message.
-		return new OTSOnGroupElementMessage(u0.generateSendableData(), c0.generateSendableData(), 
+		return new OTSOnGroupElementMsg(u0.generateSendableData(), c0.generateSendableData(), 
 				u1.generateSendableData(), c1.generateSendableData());
 	}
 

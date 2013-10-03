@@ -30,9 +30,9 @@ import java.security.SecureRandom;
 
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.SecurityLevelException;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTRMessage;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTRMsg;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSInput;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSender;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTUtil;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTUtil.RandOutput;
@@ -51,7 +51,7 @@ import edu.biu.scapi.securityLevel.UC;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-abstract class OTSenderDDHUCAbs implements OTSender, UC{
+abstract class OTUCDDHSenderAbs implements OTSender, UC{
 
 	/*	
 	  This class runs the following protocol:
@@ -79,7 +79,7 @@ abstract class OTSenderDDHUCAbs implements OTSender, UC{
 	 * @param random
 	 * @throws SecurityLevelException if the given dlog is not DDH secure
 	 */
-	OTSenderDDHUCAbs(DlogGroup dlog, GroupElement g0, GroupElement g1, 
+	OTUCDDHSenderAbs(DlogGroup dlog, GroupElement g0, GroupElement g1, 
 			GroupElement h0, GroupElement h1, SecureRandom random) throws SecurityLevelException{
 		//The underlying dlog group must be DDH secure.
 		if (!(dlog instanceof DDH)){
@@ -121,7 +121,7 @@ abstract class OTSenderDDHUCAbs implements OTSender, UC{
 	 */
 	public void transfer(Channel channel, OTSInput input) throws IOException, NullPointerException, ClassNotFoundException{
 		//Wait for message (g,h) from R
-		OTRMessage message = waitForMessageFromReceiver(channel);
+		OTRMsg message = waitForMessageFromReceiver(channel);
 		GroupElement g = dlog.reconstructElement(true, message.getFirstGE());
 		GroupElement h = dlog.reconstructElement(true, message.getSecondGE());
 		
@@ -135,7 +135,7 @@ abstract class OTSenderDDHUCAbs implements OTSender, UC{
 		GroupElement v1 = tuple1.getV();
 		
 		//Compute c0, c1.
-		OTSMessage messageToSend = computeTuple(input, u0, u1, v0, v1);
+		OTSMsg messageToSend = computeTuple(input, u0, u1, v0, v1);
 		
 		sendTupleToReceiver(channel, messageToSend);
 	
@@ -149,17 +149,17 @@ abstract class OTSenderDDHUCAbs implements OTSender, UC{
 	 * @throws ClassNotFoundException 
 	 * @throws IOException if failed to receive a message.
 	 */
-	private OTRMessage waitForMessageFromReceiver(Channel channel) throws ClassNotFoundException, IOException{
+	private OTRMsg waitForMessageFromReceiver(Channel channel) throws ClassNotFoundException, IOException{
 		Serializable message = null;
 		try {
 			message = channel.receive();
 		} catch (IOException e) {
 			throw new IOException("Failed to receive message. The thrown message is: " + e.getMessage());
 		}
-		if (!(message instanceof OTRMessage)){
+		if (!(message instanceof OTRMsg)){
 			throw new IllegalArgumentException("The received message should be an instance of OTSMessage");
 		}
-		return (OTRMessage) message;
+		return (OTRMsg) message;
 	}
 
 	/**
@@ -177,7 +177,7 @@ abstract class OTSenderDDHUCAbs implements OTSender, UC{
 	 * @param input 
 	 * @return tuple contains (u, v0, v1) to send to the receiver.
 	 */
-	protected abstract OTSMessage computeTuple(OTSInput input, GroupElement u0, GroupElement u1, GroupElement v0, GroupElement v1);
+	protected abstract OTSMsg computeTuple(OTSInput input, GroupElement u0, GroupElement u1, GroupElement v0, GroupElement v1);
 
 	/**
 	 * Runs the following lines from the protocol:
@@ -186,7 +186,7 @@ abstract class OTSenderDDHUCAbs implements OTSender, UC{
 	 * @param message to send to the receiver
 	 * @throws IOException if failed to send the message.
 	 */
-	private void sendTupleToReceiver(Channel channel, OTSMessage message) throws IOException {
+	private void sendTupleToReceiver(Channel channel, OTSMsg message) throws IOException {
 
 		try {
 			//Send the message by the channel.

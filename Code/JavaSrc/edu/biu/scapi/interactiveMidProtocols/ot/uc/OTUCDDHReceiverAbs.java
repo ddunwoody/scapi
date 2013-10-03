@@ -36,10 +36,10 @@ import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTRBasicInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTRInput;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTRMessage;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTRMsg;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTROutput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTReceiver;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSMessage;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.securityLevel.DDH;
@@ -55,7 +55,7 @@ import edu.biu.scapi.securityLevel.UC;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-abstract class OTReceiverDDHUCAbs implements OTReceiver, UC{
+abstract class OTUCDDHReceiverAbs implements OTReceiver, UC{
 	/*	
  	This class runs the following protocol:
 	 	SAMPLE a random value r <- {0, . . . , q-1} 
@@ -91,7 +91,7 @@ abstract class OTReceiverDDHUCAbs implements OTReceiver, UC{
 	 * @param random
 	 * @throws SecurityLevelException if the given dlog is not DDH secure.
 	 */
-	OTReceiverDDHUCAbs(DlogGroup dlog, GroupElement g0, GroupElement g1, 
+	OTUCDDHReceiverAbs(DlogGroup dlog, GroupElement g0, GroupElement g1, 
 			GroupElement h0, GroupElement h1, SecureRandom random) throws SecurityLevelException{
 		//The underlying dlog group must be DDH secure.
 		if (!(dlog instanceof DDH)){
@@ -155,13 +155,13 @@ abstract class OTReceiverDDHUCAbs implements OTReceiver, UC{
 		BigInteger r = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
 				
 		//Compute tuple for sender.
-		OTRMessage a = computeTuple(sigma, r);
+		OTRMsg a = computeTuple(sigma, r);
 		
 		//Send tuple to sender.
 		sendTupleToSender(channel, a);
 		
 		//Wait for message from sender.
-		OTSMessage message = waitForMessageFromSender(channel);
+		OTSMsg message = waitForMessageFromSender(channel);
 		
 		//Compute the final calculations to get xSigma.
 		return checkMessgeAndComputeX(sigma, r, message);
@@ -174,7 +174,7 @@ abstract class OTReceiverDDHUCAbs implements OTReceiver, UC{
 	 * @param sigma input for the protocol
 	 * @return OTRSemiHonestMessage contains the tuple (h0, h1).
 	 */
-	private OTRMessage computeTuple(byte sigma, BigInteger r) {
+	private OTRMsg computeTuple(byte sigma, BigInteger r) {
 		GroupElement g = null;
 		GroupElement h = null;
 		if (sigma == 0){
@@ -185,7 +185,7 @@ abstract class OTReceiverDDHUCAbs implements OTReceiver, UC{
 			g = dlog.exponentiate(g1, r);
 			h = dlog.exponentiate(h1, r);
 		}
-		return new OTRMessage(g.generateSendableData(), h.generateSendableData());
+		return new OTRMsg(g.generateSendableData(), h.generateSendableData());
 	}
 	
 	/**
@@ -195,7 +195,7 @@ abstract class OTReceiverDDHUCAbs implements OTReceiver, UC{
 	 * @param tuple to send to the sender
 	 * @throws IOException if failed to send the message.
 	 */
-	private void sendTupleToSender(Channel channel, OTRMessage tuple) throws IOException {
+	private void sendTupleToSender(Channel channel, OTRMsg tuple) throws IOException {
 		try {
 			channel.send(tuple);
 		} catch (IOException e) {
@@ -212,17 +212,17 @@ abstract class OTReceiverDDHUCAbs implements OTReceiver, UC{
 	 * @throws ClassNotFoundException
 	 * @throws IOException if failed to receive a message.
 	 */
-	private OTSMessage waitForMessageFromSender(Channel channel) throws ClassNotFoundException, IOException {
+	private OTSMsg waitForMessageFromSender(Channel channel) throws ClassNotFoundException, IOException {
 		Serializable message;
 		try {
 			message = channel.receive();
 		} catch (IOException e) {
 			throw new IOException("failed to receive message. The thrown message is: " + e.getMessage());
 		}
-		if (!(message instanceof OTSMessage)){
+		if (!(message instanceof OTSMsg)){
 			throw new IllegalArgumentException("the given message should be an instance of OTSMessage");
 		}
-		return (OTSMessage) message;
+		return (OTSMsg) message;
 	}
 	
 	/**
@@ -246,6 +246,6 @@ abstract class OTReceiverDDHUCAbs implements OTReceiver, UC{
 	 * @return OTROutput contains xSigma
 	 * @throws CheatAttemptException 
 	 */
-	protected abstract OTROutput checkMessgeAndComputeX(byte sigma, BigInteger r, OTSMessage message) throws CheatAttemptException;
+	protected abstract OTROutput checkMessgeAndComputeX(byte sigma, BigInteger r, OTSMsg message) throws CheatAttemptException;
 
 }
