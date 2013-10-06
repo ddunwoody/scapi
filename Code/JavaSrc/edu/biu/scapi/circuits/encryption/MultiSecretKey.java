@@ -26,6 +26,8 @@
 
 package edu.biu.scapi.circuits.encryption;
 
+import java.io.Serializable;
+
 import javax.crypto.SecretKey;
 
 /**
@@ -41,8 +43,12 @@ import javax.crypto.SecretKey;
  * @author Steven Goldfeder
  * 
  */
-public class MultiSecretKey {
-  private SecretKey[] keys;
+public class MultiSecretKey implements Serializable{
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1543950325054479100L;
+private SecretKey[] keys;
 
   /**
    * A constructor that constructs a {@code MultiSecretKey} from any number of
