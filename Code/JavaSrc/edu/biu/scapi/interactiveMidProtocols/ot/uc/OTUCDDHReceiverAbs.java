@@ -141,7 +141,7 @@ abstract class OTUCDDHReceiverAbs implements OTReceiver, UC{
 		//check if the input is valid.
 		//If input is not instance of OTRBasicInput, throw Exception.
 		if (!(input instanceof OTRBasicInput)){
-			throw new IllegalArgumentException("input shoud contain sigma.");
+			throw new IllegalArgumentException("input should contain sigma.");
 		}
 		
 		byte sigma = ((OTRBasicInput) input).getSigma();
