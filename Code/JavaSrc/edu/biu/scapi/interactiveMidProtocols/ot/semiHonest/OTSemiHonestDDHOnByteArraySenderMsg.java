@@ -34,7 +34,7 @@ import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-class OTSemiHonestDDHOnByteArraySenderMsg implements OTSMsg{
+public class OTSemiHonestDDHOnByteArraySenderMsg implements OTSMsg{
 	
 	private static final long serialVersionUID = -8231788505353019414L;
 	private GroupElementSendableData u;
