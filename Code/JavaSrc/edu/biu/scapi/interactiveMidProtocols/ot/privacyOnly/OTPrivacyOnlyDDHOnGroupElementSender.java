@@ -38,7 +38,7 @@ import edu.biu.scapi.securityLevel.PrivacyOnly;
 
 /**
  * Concrete class for OT Privacy assuming DDH sender ON GroupElement.
- * This class derived from OTSenderDDHPrivacyAbs and implements the functionality 
+ * This class derived from OTPrivacyOnlyDDHSenderAbs and implements the functionality 
  * related to the GroupElement inputs.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
