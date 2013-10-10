@@ -40,7 +40,7 @@ import edu.biu.scapi.securityLevel.Malicious;
  * the common reference string model.
  * This is implementation in GroupElement mode.
  * 
- * This class derived from OTSenderDDHUCAbs and implements the functionality 
+ * This class derived from OTUCDDHSenderAbs and implements the functionality 
  * related to the byte array inputs.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)

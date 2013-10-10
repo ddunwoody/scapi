@@ -40,7 +40,7 @@ import edu.biu.scapi.securityLevel.Malicious;
  * Concrete class for OT sender based on the DDH assumption that achieves UC security in
  * the common reference string model.
  * This is implementation in BYTE ARRAY mode.
- * This class derived from OTSenderDDHUCAbs and implements the functionality 
+ * This class derived from OTUCDDHSenderAbs and implements the functionality 
  * related to the byte array inputs.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
