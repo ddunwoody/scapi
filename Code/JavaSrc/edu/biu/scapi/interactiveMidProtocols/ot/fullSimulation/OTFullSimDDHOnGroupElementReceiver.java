@@ -45,7 +45,7 @@ import edu.biu.scapi.securityLevel.Malicious;
  * This implementation can also be used as batch OT that achieves full simulation. In batch oblivious transfer, 
  * the parties run an initialization phase and then can carry out concrete OTs later whenever they have new inputs and wish to carry out an OT. <p>
  * 
- * This class derived from OTReceiverDDHFullSimAbs and implements the functionality 
+ * This class derived from OTFullSimDDHReceiverAbs and implements the functionality 
  * related to the GroupElement inputs.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
