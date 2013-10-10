@@ -39,7 +39,7 @@ import edu.biu.scapi.tools.Factories.KdfFactory;
 
 /**
  * Concrete class for Semi-Honest OT assuming DDH sender ON BYTE ARRAY.
- * This class derived from OTSenderDDHSemiHonestAbs and implements the functionality 
+ * This class derived from OTSemiHonestDDHSenderAbs and implements the functionality 
  * related to the byte array inputs.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)

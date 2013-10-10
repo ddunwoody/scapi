@@ -36,7 +36,7 @@ import edu.biu.scapi.securityLevel.SemiHonest;
 
 /**
  * Concrete class for Semi-Honest OT assuming DDH sender ON GROUP ELEMENT.
- * This class derived from OTSenderDDHSemiHonestAbs and implements the functionality 
+ * This class derived from OTSemiHonestDDHSenderAbs and implements the functionality 
  * related to the GroupElement inputs.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
