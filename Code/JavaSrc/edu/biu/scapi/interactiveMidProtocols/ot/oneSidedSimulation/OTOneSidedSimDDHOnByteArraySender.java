@@ -46,7 +46,7 @@ import edu.biu.scapi.tools.Factories.KdfFactory;
  * privacy for the case that the sender is corrupted and simulation in the case that the receiver 
  * is corrupted.
  * 
- * This class derived from OTSenderDDHOneSidedSimAbs and implements the functionality 
+ * This class derived from OTOneSidedSimDDHSenderAbs and implements the functionality 
  * related to the byte array inputs.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
