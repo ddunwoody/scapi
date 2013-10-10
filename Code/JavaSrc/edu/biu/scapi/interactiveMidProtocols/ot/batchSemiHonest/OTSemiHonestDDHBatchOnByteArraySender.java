@@ -83,7 +83,7 @@ public class OTSemiHonestDDHBatchOnByteArraySender extends OTSemiHonestDDHBatchS
 	 * @param k1Array
 	 * @param k0Array 
 	 * @param u 
-	 * @return tuple contains (ui, vi0, vi1) to send to the receiver.
+	 * @return tuple contains (u, vi0, vi1) to send to the receiver.
 	 */
 	protected OTSMsg computeMsg(OTSInput input, GroupElement u, ArrayList<GroupElement> k0Array, ArrayList<GroupElement> k1Array) {
 		//If input is not instance of OTSBatchOnByteArrayInput, throw Exception.
