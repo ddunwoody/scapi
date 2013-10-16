@@ -65,7 +65,7 @@ public final class UniversalHashFactory {
 	 */
 	public UniversalHash getObject(String algName, String provider) throws FactoriesException {
 		
-		return (UniversalHash) factoriesUtility.getObject(algName, provider);
+		return (UniversalHash) factoriesUtility.getObject(provider, algName);
 	}
 
 	/** 
