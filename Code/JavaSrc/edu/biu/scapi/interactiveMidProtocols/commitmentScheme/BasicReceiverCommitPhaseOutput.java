@@ -26,18 +26,29 @@ package edu.biu.scapi.interactiveMidProtocols.commitmentScheme;
 
 
 /**
+ * Concrete class of receiver's output from the commit phase. 
+ * In the basic case, the receiver outputs the id of the received commitment.
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
 public class BasicReceiverCommitPhaseOutput implements ReceiverCommitPhaseOutput {
 	
-	int commitmentId;
-	public BasicReceiverCommitPhaseOutput(int commitmentId) {
+	private static final long serialVersionUID = 4388527503559716095L;
+	long commitmentId;
+	
+	/**
+	 * Constructor tha sets the given commitment id.
+	 * @param commitmentId the id of the received commitment message.
+	 */
+	public BasicReceiverCommitPhaseOutput(long commitmentId) {
 		super();
 		this.commitmentId = commitmentId;
 	}
 
-	public int getCommitmentId() {
+	/**
+	 * Returns the id of the received commitment message.
+	 */
+	public long getCommitmentId() {
 		return commitmentId;
 	}
 	
