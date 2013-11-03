@@ -25,11 +25,12 @@
 package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.elGamal;
 
 import java.io.Serializable;
-import java.math.BigInteger;
 
+import edu.biu.scapi.interactiveMidProtocols.BigIntegerRandomValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCDecommitmentMessage;
 
 /**
+ * Concrete implementation of decommitment message used by ElGamal commitment scheme.
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
@@ -37,34 +38,33 @@ public class CTCElGamalDecommitmentMessage implements CTCDecommitmentMessage, Se
 
 	
 	private static final long serialVersionUID = 7030668841448148428L;
-	//GroupElementSendableData x;
-	Serializable x;
-	
-	BigInteger r; 
-	/* (non-Javadoc)
-	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCDecommitmentMessage#getX()
-	 */
-	@Override
-//	public GroupElementSendableData getX() {
-	public Serializable getX() {
-		return x;
-	}
+	//This message is common to ElGamal on GroupElement and on byte[].
+	//In order to enable this, x value can hold every serializable object.
+	Serializable x; 
+	BigIntegerRandomValue r; //Random value sampled during the sampleRandomValues stage;
 
-	/* (non-Javadoc)
-	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCDecommitmentMessage#getR()
+	/**
+	 * Constructor that sets the given committed value and random value.
+	 * @param x the committed value
+	 * @param r the random value used for commit.
 	 */
-	@Override
-	public BigInteger getR() {
-		return r;
-	}
-
-	//public CTCElGamalDecommitmentMessage(GroupElementSendableData x, BigInteger r) {
-	public CTCElGamalDecommitmentMessage(Serializable x, BigInteger r) {
+	public CTCElGamalDecommitmentMessage(Serializable x, BigIntegerRandomValue r) {
 		super();
 		this.x = x;
 		this.r = r;
 	}
+	
+	/**
+	 * Returns the committed value.
+	 */
+	public Serializable getX() {
+		return x;
+	}
 
-	
-	
+	/**
+	 * Returns the random value used for commit.
+	 */
+	public BigIntegerRandomValue getR() {
+		return r;
+	}
 }
