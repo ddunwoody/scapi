@@ -27,7 +27,8 @@ package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.elGamalCommittedValu
 import java.math.BigInteger;
 
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProverInput;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.elGamal.CTCElGamalCommitmentMessage;
+import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ElGamalPublicKey;
+import edu.biu.scapi.midLayer.ciphertext.ElGamalCiphertextSendableData;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**
@@ -43,8 +44,8 @@ public class SigmaElGamalCommittedValueProverInput implements SigmaProverInput{
 	private SigmaElGamalCommittedValueCommonInput params;
 	private BigInteger r;
 	
-	public SigmaElGamalCommittedValueProverInput(CTCElGamalCommitmentMessage commitment, GroupElement x, BigInteger r){
-		params = new SigmaElGamalCommittedValueCommonInput(commitment, x);
+	public SigmaElGamalCommittedValueProverInput(ElGamalPublicKey publicKey, ElGamalCiphertextSendableData commitment, GroupElement x, BigInteger r){
+		params = new SigmaElGamalCommittedValueCommonInput(publicKey, commitment, x);
 		this.r = r;
 	}
 	

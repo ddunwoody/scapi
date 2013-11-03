@@ -28,7 +28,8 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.elGamal.CTCElGamalCommitmentMessage;
+import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ElGamalPublicKey;
+import edu.biu.scapi.midLayer.ciphertext.ElGamalCiphertextSendableData;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**
@@ -42,15 +43,17 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
 public class SigmaElGamalCommittedValueCommonInput implements SigmaCommonInput{
 	
 	private static final long serialVersionUID = 7108469354272702947L;
-	private CTCElGamalCommitmentMessage commitment;
+	private ElGamalPublicKey publicKey;
+	private ElGamalCiphertextSendableData commitment;
 	private GroupElement x;
 	
-	public SigmaElGamalCommittedValueCommonInput(CTCElGamalCommitmentMessage commitment, GroupElement x){
+	public SigmaElGamalCommittedValueCommonInput(ElGamalPublicKey publicKey, ElGamalCiphertextSendableData commitment, GroupElement x){
+		this.publicKey = publicKey;
 		this.commitment = commitment;
 		this.x = x;
 	}
 	
-	public CTCElGamalCommitmentMessage getCommitment(){
+	public ElGamalCiphertextSendableData getCommitment(){
 		return commitment;
 	}
 	
@@ -58,8 +61,12 @@ public class SigmaElGamalCommittedValueCommonInput implements SigmaCommonInput{
 		return x;
 	}
 	
+	public ElGamalPublicKey getPublicKey(){
+		return publicKey;
+	}
+	
 	private void writeObject(ObjectOutputStream out) throws IOException {  
-        
+		out.writeObject(publicKey.generateSendableData());  
 		out.writeObject(commitment);  
 		out.writeObject(x.generateSendableData());  
     }  

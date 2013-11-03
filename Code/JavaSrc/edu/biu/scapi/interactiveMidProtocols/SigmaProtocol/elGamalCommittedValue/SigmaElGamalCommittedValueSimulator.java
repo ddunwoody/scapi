@@ -122,17 +122,17 @@ public class SigmaElGamalCommittedValueSimulator implements SigmaSimulator{
 		}
 		SigmaElGamalCommittedValueCommonInput params = (SigmaElGamalCommittedValueCommonInput) in;
 		
-		if (!(params.getCommitment().getCipherData() instanceof ElGamalOnGrElSendableData)){
+		if (!(params.getCommitment() instanceof ElGamalOnGrElSendableData)){
 			throw new IllegalArgumentException("the given input must contain an instance of ElGamalOnGrElSendableData");
 		}
 		
 		//Convert input to the underlying DH prover:
 		//(g,h,u,v) = (g,h,c1,c2/x).
-		GroupElement h = dlog.reconstructElement(true, params.getCommitment().getPublicKey().getC());
+		GroupElement h = params.getPublicKey().getH();
 		//u = c1
-		GroupElement u = dlog.reconstructElement(true, ((ElGamalOnGrElSendableData)params.getCommitment().getCipherData()).getCipher1());
+		GroupElement u = dlog.reconstructElement(true, ((ElGamalOnGrElSendableData)params.getCommitment()).getCipher1());
 		//Calculate v = c2/x = c2*x^(-1)
-		GroupElement c2 = dlog.reconstructElement(true, ((ElGamalOnGrElSendableData)params.getCommitment().getCipherData()).getCipher2());
+		GroupElement c2 = dlog.reconstructElement(true, ((ElGamalOnGrElSendableData)params.getCommitment()).getCipher2());
 		GroupElement xInv = dlog.getInverse(params.getX());
 		GroupElement v = dlog.multiplyGroupElements(c2, xInv);
 		SigmaDHCommonInput dhInput = new SigmaDHCommonInput(h, u, v);
