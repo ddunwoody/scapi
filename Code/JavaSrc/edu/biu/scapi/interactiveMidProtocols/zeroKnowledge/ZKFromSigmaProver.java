@@ -82,8 +82,9 @@ public class ZKFromSigmaProver implements ZKProver{
 	 * Constructor that accepts the underlying channel, sigma protocol's prover and sets default commitment's receiver.
 	 * @param channel
 	 * @param sProver
+	 * @throws IOException can be thrown in the pre-process stage of PedersenCTReceiver
 	 */
-	public ZKFromSigmaProver(Channel channel, SigmaProverComputation sProver){
+	public ZKFromSigmaProver(Channel channel, SigmaProverComputation sProver) throws IOException{
 		
 		this.sProver = sProver;
 		this.receiver = new PedersenCTReceiver(channel);
@@ -138,7 +139,6 @@ public class ZKFromSigmaProver implements ZKProver{
 	 * @throws ClassNotFoundException 
 	 */
 	private ReceiverCommitPhaseOutput receiveCommit() throws IOException, ClassNotFoundException{
-		receiver.preProcess();
 		return receiver.receiveCommitment();
 	}
 
@@ -174,7 +174,7 @@ public class ZKFromSigmaProver implements ZKProver{
 		if (val == null){
 			throw new CheatAttemptException("Decommit phase returned invalid");
 		}
-		return val.toByteArray();
+		return receiver.generateBytesFromCommitValue(val);
 	}
 	
 	/**
