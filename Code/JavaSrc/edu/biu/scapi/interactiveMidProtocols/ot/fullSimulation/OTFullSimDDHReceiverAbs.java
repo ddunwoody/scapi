@@ -183,6 +183,12 @@ abstract class OTFullSimDDHReceiverAbs implements OTReceiver{
 		this.random = random;
 		qMinusOne =  dlog.getOrder().subtract(BigInteger.ONE);
 		
+		//read the default statistical parameter used in sigma protocols from a configuration file.
+		String statisticalParameter = ScapiDefaultConfiguration.getInstance().getProperty("StatisticalParameter");
+		int t = Integer.parseInt(statisticalParameter);	
+		//Creates the underlying ZKPOK. 
+		zkProver = new ZKPOKFromSigmaCommitPedersenProver(channel, new SigmaDHProverComputation(dlog, t, random));
+				
 		// Some OT protocols have a pre-process stage before the transfer. 
 		// Usually, pre process is done once at the beginning of the protocol and will not be executed later, 
 		// and then the transfer function could be called multiple times.
@@ -220,13 +226,6 @@ abstract class OTFullSimDDHReceiverAbs implements OTReceiver{
 				
 		//Send tuple to sender.
 		sendTupleToSender(channel, tuple);
-		
-		//read the default statistical parameter used in sigma protocols from a configuration file.
-		String statisticalParameter = ScapiDefaultConfiguration.getInstance().getProperty("StatisticalParameter");
-		int t = Integer.parseInt(statisticalParameter);
-		
-		//Creates the underlying ZKPOK. 
-		zkProver = new ZKPOKFromSigmaCommitPedersenProver(channel, new SigmaDHProverComputation(dlog, t, random));
 		
 		//Run the prover in ZKPOK_FROM_SIGMA with Sigma protocol SIGMA_DH.
 		runZKPOK();
