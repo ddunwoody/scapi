@@ -85,8 +85,11 @@ public class ZKFromSigmaVerifier implements ZKVerifier{
 	 * Constructor that accepts the underlying channel, sigma protocol's verifier and sets default committer.
 	 * @param channel
 	 * @param sVerifier
+	 * @throws CheatAttemptException 
+	 * @throws IOException 
+	 * @throws ClassNotFoundException 
 	 */
-	public ZKFromSigmaVerifier(Channel channel, SigmaVerifierComputation sVerifier, SecureRandom random){
+	public ZKFromSigmaVerifier(Channel channel, SigmaVerifierComputation sVerifier, SecureRandom random) throws ClassNotFoundException, IOException, CheatAttemptException{
 	
 		this.channel = channel;
 		this.sVerifier = sVerifier;
@@ -145,7 +148,6 @@ public class ZKFromSigmaVerifier implements ZKVerifier{
 	 * @throws ClassNotFoundException 
 	 */
 	private long commit(byte[] e) throws IOException, ClassNotFoundException, CheatAttemptException, CommitValueException {
-		committer.preProcess();
 		CommitValue val = committer.generateCommitValue(e);
 		long id = random.nextLong();
 		committer.commit(val, id);
