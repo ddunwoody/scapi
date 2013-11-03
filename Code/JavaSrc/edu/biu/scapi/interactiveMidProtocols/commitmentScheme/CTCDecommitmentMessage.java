@@ -24,16 +24,28 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.commitmentScheme;
 
+import java.io.Serializable;
+
+import edu.biu.scapi.interactiveMidProtocols.RandomValue;
+
 
 
 /**
- * 
+ * General interface for the decommitment message the committer sends to the receiver.
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
 public interface CTCDecommitmentMessage {
+	/**
+	 * 
+	 * @return the serializable committed value.
+	 */
+	Serializable getX();
 	
-	Object getX();
-	Object getR();
+	/**
+	 * 
+	 * @return the random value used to commit.
+	 */
+	RandomValue getR();
 
 }
