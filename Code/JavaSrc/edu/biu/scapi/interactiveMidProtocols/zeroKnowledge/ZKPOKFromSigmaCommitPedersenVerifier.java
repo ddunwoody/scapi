@@ -58,8 +58,11 @@ public class ZKPOKFromSigmaCommitPedersenVerifier implements ZKPOKVerifier{
 	 * Constructor that accepts the underlying channel, sigma protocol's verifier.
 	 * @param channel
 	 * @param sVerifier
+	 * @throws CheatAttemptException 
+	 * @throws IOException 
+	 * @throws ClassNotFoundException 
 	 */
-	public ZKPOKFromSigmaCommitPedersenVerifier(Channel channel, SigmaVerifierComputation sVerifier, SecureRandom random){
+	public ZKPOKFromSigmaCommitPedersenVerifier(Channel channel, SigmaVerifierComputation sVerifier, SecureRandom random) throws ClassNotFoundException, IOException, CheatAttemptException{
 	
 		this.channel = channel;
 		this.sVerifier = sVerifier;
@@ -133,7 +136,7 @@ public class ZKPOKFromSigmaCommitPedersenVerifier implements ZKPOKVerifier{
 	 * @throws ClassNotFoundException 
 	 */
 	private long commit(byte[] e) throws IOException, ClassNotFoundException, CheatAttemptException {
-		committer.preProcess();
+		
 		CommitValue val = committer.generateCommitValue(e);
 		long id = random.nextLong();
 		committer.commit(val, id);
