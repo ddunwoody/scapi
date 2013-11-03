@@ -29,12 +29,29 @@ import java.io.Serializable;
 import edu.biu.scapi.midLayer.plaintext.Plaintext;
 
 /**
+ * General interface for commit value. 
+ * Each commit value type (like BigInteger, Byte[], etc) should implement this interface.
+ * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
 public interface CommitValue {
+	
+	/**
+	 * The committed values can vary, therefore returns an Object instance.
+	 * @return the committed value.
+	 */
 	public Object getX();
+	
+	/**
+	 * Converts the committed value into a plaintext in order to encrypt it.
+	 * @return the plaintext contains this commit value.
+	 */
 	public Plaintext convertToPlaintext();
+	
+	/**
+	 * 
+	 * @return a serializable object from this commit value.
+	 */
 	public Serializable generateSendableData();
-	public byte[] toByteArray();
 }
