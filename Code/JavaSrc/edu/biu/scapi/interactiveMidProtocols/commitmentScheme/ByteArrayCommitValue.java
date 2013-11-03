@@ -29,39 +29,51 @@ import java.io.Serializable;
 import edu.biu.scapi.midLayer.plaintext.ByteArrayPlaintext;
 
 /**
+ * 
+ * Concrete implementation of CommitValue where the committed value is a byte[].
+ * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
 public class ByteArrayCommitValue implements CommitValue {
-	private byte[] x;
+	private byte[] x; //The committed value
 
+	/**
+	 * Constructor that sets the commit value.
+	 * @param x byte[] to commit on.
+	 */
 	public ByteArrayCommitValue(byte[] x) {
 		super();
 		this.x = x;
 	}
 
+	/**
+	 * Returns the committed byte[].
+	 */
 	public byte[] getX() {
 		return x;
 	}
 	
+	/**
+	 * Converts the committed value to a string.
+	 */
 	public String toString(){
-		/*String result = null;
-		for(int i = 0; i < x.length; i++)
-			result += x[i] + " " ;
-		return result;
-		*/
+		
 		return new String(x);
 	}
+	
+	/**
+	 * Converts the committed value to a ByteArrayPlaintext.
+	 */
 	public ByteArrayPlaintext convertToPlaintext(){
 		return new ByteArrayPlaintext(x);
 	}
 	
+	/**
+	 * Returns a serialized object representing this commit value.
+	 */
 	public Serializable generateSendableData() {
 		return x;
 	}
 
-	
-	public byte[] toByteArray() {
-		return x;
-	}
 }

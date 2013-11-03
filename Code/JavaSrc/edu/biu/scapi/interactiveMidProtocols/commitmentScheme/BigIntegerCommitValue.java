@@ -30,37 +30,50 @@ import java.math.BigInteger;
 import edu.biu.scapi.midLayer.plaintext.BigIntegerPlainText;
 
 /**
+ * 
+ * Concrete implementation of CommitValue where the committed value is a BigInteger.
+ * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
 public class BigIntegerCommitValue implements CommitValue {
-	BigInteger x;
+	BigInteger x; //The committed value
 
+	/**
+	 * Constructor that sets the commit value.
+	 * @param x BigInteger to commit on.
+	 */
 	public BigIntegerCommitValue(BigInteger x) {
 		super();
 		this.x = x;
 	}
 
+	/**
+	 * Returns the committed BigInteger.
+	 */
 	public BigInteger getX() {
 		return x;
 	}
 	
+	/**
+	 * Converts the committed value to a string.
+	 */
 	public String toString(){
 		return x.toString();
 	}
 	
+	/**
+	 * Converts the committed value to a BigIntegerPlaintaxt.
+	 */
 	public BigIntegerPlainText convertToPlaintext(){
 		return new BigIntegerPlainText(x);
 	}
 
-	
+	/**
+	 * Returns a serialized object representing this commit value.
+	 */
 	public Serializable generateSendableData() {
 		return x;
 	}
 
-	
-	
-	public byte[] toByteArray() {
-		return x.toByteArray();
-	}
 }
