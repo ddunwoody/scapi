@@ -25,62 +25,89 @@
 package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.elGamal;
 
 import java.io.IOException;
+import java.io.Serializable;
+import java.security.InvalidKeyException;
+import java.security.PublicKey;
 import java.util.Hashtable;
 import java.util.Map;
 
 import edu.biu.scapi.comm.Channel;
+import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.BasicReceiverCommitPhaseOutput;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTReceiver;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.ReceiverCommitPhaseOutput;
 import edu.biu.scapi.midLayer.asymmetricCrypto.encryption.ElGamalEnc;
-import edu.biu.scapi.midLayer.asymmetricCrypto.encryption.ScElGamalOnGroupElement;
+import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScElGamalPublicKey;
+import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScElGamalPublicKey.ScElGamalPublicKeySendableData;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
-import edu.biu.scapi.primitives.dlog.cryptopp.CryptoPpDlogZpSafePrime;
-import edu.biu.scapi.primitives.dlog.miracl.MiraclDlogECF2m;
+import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.securityLevel.DDH;
 
 /**
+ * This abstract class performs all the core functionality of the receiver side of 
+ * ElGamal commitment. 
+ * Specific implementations can extend this class and add or override functions as necessary.
+ * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
 
-public abstract class ElGamalCTRCore{
-	protected Map<Integer , CTCElGamalCommitmentMessage> commitmentMap;
+public abstract class ElGamalCTRCore implements CTReceiver{
+	
+	/*
+	 * runs the following protocol:
+	 * "Commit phase
+	 *		WAIT for a value c
+	 *		STORE c
+	 *	Decommit phase
+	 *		WAIT for (r, x)  from C
+	 *		Let c = (h,u,v); if not of this format, output REJ
+	 *		IF NOT
+	 *		•	VALID_PARAMS(G,q,g), AND
+	 *		•	h <-G, AND
+	 *		•	u=g^r 
+	 *		•	v = h^r * x
+	 *		•	x in G
+	 *		      OUTPUT REJ
+	 *		ELSE
+	 *		      OUTPUT ACC and value x"
+	 *
+	 */
+	
+	protected Map<Long , CTCElGamalCommitmentMessage> commitmentMap;
 	protected DlogGroup dlog;
 	protected Channel channel;
 	protected ElGamalEnc elGamal;
-	protected CTCElGamalCommitmentMessage msg = null;
+	protected ScElGamalPublicKey publicKey;
 	
-	public ElGamalCTRCore(Channel channel, DlogGroup dlog, ElGamalEnc elGamal) throws IllegalArgumentException, SecurityLevelException, InvalidDlogGroupException{
+	/**
+	 * Constructor that receives a connected channel (to the receiver), 
+	 * the DlogGroup agreed upon between them and the encryption object.
+	 * The committer needs to be instantiated with the same DlogGroup, 
+	 * otherwise nothing will work properly.
+	 */
+	public ElGamalCTRCore(Channel channel, DlogGroup dlog, ElGamalEnc elGamal) throws SecurityLevelException, InvalidDlogGroupException, ClassNotFoundException, IOException, CheatAttemptException{
 		doConstruct(channel, dlog, elGamal);
 	}
 
+	// default constructor is not enough since default encryption cannot be chosen.
+	public ElGamalCTRCore(){}
 
-
-	public ElGamalCTRCore(Channel channel) {
-		DlogGroup dlog = null;
-		try {
-			//Uses Miracl Koblitz 233 Elliptic curve.
-			dlog =  new MiraclDlogECF2m("K-233");
-		} catch (IOException e) {
-			dlog = new CryptoPpDlogZpSafePrime();
-		}
-		try {
-			doConstruct(channel, dlog, new ScElGamalOnGroupElement(dlog));
-		} catch (SecurityLevelException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvalidDlogGroupException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-
-
-	private void doConstruct(Channel channel, DlogGroup dlog, ElGamalEnc elGamal) throws SecurityLevelException, InvalidDlogGroupException{
+	/**
+	 * Sets the given parameters and execute the preprocess phase of the scheme.
+	 * @param channel
+	 * @param dlog
+	 * @param elGamal
+	 * @throws SecurityLevelException if the given dlog is not DDH secure
+	 * @throws InvalidDlogGroupException if the given dlog is not valid.
+	 * @throws ClassNotFoundException if there was a problem during serialization mechanism.
+	 * @throws IOException if there was a problem during communication phase
+	 * @throws CheatAttemptException it the receiver suspects that the committer is trying to cheat.
+	 */
+	protected void doConstruct(Channel channel, DlogGroup dlog, ElGamalEnc elGamal) throws SecurityLevelException, InvalidDlogGroupException, ClassNotFoundException, IOException, CheatAttemptException{
 		//The underlying dlog group must be DDH secure.
 		if (!(dlog instanceof DDH)){
 			throw new SecurityLevelException("DlogGroup should have DDH security level");
@@ -90,25 +117,54 @@ public abstract class ElGamalCTRCore{
 
 		this.channel = channel;
 		this.dlog = dlog;
-		commitmentMap = new Hashtable<Integer, CTCElGamalCommitmentMessage>();
-		//elGamal = new ScElGamalOnGroupElement(dlog);
+		commitmentMap = new Hashtable<Long, CTCElGamalCommitmentMessage>();
 		this.elGamal = elGamal;
+		preProcess();
+		try {
+			this.elGamal.setKey(publicKey);
+		} catch (InvalidKeyException e) {
+			//should not occur since the instance of the key is valid.
+		}
 	}
 
-
-
-	/* (non-Javadoc)`
-	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTReceiver#preProcess()
+	/**
+	 * The pre-process is performed once within the construction of this object. 
+	 * If the user needs to generate new pre-process values then it needs to disregard 
+	 * this instance and create a new one.
+	 * @throws ClassNotFoundException if there was a problem during serialization mechanism.
+	 * @throws IOException if there was a problem during communication phase
+	 * @throws CheatAttemptException it the received value h is not in G.
 	 */
-	public void preProcess() throws IOException {
-		//No pre-process in ElGamal Commitment
+	private void preProcess() throws ClassNotFoundException, IOException, CheatAttemptException{
+		Serializable message = null;
+		try {
+			message = channel.receive();
+		} catch (ClassNotFoundException e) {
+			throw new ClassNotFoundException("Failed to receive message. The error is: " + e.getMessage());
+		} catch (IOException e) {
+			throw new IOException("Failed to receive message. The error is: " + e.getMessage());
+		}
+		if (!(message instanceof ScElGamalPublicKeySendableData)){
+			throw new IllegalArgumentException("The received message should be an instance of OTSMessage");
+		}
+		ScElGamalPublicKeySendableData publicKeySendableData = (ScElGamalPublicKeySendableData) message;
+		this.publicKey = (ScElGamalPublicKey) elGamal.reconstructPublicKey(publicKeySendableData);
+		//Set the public key from now on until the end of usage of this instance.
+		GroupElement h = publicKey.getH();
+		if(!dlog.isMember(h))
+			throw new CheatAttemptException("h element is not a member of the current DlogGroup");
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTReceiver#receiveCommitment()
+	/**
+	 * Runs the commit phase of the commitment scheme:
+	 * "WAIT for a value c
+	 *	STORE c".
+	 * @return the output of the commit phase.
+	 * @throws ClassNotFoundException if there was a problem during serialization mechanism.
+	 * @throws IOException  if there was a problem during communication phase
 	 */
 	public ReceiverCommitPhaseOutput receiveCommitment() throws ClassNotFoundException, IOException {
-		
+		 CTCElGamalCommitmentMessage msg = null;
 		try{
 			msg = (CTCElGamalCommitmentMessage) channel.receive();
 		} catch (ClassNotFoundException e) {
@@ -117,26 +173,67 @@ public abstract class ElGamalCTRCore{
 			throw new IOException("Failed to receive commitment. The error is: " + e.getMessage());
 		}
 
-		commitmentMap.put(Integer.valueOf(msg.getId()), msg);
+		commitmentMap.put(Long.valueOf(msg.getId()), msg);
 		return new BasicReceiverCommitPhaseOutput(msg.getId());
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTReceiver#receiveDecommitment(int)
+	/**
+	 * Runs the decommit phase of the commitment scheme:
+	 * "WAIT for (r, x)  from C
+	 *	Let c = (h,u,v); if not of this format, output REJ
+	 *	IF NOT
+	 *	•	u=g^r 
+	 *	•	v = h^r * x
+	 *	•	x in G
+	 *		OUTPUT REJ
+	 *	ELSE
+	 *	    OUTPUT ACC and value x"
+	 * @param id
+	 * @return the committed value if the decommit succeeded; null, otherwise.
+	 * @throws ClassNotFoundException if there was a problem during serialization mechanism.
+	 * @throws IOException  if there was a problem during communication phase
+	 * @throws IllegalArgumentException
 	 */
-	public CommitValue receiveDecommitment(int id) throws ClassNotFoundException, IOException, IllegalArgumentException {
-		CTCElGamalDecommitmentMessage msg = null;
+	public CommitValue receiveDecommitment(long id) throws ClassNotFoundException, IOException, IllegalArgumentException {
+		Serializable message = null;
 		try {
-			msg = (CTCElGamalDecommitmentMessage) channel.receive();
+			message =  channel.receive();
 
 		} catch (ClassNotFoundException e) {
 			throw new ClassNotFoundException("Failed to receive decommitment. The error is: " + e.getMessage());
 		} catch (IOException e) {
 			throw new IOException("Failed to receive decommitment. The error is: " + e.getMessage());
 		}
+		if (!(message instanceof CTCElGamalDecommitmentMessage)){
+			throw new IllegalArgumentException("the received message is not an instance of CTCElGamalDecommitmentMessage");
+		}
+		return processDecommitment(id, (CTCElGamalDecommitmentMessage) message);
+	}
 	
-		return processDecommitment(id, msg);
+	@Override
+	public Object[] getPreProcessedValues(){
+		PublicKey[] keys = new PublicKey[1];
+		keys[0] = publicKey;
+		return keys;
+	}
+		
+	@Override
+	public CTCElGamalCommitmentMessage getCommitmentPhaseValues(long id){
+		return commitmentMap.get(id);
 	}
 
-	protected abstract CommitValue processDecommitment(int id, CTCElGamalDecommitmentMessage msg);
+	/**
+	 * Proccesses the decommitment phase.
+	 * "IF NOT
+	 *	•	u=g^r 
+	 *	•	v = h^r * x
+	 *	•	x in G
+	 *		OUTPUT REJ
+	 *	ELSE
+	 *	    OUTPUT ACC and value x"
+	 * @param id the id of the commitment.
+	 * @param msg the receiver message from the committer
+	 * @return the committed value if the decommit succeeded; null, otherwise.
+	 */
+	protected abstract CommitValue processDecommitment(long id, CTCElGamalDecommitmentMessage msg);
 }
