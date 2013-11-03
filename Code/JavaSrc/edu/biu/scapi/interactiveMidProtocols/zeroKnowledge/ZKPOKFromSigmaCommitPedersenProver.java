@@ -57,9 +57,9 @@ public class ZKPOKFromSigmaCommitPedersenProver implements ZKPOKProver{
 	 * Constructor that accepts the underlying channel, sigma protocol's prover.
 	 * @param channel
 	 * @param sProver
-	 * @param receiver
+	 * @throws IOException 
 	 */
-	public ZKPOKFromSigmaCommitPedersenProver(Channel channel, SigmaProverComputation sProver){
+	public ZKPOKFromSigmaCommitPedersenProver(Channel channel, SigmaProverComputation sProver) throws IOException{
 		
 		this.sProver = sProver;
 		this.receiver = new PedersenTrapdoorCTReceiver(channel);
@@ -114,7 +114,6 @@ public class ZKPOKFromSigmaCommitPedersenProver implements ZKPOKProver{
 	 * @throws ClassNotFoundException 
 	 */
 	private ReceiverCommitPhaseOutput receiveCommit() throws IOException, ClassNotFoundException{
-		receiver.preProcess();
 		return receiver.receiveCommitment();
 	}
 
@@ -149,7 +148,7 @@ public class ZKPOKFromSigmaCommitPedersenProver implements ZKPOKProver{
 		if (val == null){
 			throw new CheatAttemptException("Decommit phase returned invalid");
 		}
-		return val.toByteArray();
+		return receiver.generateBytesFromCommitValue(val);
 	}
 	
 	/**
