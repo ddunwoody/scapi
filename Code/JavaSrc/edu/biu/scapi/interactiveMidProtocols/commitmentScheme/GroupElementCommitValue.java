@@ -30,36 +30,49 @@ import edu.biu.scapi.midLayer.plaintext.GroupElementPlaintext;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**
+ * Concrete implementation of CommitValue where the committed value is a GroupElement.
+ * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
 public class GroupElementCommitValue implements CommitValue {
-	private GroupElement x;
+	private GroupElement x; //The committed value
 
+	/**
+	 * Constructor that sets the commit value.
+	 * @param x GroupElement to commit on.
+	 */
 	public GroupElementCommitValue(GroupElement x) {
 		super();
 		this.x = x;
 	}
 
+	/**
+	 * Returns the committed GroupElement.
+	 */
 	public GroupElement getX() {
 		return x;
 	}
 	
+	/**
+	 * Converts the committed value to a string.
+	 */
 	public String toString(){
 		return x.toString();
 	}
 	
+	/**
+	 * Converts the committed value to a GroupElementPlaintaxt.
+	 */
 	public GroupElementPlaintext convertToPlaintext(){
 		return new GroupElementPlaintext(x);
 	}
 
-	
+	/**
+	 * Returns a serialized object representing this commit value.
+	 */
 	public Serializable generateSendableData() {
 		return x.generateSendableData();
 	}
 
-
-	public byte[] toByteArray() {
-		throw new UnsupportedOperationException();
-	}
 }
