@@ -26,35 +26,44 @@ package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.elGamal;
 
 import java.io.Serializable;
 
-import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScElGamalPublicKey.ScElGamalPublicKeySendableData;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCtrCommitmentMsg;
 import edu.biu.scapi.midLayer.ciphertext.ElGamalCiphertextSendableData;
 
 /**
+ * Concrete implementation of commitment message used by ElGamal commitment scheme.
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-public class CTCElGamalCommitmentMessage implements Serializable {
+public class CTCElGamalCommitmentMessage implements CmtCtrCommitmentMsg, Serializable {
 
 	private static final long serialVersionUID = 8646902245380445237L;
-	private ScElGamalPublicKeySendableData publicKey;
+	// In ElGamal schemes the commitment object is a ElGamalCiphertext
+	//In order to this class be a serializable, we get it as ElGamalCiphertextSendableData. 
 	private ElGamalCiphertextSendableData cipherData;
-	private int id;
+	private long id; //The id of the commitment
 	
-	public CTCElGamalCommitmentMessage(ScElGamalPublicKeySendableData publicKey, ElGamalCiphertextSendableData cipherData, int id) {
+	/**
+	 * Constructor that sets the commitment and id.
+	 * @param cipherData the actual commitment object. In ElGamal schemes the commitment object is a ElGamalCiphertextSendableData.
+	 * @param id the commitment id.
+	 */
+	public CTCElGamalCommitmentMessage(ElGamalCiphertextSendableData cipherData, long id) {
 		super();
-		this.publicKey = publicKey;
 		this.cipherData = cipherData;
 		this.id = id;
 	}
 	
-	public ScElGamalPublicKeySendableData getPublicKey() {
-		return publicKey;
-	}
-	public ElGamalCiphertextSendableData getCipherData() {
+	/**
+	 * Returns the commitment value. In this case the instance of the commitment is ElGamalCiphertextSendableData.
+	 */
+	public ElGamalCiphertextSendableData getCommitment() {
 		return cipherData;
 	}
 	
-	public int getId(){
+	/**
+	 * Returns the commitment id.
+	 */
+	public long getId(){
 		return id;
 	}
 	
