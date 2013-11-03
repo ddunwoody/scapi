@@ -28,10 +28,17 @@ import java.io.Serializable;
 
 
 /**
+ * General interface of the receiver's output of the commit phase.
+ * All receivers have output from the commit phase, that at least includes the commitment id.
+ * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
 public interface ReceiverCommitPhaseOutput extends Serializable{
 	
-	public int getCommitmentId();
+	/**
+	 * 
+	 * @return the id of the received commitment message.
+	 */
+	public long getCommitmentId();
 }

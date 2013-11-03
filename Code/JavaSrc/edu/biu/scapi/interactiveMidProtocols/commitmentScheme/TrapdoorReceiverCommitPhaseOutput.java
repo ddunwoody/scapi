@@ -26,16 +26,31 @@ package edu.biu.scapi.interactiveMidProtocols.commitmentScheme;
 
 import java.math.BigInteger;
 
+/**
+ * Concrete class of receiver's output from the commit phase. 
+ * In the trapdoor case, the receiver outputs the id of the received commitment and the trapdoor.
+ * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
+ *
+ */
 public class TrapdoorReceiverCommitPhaseOutput extends BasicReceiverCommitPhaseOutput{
 
 	private static final long serialVersionUID = 359254858935659625L;
 	private BigInteger trap; 
 	
-	public TrapdoorReceiverCommitPhaseOutput(BigInteger trapdoor, int commitmentId) {
+	/**
+	 * Constructor tha sets the given commitment id.
+	 * @param trapdoor the receiver's trapdoor for this commitment.
+	 * @param commitmentId the id of the received commitment message.
+	 */
+	public TrapdoorReceiverCommitPhaseOutput(BigInteger trapdoor, long commitmentId) {
 		super(commitmentId);
 		this.trap = trapdoor;
 	}
 	
+	/**
+	 * 
+	 * @return the trapdoor for this commitment.
+	 */
 	public BigInteger getTrap(){
 		return trap;
 	}

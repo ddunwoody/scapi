@@ -24,6 +24,14 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.commitmentScheme;
 
+/**
+ * Marker interface. 
+ * Each committer/receiver that implement this interface is marked as committer/receiver 
+ * that commit on a byte array.
+ * 
+ * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
+ *
+ */
 public interface OnByteArrayCommitmentScheme {
 
 }
