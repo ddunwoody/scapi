@@ -27,7 +27,6 @@ package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.pedersenCTKnowledge;
 import java.math.BigInteger;
 
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProverInput;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.CTCPedersenCommitmentMessage;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**
@@ -45,7 +44,7 @@ public class SigmaPedersenCTKnowledgeProverInput implements SigmaProverInput{
 	private BigInteger x;
 	private BigInteger r;
 	
-	public SigmaPedersenCTKnowledgeProverInput(GroupElement h, CTCPedersenCommitmentMessage commitment, BigInteger x, BigInteger r){
+	public SigmaPedersenCTKnowledgeProverInput(GroupElement h, GroupElement commitment, BigInteger x, BigInteger r){
 		params = new SigmaPedersenCTKnowledgeCommonInput(h, commitment);
 		this.x = x;
 		this.r = r;

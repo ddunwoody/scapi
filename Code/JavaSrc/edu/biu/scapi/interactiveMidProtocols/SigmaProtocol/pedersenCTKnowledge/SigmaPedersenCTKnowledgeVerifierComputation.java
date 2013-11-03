@@ -184,7 +184,7 @@ public class SigmaPedersenCTKnowledgeVerifierComputation implements SigmaVerifie
 		//Convert e to BigInteger.
 		BigInteger eBI = new BigInteger(1, e);
 		//Compute c^e.
-		GroupElement c = dlog.reconstructElement(true, params.getCommitment().getC());
+		GroupElement c = params.getCommitment();
 		GroupElement cToe = dlog.exponentiate(c, eBI);
 		//Calculate a*c^e (right side of the verify equation
 		GroupElement aElement = dlog.reconstructElement(true, firstMsg.getElement());

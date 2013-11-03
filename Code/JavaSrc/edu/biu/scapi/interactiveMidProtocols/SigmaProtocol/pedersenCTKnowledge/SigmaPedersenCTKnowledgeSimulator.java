@@ -136,7 +136,7 @@ public class SigmaPedersenCTKnowledgeSimulator implements SigmaSimulator{
 		//Compute c^(-e) 
 		BigInteger e = new BigInteger(1, challenge);
 		BigInteger minusE = dlog.getOrder().subtract(e);
-		GroupElement c = dlog.reconstructElement(true, params.getCommitment().getC());
+		GroupElement c = params.getCommitment();
 		GroupElement cToE = dlog.exponentiate(c, minusE);
 		GroupElement a = dlog.multiplyGroupElements(hToU, gToV);
 		a = dlog.multiplyGroupElements(a, cToE);

@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.CTCPedersenCommitmentMessage;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**
@@ -43,9 +42,9 @@ public class SigmaPedersenCTKnowledgeCommonInput implements SigmaCommonInput{
 	
 	private static final long serialVersionUID = 6360210454705006144L;
 	private GroupElement h;
-	private CTCPedersenCommitmentMessage commitment;
+	private GroupElement commitment;
 	
-	public SigmaPedersenCTKnowledgeCommonInput(GroupElement h, CTCPedersenCommitmentMessage commitment){
+	public SigmaPedersenCTKnowledgeCommonInput(GroupElement h, GroupElement commitment){
 		this.h = h;
 		this.commitment = commitment;
 	}
@@ -54,7 +53,7 @@ public class SigmaPedersenCTKnowledgeCommonInput implements SigmaCommonInput{
 		return h;
 	}
 	
-	public CTCPedersenCommitmentMessage getCommitment(){
+	public GroupElement getCommitment(){
 		return commitment;
 	}
 	
