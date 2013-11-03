@@ -27,6 +27,7 @@ package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.elGamal;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
+import java.security.Key;
 import java.security.KeyPair;
 import java.security.SecureRandom;
 import java.util.Hashtable;
@@ -35,88 +36,77 @@ import java.util.Map;
 import org.bouncycastle.util.BigIntegers;
 
 import edu.biu.scapi.comm.Channel;
-import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.ByteArrayCommitValue;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCDecommitmentMessage;
+import edu.biu.scapi.interactiveMidProtocols.BigIntegerRandomValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitmentPair;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.GroupElementCommitValue;
 import edu.biu.scapi.midLayer.asymmetricCrypto.encryption.ElGamalEnc;
-import edu.biu.scapi.midLayer.asymmetricCrypto.encryption.ScElGamalOnGroupElement;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScElGamalPrivateKey;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScElGamalPublicKey;
-import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScElGamalPublicKey.ScElGamalPublicKeySendableData;
 import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertext;
 import edu.biu.scapi.midLayer.ciphertext.ElGamalCiphertextSendableData;
-import edu.biu.scapi.midLayer.ciphertext.ElGamalOnGroupElementCiphertext;
-import edu.biu.scapi.midLayer.plaintext.BigIntegerPlainText;
-import edu.biu.scapi.midLayer.plaintext.ByteArrayPlaintext;
-import edu.biu.scapi.midLayer.plaintext.GroupElementPlaintext;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
-import edu.biu.scapi.primitives.dlog.GroupElement;
-import edu.biu.scapi.primitives.dlog.cryptopp.CryptoPpDlogZpSafePrime;
-import edu.biu.scapi.primitives.dlog.miracl.MiraclDlogECF2m;
 import edu.biu.scapi.securityLevel.DDH;
 
 /**
+ * This abstract class performs all the core functionality of the committer side of 
+ * ElGamal commitment. 
+ * Specific implementations can extend this class and add or override functions as necessary.
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-public abstract class ElGamalCTCCore {
+public abstract class ElGamalCTCCore implements CTCommitter {
+	
+	/*
+	 * runs the following protocol:
+	 * "Commit phase
+	 *		IF NOT VALID_PARAMS(G,q,g)
+	 *			REPORT ERROR and HALT
+	 *		SAMPLE random values  a,r <- Zq
+	 *		COMPUTE h = g^a
+	 *		COMPUTE u = g^r and v = h^r * x
+	 *		SEND c = (h,u,v) to R
+	 *	Decommit phase
+	 *		SEND (r, x)  to R
+	 *		OUTPUT nothing"
+	 *
+	 */
+	
 	protected Channel channel;
 	protected DlogGroup dlog;
-	private SecureRandom random;
+	protected SecureRandom random;
 	private BigInteger qMinusOne;
-	protected Map<Integer, CommitmentPair> commitmentMap;
+	protected Map<Long, ElGamalCommitmentPhaseValues> commitmentMap;
 	protected ElGamalEnc elGamal;
 	protected ScElGamalPublicKey publicKey;
-	protected ScElGamalPrivateKey privateKey;
+	private ScElGamalPrivateKey privateKey;
 
-	//These values used in getINputForZK function in the derives class.
-	protected BigInteger r;
-	protected CTCElGamalCommitmentMessage msg;
 
+	/**
+	 * Constructor that receives a connected channel (to the receiver), 
+	 * the DlogGroup agreed upon between them, the encryption object and a SecureRandom.
+	 * The Receiver needs to be instantiated with the same DlogGroup, 
+	 * otherwise nothing will work properly.
+	 */
+	protected ElGamalCTCCore(Channel channel, DlogGroup dlog, ElGamalEnc elGamal, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException, IOException{
+		doConstruct(channel, dlog, elGamal, random);
+	}
 	
-	ElGamalCTCCore(Channel channel, ElGamalEnc elGamal) throws IllegalArgumentException, SecurityLevelException, InvalidDlogGroupException{
-		try {
-			//Uses Miracl Koblitz 233 Elliptic curve.
-			doConstruct(channel, new MiraclDlogECF2m("K-233"), new SecureRandom(), elGamal);
-		} catch (IOException e) {
-			//Why do we have this??
+	// default constructor is not enough since default encryption cannot be chosen.
+	protected ElGamalCTCCore() {}
 
-			//If there is a problem with the elliptic curves file, create Zp DlogGroup.
-			doConstruct(channel, new CryptoPpDlogZpSafePrime(), new SecureRandom(), elGamal);
-		}
-	}
-
-	protected ElGamalCTCCore(Channel channel, DlogGroup dlog, ElGamalEnc elGamal) throws IllegalArgumentException, SecurityLevelException, InvalidDlogGroupException{
-		doConstruct(channel, dlog, new SecureRandom(), elGamal);
-	}
-
-
-
-	public ElGamalCTCCore(Channel channel) {
-		DlogGroup dlog = null;
-		try {
-			//Uses Miracl Koblitz 233 Elliptic curve.
-			dlog =  new MiraclDlogECF2m("K-233");
-		} catch (IOException e) {
-			dlog = new CryptoPpDlogZpSafePrime();
-		}
-		try {
-			doConstruct(channel, dlog, new SecureRandom(), new ScElGamalOnGroupElement(dlog));
-		} catch (SecurityLevelException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvalidDlogGroupException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-	private void doConstruct(Channel channel, DlogGroup dlog, SecureRandom random, ElGamalEnc elGamal) throws SecurityLevelException, InvalidDlogGroupException{
+	/**
+	 * Sets the given parameters and execute the preprocess phase of the scheme.
+	 * @param channel
+	 * @param dlog
+	 * @param elGamal
+	 * @param random
+	 * @throws SecurityLevelException if the given dlog is not DDH secure
+	 * @throws InvalidDlogGroupException if the given dlog is not valid.
+	 * @throws IOException if there was a problem in the communication
+	 */
+	protected void doConstruct(Channel channel, DlogGroup dlog, ElGamalEnc elGamal, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException, IOException{
 		//The underlying dlog group must be DDH secure.
 		if (!(dlog instanceof DDH)){
 			throw new SecurityLevelException("DlogGroup should have DDH security level");
@@ -128,92 +118,99 @@ public abstract class ElGamalCTCCore {
 		this.dlog = dlog;
 		this.random = random;
 		qMinusOne =  dlog.getOrder().subtract(BigInteger.ONE);
-		commitmentMap = new Hashtable<Integer, CommitmentPair>();
-		//elGamal = new ScElGamalOnGroupElement(dlog);
+		commitmentMap = new Hashtable<Long, ElGamalCommitmentPhaseValues>();
 		this.elGamal = elGamal;
+		preProcess();
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter#preProcess()
+	/**
+	 * The pre-process is performed once within the construction of this object. 
+	 * If the user needs to generate new pre-process values then it needs to disregard 
+	 * this instance and create a new one.
+	 * Runs the following lines from the pseudo code:
+	 * "SAMPLE random values  a<- Zq
+	 *	COMPUTE h = g^a"
+	 * @throws IOException
 	 */
-	public void preProcess() throws ClassNotFoundException, IOException, CheatAttemptException {
+	private void preProcess() throws IOException{
+		//Instead of sample a and compute h, generate public and private keys directly.
+		
 		KeyPair pair = elGamal.generateKey();
+		//We keep both keys, the private key is used to prove knowledge of this commitment
+		//but is not used by the encryption object.
 		publicKey = (ScElGamalPublicKey) pair.getPublic();
 		privateKey = (ScElGamalPrivateKey) pair.getPrivate();
 		try {
-			elGamal.setKey(publicKey, privateKey);
+			elGamal.setKey(publicKey);
 		} catch (InvalidKeyException e) {
 			//Catch the exception since it should not happen.
 			System.out.println("The KeyPair generated by this instance of ElGamal is not valid: " + e.getMessage());
 		}
+		//Send the public key to the receiver since throughout this connection the same key will be used used for all the commitments.
+		try{
+			
+			channel.send(publicKey.generateSendableData());
+		}
+		catch (IOException e) {
+			throw new IOException("failed to send the public key in the pre-process phase. The error is: " + e.getLocalizedMessage());
+		}	
 	}
 
+	/**
+	 * Runs the commit phase of the commitment scheme:
+	 * "SAMPLE random values  r <- Zq
+	 *	COMPUTE u = g^r and v = h^r * x
+	 *	SEND c = (h,u,v) to R".
+	 */
+	public void commit(CommitValue input, long id) throws IOException {
+		
+		//Sample random r <-Zq.
+		BigInteger r = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);	
 
-	public void commit(CommitValue input, int id) throws IOException {
-
-		r = sampleRandomValues();	
-
+		//Compute u = g^r and v = h^r * x.
+		//This is actually the encryption of x.
 		AsymmetricCiphertext c =  elGamal.encryptWithGivenRandomValue(input.convertToPlaintext(), r);
 
-		msg = new CTCElGamalCommitmentMessage((ScElGamalPublicKeySendableData) publicKey.generateSendableData(),  (ElGamalCiphertextSendableData)c.generateSendableData(), id);
 		try {
 			//Send the message by the channel.
-			channel.send(msg);
+			channel.send(new CTCElGamalCommitmentMessage((ElGamalCiphertextSendableData)c.generateSendableData(), id));
 		} catch (IOException e) {
-			throw new IOException("failed to send the message. The error is: " + e.getMessage());
+			throw new IOException("failed to send the commitment. The error is: " + e.getMessage());
 		}	
 		//After succeeding in sending the commitment, keep the committed value in the map together with its ID.
-		commitmentMap.put(Integer.valueOf(id), new CommitmentPair(r, input));
-		System.out.println("h = " + ((ScElGamalPublicKey)publicKey).getH().toString());
-		System.out.println("a = " + ((ScElGamalPrivateKey)privateKey).getX().toString());
-		System.out.println("x = " + input.getX());
-		System.out.println("r = " + r);
-		System.out.println("cipher = " + c);
+		commitmentMap.put(Long.valueOf(id), new ElGamalCommitmentPhaseValues(new BigIntegerRandomValue(r), input,c));
 	}
 
-	//This function is for testing purposes only. It should be deleted before publishing this part of SCAPI.
-	//To be used immediately after commit function.
-	public Object getCommitment(int id){
-		CommitmentPair pair = commitmentMap.get(Integer.valueOf(id));
-		AsymmetricCiphertext c = null;
-		if( pair.getX() instanceof GroupElementCommitValue){
-			GroupElement x = ((GroupElementCommitValue)pair.getX()).getX();
-			c = elGamal.encryptWithGivenRandomValue(new GroupElementPlaintext(x), pair.getR());
-		}
-		else if( pair.getX() instanceof BigInteger)
-			c = elGamal.encryptWithGivenRandomValue(new BigIntegerPlainText((BigInteger)pair.getX()), pair.getR());
-		else c = elGamal.encryptWithGivenRandomValue(new ByteArrayPlaintext(((ByteArrayCommitValue) pair.getX()).getX()), pair.getR());
-		return c;
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter#decommit(int)
+	/**
+	 * Runs the decommit phase of the commitment scheme:
+	 * "SEND (r, x)  to R
+	 *	OUTPUT nothing""
 	 */
-	public void decommit(int id) throws IOException {
+	public void decommit(long id) throws IOException {
 
+		//fetch the commitment according to the requested ID
+		ElGamalCommitmentPhaseValues values = commitmentMap.get(Long.valueOf(id));
+		CTCElGamalDecommitmentMessage msg =  new CTCElGamalDecommitmentMessage(values.getX().generateSendableData(),values.getR());
 		try{
-			channel.send((CTCElGamalDecommitmentMessage)computeDecommit(id));
+			channel.send(msg);
 		}
 		catch (IOException e) {
 			throw new IOException("failed to send the message. The error is: " + e.getMessage());
 		}
-		//This is not according to the pseudo-code but for our programming needs. TODO Check if can be left.
-		//return (CTCDecommitmentMessage) msg;
 	}	
 
-	CTCDecommitmentMessage computeDecommit(int id){
-		//fetch the commitment according to the requested ID
-		CommitmentPair pair = commitmentMap.get(Integer.valueOf(id));
-		return (CTCDecommitmentMessage) new CTCElGamalDecommitmentMessage(pair.getX().generateSendableData(),pair.getR());
+	@Override
+	public Key[] getPreProcessValues() {
+		Key[] keys = new Key[2];
+		keys[0] = publicKey;
+		keys[1] = privateKey;
+		return keys;
 	}
 
-	private BigInteger sampleRandomValues() {
-		BigInteger r = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
-		return r;
+	@Override
+	public ElGamalCommitmentPhaseValues getCommitmentPhaseValues(long id) {
+		return commitmentMap.get(id);
 	}
 
-	private ElGamalOnGroupElementCiphertext computeCommittment(GroupElement x, BigInteger r){
-		return (ElGamalOnGroupElementCiphertext) elGamal.encryptWithGivenRandomValue(new GroupElementPlaintext(x), r);
-	}
 }
 
