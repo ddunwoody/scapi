@@ -27,7 +27,7 @@ package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.elGamalCTKnowledge;
 import java.math.BigInteger;
 
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProverInput;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.elGamal.CTCElGamalCommitmentMessage;
+import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ElGamalPublicKey;
 
 
 /**
@@ -42,8 +42,8 @@ public class SigmaElGamalCTKnowledgeProverInput implements SigmaProverInput{
 	private SigmaElGamalCTKnowledgeCommonInput params;
 	private BigInteger w;
 	
-	public SigmaElGamalCTKnowledgeProverInput(CTCElGamalCommitmentMessage commitment, BigInteger w){
-		params = new SigmaElGamalCTKnowledgeCommonInput(commitment);
+	public SigmaElGamalCTKnowledgeProverInput(ElGamalPublicKey publicKey, BigInteger w){
+		params = new SigmaElGamalCTKnowledgeCommonInput(publicKey);
 		this.w = w;
 	}
 	

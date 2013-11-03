@@ -51,7 +51,6 @@ public class SigmaElGamalCTKnowledgeSimulator implements SigmaSimulator{
 	*/
 
 	private SigmaDlogSimulator dlogSim; //underlying SigmaDlogSimulator to use.
-	private DlogGroup dlog;				//We need the DlogGroup instance in order to calculate the input for the underlying SigmaDlogProver
 	
 	/**
 	 * Constructor that gets the underlying DlogGroup, soundness parameter and SecureRandom.
@@ -63,7 +62,6 @@ public class SigmaElGamalCTKnowledgeSimulator implements SigmaSimulator{
 		
 		//Creates the underlying SigmaDlogSimulator object with the given parameters.
 		dlogSim = new SigmaDlogSimulator(dlog, t, random);
-		this.dlog = dlog;
 	}
 	
 	/**
@@ -123,7 +121,7 @@ public class SigmaElGamalCTKnowledgeSimulator implements SigmaSimulator{
 		SigmaElGamalCTKnowledgeCommonInput params = (SigmaElGamalCTKnowledgeCommonInput) input;
 		
 		//Convert the input to match the required SigmaDlogSimulator's input.
-		GroupElement h = dlog.reconstructElement(true, params.getCommitment().getPublicKey().getC());
+		GroupElement h = params.getPublicKey().getH();
 		SigmaDlogCommonInput dlogInput = new SigmaDlogCommonInput(h);
 		return dlogInput;
 	}

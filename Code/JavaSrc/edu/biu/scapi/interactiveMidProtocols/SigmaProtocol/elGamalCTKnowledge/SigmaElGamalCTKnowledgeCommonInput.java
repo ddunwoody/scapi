@@ -28,7 +28,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.elGamal.CTCElGamalCommitmentMessage;
+import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ElGamalPublicKey;
 
 /**
  * Concrete implementation of SigmaProtocol input, used by the SigmaElGamalCTKnowldge verifier and simulator.
@@ -40,18 +40,17 @@ import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.elGamal.CTCElGamal
 public class SigmaElGamalCTKnowledgeCommonInput implements SigmaCommonInput{
 
 	private static final long serialVersionUID = 761506828568805999L;
-	private CTCElGamalCommitmentMessage commitment;
+	private ElGamalPublicKey publicKey;
 	
-	public SigmaElGamalCTKnowledgeCommonInput(CTCElGamalCommitmentMessage commitment){
-		this.commitment = commitment;
+	public SigmaElGamalCTKnowledgeCommonInput(ElGamalPublicKey publicKey){
+		this.publicKey = publicKey;
 	}
 	
-	public CTCElGamalCommitmentMessage getCommitment(){
-		return commitment;
+	public ElGamalPublicKey getPublicKey(){
+		return publicKey;
 	}
 	
 	private void writeObject(ObjectOutputStream out) throws IOException {  
-        
-		out.writeObject(commitment);   
+		out.writeObject(publicKey.generateSendableData());    
     }  
 }

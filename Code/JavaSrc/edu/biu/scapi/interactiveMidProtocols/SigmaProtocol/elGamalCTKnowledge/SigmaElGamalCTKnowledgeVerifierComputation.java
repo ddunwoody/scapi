@@ -53,8 +53,6 @@ public class SigmaElGamalCTKnowledgeVerifierComputation implements SigmaVerifier
 	*/	
 	
 	private SigmaDlogVerifierComputation sigmaDlog;//underlying SigmaDlogVerifier to use.
-	private DlogGroup dlog;				//We need the DlogGroup instance in order to calculate the input for the underlying SigmaDlogProver
-	
 	
 	/**
 	 * Constructor that gets the underlying DlogGroup, soundness parameter and SecureRandom.
@@ -67,7 +65,6 @@ public class SigmaElGamalCTKnowledgeVerifierComputation implements SigmaVerifier
 		
 		//Create the underlying SigmaDlogVerifier object with the given parameters.
 		sigmaDlog = new SigmaDlogVerifierComputation(dlog, t, random);
-		this.dlog = dlog;
 	}
 	
 	/**
@@ -91,7 +88,7 @@ public class SigmaElGamalCTKnowledgeVerifierComputation implements SigmaVerifier
 		SigmaElGamalCTKnowledgeCommonInput params = (SigmaElGamalCTKnowledgeCommonInput) in;
 		
 		//Create an input object to the underlying sigma dlog prover.
-		GroupElement h = dlog.reconstructElement(true, params.getCommitment().getPublicKey().getC());
+		GroupElement h = params.getPublicKey().getH();
 		
 		return new SigmaDlogCommonInput(h);
 				
