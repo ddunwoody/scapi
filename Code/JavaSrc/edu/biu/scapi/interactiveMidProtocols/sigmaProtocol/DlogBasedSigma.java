@@ -22,7 +22,7 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol;
+package edu.biu.scapi.interactiveMidProtocols.sigmaProtocol;
 
 /**
  * Marker interface. Every Sigma prover or verifier that consists of DlogGroup should implement this interface.
