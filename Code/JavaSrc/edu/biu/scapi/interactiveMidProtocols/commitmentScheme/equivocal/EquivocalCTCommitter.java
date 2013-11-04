@@ -9,23 +9,23 @@ import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.exceptions.CommitValueException;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTWithProofsCommitter;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
-import edu.biu.scapi.interactiveMidProtocols.zeroKnowledge.ZeroKnowledgeProver;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitmentPhaseValues;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.CTPedersenWithProofsCommitter;
 import edu.biu.scapi.securityLevel.EquivocalCT;
 
 /**
- * Abstract implementation of Equivocal commitment scheme.
+ * Concrete implementation of Equivocal commitment scheme in the committer's point of view.
  * This is a protocol to obtain an equivocal commitment from any commitment with a ZK-protocol 
  * of the commitment value.
  * The equivocality property means that a simulator can decommit to any value it needs 
  * (needed for proofs of security).
  * 
- * This class represent the committer.
- * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public abstract class EquivocalCTCommitter implements CTCommitter, EquivocalCT{
+public class EquivocalCTCommitter implements CTCommitter, EquivocalCT{
 	
 	/*
 	  Runs the following pseudo code:
@@ -36,37 +36,34 @@ public abstract class EquivocalCTCommitter implements CTCommitter, EquivocalCT{
 			Run ZK protocol as the prover, that x is the correct decommitment value
 	 */
 	
-	protected CTCommitter cTCommitter;
-	protected ZeroKnowledgeProver prover;
-	private CommitValue input; //The commit value.
-	private Channel channel;
+	protected CTWithProofsCommitter committer;
 	
 	/**
-	 * Constructor that gets channel, committer and prover to use in the protocol execution.
+	 * Constructor that gets committer to use in the protocol execution.
+	 * @param committer instance of committer that has proofs.
+	 */
+	public EquivocalCTCommitter(CTWithProofsCommitter committer){
+		this.committer = committer;
+	}
+	
+	/**
+	 * Constructor that gets channel to use in the protocol execution and chooses default committer.
 	 * @param channel
-	 * @param cTCommitter
-	 * @param prover
+	 * @throws CheatAttemptException 
+	 * @throws IOException 
+	 * @throws ClassNotFoundException 
 	 */
-	public EquivocalCTCommitter(Channel channel, CTCommitter cTCommitter, ZeroKnowledgeProver prover){
-		this.cTCommitter = cTCommitter;
-		this.prover = prover;
-		this.channel = channel;
+	public EquivocalCTCommitter(Channel channel) throws ClassNotFoundException, IOException, CheatAttemptException{
+		committer = new CTPedersenWithProofsCommitter(channel);
 	}
-	
-	/**
-	 * Computes the pre process of the commitment scheme.
-	 */
-	public void preProcess() throws ClassNotFoundException, IOException, CheatAttemptException {
-		cTCommitter.preProcess();
-	}
-	
+
 	/**
 	 * Runs the following line of the protocol:
 	 * "RUN any COMMIT protocol for C to commit to x".
 	 */
-	public void commit(CommitValue input, int id) throws IOException {
-		this.input = input;
-		cTCommitter.commit(input, id);
+	public void commit(CommitValue input, long id) throws IOException {
+		//Delegate to the underlying committer.
+		committer.commit(input, id);
 	}
 
 	/**
@@ -78,35 +75,18 @@ public abstract class EquivocalCTCommitter implements CTCommitter, EquivocalCT{
 	 * @throws CheatAttemptException 
 	 * @throws CommitValueException 
 	 */
-	public void decommit(int id) throws IOException, CheatAttemptException, ClassNotFoundException, CommitValueException {
-		sendX();
-		
-		runZK();
+	public void decommit(long id) throws IOException, CheatAttemptException, ClassNotFoundException, CommitValueException {
+		//During the execution of proveCommittedValue, the x is sent to the receiver.
+		committer.proveCommittedValue(id);
 	}
-
+	
 	/**
-	 * Runs the following line of the protocol:
-	 * "Run ZK protocol as the prover, that x is the correct decommitment value".
-	 * @throws IOException
-	 * @throws CheatAttemptException
-	 * @throws ClassNotFoundException
-	 * @throws CommitValueException
+	 * This function samples random commit value and returns it.
+	 * @return the sampled commit value
 	 */
-	protected abstract void runZK() throws IOException, CheatAttemptException, ClassNotFoundException, CommitValueException;
-
-	/**
-	 * Runs the following lines of the protocol:
-	 * "SEND x to R".
-	 * @throws IOException
-	 */
-	private void sendX() throws IOException {
-		try{
-			channel.send(input.generateSendableData());
-		}
-		catch (IOException e) {
-			throw new IOException("failed to send the message. The error is: " + e.getMessage());
-		}
-		
+	public CommitValue sampleRandomCommitValue(){
+		//Delegate to the underlying committer.
+		return committer.sampleRandomCommitValue();
 	}
 
 	/**
@@ -114,13 +94,30 @@ public abstract class EquivocalCTCommitter implements CTCommitter, EquivocalCT{
 	 */
 	public CommitValue generateCommitValue(byte[] x)
 			throws CommitValueException {
-		//delegate to the underlying committer
-		return cTCommitter.generateCommitValue(x);
+		//Delegate to the underlying committer.
+		return committer.generateCommitValue(x);
+	}
+	
+	@Override
+	public Object[] getPreProcessValues() {
+		//Delegate to the underlying committer.
+		return committer.getPreProcessValues();
 	}
 
-	
-	public Object getCommitment(int id) {
-		// delete!
-		return null;
+	@Override
+	public CommitmentPhaseValues getCommitmentPhaseValues(long id) {
+		//Delegate to the underlying committer.
+		return committer.getCommitmentPhaseValues(id);
 	}
+	
+	/**
+	 * This function converts the given commit value to a byte array. 
+	 * @param value
+	 * @return the generated bytes.
+	 */
+	public byte[] generateBytesFromCommitValue(CommitValue value){
+		//Delegate to the underlying committer.
+		return committer.generateBytesFromCommitValue(value);
+	}
+
 }
