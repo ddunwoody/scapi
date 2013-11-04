@@ -34,12 +34,12 @@ import edu.biu.scapi.exceptions.CommitValueException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.BigIntegerRandomValue;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.ByteArrayCommitValue;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.OnByteArrayCommitmentScheme;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.elGamal.CTCElGamalDecommitmentMessage;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.elGamal.ElGamalCTCCore;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtByteArrayCommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitter;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtOnByteArray;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.elGamal.CmtElGamalDecommitmentMessage;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.elGamal.CmtElGamalCommitterCore;
 import edu.biu.scapi.midLayer.asymmetricCrypto.encryption.ScElGamalOnByteArray;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.hash.CryptographicHash;
@@ -53,7 +53,7 @@ import edu.biu.scapi.securityLevel.SecureCommit;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-public class ElGamalHashCTCommitter extends ElGamalCTCCore implements CTCommitter, SecureCommit, OnByteArrayCommitmentScheme {
+public class CmtElGamalHashCommitter extends CmtElGamalCommitterCore implements CmtCommitter, SecureCommit, CmtOnByteArray {
 
 	/*
 	 * runs the following protocol:
@@ -88,7 +88,7 @@ public class ElGamalHashCTCommitter extends ElGamalCTCCore implements CTCommitte
 	 * @throws InvalidDlogGroupException
 	 * @throws IOException
 	 */
-	public ElGamalHashCTCommitter(Channel channel, DlogGroup dlog, CryptographicHash hash, SecureRandom random) throws IllegalArgumentException, SecurityLevelException, InvalidDlogGroupException, IOException{
+	public CmtElGamalHashCommitter(Channel channel, DlogGroup dlog, CryptographicHash hash, SecureRandom random) throws IllegalArgumentException, SecurityLevelException, InvalidDlogGroupException, IOException{
 		//During the construction of this object, the Public Key with which we set the El Gamal object gets sent to the receiver.
 		super(channel, dlog, new ScElGamalOnByteArray(dlog, new HKDF(new BcHMAC())), random);
 		if (hash.getHashedMsgSize()> (dlog.getOrder().bitLength()/8)){
@@ -102,12 +102,12 @@ public class ElGamalHashCTCommitter extends ElGamalCTCCore implements CTCommitte
 	/**
 	 * Run COMMIT_ElGamal to commit to value H(x).
 	 */
-	public void commit(CommitValue input, long id) throws IOException {
+	public void commit(CmtCommitValue input, long id) throws IOException {
 		//Check that the input x is in the end a byte[]
-		if (!(input instanceof ByteArrayCommitValue))
+		if (!(input instanceof CmtByteArrayCommitValue))
 			throw new IllegalArgumentException("The input must be of type ByteArrayCommitValue");
 		//Hash the input x with the hash function
-		byte[] x  = ((ByteArrayCommitValue)input).getX();
+		byte[] x  = ((CmtByteArrayCommitValue)input).getX();
 		//Keep the original commit value x and its id in the commitmentMap, needed for later (during the decommit phase).
 		hashCommitmentMap.put(Long.valueOf(id), x);
 
@@ -117,7 +117,7 @@ public class ElGamalHashCTCommitter extends ElGamalCTCCore implements CTCommitte
 		hash.hashFinal(hashValArray, 0);
 		//After the input has been manipulated with the Hash call the super's commit function. Since the super has been initialized with ScElGamalOnByteArray
 		//it will know how to take care of the byte array input.
-		super.commit(new ByteArrayCommitValue(hashValArray), id);
+		super.commit(new CmtByteArrayCommitValue(hashValArray), id);
 	}
 
 
@@ -130,7 +130,7 @@ public class ElGamalHashCTCommitter extends ElGamalCTCCore implements CTCommitte
 		//Get the relevant random value used in the commitment phase
 		BigIntegerRandomValue r = (commitmentMap.get(id)).getR();
 		
-		CTCElGamalDecommitmentMessage msg = new CTCElGamalDecommitmentMessage(x,r);
+		CmtElGamalDecommitmentMessage msg = new CmtElGamalDecommitmentMessage(x,r);
 		try{
 			channel.send(msg);
 		}
@@ -143,15 +143,15 @@ public class ElGamalHashCTCommitter extends ElGamalCTCCore implements CTCommitte
 	 * This function samples random commit value and returns it.
 	 * @return the sampled commit value
 	 */
-	public CommitValue sampleRandomCommitValue(){
+	public CmtCommitValue sampleRandomCommitValue(){
 		byte[] val = new byte[32];
 		random.nextBytes(val);
-		return new ByteArrayCommitValue(val);
+		return new CmtByteArrayCommitValue(val);
 	}
 
 	@Override
-	public CommitValue generateCommitValue(byte[] x)throws CommitValueException {
-		return new ByteArrayCommitValue(x);
+	public CmtCommitValue generateCommitValue(byte[] x)throws CommitValueException {
+		return new CmtByteArrayCommitValue(x);
 	}
 	
 	/**
@@ -159,8 +159,8 @@ public class ElGamalHashCTCommitter extends ElGamalCTCCore implements CTCommitte
 	 * @param value
 	 * @return the generated bytes.
 	 */
-	public byte[] generateBytesFromCommitValue(CommitValue value){
-		if (!(value instanceof ByteArrayCommitValue))
+	public byte[] generateBytesFromCommitValue(CmtCommitValue value){
+		if (!(value instanceof CmtByteArrayCommitValue))
 			throw new IllegalArgumentException("The given value must be of type ByteArrayCommitValue");
 		return (byte[]) value.getX();
 	}
