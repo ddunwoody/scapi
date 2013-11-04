@@ -9,24 +9,23 @@ import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.exceptions.CommitValueException;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTReceiver;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTWithProofsReceiver;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.ReceiverCommitPhaseOutput;
-import edu.biu.scapi.interactiveMidProtocols.zeroKnowledge.ZeroKnowledgeVerifier;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.CTPedersenWithProofsReceiver;
 import edu.biu.scapi.securityLevel.EquivocalCT;
 
 /**
- * Abstract implementation of Equivocal commitment scheme.
+ * Concrete implementation of Equivocal commitment scheme in the receiver's point of view.
  * This is a protocol to obtain an equivocal commitment from any commitment with a ZK-protocol 
  * of the commitment value.
  * The equivocality property means that a simulator can decommit to any value it needs 
  * (needed for proofs of security).
  * 
- * This class represent the receiver.
- * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public abstract class EquivocalCTReceiver implements CTReceiver, EquivocalCT {
+public class EquivocalCTReceiver implements CTReceiver, EquivocalCT {
 	
 	/*
 	  Runs the following pseudo code:
@@ -41,35 +40,34 @@ public abstract class EquivocalCTReceiver implements CTReceiver, EquivocalCT {
 
 	 */
 	
-	protected CTReceiver cTReceiver;
-	protected ZeroKnowledgeVerifier verifier;
-	protected Channel channel;
+	protected CTWithProofsReceiver receiver;
 	
 	/**
-	 * Constructor that gets channel, receiver and verifier to use in the protocol execution.
+	 * Constructor that gets the receiver to use in the protocol execution.
+	 * @param receiver
+	 */
+	public EquivocalCTReceiver(CTWithProofsReceiver receiver){
+		this.receiver = receiver;
+	}
+	
+	/**
+	 * Constructor that gets channel to use in the protocol execution and chooses default receiver.
 	 * @param channel
-	 * @param cTCommitter
-	 * @param prover
+	 * @throws CheatAttemptException 
+	 * @throws IOException 
+	 * @throws ClassNotFoundException 
 	 */
-	public EquivocalCTReceiver(Channel channel, CTReceiver cTReceiver, ZeroKnowledgeVerifier verifier){
-		this.cTReceiver = cTReceiver;
-		this.verifier = verifier;
-		this.channel = channel;
+	public EquivocalCTReceiver(Channel channel) throws ClassNotFoundException, IOException, CheatAttemptException{
+		receiver = new CTPedersenWithProofsReceiver(channel);
 	}
 	
-	/**
-	 * Computes the pre process of the commitment scheme.
-	 */
-	public void preProcess() throws IOException {
-		cTReceiver.preProcess();
-	}
-
 	/**
 	 * Runs the following line of the protocol:
 	 * "RUN any COMMIT protocol for C to commit to x".
 	 */
 	public ReceiverCommitPhaseOutput receiveCommitment() throws ClassNotFoundException, IOException {
-		return cTReceiver.receiveCommitment();
+		//Delegate to the underlying receiver.
+		return receiver.receiveCommitment();
 	}
 
 	/**
@@ -79,32 +77,35 @@ public abstract class EquivocalCTReceiver implements CTReceiver, EquivocalCT {
 	 *          OUTPUT ACC and x
 	 *    	ELSE
 	 *          OUTPUT REJ".
+	 * @throws CommitValueException 
+	 * @throws CheatAttemptException 
+	 * @throws ClassNotFoundException 
+	 * @throws IOException 
 	 */
-	public CommitValue receiveDecommitment(int id) throws ClassNotFoundException, IOException, CommitValueException, CheatAttemptException{
-		CommitValue x = waitForMsgFromCommitter();
-		
-		runZK(x);
-		
-		return x;
+	public CommitValue receiveDecommitment(long id) throws IOException, ClassNotFoundException, CheatAttemptException, CommitValueException {
+		//During the execution of verifyCommittedValue, the x is received by the receiver.
+		return receiver.verifyCommittedValue(id);
 	}
 
-	/**
-	 * Runs the underlying ZK protocol.
-	 * @param x
-	 * @throws IOException
-	 * @throws ClassNotFoundException
-	 * @throws CommitValueException
-	 * @throws CheatAttemptException
-	 */
-	protected abstract void runZK(CommitValue x) throws IOException, ClassNotFoundException, CommitValueException, CheatAttemptException;
+	@Override
+	public Object[] getPreProcessedValues() {
+		//Delegate to the underlying receiver.
+		return receiver.getPreProcessedValues();
+	}
 
-	/**
-	 * receives the message from the committer.
-	 * @return
-	 * @throws ClassNotFoundException
-	 * @throws IOException
-	 */
-	protected abstract CommitValue waitForMsgFromCommitter() throws ClassNotFoundException, IOException;
-
+	@Override
+	public Object getCommitmentPhaseValues(long id) {
+		//Delegate to the underlying receiver.
+		return receiver.getCommitmentPhaseValues(id);
+	}
 	
+	/**
+	 * This function converts the given commit value to a byte array. 
+	 * @param value
+	 * @return the generated bytes.
+	 */
+	public byte[] generateBytesFromCommitValue(CommitValue value){
+		//Delegate to the underlying receiver.
+		return receiver.generateBytesFromCommitValue(value);
+	}
 }
