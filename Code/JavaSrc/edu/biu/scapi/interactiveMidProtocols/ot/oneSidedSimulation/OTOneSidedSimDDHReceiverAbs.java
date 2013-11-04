@@ -45,7 +45,7 @@ import edu.biu.scapi.interactiveMidProtocols.ot.OTROutput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTRGroupElementQuadMsg;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTReceiver;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
-import edu.biu.scapi.interactiveMidProtocols.zeroKnowledge.ZKPOKFromSigmaCommitPedersenProver;
+import edu.biu.scapi.interactiveMidProtocols.zeroKnowledge.ZKPOKFromSigmaCmtPedersenProver;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.securityLevel.DDH;
@@ -95,7 +95,7 @@ abstract class OTOneSidedSimDDHReceiverAbs implements OTReceiver{
 	
 	protected DlogGroup dlog;
 	private SecureRandom random;
-	private ZKPOKFromSigmaCommitPedersenProver zkProver;
+	private ZKPOKFromSigmaCmtPedersenProver zkProver;
 	private BigInteger qMinusOne; 
 	
 	/**
@@ -308,7 +308,7 @@ abstract class OTOneSidedSimDDHReceiverAbs implements OTReceiver{
 		int t = Integer.parseInt(statisticalParameter);
 				
 		//Creates the underlying ZKPOK
-		zkProver = new ZKPOKFromSigmaCommitPedersenProver(channel, new SigmaDlogProverComputation(dlog, t, random));
+		zkProver = new ZKPOKFromSigmaCmtPedersenProver(channel, new SigmaDlogProverComputation(dlog, t, random));
 		
 		zkProver.prove(new SigmaDlogProverInput(gAlpha, alpha));
 	}

@@ -43,7 +43,7 @@ import edu.biu.scapi.interactiveMidProtocols.ot.OTRGroupElementQuadMsg;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSender;
-import edu.biu.scapi.interactiveMidProtocols.zeroKnowledge.ZKPOKFromSigmaCommitPedersenVerifier;
+import edu.biu.scapi.interactiveMidProtocols.zeroKnowledge.ZKPOKFromSigmaCmtPedersenVerifier;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.securityLevel.DDH;
@@ -90,7 +90,7 @@ abstract class OTOneSidedSimDDHSenderAbs implements OTSender{
 
 	protected DlogGroup dlog;
 	private SecureRandom random;
-	private ZKPOKFromSigmaCommitPedersenVerifier zkVerifier;
+	private ZKPOKFromSigmaCmtPedersenVerifier zkVerifier;
 	private BigInteger qMinusOne;
 	
 	/**
@@ -278,7 +278,7 @@ abstract class OTOneSidedSimDDHSenderAbs implements OTSender{
 		int t = Integer.parseInt(statisticalParameter);
 				
 		//Create the underlying ZKPOK
-		zkVerifier = new ZKPOKFromSigmaCommitPedersenVerifier(channel, new SigmaDlogVerifierComputation(dlog, t, random), random);
+		zkVerifier = new ZKPOKFromSigmaCmtPedersenVerifier(channel, new SigmaDlogVerifierComputation(dlog, t, random), random);
 				
 		//If the output of the Zero Knowledge Proof Of Knowledge is REJ, throw CheatAttempException.
 		if (!zkVerifier.verify(new SigmaDlogCommonInput(h))){
