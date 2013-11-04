@@ -33,12 +33,12 @@ import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaProverComputation;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProverInput;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTReceiver;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.OnBigIntegerCommitmentScheme;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.OnByteArrayCommitmentScheme;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.ReceiverCommitPhaseOutput;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.PedersenCTReceiver;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtReceiver;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtOnBigInteger;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtOnByteArray;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtRCommitPhaseOutput;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.CmtPedersenReceiver;
 import edu.biu.scapi.securityLevel.PerfectlyHidingCT;
 
 /**
@@ -54,7 +54,7 @@ public class ZKFromSigmaProver implements ZKProver{
 
 	private Channel channel;
 	private SigmaProverComputation sProver; //Underlying prover that computes the proof of the sigma protocol.
-	private CTReceiver receiver;			//Underlying Commitment receiver to use.
+	private CmtReceiver receiver;			//Underlying Commitment receiver to use.
 	
 	/**
 	 * Constructor that accepts the underlying channel, sigma protocol's prover and commitment's receiver to use.
@@ -63,13 +63,13 @@ public class ZKFromSigmaProver implements ZKProver{
 	 * @param receiver
 	 * @throws SecurityLevelException if the given CTReceiver is not an instance of PerfectlyHidingCT
 	 */
-	public ZKFromSigmaProver(Channel channel, SigmaProverComputation sProver, CTReceiver receiver) throws SecurityLevelException{
+	public ZKFromSigmaProver(Channel channel, SigmaProverComputation sProver, CmtReceiver receiver) throws SecurityLevelException{
 		//receiver must be an instance of PerfectlyHidingCT
 		if (!(receiver instanceof PerfectlyHidingCT)){
 			throw new SecurityLevelException("the given CTReceiver must be an instance of PerfectlyHidingCT");
 		}
 		//receiver must be a commitment scheme on ByteArray or on BigInteger
-		if (!(receiver instanceof OnBigIntegerCommitmentScheme) && !(receiver instanceof OnByteArrayCommitmentScheme)){
+		if (!(receiver instanceof CmtOnBigInteger) && !(receiver instanceof CmtOnByteArray)){
 			throw new IllegalArgumentException("the given CTReceiver must be a commitment scheme on ByteArray or on BigInteger");
 		}
 
@@ -87,7 +87,7 @@ public class ZKFromSigmaProver implements ZKProver{
 	public ZKFromSigmaProver(Channel channel, SigmaProverComputation sProver) throws IOException{
 		
 		this.sProver = sProver;
-		this.receiver = new PedersenCTReceiver(channel);
+		this.receiver = new CmtPedersenReceiver(channel);
 		this.channel = channel;
 	}
 	
@@ -120,7 +120,7 @@ public class ZKFromSigmaProver implements ZKProver{
 		}
 				
 		//Run the receiver in COMMIT.commit 
-		ReceiverCommitPhaseOutput output = receiveCommit();
+		CmtRCommitPhaseOutput output = receiveCommit();
 		//Compute the first message a in sigma, using (x,w) as input and 
 		//Send a to V
 		processFirstMsg((SigmaProverInput) input);
@@ -138,7 +138,7 @@ public class ZKFromSigmaProver implements ZKProver{
 	 * @throws IOException 
 	 * @throws ClassNotFoundException 
 	 */
-	private ReceiverCommitPhaseOutput receiveCommit() throws IOException, ClassNotFoundException{
+	private CmtRCommitPhaseOutput receiveCommit() throws IOException, ClassNotFoundException{
 		return receiver.receiveCommitment();
 	}
 
@@ -170,7 +170,7 @@ public class ZKFromSigmaProver implements ZKProver{
 	 * @throws CommitValueException 
 	 */
 	private byte[] receiveDecommit(long id) throws IOException, CheatAttemptException, ClassNotFoundException, CommitValueException{
-		CommitValue val = receiver.receiveDecommitment(id);
+		CmtCommitValue val = receiver.receiveDecommitment(id);
 		if (val == null){
 			throw new CheatAttemptException("Decommit phase returned invalid");
 		}

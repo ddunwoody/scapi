@@ -33,9 +33,9 @@ import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaVerifierComputation;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.ReceiverCommitPhaseOutput;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersenTrapdoor.PedersenTrapdoorCTCommitter;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtRCommitPhaseOutput;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersenTrapdoor.CmtPedersenTrapdoorCommitter;
 
 /**
  * Concrete implementation of Zero Knowledge verifier.
@@ -50,7 +50,7 @@ public class ZKPOKFromSigmaCommitPedersenVerifier implements ZKPOKVerifier{
 
 	private Channel channel;
 	private SigmaVerifierComputation sVerifier; //Underlying verifier that computes the proof of the sigma protocol.
-	private PedersenTrapdoorCTCommitter committer;				//Underlying Commitment committer to use.
+	private CmtPedersenTrapdoorCommitter committer;				//Underlying Commitment committer to use.
 	private SecureRandom random;
 	
 	
@@ -66,7 +66,7 @@ public class ZKPOKFromSigmaCommitPedersenVerifier implements ZKPOKVerifier{
 	
 		this.channel = channel;
 		this.sVerifier = sVerifier;
-		this.committer = new PedersenTrapdoorCTCommitter(channel);
+		this.committer = new CmtPedersenTrapdoorCommitter(channel);
 		this.random = random;
 	}
 	
@@ -116,7 +116,7 @@ public class ZKPOKFromSigmaCommitPedersenVerifier implements ZKPOKVerifier{
 		//Wait for a message z from P
 		SigmaProtocolMsg z = receiveMsgFromProver();
 		//Wait for trap from P
-		ReceiverCommitPhaseOutput trap = receiveTrapFromProver();
+		CmtRCommitPhaseOutput trap = receiveTrapFromProver();
 		
 		//Run TRAP_COMMIT.valid(T,trap), where T is the transcript from the commit phase
 		valid = valid && committer.validate(trap);
@@ -137,7 +137,7 @@ public class ZKPOKFromSigmaCommitPedersenVerifier implements ZKPOKVerifier{
 	 */
 	private long commit(byte[] e) throws IOException, ClassNotFoundException, CheatAttemptException {
 		
-		CommitValue val = committer.generateCommitValue(e);
+		CmtCommitValue val = committer.generateCommitValue(e);
 		long id = random.nextLong();
 		committer.commit(val, id);
 		return id;
@@ -172,7 +172,7 @@ public class ZKPOKFromSigmaCommitPedersenVerifier implements ZKPOKVerifier{
 	 * @throws ClassNotFoundException
 	 * @throws IOException if failed to send the message.
 	 */
-	private ReceiverCommitPhaseOutput receiveTrapFromProver() throws ClassNotFoundException, IOException {
+	private CmtRCommitPhaseOutput receiveTrapFromProver() throws ClassNotFoundException, IOException {
 		Serializable msg = null;
 		try {
 			//receive the mesage.
@@ -181,11 +181,11 @@ public class ZKPOKFromSigmaCommitPedersenVerifier implements ZKPOKVerifier{
 			throw new IOException("failed to receive the a message. The thrown message is: " + e.getMessage());
 		}
 		//If the given message is not an instance of ReceiverCommitPhaseOutput, throw exception.
-		if (!(msg instanceof ReceiverCommitPhaseOutput)){
+		if (!(msg instanceof CmtRCommitPhaseOutput)){
 			throw new IllegalArgumentException("the given message should be an instance of ReceiverCommitPhaseOutput");
 		}
 		//Return the given message.
-		return (ReceiverCommitPhaseOutput) msg;
+		return (CmtRCommitPhaseOutput) msg;
 	}
 	
 	/**

@@ -35,11 +35,11 @@ import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaVerifierComputation;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.OnBigIntegerCommitmentScheme;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.OnByteArrayCommitmentScheme;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.PedersenCTCommitter;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitter;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtOnBigInteger;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtOnByteArray;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.CmtPedersenCommitter;
 import edu.biu.scapi.securityLevel.PerfectlyHidingCT;
 
 /**
@@ -55,7 +55,7 @@ public class ZKFromSigmaVerifier implements ZKVerifier{
 
 	private Channel channel;
 	private SigmaVerifierComputation sVerifier; //Underlying verifier that computes the proof of the sigma protocol.
-	private CTCommitter committer;				//Underlying Commitment committer to use.
+	private CmtCommitter committer;				//Underlying Commitment committer to use.
 	private SecureRandom random;
 	
 	/**
@@ -65,13 +65,13 @@ public class ZKFromSigmaVerifier implements ZKVerifier{
 	 * @param committer
 	 * @throws SecurityLevelException if the given CTCommitter is not an instance of PerfectlyHidingCT
 	 */
-	public ZKFromSigmaVerifier(Channel channel, SigmaVerifierComputation sVerifier, CTCommitter committer, SecureRandom random) throws SecurityLevelException{
+	public ZKFromSigmaVerifier(Channel channel, SigmaVerifierComputation sVerifier, CmtCommitter committer, SecureRandom random) throws SecurityLevelException{
 		//committer must be an instance of PerfectlyHidingCT
 		if (!(committer instanceof PerfectlyHidingCT)){
 			throw new SecurityLevelException("the given CTCommitter must be an instance of PerfectlyHidingCT");
 		}
 		//committer must be an instance of PerfectlyHidingCT
-		if (!(committer instanceof OnBigIntegerCommitmentScheme) && !(committer instanceof OnByteArrayCommitmentScheme)){
+		if (!(committer instanceof CmtOnBigInteger) && !(committer instanceof CmtOnByteArray)){
 			throw new IllegalArgumentException("the given CTCommitter must be a commitment scheme on ByteArray or on BigInteger");
 		}
 
@@ -93,7 +93,7 @@ public class ZKFromSigmaVerifier implements ZKVerifier{
 	
 		this.channel = channel;
 		this.sVerifier = sVerifier;
-		this.committer = new PedersenCTCommitter(channel);
+		this.committer = new CmtPedersenCommitter(channel);
 		this.random = random;
 	}
 	
@@ -148,7 +148,7 @@ public class ZKFromSigmaVerifier implements ZKVerifier{
 	 * @throws ClassNotFoundException 
 	 */
 	private long commit(byte[] e) throws IOException, ClassNotFoundException, CheatAttemptException, CommitValueException {
-		CommitValue val = committer.generateCommitValue(e);
+		CmtCommitValue val = committer.generateCommitValue(e);
 		long id = random.nextLong();
 		committer.commit(val, id);
 		return id;

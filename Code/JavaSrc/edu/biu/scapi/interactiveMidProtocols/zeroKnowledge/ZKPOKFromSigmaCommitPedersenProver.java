@@ -32,9 +32,9 @@ import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaProverComputation;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
 import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProverInput;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersenTrapdoor.PedersenTrapdoorCTReceiver;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.ReceiverCommitPhaseOutput;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersenTrapdoor.CmtPedersenTrapdoorReceiver;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtRCommitPhaseOutput;
 
 /**
  * Concrete implementation of Zero Knowledge prover.
@@ -49,7 +49,7 @@ public class ZKPOKFromSigmaCommitPedersenProver implements ZKPOKProver{
 
 	private Channel channel;
 	private SigmaProverComputation sProver; //Underlying prover that computes the proof of the sigma protocol.
-	private PedersenTrapdoorCTReceiver receiver;		//Underlying Commitment receiver to use.
+	private CmtPedersenTrapdoorReceiver receiver;		//Underlying Commitment receiver to use.
 	
 	
 	
@@ -62,7 +62,7 @@ public class ZKPOKFromSigmaCommitPedersenProver implements ZKPOKProver{
 	public ZKPOKFromSigmaCommitPedersenProver(Channel channel, SigmaProverComputation sProver) throws IOException{
 		
 		this.sProver = sProver;
-		this.receiver = new PedersenTrapdoorCTReceiver(channel);
+		this.receiver = new CmtPedersenTrapdoorReceiver(channel);
 		this.channel = channel;
 	}
 	
@@ -95,7 +95,7 @@ public class ZKPOKFromSigmaCommitPedersenProver implements ZKPOKProver{
 		}
 				
 		//Run the receiver in TRAP_COMMIT.commit 
-		ReceiverCommitPhaseOutput trap = receiveCommit();
+		CmtRCommitPhaseOutput trap = receiveCommit();
 		//Compute the first message a in sigma, using (x,w) as input and 
 		//Send a to V
 		processFirstMsg((SigmaProverInput) input);
@@ -113,7 +113,7 @@ public class ZKPOKFromSigmaCommitPedersenProver implements ZKPOKProver{
 	 * @throws IOException 
 	 * @throws ClassNotFoundException 
 	 */
-	private ReceiverCommitPhaseOutput receiveCommit() throws IOException, ClassNotFoundException{
+	private CmtRCommitPhaseOutput receiveCommit() throws IOException, ClassNotFoundException{
 		return receiver.receiveCommitment();
 	}
 
@@ -144,7 +144,7 @@ public class ZKPOKFromSigmaCommitPedersenProver implements ZKPOKProver{
 	 * @throws ClassNotFoundException 
 	 */
 	private byte[] receiveDecommit(long id) throws IOException, CheatAttemptException, ClassNotFoundException{
-		CommitValue val = receiver.receiveDecommitment(id);
+		CmtCommitValue val = receiver.receiveDecommitment(id);
 		if (val == null){
 			throw new CheatAttemptException("Decommit phase returned invalid");
 		}
@@ -160,7 +160,7 @@ public class ZKPOKFromSigmaCommitPedersenProver implements ZKPOKProver{
 	 * @throws CheatAttemptException if the challenge's length is not as expected.
 	 * @throws IOException if failed to send the message.
 	 */
-	public void processSecondMsg(byte[] e, ReceiverCommitPhaseOutput trap) throws CheatAttemptException, IOException {
+	public void processSecondMsg(byte[] e, CmtRCommitPhaseOutput trap) throws CheatAttemptException, IOException {
 		
 		//Compute the second message by the underlying proverComputation.
 		SigmaProtocolMsg z = sProver.computeSecondMsg(e);
