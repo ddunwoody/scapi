@@ -39,8 +39,8 @@ import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.BigIntegerRandomValue;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitter;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitValue;
 import edu.biu.scapi.midLayer.asymmetricCrypto.encryption.ElGamalEnc;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScElGamalPrivateKey;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScElGamalPublicKey;
@@ -56,7 +56,7 @@ import edu.biu.scapi.securityLevel.DDH;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-public abstract class ElGamalCTCCore implements CTCommitter {
+public abstract class CmtElGamalCommitterCore implements CmtCommitter {
 	
 	/*
 	 * runs the following protocol:
@@ -77,7 +77,7 @@ public abstract class ElGamalCTCCore implements CTCommitter {
 	protected DlogGroup dlog;
 	protected SecureRandom random;
 	private BigInteger qMinusOne;
-	protected Map<Long, ElGamalCommitmentPhaseValues> commitmentMap;
+	protected Map<Long, CmtElGamalCommitmentPhaseValues> commitmentMap;
 	protected ElGamalEnc elGamal;
 	protected ScElGamalPublicKey publicKey;
 	private ScElGamalPrivateKey privateKey;
@@ -89,12 +89,12 @@ public abstract class ElGamalCTCCore implements CTCommitter {
 	 * The Receiver needs to be instantiated with the same DlogGroup, 
 	 * otherwise nothing will work properly.
 	 */
-	protected ElGamalCTCCore(Channel channel, DlogGroup dlog, ElGamalEnc elGamal, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException, IOException{
+	protected CmtElGamalCommitterCore(Channel channel, DlogGroup dlog, ElGamalEnc elGamal, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException, IOException{
 		doConstruct(channel, dlog, elGamal, random);
 	}
 	
 	// default constructor is not enough since default encryption cannot be chosen.
-	protected ElGamalCTCCore() {}
+	protected CmtElGamalCommitterCore() {}
 
 	/**
 	 * Sets the given parameters and execute the preprocess phase of the scheme.
@@ -118,7 +118,7 @@ public abstract class ElGamalCTCCore implements CTCommitter {
 		this.dlog = dlog;
 		this.random = random;
 		qMinusOne =  dlog.getOrder().subtract(BigInteger.ONE);
-		commitmentMap = new Hashtable<Long, ElGamalCommitmentPhaseValues>();
+		commitmentMap = new Hashtable<Long, CmtElGamalCommitmentPhaseValues>();
 		this.elGamal = elGamal;
 		preProcess();
 	}
@@ -162,7 +162,7 @@ public abstract class ElGamalCTCCore implements CTCommitter {
 	 *	COMPUTE u = g^r and v = h^r * x
 	 *	SEND c = (h,u,v) to R".
 	 */
-	public void commit(CommitValue input, long id) throws IOException {
+	public void commit(CmtCommitValue input, long id) throws IOException {
 		
 		//Sample random r <-Zq.
 		BigInteger r = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);	
@@ -173,12 +173,12 @@ public abstract class ElGamalCTCCore implements CTCommitter {
 
 		try {
 			//Send the message by the channel.
-			channel.send(new CTCElGamalCommitmentMessage((ElGamalCiphertextSendableData)c.generateSendableData(), id));
+			channel.send(new CmtElGamalCommitmentMessage((ElGamalCiphertextSendableData)c.generateSendableData(), id));
 		} catch (IOException e) {
 			throw new IOException("failed to send the commitment. The error is: " + e.getMessage());
 		}	
 		//After succeeding in sending the commitment, keep the committed value in the map together with its ID.
-		commitmentMap.put(Long.valueOf(id), new ElGamalCommitmentPhaseValues(new BigIntegerRandomValue(r), input,c));
+		commitmentMap.put(Long.valueOf(id), new CmtElGamalCommitmentPhaseValues(new BigIntegerRandomValue(r), input,c));
 	}
 
 	/**
@@ -189,8 +189,8 @@ public abstract class ElGamalCTCCore implements CTCommitter {
 	public void decommit(long id) throws IOException {
 
 		//fetch the commitment according to the requested ID
-		ElGamalCommitmentPhaseValues values = commitmentMap.get(Long.valueOf(id));
-		CTCElGamalDecommitmentMessage msg =  new CTCElGamalDecommitmentMessage(values.getX().generateSendableData(),values.getR());
+		CmtElGamalCommitmentPhaseValues values = commitmentMap.get(Long.valueOf(id));
+		CmtElGamalDecommitmentMessage msg =  new CmtElGamalDecommitmentMessage(values.getX().generateSendableData(),values.getR());
 		try{
 			channel.send(msg);
 		}
@@ -208,7 +208,7 @@ public abstract class ElGamalCTCCore implements CTCommitter {
 	}
 
 	@Override
-	public ElGamalCommitmentPhaseValues getCommitmentPhaseValues(long id) {
+	public CmtElGamalCommitmentPhaseValues getCommitmentPhaseValues(long id) {
 		return commitmentMap.get(id);
 	}
 

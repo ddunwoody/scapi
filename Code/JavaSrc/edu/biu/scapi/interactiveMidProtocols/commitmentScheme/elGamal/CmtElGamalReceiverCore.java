@@ -35,10 +35,10 @@ import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.BasicReceiverCommitPhaseOutput;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTReceiver;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.ReceiverCommitPhaseOutput;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtRBasicCommitPhaseOutput;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtReceiver;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtRCommitPhaseOutput;
 import edu.biu.scapi.midLayer.asymmetricCrypto.encryption.ElGamalEnc;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScElGamalPublicKey;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScElGamalPublicKey.ScElGamalPublicKeySendableData;
@@ -55,7 +55,7 @@ import edu.biu.scapi.securityLevel.DDH;
  *
  */
 
-public abstract class ElGamalCTRCore implements CTReceiver{
+public abstract class CmtElGamalReceiverCore implements CmtReceiver{
 	
 	/*
 	 * runs the following protocol:
@@ -77,7 +77,7 @@ public abstract class ElGamalCTRCore implements CTReceiver{
 	 *
 	 */
 	
-	protected Map<Long , CTCElGamalCommitmentMessage> commitmentMap;
+	protected Map<Long , CmtElGamalCommitmentMessage> commitmentMap;
 	protected DlogGroup dlog;
 	protected Channel channel;
 	protected ElGamalEnc elGamal;
@@ -89,12 +89,12 @@ public abstract class ElGamalCTRCore implements CTReceiver{
 	 * The committer needs to be instantiated with the same DlogGroup, 
 	 * otherwise nothing will work properly.
 	 */
-	public ElGamalCTRCore(Channel channel, DlogGroup dlog, ElGamalEnc elGamal) throws SecurityLevelException, InvalidDlogGroupException, ClassNotFoundException, IOException, CheatAttemptException{
+	public CmtElGamalReceiverCore(Channel channel, DlogGroup dlog, ElGamalEnc elGamal) throws SecurityLevelException, InvalidDlogGroupException, ClassNotFoundException, IOException, CheatAttemptException{
 		doConstruct(channel, dlog, elGamal);
 	}
 
 	// default constructor is not enough since default encryption cannot be chosen.
-	public ElGamalCTRCore(){}
+	public CmtElGamalReceiverCore(){}
 
 	/**
 	 * Sets the given parameters and execute the preprocess phase of the scheme.
@@ -117,7 +117,7 @@ public abstract class ElGamalCTRCore implements CTReceiver{
 
 		this.channel = channel;
 		this.dlog = dlog;
-		commitmentMap = new Hashtable<Long, CTCElGamalCommitmentMessage>();
+		commitmentMap = new Hashtable<Long, CmtElGamalCommitmentMessage>();
 		this.elGamal = elGamal;
 		preProcess();
 		try {
@@ -163,10 +163,10 @@ public abstract class ElGamalCTRCore implements CTReceiver{
 	 * @throws ClassNotFoundException if there was a problem during serialization mechanism.
 	 * @throws IOException  if there was a problem during communication phase
 	 */
-	public ReceiverCommitPhaseOutput receiveCommitment() throws ClassNotFoundException, IOException {
-		 CTCElGamalCommitmentMessage msg = null;
+	public CmtRCommitPhaseOutput receiveCommitment() throws ClassNotFoundException, IOException {
+		 CmtElGamalCommitmentMessage msg = null;
 		try{
-			msg = (CTCElGamalCommitmentMessage) channel.receive();
+			msg = (CmtElGamalCommitmentMessage) channel.receive();
 		} catch (ClassNotFoundException e) {
 			throw new ClassNotFoundException("Failed to receive commitment. The error is: " + e.getMessage());
 		} catch (IOException e) {
@@ -174,7 +174,7 @@ public abstract class ElGamalCTRCore implements CTReceiver{
 		}
 
 		commitmentMap.put(Long.valueOf(msg.getId()), msg);
-		return new BasicReceiverCommitPhaseOutput(msg.getId());
+		return new CmtRBasicCommitPhaseOutput(msg.getId());
 	}
 
 	/**
@@ -194,7 +194,7 @@ public abstract class ElGamalCTRCore implements CTReceiver{
 	 * @throws IOException  if there was a problem during communication phase
 	 * @throws IllegalArgumentException
 	 */
-	public CommitValue receiveDecommitment(long id) throws ClassNotFoundException, IOException, IllegalArgumentException {
+	public CmtCommitValue receiveDecommitment(long id) throws ClassNotFoundException, IOException, IllegalArgumentException {
 		Serializable message = null;
 		try {
 			message =  channel.receive();
@@ -204,10 +204,10 @@ public abstract class ElGamalCTRCore implements CTReceiver{
 		} catch (IOException e) {
 			throw new IOException("Failed to receive decommitment. The error is: " + e.getMessage());
 		}
-		if (!(message instanceof CTCElGamalDecommitmentMessage)){
+		if (!(message instanceof CmtElGamalDecommitmentMessage)){
 			throw new IllegalArgumentException("the received message is not an instance of CTCElGamalDecommitmentMessage");
 		}
-		return processDecommitment(id, (CTCElGamalDecommitmentMessage) message);
+		return processDecommitment(id, (CmtElGamalDecommitmentMessage) message);
 	}
 	
 	@Override
@@ -218,7 +218,7 @@ public abstract class ElGamalCTRCore implements CTReceiver{
 	}
 		
 	@Override
-	public CTCElGamalCommitmentMessage getCommitmentPhaseValues(long id){
+	public CmtElGamalCommitmentMessage getCommitmentPhaseValues(long id){
 		return commitmentMap.get(id);
 	}
 
@@ -235,5 +235,5 @@ public abstract class ElGamalCTRCore implements CTReceiver{
 	 * @param msg the receiver message from the committer
 	 * @return the committed value if the decommit succeeded; null, otherwise.
 	 */
-	protected abstract CommitValue processDecommitment(long id, CTCElGamalDecommitmentMessage msg);
+	protected abstract CmtCommitValue processDecommitment(long id, CmtElGamalDecommitmentMessage msg);
 }

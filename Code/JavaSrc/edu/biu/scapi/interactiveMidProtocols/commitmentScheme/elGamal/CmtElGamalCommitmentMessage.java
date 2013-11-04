@@ -26,7 +26,7 @@ package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.elGamal;
 
 import java.io.Serializable;
 
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCtrCommitmentMsg;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCCommitmentMsg;
 import edu.biu.scapi.midLayer.ciphertext.ElGamalCiphertextSendableData;
 
 /**
@@ -34,7 +34,7 @@ import edu.biu.scapi.midLayer.ciphertext.ElGamalCiphertextSendableData;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-public class CTCElGamalCommitmentMessage implements CmtCtrCommitmentMsg, Serializable {
+public class CmtElGamalCommitmentMessage implements CmtCCommitmentMsg, Serializable {
 
 	private static final long serialVersionUID = 8646902245380445237L;
 	// In ElGamal schemes the commitment object is a ElGamalCiphertext
@@ -47,7 +47,7 @@ public class CTCElGamalCommitmentMessage implements CmtCtrCommitmentMsg, Seriali
 	 * @param cipherData the actual commitment object. In ElGamal schemes the commitment object is a ElGamalCiphertextSendableData.
 	 * @param id the commitment id.
 	 */
-	public CTCElGamalCommitmentMessage(ElGamalCiphertextSendableData cipherData, long id) {
+	public CmtElGamalCommitmentMessage(ElGamalCiphertextSendableData cipherData, long id) {
 		super();
 		this.cipherData = cipherData;
 		this.id = id;

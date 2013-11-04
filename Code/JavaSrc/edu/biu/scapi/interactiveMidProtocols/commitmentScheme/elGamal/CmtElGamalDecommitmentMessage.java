@@ -27,14 +27,14 @@ package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.elGamal;
 import java.io.Serializable;
 
 import edu.biu.scapi.interactiveMidProtocols.BigIntegerRandomValue;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCDecommitmentMessage;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCDecommitmentMessage;
 
 /**
  * Concrete implementation of decommitment message used by ElGamal commitment scheme.
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-public class CTCElGamalDecommitmentMessage implements CTCDecommitmentMessage, Serializable {
+public class CmtElGamalDecommitmentMessage implements CmtCDecommitmentMessage, Serializable {
 
 	
 	private static final long serialVersionUID = 7030668841448148428L;
@@ -48,7 +48,7 @@ public class CTCElGamalDecommitmentMessage implements CTCDecommitmentMessage, Se
 	 * @param x the committed value
 	 * @param r the random value used for commit.
 	 */
-	public CTCElGamalDecommitmentMessage(Serializable x, BigIntegerRandomValue r) {
+	public CmtElGamalDecommitmentMessage(Serializable x, BigIntegerRandomValue r) {
 		super();
 		this.x = x;
 		this.r = r;
