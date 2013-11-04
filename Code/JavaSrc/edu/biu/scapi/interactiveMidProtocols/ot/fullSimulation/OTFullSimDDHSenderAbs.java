@@ -43,7 +43,7 @@ import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSender;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTUtil;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTUtil.RandOutput;
-import edu.biu.scapi.interactiveMidProtocols.zeroKnowledge.ZKPOKFromSigmaCommitPedersenVerifier;
+import edu.biu.scapi.interactiveMidProtocols.zeroKnowledge.ZKPOKFromSigmaCmtPedersenVerifier;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.securityLevel.DDH;
@@ -89,7 +89,7 @@ abstract class OTFullSimDDHSenderAbs implements OTSender{
 
 	protected DlogGroup dlog;
 	private SecureRandom random;
-	private ZKPOKFromSigmaCommitPedersenVerifier zkVerifier;
+	private ZKPOKFromSigmaCmtPedersenVerifier zkVerifier;
 
 	private GroupElement g1, h0, h1; //Pre process values.
 	
@@ -171,7 +171,7 @@ abstract class OTFullSimDDHSenderAbs implements OTSender{
 		int t = Integer.parseInt(statisticalParameter);
 		
 		//Create the underlying ZKPOK
-		zkVerifier = new ZKPOKFromSigmaCommitPedersenVerifier(channel, new SigmaDHVerifierComputation(dlog, t, random), random);
+		zkVerifier = new ZKPOKFromSigmaCmtPedersenVerifier(channel, new SigmaDHVerifierComputation(dlog, t, random), random);
 		
 		// Some OT protocols have a pre-process stage before the transfer. 
 		// Usually, pre process is done once at the beginning of the protocol and will not be executed later, 

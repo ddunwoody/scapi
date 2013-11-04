@@ -45,7 +45,7 @@ import edu.biu.scapi.interactiveMidProtocols.ot.OTRGroupElementPairMsg;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTROutput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTReceiver;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
-import edu.biu.scapi.interactiveMidProtocols.zeroKnowledge.ZKPOKFromSigmaCommitPedersenProver;
+import edu.biu.scapi.interactiveMidProtocols.zeroKnowledge.ZKPOKFromSigmaCmtPedersenProver;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.securityLevel.DDH;
@@ -101,7 +101,7 @@ abstract class OTFullSimDDHReceiverAbs implements OTReceiver{
 	
 	protected DlogGroup dlog;
 	private SecureRandom random;
-	private ZKPOKFromSigmaCommitPedersenProver zkProver;
+	private ZKPOKFromSigmaCmtPedersenProver zkProver;
 	private BigInteger qMinusOne; 
 	
 	//Pre process values required for calculations:
@@ -187,7 +187,7 @@ abstract class OTFullSimDDHReceiverAbs implements OTReceiver{
 		String statisticalParameter = ScapiDefaultConfiguration.getInstance().getProperty("StatisticalParameter");
 		int t = Integer.parseInt(statisticalParameter);	
 		//Creates the underlying ZKPOK. 
-		zkProver = new ZKPOKFromSigmaCommitPedersenProver(channel, new SigmaDHProverComputation(dlog, t, random));
+		zkProver = new ZKPOKFromSigmaCmtPedersenProver(channel, new SigmaDHProverComputation(dlog, t, random));
 				
 		// Some OT protocols have a pre-process stage before the transfer. 
 		// Usually, pre process is done once at the beginning of the protocol and will not be executed later, 
