@@ -24,7 +24,7 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.zeroKnowledge;
 
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProverInput;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProverInput;
 
 public class ZKPOKFiatShamirProverInput implements ZKProverInput{
 

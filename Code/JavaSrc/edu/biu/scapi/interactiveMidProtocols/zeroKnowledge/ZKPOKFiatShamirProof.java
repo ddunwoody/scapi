@@ -26,7 +26,7 @@ package edu.biu.scapi.interactiveMidProtocols.zeroKnowledge;
 
 import java.io.Serializable;
 
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProtocolMsg;
 
 /** 
  * This message contains two SigmaProtocolMessage and a challenge. 

@@ -30,9 +30,9 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 import edu.biu.scapi.comm.Channel;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaVerifierComputation;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.SigmaVerifierComputation;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaCommonInput;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProtocolMsg;
 import edu.biu.scapi.primitives.randomOracle.HKDFBasedRO;
 import edu.biu.scapi.primitives.randomOracle.RandomOracle;
 
