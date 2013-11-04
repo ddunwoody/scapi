@@ -27,26 +27,44 @@ package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen;
 import java.io.Serializable;
 
 
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCtrCommitmentMsg;
 import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
 
 /**
+ * Concrete implementation of commitment message used by Pedersen commitment scheme.
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-public class CTCPedersenCommitmentMessage implements Serializable {
+class CTCPedersenCommitmentMessage implements CmtCtrCommitmentMsg, Serializable {
 	private static final long serialVersionUID = -4867238837511177003L;
-	private GroupElementSendableData c;
-	private int id;
 	
-	public CTCPedersenCommitmentMessage(GroupElementSendableData c, int id) {
+	// In Pedersen schemes the commitment object is a groupElement. 
+	//In order to this class be a serializable, we get it as GroupElementSendableData.
+	private GroupElementSendableData c;  
+	private long id; //The id of the commitment
+	
+	/**
+	 * Constructor that sets the commitment and id.
+	 * @param c the actual commitment object. In Pedersen schemes the commitment object is a groupElement.
+	 * @param id the commitment id.
+	 */
+	public CTCPedersenCommitmentMessage(GroupElementSendableData c, long id) {
 		super();
 		this.c = c;
 		this.id = id;
 	}
-	public GroupElementSendableData getC() {
+	
+	/**
+	 * Returns the commitment value
+	 */
+	public GroupElementSendableData getCommitment() {
 		return c;
 	}
-	public int getId() {
+	
+	/**
+	 * Returns the commitment id.
+	 */
+	public long getId() {
 		return id;
 	}
 
