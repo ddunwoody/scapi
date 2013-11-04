@@ -35,97 +35,101 @@ import org.bouncycastle.util.BigIntegers;
 
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CheatAttemptException;
+import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.pedersenCommittedValue.SigmaPedersenCommittedValueProverInput;
+import edu.biu.scapi.generals.ScapiDefaultConfiguration;
+import edu.biu.scapi.interactiveMidProtocols.BigIntegerRandomValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.BigIntegerCommitValue;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCDecommitmentMessage;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitmentPair;
-//import edu.biu.scapi.interactiveMidProtocols.ot.semiHonest.OTRSemiHonestMessage;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
-import edu.biu.scapi.primitives.dlog.cryptopp.CryptoPpDlogZpSafePrime;
-import edu.biu.scapi.primitives.dlog.miracl.MiraclDlogECF2m;
 import edu.biu.scapi.securityLevel.DDH;
+import edu.biu.scapi.tools.Factories.DlogGroupFactory;
+
 /**
+ * This abstract class performs all the core functionality of the committer side of Pedersen commitment. 
+ * Specific implementations can extend this class and add or override functions as necessary.
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-public abstract class PedersenCommitterCore {
+public abstract class PedersenCommitterCore implements CTCommitter{
+	
 	/*
-	public class CommitmentPair{
-		BigInteger x;	//The commitment
-		BigInteger r;	//The random value used to commit
-		
-		CommitmentPair(BigInteger x, BigInteger r){
-			this.x  =x;
-			this.r = r;
-		}
-		public BigInteger getX(){
-			return x;
-		}
-		public BigInteger getR(){
-			return r;
-		}
-	}
-	*/
+	 * runs the following protocol:
+	 * "Commit phase
+	 *		IF NOT VALID_PARAMS(G,q,g)
+	 *			REPORT ERROR and HALT
+	 *		WAIT for h from R 
+	 *		IF NOT h in G
+	 *			REPORT ERROR and HALT
+	 * 		SAMPLE a random value r <- Zq
+	 * 		COMPUTE  c = g^r * h^x
+	 * 		SEND c
+	 *	Decommit phase
+	 *		SEND (r, x) to R
+	 *		OUTPUT nothing."
+	 *
+	 */
+	
 	protected Channel channel;
 	protected DlogGroup dlog;
-	private SecureRandom random;
+	protected SecureRandom random;
 	private BigInteger qMinusOne;
-	protected Map<Integer, CommitmentPair> commitmentMap;			//The key to the map is an ID and the value is a pair that has the Committer's private input x in Zq and the random value
-																//used to commit x.
-										//Each committed value is sent together with an ID so that the receiver can keep it it in some data structure. This is necessary
-										//in the cases that the same instances of committer and receiver can be used for performing various commitments utilizing the values calculated
-										//during the pre-process stage for the sake of efficiency.
 	
-	//private BigInteger x; 			//Committer's private input x in Zq
-	//private BigInteger r; 			//Random value sampled during the sampleRandomValues stage;
-	//private CTRPedersenMessage msg; //Message obtained from the receiver during the preProcess stage. Later is needed to commit.
-    protected GroupElement h; 		//The content of the message obtained from the receiver. 
-    private SigmaPedersenCommittedValueProverInput input; //returned in getINputForZK function.
-    //private int id;					
-	public PedersenCommitterCore(Channel channel) {
+	//The key to the map is an ID and the value is a structure that has the Committer's private input x in Zq,the random value
+	//used to commit x and the actual commitment.
+	//Each committed value is sent together with an ID so that the receiver can keep it in some data structure. This is necessary
+	//in the cases that the same instances of committer and receiver can be used for performing various commitments utilizing the values calculated
+	//during the pre-process stage for the sake of efficiency.
+	protected Map<Long, PedersenCommitmentPhaseValues> commitmentMap;		
+	
+	//The content of the message obtained from the receiver during the pre-process phase which occurs upon construction.
+    protected GroupElement h; 		 
+ 
+    /**
+	 * Constructor that receives a connected channel (to the receiver) and chooses default dlog and random. 
+	 * The receiver needs to be instantiated with the default constructor too.
+	 */
+	protected PedersenCommitterCore(Channel channel) throws ClassNotFoundException, IOException, CheatAttemptException {
+		String dlogGroupName = ScapiDefaultConfiguration.getInstance().getProperty("DDHDlogGroup");
 		try {
-			//Uses Miracl Koblitz 233 Elliptic curve.
-			doConstruct(channel, new MiraclDlogECF2m("K-233"), new SecureRandom());
-		} catch (IOException e) {
-			//Why do we have this??
-			
-			//If there is a problem with the elliptic curves file, create Zp DlogGroup.
-			try {
-				doConstruct(channel, new CryptoPpDlogZpSafePrime(), new SecureRandom());
-			} catch (SecurityLevelException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (InvalidDlogGroupException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			doConstruct(channel, DlogGroupFactory.getInstance().getObject(dlogGroupName) , new SecureRandom());
 		} catch (SecurityLevelException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InvalidDlogGroupException e) {
-			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (FactoriesException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public PedersenCommitterCore(Channel channel, DlogGroup dlog) throws IllegalArgumentException, SecurityLevelException, InvalidDlogGroupException{
-			doConstruct(channel, dlog, new SecureRandom());
+	/**
+	 * Constructor that receives a connected channel (to the receiver), the DlogGroup agreed upon between them and a SecureRandom object.
+	 * The Receiver needs to be instantiated with the same DlogGroup, otherwise nothing will work properly.
+	 */
+	protected PedersenCommitterCore(Channel channel, DlogGroup dlog, SecureRandom random) throws IllegalArgumentException, SecurityLevelException, InvalidDlogGroupException, ClassNotFoundException, IOException, CheatAttemptException{
+			doConstruct(channel, dlog, random);
 	}
 	
-
-	
-	private void doConstruct(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException{
+	/**
+	 * Sets the given parameters and execute the preprocess phase of the scheme.
+	 * @param channel
+	 * @param dlog
+	 * @param random
+	 * @throws SecurityLevelException if the given dlog is not DDH secure
+	 * @throws InvalidDlogGroupException if the given dlog is not valid.
+	 * @throws ClassNotFoundException if there was a problem in the serialization
+	 * @throws IOException if there was a problem in the communication
+	 * @throws CheatAttemptException if the receiver h is not in the DlogGroup.
+	 */
+	private void doConstruct(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException, ClassNotFoundException, IOException, CheatAttemptException{
 		//The underlying dlog group must be DDH secure.
 		if (!(dlog instanceof DDH)){
 			throw new SecurityLevelException("DlogGroup should have DDH security level");
 		}
+		//Validate the params of the group.
 		if(!dlog.validateGroup())
 			throw new InvalidDlogGroupException();
 			
@@ -133,29 +137,49 @@ public abstract class PedersenCommitterCore {
 		this.dlog = dlog;
 		this.random = random;
 		qMinusOne =  dlog.getOrder().subtract(BigInteger.ONE);
-		commitmentMap = new Hashtable<Integer, CommitmentPair>();
+		commitmentMap = new Hashtable<Long, PedersenCommitmentPhaseValues>();
+		//The pre-process phase is actually performed at construction
+		preProcess();
 	}
 	
-
-	public void preProcess() throws ClassNotFoundException, IOException, CheatAttemptException {
-	
+	/**
+	 * Runs the preprocess phase of the commitment scheme:
+	 * "WAIT for h from R 
+	 * IF NOT h in G
+	 *	REPORT ERROR and HALT"
+	 * @throws ClassNotFoundException if there was a problem in the serialization
+	 * @throws IOException if there was a problem in the communication
+	 * @throws CheatAttemptException if the receiver h is not in the DlogGroup.
+	 */
+	private void preProcess() throws ClassNotFoundException, IOException, CheatAttemptException {
 		CTRPedersenMessage msg = waitForMessageFromReceiver();
-		//If the element cannot be reconstructed IllegalArgumentException gets thrown....It is weird for a function that doesn't have any arguments...
 		h = dlog.reconstructElement(true, msg.getH());
 		if(!dlog.isMember(h))
 				throw new CheatAttemptException("h element is not a member of the current DlogGroup");
-		System.out.println("h = " + h);
-	
 	}
 
-	
-	public void  commit(CommitValue in, int id) throws IOException, IllegalArgumentException {
+	/**
+	 * Runs the commit phase of the commitment scheme:
+	 * "SAMPLE a random value r <- Zq
+	 * 	COMPUTE  c = g^r * h^x
+	 * 	SEND c".
+	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter#commit(edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue, long)
+	 */
+	public void  commit(CommitValue in, long id) throws IOException, IllegalArgumentException {
 		
 		if (!(in instanceof BigIntegerCommitValue))
 			throw new IllegalArgumentException("The input must be of type BigIntegerCommitValue");
-		BigInteger r = sampleRandomValues();	
+		
+		//Sample a random value r <- Zq
+		BigInteger r = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);	
+		
+		//Compute  c = g^r * h^x
 		BigInteger x = ((BigIntegerCommitValue)in).getX();
-		GroupElement c =  computeCommitment(x, r);
+		GroupElement gToR = dlog.exponentiate(dlog.getGenerator(), r);
+		GroupElement hToX = dlog.exponentiate(h, x);
+		GroupElement c = dlog.multiplyGroupElements(gToR, hToX);
+		
+		//Send c
 		CTCPedersenCommitmentMessage msg = new CTCPedersenCommitmentMessage(c.generateSendableData(), id);
 		try {
 			//Send the message by the channel.
@@ -163,50 +187,36 @@ public abstract class PedersenCommitterCore {
 		} catch (IOException e) {
 			throw new IOException("failed to send the message. The error is: " + e.getMessage());
 		}	
-		//After succeeding in sending the commitment, keep the committed value in the map together with its ID.
-		commitmentMap.put(Integer.valueOf(id), new CommitmentPair(r, new BigIntegerCommitValue(x)));
-		System.out.println("x = " + x);
-		System.out.println("r = " + r);
-		System.out.println("c = " + c);
-		//This is not according to the pseudo-code but for our programming needs. TODO Check if can be left.
-		//return c;
 		
-		input = new SigmaPedersenCommittedValueProverInput(h, msg, x, r);
+		//After succeeding in sending the commitment, keep the committed value in the map together with its ID.
+		commitmentMap.put(Long.valueOf(id), new PedersenCommitmentPhaseValues(new BigIntegerRandomValue(r), new BigIntegerCommitValue(x), c));
+		
 	}
 
-	//This function is for testing purposes only. It should be deleted before publishing this part of SCAPI.
-	//To be used immediately after commit function.
-	public Object getCommitment(int id){
-		CommitmentPair pair = commitmentMap.get(Integer.valueOf(id));
-		BigIntegerCommitValue xCVal = (BigIntegerCommitValue)pair.getX();
-		return computeCommitment(xCVal.getX(), pair.getR());
-	}
-	
-	public void decommit(int id) throws IOException {
-		
+	/**
+	 * Runs the decommit phase of the commitment scheme:
+	 * "SEND (r, x) to R
+	 *	OUTPUT nothing."
+	 */
+	public void decommit(long id) throws IOException {
+		//fetch the commitment according to the requested ID
+		PedersenCommitmentPhaseValues values = commitmentMap.get(Long.valueOf(id));
+		BigIntegerCommitValue xCVal = (BigIntegerCommitValue)values.getX();
+		CTCPedersenDecommitmentMessage msg = new CTCPedersenDecommitmentMessage(xCVal.getX(),values.getR());
 		try{
-			channel.send((CTCPedersenDecommitmentMessage)computeDecommit(id));
+			channel.send(msg);
 		}
 		catch (IOException e) {
 			throw new IOException("failed to send the message. The error is: " + e.getMessage());
 		}
-		//This is not according to the pseudo-code but for our programming needs. TODO Check if can be left.
-		//return (CTCDecommitmentMessage) msg;
 	}	
-	
-	CTCDecommitmentMessage computeDecommit(int id){
-		//fetch the commitment according to the requested ID
-		CommitmentPair pair = commitmentMap.get(Integer.valueOf(id));
-		BigIntegerCommitValue xCVal = (BigIntegerCommitValue)pair.getX();
-		return (CTCDecommitmentMessage) new CTCPedersenDecommitmentMessage(xCVal.getX(),pair.getR());
-	}
 
-	
-	private BigInteger sampleRandomValues() {
-		BigInteger r = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
-		return r;
-	}
-	
+	/**
+	 * Receives message from teh receiver.
+	 * @return the received message
+	 * @throws ClassNotFoundException if there was a problem during serialization.
+	 * @throws IOException if there was a problem in the communication level.
+	 */
 	private CTRPedersenMessage waitForMessageFromReceiver() throws ClassNotFoundException, IOException{
 		Serializable message = null;
 		try {
@@ -217,19 +227,21 @@ public abstract class PedersenCommitterCore {
 			throw new IOException("Failed to receive message. The error is: " + e.getMessage());
 		}
 		if (!(message instanceof CTRPedersenMessage)){
-			throw new IllegalArgumentException("The received message should be an instance of OTSMessage");
+			throw new IllegalArgumentException("The received message should be an instance of CTRPedersenMessage");
 		}
 		return (CTRPedersenMessage) message;
 	}
 	
-	
-	private GroupElement computeCommitment(BigInteger x, BigInteger r) {		
-		GroupElement c = dlog.multiplyGroupElements(dlog.exponentiate(dlog.getGenerator(), r), dlog.exponentiate(h, x));
-		return c;
+	@Override
+	public GroupElement[] getPreProcessValues() {
+		GroupElement[] values = new GroupElement[1];
+		values[0] = h;
+		return values;
 	}
-	
-	public SigmaPedersenCommittedValueProverInput getInputForZK(){
-		return input;
+
+	@Override
+	public PedersenCommitmentPhaseValues getCommitmentPhaseValues(long id) {
+		return commitmentMap.get(id);
 	}
 
 }
