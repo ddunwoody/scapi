@@ -25,20 +25,27 @@
 package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.simpleHash;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
+import edu.biu.scapi.interactiveMidProtocols.ByteArrayRandomValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCDecommitmentMessage;
 
 /**
+ * Concrete implementation of decommitment message used by SimpleHash commitment scheme.
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-public class CTCSimpleHashDecommitmentMessage implements CTCDecommitmentMessage, Serializable {
-	private byte[] r;
-	private byte[] x;
+ class CTCSimpleHashDecommitmentMessage implements CTCDecommitmentMessage, Serializable {
+	private ByteArrayRandomValue r; //Random value sampled during the commitment stage;
+	private byte[] x; //Committer's private input x 
 	private static final long serialVersionUID = 445290722191231848L;
 
-	
-	public CTCSimpleHashDecommitmentMessage(byte[] r, byte[] x) {
+	/**
+	 * Constructor that sets the given committed value and random value.
+	 * @param x the committed value
+	 * @param r the random value used for commit.
+	 */
+	CTCSimpleHashDecommitmentMessage(ByteArrayRandomValue r, byte[] x) {
 		super();
 		this.r = r;
 		this.x = x;
@@ -52,8 +59,15 @@ public class CTCSimpleHashDecommitmentMessage implements CTCDecommitmentMessage,
 
 	
 	@Override
-	public byte[] getR() {
+	public ByteArrayRandomValue getR() {
 		return r;
+	}
+
+
+	@Override
+	public String toString() {
+		return "CTCSimpleHashDecommitmentMessage [r=" + Arrays.toString(r.getR())
+				+ ", x=" + Arrays.toString(x) + "]";
 	}
 
 }
