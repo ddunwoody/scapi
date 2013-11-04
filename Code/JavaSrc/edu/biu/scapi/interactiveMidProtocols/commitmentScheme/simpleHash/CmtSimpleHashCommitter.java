@@ -32,10 +32,10 @@ import java.util.Map;
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CommitValueException;
 import edu.biu.scapi.interactiveMidProtocols.ByteArrayRandomValue;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.ByteArrayCommitValue;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitmentPhaseValues;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtByteArrayCommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitter;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitmentPhaseValues;
 import edu.biu.scapi.primitives.hash.CryptographicHash;
 import edu.biu.scapi.securityLevel.SecureCommit;
 
@@ -50,7 +50,7 @@ import edu.biu.scapi.securityLevel.SecureCommit;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-public class SimpleHashCTCommitter implements CTCommitter, SecureCommit {
+public class CmtSimpleHashCommitter implements CmtCommitter, SecureCommit {
 	
 	/*
 	 * runs the following protocol:
@@ -67,7 +67,7 @@ public class SimpleHashCTCommitter implements CTCommitter, SecureCommit {
 	private CryptographicHash hash;
 	private int n;
 	private SecureRandom random;
-	private  Map<Long, SimpleHashCommitmentValues> commitmentMap;
+	private  Map<Long, CmtSimpleHashCommitmentValues> commitmentMap;
 
 	/**
 	 * Constructor that receives a connected channel (to the receiver), the hash function
@@ -79,12 +79,12 @@ public class SimpleHashCTCommitter implements CTCommitter, SecureCommit {
 	 * @param n security parameter
 	 * 
 	 */
-	public SimpleHashCTCommitter(Channel channel, CryptographicHash hash, SecureRandom random, int n) {
+	public CmtSimpleHashCommitter(Channel channel, CryptographicHash hash, SecureRandom random, int n) {
 		this.channel = channel;
 		this.hash = hash;
 		this.n = n;
 		this.random = random;
-		commitmentMap = new Hashtable<Long, SimpleHashCommitmentValues>();
+		commitmentMap = new Hashtable<Long, CmtSimpleHashCommitmentValues>();
 		
 		//No pre-process in SimpleHash Commitment
 	}
@@ -94,13 +94,13 @@ public class SimpleHashCTCommitter implements CTCommitter, SecureCommit {
 	 * "SAMPLE a random value r <- {0, 1}^n
 	 *	COMPUTE c = H(r,x) (c concatenated with r)
 	 *	SEND c to R".
-	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter#commit(edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue, long)
+	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitter#commit(edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitValue, long)
 	 */
-	public void commit(CommitValue input, long id) throws IOException {
+	public void commit(CmtCommitValue input, long id) throws IOException {
 		
-		if(!(input instanceof ByteArrayCommitValue))
+		if(!(input instanceof CmtByteArrayCommitValue))
 			throw new IllegalArgumentException("The input has to be of type ByteArrayCommitValue");
-		byte[] x = ((ByteArrayCommitValue)input).getX();
+		byte[] x = ((CmtByteArrayCommitValue)input).getX();
 		//Sample random byte array r
 		byte[] r = new byte[n];
 		random.nextBytes(r);
@@ -109,12 +109,12 @@ public class SimpleHashCTCommitter implements CTCommitter, SecureCommit {
 		byte[] hashValArray = computeCommitment(x, r);
 		try {
 			//Send the message by the channel.
-			channel.send(new CTCSimpleHashCommitmentMessage(hashValArray, id));
+			channel.send(new CmtSimpleHashCommitmentMessage(hashValArray, id));
 		} catch (IOException e) {
 			throw new IOException("failed to send the message. The error is: " + e.getMessage());
 		}	
 		//After succeeding in sending the commitment, keep the committed value in the map together with its ID.
-		commitmentMap.put(Long.valueOf(id), new SimpleHashCommitmentValues(new ByteArrayRandomValue(r), input, hashValArray));
+		commitmentMap.put(Long.valueOf(id), new CmtSimpleHashCommitmentValues(new ByteArrayRandomValue(r), input, hashValArray));
 	}
 
 	/**
@@ -142,9 +142,9 @@ public class SimpleHashCTCommitter implements CTCommitter, SecureCommit {
 	 */
 	public void decommit(long id) throws IOException {
 		//fetch the commitment according to the requested ID
-		SimpleHashCommitmentValues vals = commitmentMap.get(Long.valueOf(id));
-		byte[] x = ((ByteArrayCommitValue)vals.getX()).getX();
-		CTCSimpleHashDecommitmentMessage msg =  new CTCSimpleHashDecommitmentMessage(vals.getR(), x);
+		CmtSimpleHashCommitmentValues vals = commitmentMap.get(Long.valueOf(id));
+		byte[] x = ((CmtByteArrayCommitValue)vals.getX()).getX();
+		CmtSimpleHashDecommitmentMessage msg =  new CmtSimpleHashDecommitmentMessage(vals.getR(), x);
 		try{
 			channel.send(msg);
 		}
@@ -158,15 +158,15 @@ public class SimpleHashCTCommitter implements CTCommitter, SecureCommit {
 	 * This function samples random commit value and returns it.
 	 * @return the sampled commit value
 	 */
-	public CommitValue sampleRandomCommitValue(){
+	public CmtCommitValue sampleRandomCommitValue(){
 		byte[] val = new byte[32];
 		random.nextBytes(val);
-		return new ByteArrayCommitValue(val);
+		return new CmtByteArrayCommitValue(val);
 	}
 	
 	@Override
-	public CommitValue generateCommitValue(byte[] x)throws CommitValueException {
-		return new ByteArrayCommitValue(x);
+	public CmtCommitValue generateCommitValue(byte[] x)throws CommitValueException {
+		return new CmtByteArrayCommitValue(x);
 	}
 
 	/**
@@ -179,7 +179,7 @@ public class SimpleHashCTCommitter implements CTCommitter, SecureCommit {
 	}
 
 	@Override
-	public CommitmentPhaseValues getCommitmentPhaseValues(long id) {
+	public CmtCommitmentPhaseValues getCommitmentPhaseValues(long id) {
 		return commitmentMap.get(id);
 	}
 	
@@ -188,8 +188,8 @@ public class SimpleHashCTCommitter implements CTCommitter, SecureCommit {
 	 * @param value
 	 * @return the generated bytes.
 	 */
-	public byte[] generateBytesFromCommitValue(CommitValue value){
-		if (!(value instanceof ByteArrayCommitValue))
+	public byte[] generateBytesFromCommitValue(CmtCommitValue value){
+		if (!(value instanceof CmtByteArrayCommitValue))
 			throw new IllegalArgumentException("The given value must be of type ByteArrayCommitValue");
 		return (byte[]) value.getX();
 	}

@@ -27,14 +27,14 @@ package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.simpleHash;
 import java.io.Serializable;
 import java.util.Arrays;
 
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCtrCommitmentMsg;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCCommitmentMsg;
 
 /**
  * Concrete implementation of commitment message used by SimpleHash commitment scheme.
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-class CTCSimpleHashCommitmentMessage implements CmtCtrCommitmentMsg, Serializable {
+class CmtSimpleHashCommitmentMessage implements CmtCCommitmentMsg, Serializable {
 	
 	private static final long serialVersionUID = -4365203740560516693L;
 	
@@ -47,7 +47,7 @@ class CTCSimpleHashCommitmentMessage implements CmtCtrCommitmentMsg, Serializabl
 	 * @param c the actual commitment object. In simple hash schemes the commitment object is a byte[].
 	 * @param id the commitment id.
 	 */
-	public CTCSimpleHashCommitmentMessage(byte[] c, long id) {
+	public CmtSimpleHashCommitmentMessage(byte[] c, long id) {
 		super();
 		this.c = c;
 		this.id = id;

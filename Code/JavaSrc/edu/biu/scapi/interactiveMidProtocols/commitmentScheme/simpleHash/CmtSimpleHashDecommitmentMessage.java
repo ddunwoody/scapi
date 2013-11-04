@@ -28,14 +28,14 @@ import java.io.Serializable;
 import java.util.Arrays;
 
 import edu.biu.scapi.interactiveMidProtocols.ByteArrayRandomValue;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCDecommitmentMessage;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCDecommitmentMessage;
 
 /**
  * Concrete implementation of decommitment message used by SimpleHash commitment scheme.
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
- class CTCSimpleHashDecommitmentMessage implements CTCDecommitmentMessage, Serializable {
+ class CmtSimpleHashDecommitmentMessage implements CmtCDecommitmentMessage, Serializable {
 	private ByteArrayRandomValue r; //Random value sampled during the commitment stage;
 	private byte[] x; //Committer's private input x 
 	private static final long serialVersionUID = 445290722191231848L;
@@ -45,7 +45,7 @@ import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCDecommitmentMes
 	 * @param x the committed value
 	 * @param r the random value used for commit.
 	 */
-	CTCSimpleHashDecommitmentMessage(ByteArrayRandomValue r, byte[] x) {
+	CmtSimpleHashDecommitmentMessage(ByteArrayRandomValue r, byte[] x) {
 		super();
 		this.r = r;
 		this.x = x;
