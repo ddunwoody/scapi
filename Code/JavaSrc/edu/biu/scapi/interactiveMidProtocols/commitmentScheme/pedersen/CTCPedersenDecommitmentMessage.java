@@ -27,31 +27,44 @@ package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen;
 import java.io.Serializable;
 import java.math.BigInteger;
 
+import edu.biu.scapi.interactiveMidProtocols.BigIntegerRandomValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCDecommitmentMessage;
 
 /**
+ * Concrete implementation of decommitment message used by Pedersen commitment scheme.
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
 public class CTCPedersenDecommitmentMessage implements CTCDecommitmentMessage, Serializable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 510887524381013384L;
-	private BigInteger x; 			//Committer's private input x in Zq
-	private BigInteger r; 			//Random value sampled during the sampleRandomValues stage;
 	
-	public CTCPedersenDecommitmentMessage(BigInteger x, BigInteger r) {
+	private static final long serialVersionUID = 510887524381013384L;
+	
+	private BigInteger x; 				//Committer's private input x in Zq
+	private BigIntegerRandomValue r; 	//Random value sampled during the sampleRandomValues stage;
+	
+	/**
+	 * Constructor that sets the given committed value and random value.
+	 * @param x the committed value
+	 * @param r the random value used for commit.
+	 */
+	public CTCPedersenDecommitmentMessage(BigInteger x, BigIntegerRandomValue r) {
 		super();
 		this.x = x;
 		this.r = r;
 	}
+	
+	/**
+	 * Returns the committed value.
+	 */
 	public BigInteger getX() {
 		return x;
 	}
 
-	public BigInteger getR() {
+	/**
+	 * Returns the random value used for commit.
+	 */
+	public BigIntegerRandomValue getR() {
 		return r;
 	}
 	
