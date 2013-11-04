@@ -36,13 +36,13 @@ import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.generals.ScapiDefaultConfiguration;
 import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.SigmaVerifierComputation;
-import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.pedersenCTKnowledge.SigmaPedersenCTKnowledgeCommonInput;
-import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.pedersenCTKnowledge.SigmaPedersenCTKnowledgeVerifierComputation;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.pedersenCmtKnowledge.SigmaPedersenCmtKnowledgeCommonInput;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.pedersenCmtKnowledge.SigmaPedersenCmtKnowledgeVerifierComputation;
 import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.pedersenCommittedValue.SigmaPedersenCommittedValueCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.pedersenCommittedValue.SigmaPedersenCommittedValueVerifierComputation;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtBigIntegerCommitValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtWithProofsReceiver;
-import edu.biu.scapi.interactiveMidProtocols.zeroKnowledge.ZKPOKFromSigmaCommitPedersenVerifier;
+import edu.biu.scapi.interactiveMidProtocols.zeroKnowledge.ZKPOKFromSigmaCmtPedersenVerifier;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
@@ -55,12 +55,12 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
 public class CmtPedersenWithProofsReceiver extends CmtPedersenReceiver implements CmtWithProofsReceiver{
 
 	//Verifies that the committer knows the committed value.
-	private ZKPOKFromSigmaCommitPedersenVerifier knowledgeVerifier;
+	private ZKPOKFromSigmaCmtPedersenVerifier knowledgeVerifier;
 	//Verifies that the committed value is x.
 	//Usually, if the commitment scheme is PerfectlyBinding secure, than a ZK is used to verify committed value.
 	//In Pedersen, this is not the case since Pedersen is not PerfectlyBinding secure.
 	//In order to be able to use the Pedersen scheme we need to verify committed value with ZKPOK instead.
-	private ZKPOKFromSigmaCommitPedersenVerifier committedValVerifier;
+	private ZKPOKFromSigmaCmtPedersenVerifier committedValVerifier;
 	
 	/**
 	 * Default constructor that gets the channel and creates the ZK verifiers with default Dlog group.
@@ -107,16 +107,16 @@ public class CmtPedersenWithProofsReceiver extends CmtPedersenReceiver implement
 	 */
 	private void doConstruct(int t) throws IOException, InvalidDlogGroupException, ClassNotFoundException, CheatAttemptException{
 		SigmaVerifierComputation pedersenCommittedValVerifier = new SigmaPedersenCommittedValueVerifierComputation(dlog, t, random);
-		SigmaVerifierComputation pedersenCTKnowledgeVerifier = new SigmaPedersenCTKnowledgeVerifierComputation(dlog, t, random);
-		knowledgeVerifier = new  ZKPOKFromSigmaCommitPedersenVerifier(channel, pedersenCTKnowledgeVerifier, random);
-		committedValVerifier = new ZKPOKFromSigmaCommitPedersenVerifier(channel, pedersenCommittedValVerifier, random);
+		SigmaVerifierComputation pedersenCTKnowledgeVerifier = new SigmaPedersenCmtKnowledgeVerifierComputation(dlog, t, random);
+		knowledgeVerifier = new  ZKPOKFromSigmaCmtPedersenVerifier(channel, pedersenCTKnowledgeVerifier, random);
+		committedValVerifier = new ZKPOKFromSigmaCmtPedersenVerifier(channel, pedersenCommittedValVerifier, random);
 		
 	}
 
 	@Override
 	public boolean verifyKnowledge(long id) throws ClassNotFoundException, IOException, CheatAttemptException {
 		GroupElement commitmentVal = getCommitmentPhaseValues(id);
-		SigmaPedersenCTKnowledgeCommonInput input =  new SigmaPedersenCTKnowledgeCommonInput((GroupElement) getPreProcessedValues()[0], commitmentVal);
+		SigmaPedersenCmtKnowledgeCommonInput input =  new SigmaPedersenCmtKnowledgeCommonInput((GroupElement) getPreProcessedValues()[0], commitmentVal);
 		return knowledgeVerifier.verify(input);
 	}
 

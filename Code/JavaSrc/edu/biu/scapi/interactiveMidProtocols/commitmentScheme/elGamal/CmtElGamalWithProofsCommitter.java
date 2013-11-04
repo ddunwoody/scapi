@@ -34,8 +34,8 @@ import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.generals.ScapiDefaultConfiguration;
 import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.SigmaProverComputation;
-import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.elGamalCTKnowledge.SigmaElGamalCTKnowledgeProverComputation;
-import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.elGamalCTKnowledge.SigmaElGamalCTKnowledgeProverInput;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.elGamalCmtKnowledge.SigmaElGamalCmtKnowledgeProverComputation;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.elGamalCmtKnowledge.SigmaElGamalCmtKnowledgeProverInput;
 import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.elGamalCommittedValue.SigmaElGamalCommittedValueProverComputation;
 import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.elGamalCommittedValue.SigmaElGamalCommittedValueProverInput;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtWithProofsCommitter;
@@ -96,7 +96,7 @@ public class CmtElGamalWithProofsCommitter extends CmtElGamalOnGroupElementCommi
 	 */
 	private void doConstruct(int t, SecureRandom random) throws IOException {
 		SigmaProverComputation elGamalCommittedValProver = new SigmaElGamalCommittedValueProverComputation(dlog, t, random);
-		SigmaProverComputation elGamalCTKnowledgeProver = new SigmaElGamalCTKnowledgeProverComputation(dlog, t, random);
+		SigmaProverComputation elGamalCTKnowledgeProver = new SigmaElGamalCmtKnowledgeProverComputation(dlog, t, random);
 		knowledgeProver = new  ZKPOKFromSigmaCmtPedersenProver(channel, elGamalCTKnowledgeProver);
 		committedValProver = new ZKFromSigmaProver(channel, elGamalCommittedValProver);
 		
@@ -105,7 +105,7 @@ public class CmtElGamalWithProofsCommitter extends CmtElGamalOnGroupElementCommi
 	@Override
 	public void proveKnowledge(long id) throws IOException, CheatAttemptException, ClassNotFoundException {
 		Object[] keys = getPreProcessValues();
-		SigmaElGamalCTKnowledgeProverInput input =  new SigmaElGamalCTKnowledgeProverInput
+		SigmaElGamalCmtKnowledgeProverInput input =  new SigmaElGamalCmtKnowledgeProverInput
 				((ElGamalPublicKey) keys[0], ((ScElGamalPrivateKey) keys[1]).getX());
 		knowledgeProver.prove(input);
 	}

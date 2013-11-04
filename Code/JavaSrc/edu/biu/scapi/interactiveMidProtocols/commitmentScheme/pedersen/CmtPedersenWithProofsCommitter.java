@@ -35,12 +35,12 @@ import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.generals.ScapiDefaultConfiguration;
 import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.SigmaProverComputation;
-import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.pedersenCTKnowledge.SigmaPedersenCTKnowledgeProverComputation;
-import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.pedersenCTKnowledge.SigmaPedersenCTKnowledgeProverInput;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.pedersenCmtKnowledge.SigmaPedersenCmtKnowledgeProverComputation;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.pedersenCmtKnowledge.SigmaPedersenCmtKnowledgeProverInput;
 import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.pedersenCommittedValue.SigmaPedersenCommittedValueProverComputation;
 import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.pedersenCommittedValue.SigmaPedersenCommittedValueProverInput;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtWithProofsCommitter;
-import edu.biu.scapi.interactiveMidProtocols.zeroKnowledge.ZKPOKFromSigmaCommitPedersenProver;
+import edu.biu.scapi.interactiveMidProtocols.zeroKnowledge.ZKPOKFromSigmaCmtPedersenProver;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 
 /**
@@ -53,12 +53,12 @@ import edu.biu.scapi.primitives.dlog.DlogGroup;
 public class CmtPedersenWithProofsCommitter extends CmtPedersenCommitter implements CmtWithProofsCommitter{
 
 	//Proves that the committer knows the committed value.
-	private ZKPOKFromSigmaCommitPedersenProver knowledgeProver;
+	private ZKPOKFromSigmaCmtPedersenProver knowledgeProver;
 	//Proves that the committed value is x.
 	//Usually, if the commitment scheme is PerfectlyBinding secure, than a ZK is used to prove committed value.
 	//In Pedersen, this is not the case since Pedersen is not PerfectlyBinding secure.
 	//In order to be able to use the Pedersen scheme we need to prove committed value with ZKPOK instead.
-	private ZKPOKFromSigmaCommitPedersenProver committedValProver;
+	private ZKPOKFromSigmaCmtPedersenProver committedValProver;
 	
 	/**
 	 * Default constructor that gets the channel and creates the ZK provers with default Dlog group.
@@ -98,16 +98,16 @@ public class CmtPedersenWithProofsCommitter extends CmtPedersenCommitter impleme
 	 */
 	private void doConstruct(int t) throws IOException{
 		SigmaProverComputation pedersenCommittedValProver = new SigmaPedersenCommittedValueProverComputation(dlog, t, random);
-		SigmaProverComputation pedersenCTKnowledgeProver = new SigmaPedersenCTKnowledgeProverComputation(dlog, t, random);
-		knowledgeProver = new  ZKPOKFromSigmaCommitPedersenProver(channel, pedersenCTKnowledgeProver);
-		committedValProver = new ZKPOKFromSigmaCommitPedersenProver(channel, pedersenCommittedValProver);
+		SigmaProverComputation pedersenCTKnowledgeProver = new SigmaPedersenCmtKnowledgeProverComputation(dlog, t, random);
+		knowledgeProver = new  ZKPOKFromSigmaCmtPedersenProver(channel, pedersenCTKnowledgeProver);
+		committedValProver = new ZKPOKFromSigmaCmtPedersenProver(channel, pedersenCommittedValProver);
 		
 	}
 
 	@Override
 	public void proveKnowledge(long id) throws IOException, CheatAttemptException, ClassNotFoundException {
 		CmtPedersenCommitmentPhaseValues val = getCommitmentPhaseValues(id);
-		SigmaPedersenCTKnowledgeProverInput input = new SigmaPedersenCTKnowledgeProverInput(getPreProcessValues()[0], val.getComputedCommitment(), (BigInteger)val.getX().getX(), val.getR().getR());
+		SigmaPedersenCmtKnowledgeProverInput input = new SigmaPedersenCmtKnowledgeProverInput(getPreProcessValues()[0], val.getComputedCommitment(), (BigInteger)val.getX().getX(), val.getR().getR());
 		knowledgeProver.prove(input);
 	}
 

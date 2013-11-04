@@ -35,8 +35,8 @@ import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.generals.ScapiDefaultConfiguration;
 import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.SigmaVerifierComputation;
-import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.elGamalCTKnowledge.SigmaElGamalCTKnowledgeCommonInput;
-import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.elGamalCTKnowledge.SigmaElGamalCTKnowledgeVerifierComputation;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.elGamalCmtKnowledge.SigmaElGamalCmtKnowledgeCommonInput;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.elGamalCmtKnowledge.SigmaElGamalCmtKnowledgeVerifierComputation;
 import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.elGamalCommittedValue.SigmaElGamalCommittedValueCommonInput;
 import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.elGamalCommittedValue.SigmaElGamalCommittedValueVerifierComputation;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtWithProofsReceiver;
@@ -109,7 +109,7 @@ public class CmtElGamalWithProofsReceiver extends CmtElGamalOnGroupElementReceiv
 	 */
 	private void doConstruct(int t, SecureRandom random) throws IOException, ClassNotFoundException, CheatAttemptException, InvalidDlogGroupException {
 		SigmaVerifierComputation elGamalCommittedValVerifier = new SigmaElGamalCommittedValueVerifierComputation(dlog, t, random);
-		SigmaVerifierComputation elGamalCTKnowledgeVerifier = new SigmaElGamalCTKnowledgeVerifierComputation(dlog, t, random);
+		SigmaVerifierComputation elGamalCTKnowledgeVerifier = new SigmaElGamalCmtKnowledgeVerifierComputation(dlog, t, random);
 		knowledgeVerifier = new  ZKPOKFromSigmaCmtPedersenVerifier(channel, elGamalCTKnowledgeVerifier, random);
 		committedValVerifier = new ZKFromSigmaVerifier(channel, elGamalCommittedValVerifier, random);
 		
@@ -117,7 +117,7 @@ public class CmtElGamalWithProofsReceiver extends CmtElGamalOnGroupElementReceiv
 
 	@Override
 	public boolean verifyKnowledge(long id) throws IOException, CheatAttemptException, ClassNotFoundException {
-		SigmaElGamalCTKnowledgeCommonInput input =  new SigmaElGamalCTKnowledgeCommonInput
+		SigmaElGamalCmtKnowledgeCommonInput input =  new SigmaElGamalCmtKnowledgeCommonInput
 				((ElGamalPublicKey)getPreProcessedValues()[0]);
 		return knowledgeVerifier.verify(input);
 	}
