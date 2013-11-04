@@ -22,18 +22,18 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.cramerShoupEncryptedValue;
+package edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.cramerShoupEncryptedValue;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 
 import edu.biu.scapi.exceptions.CheatAttemptException;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaSimulator;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dhExtended.SigmaDHExtendedCommonInput;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dhExtended.SigmaDHExtendedSimulator;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaSimulatorOutput;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.SigmaSimulator;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.dhExtended.SigmaDHExtendedCommonInput;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.dhExtended.SigmaDHExtendedSimulator;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaCommonInput;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaSimulatorOutput;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.CramerShoupPublicKey;
 import edu.biu.scapi.midLayer.ciphertext.CramerShoupOnGroupElementCiphertext;
 import edu.biu.scapi.primitives.dlog.DlogGroup;

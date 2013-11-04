@@ -22,19 +22,19 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.cramerShoupEncryptedValue;
+package edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.cramerShoupEncryptedValue;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.DlogBasedSigma;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaVerifierComputation;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dhExtended.SigmaDHExtendedCommonInput;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dhExtended.SigmaDHExtendedVerifierComputation;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.DlogBasedSigma;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.SigmaVerifierComputation;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.dhExtended.SigmaDHExtendedCommonInput;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.dhExtended.SigmaDHExtendedVerifierComputation;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaCommonInput;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProtocolMsg;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.CramerShoupPublicKey;
 import edu.biu.scapi.midLayer.ciphertext.CramerShoupOnGroupElementCiphertext;
 import edu.biu.scapi.primitives.dlog.DlogGroup;

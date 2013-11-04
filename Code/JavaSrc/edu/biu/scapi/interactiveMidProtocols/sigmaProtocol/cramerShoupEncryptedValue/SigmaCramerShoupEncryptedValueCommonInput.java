@@ -22,12 +22,12 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.cramerShoupEncryptedValue;
+package edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.cramerShoupEncryptedValue;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.CramerShoupPublicKey;
 import edu.biu.scapi.midLayer.ciphertext.CramerShoupOnGroupElementCiphertext;
 import edu.biu.scapi.primitives.dlog.GroupElement;
