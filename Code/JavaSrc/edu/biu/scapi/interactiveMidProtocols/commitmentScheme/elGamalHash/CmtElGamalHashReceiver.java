@@ -42,7 +42,9 @@ import edu.biu.scapi.midLayer.asymmetricCrypto.encryption.ScElGamalOnByteArray;
 import edu.biu.scapi.midLayer.ciphertext.ElGamalOnByteArrayCiphertext;
 import edu.biu.scapi.midLayer.plaintext.ByteArrayPlaintext;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
+import edu.biu.scapi.primitives.dlog.miracl.MiraclDlogECF2m;
 import edu.biu.scapi.primitives.hash.CryptographicHash;
+import edu.biu.scapi.primitives.hash.bc.BcSHA256;
 import edu.biu.scapi.primitives.kdf.HKDF;
 import edu.biu.scapi.primitives.prf.bc.BcHMAC;
 import edu.biu.scapi.securityLevel.SecureCommit;
@@ -63,6 +65,25 @@ public class CmtElGamalHashReceiver extends CmtElGamalReceiverCore implements Cm
 	
 	private CryptographicHash hash;
 
+	/**
+	 * This constructor receives as argument the channel and chosses default values of 
+	 * Dlog Group and Cryptographic Hash such that they keep the condition that the size in 
+	 * bytes of the resulting hash is less than the size in bytes of the order of the DlogGroup.
+	 * Otherwise, it throws IllegalArgumentException.
+	 * An established channel has to be provided by the user of the class.
+	 * @param channel
+	 * @throws IllegalArgumentException
+	 * @throws SecurityLevelException
+	 * @throws InvalidDlogGroupException
+	 * @throws IOException
+	 * @throws CheatAttemptException 
+	 * @throws ClassNotFoundException 
+	 */
+	public CmtElGamalHashReceiver(Channel channel) throws IllegalArgumentException, SecurityLevelException, InvalidDlogGroupException, IOException, ClassNotFoundException, CheatAttemptException{
+		//This default hash suits the default DlogGroup.
+		this(channel, new MiraclDlogECF2m("K-283"), new BcSHA256());
+	}
+	
 	/**
 	 * This constructor receives as arguments an instance of a Dlog Group and an instance 
 	 * of a Cryptographic Hash such that they keep the condition that the size in bytes 

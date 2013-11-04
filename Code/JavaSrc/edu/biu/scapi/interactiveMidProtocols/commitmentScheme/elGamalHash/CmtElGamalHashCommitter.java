@@ -42,7 +42,9 @@ import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.elGamal.CmtElGamal
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.elGamal.CmtElGamalCommitterCore;
 import edu.biu.scapi.midLayer.asymmetricCrypto.encryption.ScElGamalOnByteArray;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
+import edu.biu.scapi.primitives.dlog.miracl.MiraclDlogECF2m;
 import edu.biu.scapi.primitives.hash.CryptographicHash;
+import edu.biu.scapi.primitives.hash.bc.BcSHA256;
 import edu.biu.scapi.primitives.kdf.HKDF;
 import edu.biu.scapi.primitives.prf.bc.BcHMAC;
 import edu.biu.scapi.securityLevel.SecureCommit;
@@ -64,14 +66,23 @@ public class CmtElGamalHashCommitter extends CmtElGamalCommitterCore implements 
 	private CryptographicHash hash;
 	private Map<Long, byte[]> hashCommitmentMap;
 
-	/*
-	 *Too complicated to have a default constructor. Many things need to be suitable to each other. Cannot have some being default (and unknown to the caller) and some defined by the caller.
-	public ElGamalHashCTCommitter(Channel channel) throws IllegalArgumentException, SecurityLevelException, InvalidDlogGroupException{
-		super(channel, new );
-		hash = new BcSHA224(); 		//This default hash suits the default DlogGroup of the underlying Committer.
-		hashCommitmentMap = new Hashtable<Integer, byte[]>();
+	/**
+	 * This constructor receives as argument the channel and chosses default values of 
+	 * Dlog Group and Cryptographic Hash such that they keep the condition that the size in 
+	 * bytes of the resulting hash is less than the size in bytes of the order of the DlogGroup.
+	 * Otherwise, it throws IllegalArgumentException.
+	 * An established channel has to be provided by the user of the class.
+	 * @param channel
+	 * @throws IllegalArgumentException
+	 * @throws SecurityLevelException
+	 * @throws InvalidDlogGroupException
+	 * @throws IOException
+	 */
+	public CmtElGamalHashCommitter(Channel channel) throws IllegalArgumentException, SecurityLevelException, InvalidDlogGroupException, IOException{
+		//This default hash suits the default DlogGroup.
+		this(channel, new MiraclDlogECF2m("K-283"), new BcSHA256(), new SecureRandom());
 	}
-	*/
+	
 
 	/**
 	 * This constructor receives as arguments an instance of a Dlog Group and an instance 
