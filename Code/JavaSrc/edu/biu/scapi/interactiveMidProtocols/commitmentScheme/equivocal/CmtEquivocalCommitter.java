@@ -12,7 +12,7 @@ import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitter;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtWithProofsCommitter;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitmentPhaseValues;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.CTPedersenWithProofsCommitter;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.CmtPedersenWithProofsCommitter;
 import edu.biu.scapi.securityLevel.EquivocalCT;
 
 /**
@@ -54,7 +54,7 @@ public class CmtEquivocalCommitter implements CmtCommitter, EquivocalCT{
 	 * @throws ClassNotFoundException 
 	 */
 	public CmtEquivocalCommitter(Channel channel) throws ClassNotFoundException, IOException, CheatAttemptException{
-		committer = new CTPedersenWithProofsCommitter(channel);
+		committer = new CmtPedersenWithProofsCommitter(channel);
 	}
 
 	/**

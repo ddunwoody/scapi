@@ -12,7 +12,7 @@ import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtReceiver;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtWithProofsReceiver;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtRCommitPhaseOutput;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.CTPedersenWithProofsReceiver;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.CmtPedersenWithProofsReceiver;
 import edu.biu.scapi.securityLevel.EquivocalCT;
 
 /**
@@ -58,7 +58,7 @@ public class CmtEquivocalReceiver implements CmtReceiver, EquivocalCT {
 	 * @throws ClassNotFoundException 
 	 */
 	public CmtEquivocalReceiver(Channel channel) throws ClassNotFoundException, IOException, CheatAttemptException{
-		receiver = new CTPedersenWithProofsReceiver(channel);
+		receiver = new CmtPedersenWithProofsReceiver(channel);
 	}
 	
 	/**
