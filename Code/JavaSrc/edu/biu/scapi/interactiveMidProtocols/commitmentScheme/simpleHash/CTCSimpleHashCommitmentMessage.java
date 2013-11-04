@@ -25,32 +25,52 @@
 package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.simpleHash;
 
 import java.io.Serializable;
+import java.util.Arrays;
+
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCtrCommitmentMsg;
 
 /**
+ * Concrete implementation of commitment message used by SimpleHash commitment scheme.
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-public class CTCSimpleHashCommitmentMessage implements Serializable {
+class CTCSimpleHashCommitmentMessage implements CmtCtrCommitmentMsg, Serializable {
+	
+	private static final long serialVersionUID = -4365203740560516693L;
+	
+	// In SimpleHash schemes the commitment object is a byte[]. 
+	private byte[] c;
+	private long id; //The id of the commitment
 	
 	/**
-	 * 
+	 * Constructor that sets the commitment and id.
+	 * @param c the actual commitment object. In simple hash schemes the commitment object is a byte[].
+	 * @param id the commitment id.
 	 */
-	private static final long serialVersionUID = -4365203740560516693L;
-	private byte[] c;
-	private int id;
-	public CTCSimpleHashCommitmentMessage(byte[] c, int id) {
+	public CTCSimpleHashCommitmentMessage(byte[] c, long id) {
 		super();
 		this.c = c;
 		this.id = id;
 	}
-	public static long getSerialversionuid() {
-		return serialVersionUID;
-	}
-	public byte[] getC() {
+	
+	/**
+	 * Returns the commitment value
+	 */
+	public byte[] getCommitment() {
 		return c;
 	}
-	public int getId() {
+	
+	/**
+	 * Returns the commitment id.
+	 */
+	public long getId() {
 		return id;
+	}
+	
+	@Override
+	public String toString() {
+		return "CTCSimpleHashCommitmentMessage [c=" + Arrays.toString(c)
+				+ ", id=" + id + "]";
 	}
 	
 }
