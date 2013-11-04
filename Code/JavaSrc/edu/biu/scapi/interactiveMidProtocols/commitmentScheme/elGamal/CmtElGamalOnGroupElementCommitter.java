@@ -25,57 +25,106 @@ Copyright (c) 2012 - SCAPI (http://crypto.biu.ac.il/scapi)
 package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.elGamal;
 
 import java.io.IOException;
+import java.security.SecureRandom;
 
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CommitValueException;
+import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.elGamalCommittedValue.SigmaElGamalCommittedValueProverInput;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.GroupElementCommitValue;
+import edu.biu.scapi.generals.ScapiDefaultConfiguration;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitter;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtGroupElementCommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtOnGroupElement;
 import edu.biu.scapi.midLayer.asymmetricCrypto.encryption.ScElGamalOnGroupElement;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.securityLevel.PerfectlyBindingCT;
+import edu.biu.scapi.tools.Factories.DlogGroupFactory;
 
-/** 
- * <!-- begin-UML-doc -->
- * <!-- end-UML-doc -->
- * @author user
- * @generated "UML to Java (com.ibm.xtools.transform.uml2.java5.internal.UML2JavaTransform)"
+/**
+ * This class implements the committer side of the ElGamal commitment. 
+ * It uses El Gamal encryption for  group elements, that is, the encryption class used is 
+ * ScElGamalOnGroupElement. This default cannot be changed.
+ * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
+ *
  */
-public class ElGamalCTCommitter extends ElGamalCTCCore implements CTCommitter, PerfectlyBindingCT {
-	
-	private SigmaElGamalCommittedValueProverInput zkInput; //Returned in getInputForZK function.
-	
-	public ElGamalCTCommitter(Channel channel, DlogGroup dlog) throws IllegalArgumentException, SecurityLevelException, InvalidDlogGroupException{
-			//doConstruct(channel, dlog, new SecureRandom());
-		super(channel, dlog, new ScElGamalOnGroupElement(dlog));
-	}
-
-	public ElGamalCTCommitter(Channel channel) {
-		super(channel);
-	}
-
-	public void commit(CommitValue input, int id) throws IOException {
-		if (!(input instanceof GroupElementCommitValue))
-			throw new IllegalArgumentException("The input must be of type GroupElementCommitValue");
-		super.commit(input, id);
-		zkInput = new SigmaElGamalCommittedValueProverInput(msg, (GroupElement) input.getX(), r);
-	}
-	
-	/* (non-Javadoc)
-	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter#generateCommitValue(byte[])
+public class CmtElGamalOnGroupElementCommitter extends CmtElGamalCommitterCore implements CmtCommitter, PerfectlyBindingCT, CmtOnGroupElement {
+	 
+	/**
+	 * This constructor lets the caller pass the channel and the dlog group to work with. The El Gamal option (ScElGamalOnGroupElement)is set by default by the constructor and cannot be changed.
+	 * @param channel used for the communication
+	 * @param dlog	Dlog group
+	 * @throws IllegalArgumentException
+	 * @throws SecurityLevelException
+	 * @throws InvalidDlogGroupException
+	 * @throws IOException
 	 */
+	public CmtElGamalOnGroupElementCommitter(Channel channel, DlogGroup dlog, SecureRandom random) throws IllegalArgumentException, SecurityLevelException, InvalidDlogGroupException, IOException{
+		super(channel, dlog, new ScElGamalOnGroupElement(dlog), random);
+		
+	}
+
+	/**
+	 * This constructor uses default Dlog group and El Gamal.
+	 * @param channel
+	 * @throws IOException
+	 */
+	public CmtElGamalOnGroupElementCommitter(Channel channel) throws IOException {
+		String dlogGroupName = ScapiDefaultConfiguration.getInstance().getProperty("DDHDlogGroup");
+		DlogGroup dlogGroup = null;
+		//Create the Dlog group
+		try {
+			dlogGroup = DlogGroupFactory.getInstance().getObject(dlogGroupName);
+		} catch (FactoriesException e1) {
+			e1.printStackTrace();
+		}
+		//Proceed with construction of ElGamalCTCCore instance
+		try {
+			doConstruct(channel, dlogGroup, new ScElGamalOnGroupElement(dlogGroup), new SecureRandom());
+		} catch (SecurityLevelException e) {
+			e.printStackTrace();
+		} catch (InvalidDlogGroupException e) {
+			e.printStackTrace();
+		}
+		
+	}
+
+	/**
+	 * Runs the commit phase of the commitment scheme:
+	 * "SAMPLE random values  r <- Zq
+	 *	COMPUTE u = g^r and v = h^r * x
+	 *	SEND c = (h,u,v) to R".
+	 */
+	public void commit(CmtCommitValue input, long id) throws IOException {
+		if (!(input instanceof CmtGroupElementCommitValue))
+			throw new IllegalArgumentException("The input must be of type GroupElementCommitValue");
+		super.commit(input, id);	
+	}
+	
+	/**
+	 * This function samples random commit value and returns it.
+	 * @return the sampled commit value
+	 */
+	public CmtCommitValue sampleRandomCommitValue(){
+		return new CmtGroupElementCommitValue(dlog.createRandomElement());
+	}
+	
 	@Override
-	public CommitValue generateCommitValue(byte[] x)throws CommitValueException {
+	public CmtCommitValue generateCommitValue(byte[] x)throws CommitValueException {
 		throw new CommitValueException("El Gamal committer cannot generate a CommitValue from a byte[], since there isn't always a suitable encoding");
 	}	
 	
-	
-	public SigmaElGamalCommittedValueProverInput getInputForZK(){
-		return zkInput;
+	/**
+	 * This function converts the given commit value to a byte array. 
+	 * @param value
+	 * @return the generated bytes.
+	 */
+	public byte[] generateBytesFromCommitValue(CmtCommitValue value){
+		if (!(value instanceof  CmtGroupElementCommitValue))
+			throw new IllegalArgumentException("The given value must be of type  GroupElementCommitValue");
+		return dlog.mapAnyGroupElementToByteArray((GroupElement) value.getX());
 	}
-	
+			
 }
