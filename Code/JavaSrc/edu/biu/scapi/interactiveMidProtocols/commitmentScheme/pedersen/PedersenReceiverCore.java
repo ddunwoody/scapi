@@ -25,84 +25,110 @@
 package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen;
 
 import java.io.IOException;
+import java.io.Serializable;
+
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.Hashtable;
-import java.util.Map;
 
 import org.bouncycastle.util.BigIntegers;
 
 import edu.biu.scapi.comm.Channel;
+import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
+import edu.biu.scapi.generals.ScapiDefaultConfiguration;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.BasicReceiverCommitPhaseOutput;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.BigIntegerCommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTReceiver;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
-import edu.biu.scapi.primitives.dlog.cryptopp.CryptoPpDlogZpSafePrime;
-import edu.biu.scapi.primitives.dlog.miracl.MiraclDlogECF2m;
 import edu.biu.scapi.securityLevel.DDH;
+import edu.biu.scapi.tools.Factories.DlogGroupFactory;
 
-/**
+/*
+ * This abstract class performs all the core functionality of the receiver side of Pedersen commitment. 
+ * Specific implementations can extend this class and add or override functions as necessary.
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-
-public abstract class PedersenReceiverCore {
+public abstract class PedersenReceiverCore implements CTReceiver{
+	
+	/*
+	 * runs the following protocol:
+	 * "Commit phase
+	 *		SAMPLE a random value a <- Zq
+	 *		COMPUTE h = g^a
+	 *		SEND h to C
+	 *		WAIT for message c from C
+	 *		STORE values (h,c)
+	 *	Decommit phase
+	 *		WAIT for (r, x)  from C
+	 *		IF  c = g^r * h^x AND x <- Zq
+	 *	    	OUTPUT ACC and value x
+	 *		ELSE
+	 *	        OUTPUT REJ"
+	 *
+	 */
+	
 	protected Channel channel;
 	protected DlogGroup dlog;
-	private SecureRandom random;
+	protected SecureRandom random;
 	private BigInteger qMinusOne;
-	protected BigInteger trapdoor ; // Sampled random value in Zq
-									//TODO check if making this variable protected is a breach of security...
-
-	protected GroupElement h;  //Receiver's message
-	private Map<Integer, GroupElement> commitmentMap;
-	protected CTCPedersenCommitmentMessage msg; //Committer's message. used in getInputForZK function.
 	
-	//private GroupElement receivedCommitment;
+	//Sampled random value in Zq that will be the trpadoor.
+	protected BigInteger trapdoor ; 	
+	
+	//h is a value calculated during the creation of this receiver and is sent to the committer once in the beginning.
+	protected GroupElement h;  			
+	
+	//The committer may commit many values one after the other without decommitting. And only at a later time decommit some or all those values. In order to keep track
+	//of the commitments and be able to relate them afterwards to the decommitments we keep them in the commitmentMap. The key is some unique id known to the application
+	//running the committer. The exact same id has to be use later on to decommit the corresponding values, otherwise the receiver will reject the decommitment.
+	private Hashtable<Long, GroupElement> commitmentMap; 
+	
 
-
-	public PedersenReceiverCore(Channel channel){
+	/**
+	 * This constructor only needs to get a connected channel (to the committer). All the other needed elements have default values.
+	 * If this constructor is used for the recevier then also the default constructor needs to be used by the committer.  
+	 */
+	protected PedersenReceiverCore(Channel channel) throws IOException{
+		String dlogGroupName = ScapiDefaultConfiguration.getInstance().getProperty("DDHDlogGroup");
 		try {
-			//Uses Miracl Koblitz 233 Elliptic curve.
-			doConstruct(channel, new MiraclDlogECF2m("K-233"), new SecureRandom());
-		} catch (IOException e) {
-			//Why do we have this??
-
-			//If there is a problem with the elliptic curves file, create Zp DlogGroup.
-			try {
-				doConstruct(channel, new CryptoPpDlogZpSafePrime(), new SecureRandom());
-			} catch (SecurityLevelException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (InvalidDlogGroupException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			doConstruct(channel, DlogGroupFactory.getInstance().getObject(dlogGroupName) , new SecureRandom());
 		} catch (SecurityLevelException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InvalidDlogGroupException e) {
-			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (FactoriesException e) {
 			e.printStackTrace();
 		}
 	}
-	public PedersenReceiverCore(Channel channel, DlogGroup dlog) throws IllegalArgumentException, SecurityLevelException, InvalidDlogGroupException{
-		doConstruct(channel, dlog, new SecureRandom());
+	
+	/**
+	 * Constructor that receives a connected channel (to the committer),the DlogGroup agreed upon between them and a SecureRandom object.
+	 * The Committer needs to be instantiated with the same DlogGroup, otherwise nothing will work properly.
+	 */
+	protected PedersenReceiverCore(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException, IOException{
+		doConstruct(channel, dlog, random);
 	}
 
-
-
-	private void doConstruct(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException{
+	/**
+	 * Sets the given parameters and execute the preprocess phase of the scheme.
+	 * @param channel
+	 * @param dlog
+	 * @param random
+	 * @throws SecurityLevelException if the given dlog is not DDH secure
+	 * @throws InvalidDlogGroupException if the given dlog is not valid.
+	 * @throws IOException if there was a problem in the communication
+	 */
+	private void doConstruct(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException, IOException{
 		//The underlying dlog group must be DDH secure.
 		if (!(dlog instanceof DDH)){
 			throw new SecurityLevelException("DlogGroup should have DDH security level");
 		}
+		//Validate the params of the group.
 		if(!dlog.validateGroup())
 			throw new InvalidDlogGroupException();
 
@@ -110,89 +136,120 @@ public abstract class PedersenReceiverCore {
 		this.dlog = dlog;
 		this.random = random;
 		qMinusOne =  dlog.getOrder().subtract(BigInteger.ONE);
-		commitmentMap = new Hashtable<Integer, GroupElement>();
+		commitmentMap = new Hashtable<Long, GroupElement>();
+		
+		//The pre-process phase is actually performed at construction
+		preProcess();
 	}
 
 
-
-	public void preProcess() throws IOException {
-		trapdoor = sampleRandomValues();
-		computeH();
-		sendH();
-	}
-
-	private BigInteger sampleRandomValues() {
-		BigInteger r = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
-		return r;
-	}
-
-	private void computeH()
-	{
+	/**
+	 * Runs the preprocess stage of the protocol:
+	 * "SAMPLE a random value a <- Zq
+	 *	COMPUTE h = g^a
+	 *	SEND h to C".
+	 * The pre-process phase is performed once per instance. 
+	 * If different values are required, a new instance of the receiver and the committer 
+	 * need to be created.
+	 */
+	private void preProcess() throws IOException {
+		trapdoor = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
 		h = dlog.exponentiate(dlog.getGenerator(), trapdoor);
-	}
-
-	private void sendH() throws IOException{
+		
 		CTRPedersenMessage msg = new CTRPedersenMessage(h.generateSendableData());
 		try{
 			channel.send(msg);
 		} catch (IOException e) {
 			throw new IOException("failed to send the message. The error is: " + e.getMessage());
 		}	
-
+		
 	}
 
 
+	/**
+	 * Wait for the committer to send the commitment. When the message is received and 
+	 * after reconstructing the group element, save it in the commitmentMap using the id 
+	 * also received in the message.
+	 * Pseudo code:
+	 * "WAIT for message c from C
+	 *  STORE values (h,c)".
+	 */
 	public BasicReceiverCommitPhaseOutput receiveCommitment() throws ClassNotFoundException, IOException {
+		Serializable message = null;
 		try{
-			msg = (CTCPedersenCommitmentMessage) channel.receive();
+			message = channel.receive();
 		} catch (ClassNotFoundException e) {
 			throw new ClassNotFoundException("Failed to receive commitment. The error is: " + e.getMessage());
 		} catch (IOException e) {
 			throw new IOException("Failed to receive commitment. The error is: " + e.getMessage());
 		}
 
-		GroupElement receivedCommitment = dlog.reconstructElement(true,msg.getC());
-		commitmentMap.put(Integer.valueOf(msg.getId()), receivedCommitment);
+		if (!(message instanceof CTCPedersenCommitmentMessage)){
+			throw new IllegalArgumentException("The received message should be an instance of CTCPedersenCommitmentMessage");
+		}
+		CTCPedersenCommitmentMessage msg = (CTCPedersenCommitmentMessage) message;
+		GroupElement receivedCommitment = dlog.reconstructElement(true,msg.getCommitment());
+		commitmentMap.put(Long.valueOf(msg.getId()), receivedCommitment);
 		return new BasicReceiverCommitPhaseOutput(msg.getId());
 	}
 
-	public CommitValue receiveDecommitment(int id) throws ClassNotFoundException, IOException {
-		CTCPedersenDecommitmentMessage msg = null;
+	/**
+	 * Wait for the decommitter to send the decommitment message. 
+	 * If there had been a commitment for the requested id then proceed with validation, 
+	 * otherwise reject.
+	 * 
+	 */
+	public CommitValue receiveDecommitment(long id) throws ClassNotFoundException, IOException {
+		CTCPedersenDecommitmentMessage message = null;
 		try {
-			msg = (CTCPedersenDecommitmentMessage) channel.receive();
+			message = (CTCPedersenDecommitmentMessage) channel.receive();
 
 		} catch (ClassNotFoundException e) {
 			throw new ClassNotFoundException("Failed to receive decommitment. The error is: " + e.getMessage());
 		} catch (IOException e) {
 			throw new IOException("Failed to receive decommitment. The error is: " + e.getMessage());
 		}
+		if (!(message instanceof CTCPedersenDecommitmentMessage)){
+			throw new IllegalArgumentException("The received message should be an instance of CTCPedersenDecommitmentMessage");
+		}
+		CTCPedersenDecommitmentMessage msg = (CTCPedersenDecommitmentMessage) message;
 		
-		
-/*
-		//Calculate cc = g^r * h^x
-		GroupElement gTor = dlog.exponentiate(dlog.getGenerator(),msg.getR());
-		GroupElement hTox = dlog.exponentiate(h,msg.getX());
-		//Fetch received commitment according to ID
-		GroupElement receivedCommitment = commitmentMap.get(Integer.valueOf(id));
-		if (receivedCommitment.equals(dlog.multiplyGroupElements(gTor, hTox)))
-			return new BigIntegerCommitValue(msg.getX());
-		//In the pseudocode it says to return X and ACCEPT if valid commitment else, REJECT.
-		//For now we return null as a mode of reject. If the returned value of this function is not null then it means ACCEPT
-		return null;
-*/		
-		return processDecommitment(id, msg.getX(), msg.getR());
+		return processDecommitment(id, msg.getX(), msg.getR().getR());
 	}
 	
-	protected CommitValue processDecommitment(int id, BigInteger x, BigInteger r) {
-		//Calculate cc = g^r * h^x
+	/**
+	 * Run the decommitment phase of the protocol:
+	 * "IF  c = g^r * h^x AND x <- Zq
+	 *	    OUTPUT ACC and value x
+	 *	ELSE
+	 *	    OUTPUT REJ".	
+	 * @param id
+	 * @param x
+	 * @param r
+	 * @return
+	 */
+	protected CommitValue processDecommitment(long id, BigInteger x, BigInteger r) {
+		//Calculate c = g^r * h^x
 		GroupElement gTor = dlog.exponentiate(dlog.getGenerator(),r);
 		GroupElement hTox = dlog.exponentiate(h,x);
 		//Fetch received commitment according to ID
-		GroupElement receivedCommitment = commitmentMap.get(Integer.valueOf(id));
+		GroupElement receivedCommitment = commitmentMap.get(Long.valueOf(id));
 		if (receivedCommitment.equals(dlog.multiplyGroupElements(gTor, hTox)))
 			return new BigIntegerCommitValue(x);
 		//In the pseudocode it says to return X and ACCEPT if valid commitment else, REJECT.
 		//For now we return null as a mode of reject. If the returned value of this function is not null then it means ACCEPT
 		return null;
+	}
+
+	@Override
+	public Object[] getPreProcessedValues(){
+		GroupElement[] values = new GroupElement[1];
+		values[0] = h;
+		return values;
+	}
+	
+	@Override
+	public GroupElement getCommitmentPhaseValues(long id){
+		return commitmentMap.get(id);
 	}
 }
