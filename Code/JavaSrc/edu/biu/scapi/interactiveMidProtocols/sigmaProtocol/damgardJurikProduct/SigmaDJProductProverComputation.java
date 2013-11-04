@@ -22,7 +22,7 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.damgardJurikProduct;
+package edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.damgardJurikProduct;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
@@ -31,11 +31,11 @@ import org.bouncycastle.util.BigIntegers;
 
 import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.generals.ScapiDefaultConfiguration;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.DJBasedSigma;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaProverComputation;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaSimulator;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProverInput;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.DJBasedSigma;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.SigmaProverComputation;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.SigmaSimulator;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProverInput;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProtocolMsg;
 
 /**
  * Concrete implementation of Sigma Protocol prover computation.<p>
