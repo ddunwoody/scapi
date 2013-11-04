@@ -22,7 +22,7 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-package edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.elGamalCTKnowledge;
+package edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.elGamalCmtKnowledge;
 
 import java.security.SecureRandom;
 
