@@ -40,7 +40,7 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.elGamalCommittedValue
 import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.elGamalCommittedValue.SigmaElGamalCommittedValueProverInput;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtWithProofsCommitter;
 import edu.biu.scapi.interactiveMidProtocols.zeroKnowledge.ZKFromSigmaProver;
-import edu.biu.scapi.interactiveMidProtocols.zeroKnowledge.ZKPOKFromSigmaCommitPedersenProver;
+import edu.biu.scapi.interactiveMidProtocols.zeroKnowledge.ZKPOKFromSigmaCmtPedersenProver;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ElGamalPublicKey;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScElGamalPrivateKey;
 import edu.biu.scapi.midLayer.ciphertext.ElGamalCiphertextSendableData;
@@ -57,7 +57,7 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
 public class CmtElGamalWithProofsCommitter extends CmtElGamalOnGroupElementCommitter implements CmtWithProofsCommitter{
 
 	//Proves that the committer knows the committed value.
-	private ZKPOKFromSigmaCommitPedersenProver knowledgeProver;
+	private ZKPOKFromSigmaCmtPedersenProver knowledgeProver;
 	//Proves that the committed value is x.
 	private ZKFromSigmaProver committedValProver;
 	
@@ -97,7 +97,7 @@ public class CmtElGamalWithProofsCommitter extends CmtElGamalOnGroupElementCommi
 	private void doConstruct(int t, SecureRandom random) throws IOException {
 		SigmaProverComputation elGamalCommittedValProver = new SigmaElGamalCommittedValueProverComputation(dlog, t, random);
 		SigmaProverComputation elGamalCTKnowledgeProver = new SigmaElGamalCTKnowledgeProverComputation(dlog, t, random);
-		knowledgeProver = new  ZKPOKFromSigmaCommitPedersenProver(channel, elGamalCTKnowledgeProver);
+		knowledgeProver = new  ZKPOKFromSigmaCmtPedersenProver(channel, elGamalCTKnowledgeProver);
 		committedValProver = new ZKFromSigmaProver(channel, elGamalCommittedValProver);
 		
 	}

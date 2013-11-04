@@ -42,7 +42,7 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.elGamalCommittedValue
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtWithProofsReceiver;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtGroupElementCommitValue;
 import edu.biu.scapi.interactiveMidProtocols.zeroKnowledge.ZKFromSigmaVerifier;
-import edu.biu.scapi.interactiveMidProtocols.zeroKnowledge.ZKPOKFromSigmaCommitPedersenVerifier;
+import edu.biu.scapi.interactiveMidProtocols.zeroKnowledge.ZKPOKFromSigmaCmtPedersenVerifier;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ElGamalPublicKey;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
@@ -59,7 +59,7 @@ import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
 public class CmtElGamalWithProofsReceiver extends CmtElGamalOnGroupElementReceiver implements CmtWithProofsReceiver{
 	
 	//Verifies that the committer knows the committed value.
-	private ZKPOKFromSigmaCommitPedersenVerifier knowledgeVerifier;
+	private ZKPOKFromSigmaCmtPedersenVerifier knowledgeVerifier;
 	//Proves that the committed value is x.
 	private ZKFromSigmaVerifier committedValVerifier;
 	
@@ -110,7 +110,7 @@ public class CmtElGamalWithProofsReceiver extends CmtElGamalOnGroupElementReceiv
 	private void doConstruct(int t, SecureRandom random) throws IOException, ClassNotFoundException, CheatAttemptException, InvalidDlogGroupException {
 		SigmaVerifierComputation elGamalCommittedValVerifier = new SigmaElGamalCommittedValueVerifierComputation(dlog, t, random);
 		SigmaVerifierComputation elGamalCTKnowledgeVerifier = new SigmaElGamalCTKnowledgeVerifierComputation(dlog, t, random);
-		knowledgeVerifier = new  ZKPOKFromSigmaCommitPedersenVerifier(channel, elGamalCTKnowledgeVerifier, random);
+		knowledgeVerifier = new  ZKPOKFromSigmaCmtPedersenVerifier(channel, elGamalCTKnowledgeVerifier, random);
 		committedValVerifier = new ZKFromSigmaVerifier(channel, elGamalCommittedValVerifier, random);
 		
 	}
