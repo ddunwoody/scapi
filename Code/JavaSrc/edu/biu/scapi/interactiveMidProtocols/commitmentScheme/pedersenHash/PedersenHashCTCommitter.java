@@ -27,18 +27,21 @@ package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersenHash;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.Hashtable;
 import java.util.Map;
 
 import edu.biu.scapi.comm.Channel;
+import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.exceptions.CommitValueException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
+import edu.biu.scapi.interactiveMidProtocols.BigIntegerRandomValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.BigIntegerCommitValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.ByteArrayCommitValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.OnBigIntegerCommitmentScheme;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.OnByteArrayCommitmentScheme;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.CTCPedersenDecommitmentMessage;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.PedersenCommitterCore;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
@@ -47,99 +50,102 @@ import edu.biu.scapi.primitives.hash.bc.BcSHA224;
 import edu.biu.scapi.securityLevel.PerfectlyHidingCT;
 
 /**
+ * Concrete implementation of committer that executes the Pedersen hash commitment 
+ * scheme in the committer's point of view.
+ * 
+ * This is a perfectly-hiding commitment that can be used to commit to a value of any length. 
+ * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-public class PedersenHashCTCommitter extends PedersenCommitterCore implements CTCommitter, PerfectlyHidingCT, OnBigIntegerCommitmentScheme {
-	//private PedersenCTCommitter pedCommitter;
+public class PedersenHashCTCommitter extends PedersenCommitterCore implements CTCommitter, PerfectlyHidingCT, OnByteArrayCommitmentScheme{
+	/*
+	 * runs the following protocol:
+	 * "Run COMMIT_PEDERSEN to commit to value H(x). 
+	 * For decommitment, send x and the receiver verifies that the commitment was to H(x). "
+	 */
+	
 	private CryptographicHash hash;
-	private Map<Integer, byte[]> hashCommitmentMap;
+	private Map<Long, byte[]> hashCommitmentMap;
 	
 	/**
 	 * This constructor uses a default Dlog Group and default Cryptographic Hash. They keep the condition that 
 	 * the size in bytes of the resulting hash is less than the size in bytes of the order of the DlogGroup.
 	 * An established channel has to be provided by the user of the class.
 	 * @param channel
-	 * @throws IllegalArgumentException
-	 * @throws SecurityLevelException
-	 * @throws InvalidDlogGroupException
+	 * @throws CheatAttemptException 
+	 * @throws IOException 
+	 * @throws ClassNotFoundException 
 	 */
-	public PedersenHashCTCommitter(Channel channel){
+	public PedersenHashCTCommitter(Channel channel) throws ClassNotFoundException, IOException, CheatAttemptException{
 		super(channel);
-		this.hash = new BcSHA224(); 		//This default hash suits the default DlogGroup of the underlying Committer.
-		//this.pedCommitter = new PedersenCTCommitter(channel);
-		hashCommitmentMap = new Hashtable<Integer, byte[]>();
+		this.hash = new BcSHA224(); 	//This default hash suits the default DlogGroup of the underlying Committer.
+		hashCommitmentMap = new Hashtable<Long, byte[]>();
 	}
 	
 	/**
-	 * This constructor receives as arguments an instance of a Dlog Group and an instance of a Cryptographic Hash such that they keep the condition that 
-	 * the size in bytes of the resulting hash is less than the size in bytes of the order of the DlogGroup. Otherwise, it throws IllegalArgumentException.
+	 * This constructor receives as arguments an instance of a Dlog Group and an instance 
+	 * of a Cryptographic Hash such that they keep the condition that the size in bytes 
+	 * of the resulting hash is less than the size in bytes of the order of the DlogGroup.
+	 * Otherwise, it throws IllegalArgumentException.
 	 * An established channel has to be provided by the user of the class.
- 
-	 * @param channel an established channel obtained via the Communication Layer 
+ 	 * @param channel an established channel obtained via the Communication Layer 
 	 * @param dlog 
 	 * @param hash
+	 * @param random
 	 * @throws IllegalArgumentException if the size in bytes of the resulting hash is bigger than the size in bytes of the order of the DlogGroup
 	 * @throws SecurityLevelException if the Dlog Group is not DDH
 	 * @throws InvalidDlogGroupException if the parameters of the group do not conform the type the group is supposed to be
+	 * @throws CheatAttemptException if the commetter suspects that the receiver is trying to cheat.
+	 * @throws IOException if there was a problem during the communication
+	 * @throws ClassNotFoundException if there was a problem with the serialization mechanism.
 	 */
-	public PedersenHashCTCommitter(Channel channel, DlogGroup dlog, CryptographicHash hash) throws IllegalArgumentException, SecurityLevelException, InvalidDlogGroupException{
-		super(channel,dlog);
+	public PedersenHashCTCommitter(Channel channel, DlogGroup dlog, CryptographicHash hash, SecureRandom random) throws IllegalArgumentException, SecurityLevelException, InvalidDlogGroupException, ClassNotFoundException, IOException, CheatAttemptException{
+		super(channel,dlog, random);
 		if (hash.getHashedMsgSize()> (dlog.getOrder().bitLength()/8)){
 			throw new IllegalArgumentException("The size in bytes of the resulting hash is bigger than the size in bytes of the order of the DlogGroup.");
 		}
 		this.hash = hash;
-		//pedCommitter = new PedersenCTCommitter(channel, dlog);
-		hashCommitmentMap = new Hashtable<Integer, byte[]>();
+		hashCommitmentMap = new Hashtable<Long, byte[]>();
 	}
-	/**
+	
+	/*
 	 * We do not provide a constructor that receives a DlogGroup and not a Hash or vice-versa, since they size of the resulting hash has to be less than the order of the group and we cannot 
 	 * choose a relevant default for either the group of the hash. 
 	 */
 	
-	/* (non-Javadoc)
-	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter#preProcess()
-	 */
-	//@Override
-	/*
-	public void preProcess() throws ClassNotFoundException, IOException, CheatAttemptException {
-		pedCommitter.preProcess();
-	}
-	*/
-	/* (non-Javadoc)
-	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter#commit(edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue, int)
+	/**
+	 * Run COMMIT_PEDERSEN to commit to value H(x).
 	 */
 	@Override
-	public void commit(CommitValue input, int id) throws IOException, IllegalArgumentException {
+	public void commit(CommitValue input, long id) throws IOException, IllegalArgumentException {
 		//Check that the input x is in the end a byte[]
 		if (!(input instanceof ByteArrayCommitValue))
 			throw new IllegalArgumentException("The input must be of type ByteArrayCommitValue");
 		//Hash the input x with the hash function
 		byte[] x  = ((ByteArrayCommitValue)input).getX();
 		//Keep the original commit value x and its id in the commitmentMap, needed for later (during the decommit phase).
-		hashCommitmentMap.put(Integer.valueOf(id), x);
+		hashCommitmentMap.put(Long.valueOf(id), x);
 		
 		//calculate H(x) = Hash(x)
 		byte[] hashValArray = new byte[hash.getHashedMsgSize()];
 		hash.update(x, 0, x.length);
 		hash.hashFinal(hashValArray, 0);
 		//Use Pedersen commitment on the hashed value 
-		//return pedCommitter.commit(new BigIntegerCommitValue(new BigInteger(hashValArray)), id);
 		super.commit(new BigIntegerCommitValue(new BigInteger(hashValArray)), id);
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter#decommit(int)
+	/**
+	 * Sends x to the receiver.
 	 */
 	@Override
-	public void decommit(int id) throws IOException {
+	public void decommit(long id) throws IOException {
 
 		//Fetch the commitment according to the requested ID
-		byte[] x = hashCommitmentMap.get(Integer.valueOf(id));
+		byte[] x = hashCommitmentMap.get(Long.valueOf(id));
 		//Get the relevant random value used in the commitment phase
-		//CTCPedersenDecommitmentMessage underMsg = (CTCPedersenDecommitmentMessage) computeDecommit(id);
-		BigInteger r = (commitmentMap.get(id)).getR();
-		//Is it OK to convert the byte[] x to BigInteger?
+		BigIntegerRandomValue r = (commitmentMap.get(id)).getR();
+		
 		CTCPedersenDecommitmentMessage msg = new CTCPedersenDecommitmentMessage(new BigInteger(x),r);
 		try{
 			channel.send(msg);
@@ -147,16 +153,33 @@ public class PedersenHashCTCommitter extends PedersenCommitterCore implements CT
 		catch (IOException e) {
 			throw new IOException("failed to send the message. The error is: " + e.getMessage());
 		}
-		//This is not according to the pseudo-code but for our programming needs. TODO Check if can be left.
-		//return (CTCDecommitmentMessage) msg;
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter#generateCommitValue(byte[])
+	/**
+	 * This function samples random commit value and returns it.
+	 * @return the sampled commit value
 	 */
+	public CommitValue sampleRandomCommitValue(){
+		byte[] val = new byte[32];
+		random.nextBytes(val);
+		return new ByteArrayCommitValue(val);
+	}
+	
+	
 	@Override
 	public CommitValue generateCommitValue(byte[] x) throws CommitValueException {
 		return new ByteArrayCommitValue(x);
+	}
+	
+	/**
+	 * This function converts the given commit value to a byte array. 
+	 * @param value
+	 * @return the generated bytes.
+	 */
+	public byte[] generateBytesFromCommitValue(CommitValue value){
+		if (!(value instanceof ByteArrayCommitValue))
+			throw new IllegalArgumentException("The given value must be of type ByteArrayCommitValue");
+		return (byte[]) value.getX();
 	}
 
 }
