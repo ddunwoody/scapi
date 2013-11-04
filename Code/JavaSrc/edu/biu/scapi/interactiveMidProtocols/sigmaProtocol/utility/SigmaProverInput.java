@@ -22,7 +22,7 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility;
+package edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility;
 
 import edu.biu.scapi.interactiveMidProtocols.zeroKnowledge.ZKProverInput;
 

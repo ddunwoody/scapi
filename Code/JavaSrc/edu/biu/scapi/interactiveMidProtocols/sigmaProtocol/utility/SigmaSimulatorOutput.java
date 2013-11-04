@@ -22,7 +22,7 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility;
+package edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility;
 
 /**
  * Every sigma simulator outputs the result in the end of it's compute function, but each one can outputs different values. 
