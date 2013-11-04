@@ -26,74 +26,86 @@ Copyright (c) 2012 - SCAPI (http://crypto.biu.ac.il/scapi)
 package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersenHash;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.math.BigInteger;
+import java.security.SecureRandom;
 
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.pedersenCommittedValue.SigmaPedersenCommittedValueInput;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.ByteArrayCommitValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTReceiver;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.OnBigIntegerCommitmentScheme;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.OnByteArrayCommitmentScheme;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.CTCPedersenDecommitmentMessage;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.PedersenReceiverCore;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.hash.CryptographicHash;
 import edu.biu.scapi.primitives.hash.bc.BcSHA224;
 import edu.biu.scapi.securityLevel.PerfectlyHidingCT;
+
 /**
+ * Concrete implementation of receiver that executes the Pedersen hash commitment 
+ * scheme in the receiver's point of view.
+ * 
+ * This is a perfectly-hiding commitment that can be used to commit to a value of any length. 
+ * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-public class PedersenHashCTReceiver extends PedersenReceiverCore implements CTReceiver, PerfectlyHidingCT, OnBigIntegerCommitmentScheme {
-
+public class PedersenHashCTReceiver extends PedersenReceiverCore implements CTReceiver, PerfectlyHidingCT, OnByteArrayCommitmentScheme{
+	
+	/*
+	 * runs the following protocol:
+	 * "Run COMMIT_PEDERSEN to commit to value H(x). 
+	 * For decommitment, send x and the receiver verifies that the commitment was to H(x). "
+	 */
+	
 	private CryptographicHash hash;
 	
-	
-	public PedersenHashCTReceiver(Channel channel) {
-		//pedersenCTReceiver = new PedersenCTReceiver(channel);
+	/**
+	 * This constructor uses a default Dlog Group and default Cryptographic Hash. They keep the condition that 
+	 * the size in bytes of the resulting hash is less than the size in bytes of the order of the DlogGroup.
+	 * An established channel has to be provided by the user of the class.
+	 * @param channel
+	 * @throws IOException if there was a problem in the communication.
+	 */
+	public PedersenHashCTReceiver(Channel channel) throws IOException {
 		super(channel);
 		hash = new BcSHA224(); 		//This default hash suits the default DlogGroup of the underlying Committer.
 	}
 	
-	
-	public PedersenHashCTReceiver(Channel channel, DlogGroup dlog, CryptographicHash hash) throws IllegalArgumentException, SecurityLevelException, InvalidDlogGroupException{
-		super(channel, dlog);
+	/**
+	 * This constructor receives as arguments an instance of a Dlog Group and an instance 
+	 * of a Cryptographic Hash such that they keep the condition that the size in bytes 
+	 * of the resulting hash is less than the size in bytes of the order of the DlogGroup.
+	 * Otherwise, it throws IllegalArgumentException.
+	 * An established channel has to be provided by the user of the class.
+ 	 * @param channel an established channel obtained via the Communication Layer 
+	 * @param dlog 
+	 * @param hash
+	 * @param random
+	 * @throws IllegalArgumentException if the size in bytes of the resulting hash is bigger than the size in bytes of the order of the DlogGroup
+	 * @throws SecurityLevelException if the Dlog Group is not DDH
+	 * @throws InvalidDlogGroupException if the parameters of the group do not conform the type the group is supposed to be
+	 * @throws IOException if there was a problem during the communication
+	 */
+	public PedersenHashCTReceiver(Channel channel, DlogGroup dlog, CryptographicHash hash, SecureRandom random) throws IllegalArgumentException,  IOException, SecurityLevelException, InvalidDlogGroupException{
+		super(channel, dlog, random);
 		if (hash.getHashedMsgSize()> (dlog.getOrder().bitLength()/8)){
 			throw new IllegalArgumentException("The size in bytes of the resulting hash is bigger than the size in bytes of the order of the DlogGroup.");
 		}
 		this.hash = hash;
-}
-
-	public SigmaPedersenCommittedValueInput getInputForZK(byte[] x){
-		return new SigmaPedersenCommittedValueInput(h, msg, new BigInteger(x));
 	}
 
-	/*
-	@Override
-	public void preProcess() throws IOException {
-		pedersenCTReceiver.preProcess();
-	}
-
-
-	/* (non-Javadoc)
-	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTReceiver#receiveCommitment()
-	 */
-/*	@Override
-	public ReceiverCommitPhaseOutput receiveCommitment() throws ClassNotFoundException, IOException {
-		return pedersenCTReceiver.receiveCommitment();
-	}
-	*/
-
-	/* (non-Javadoc)
-	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTReceiver#receiveDecommitment(int)
+	/**
+	 * Verifies that the commitment was to H(x).
 	 */
 	@Override
-	public CommitValue receiveDecommitment(int id) throws ClassNotFoundException, IOException {
-		CTCPedersenDecommitmentMessage msg = null;
+	public CommitValue receiveDecommitment(long id) throws ClassNotFoundException, IOException {
+		Serializable message = null;
 		try {
-			msg = (CTCPedersenDecommitmentMessage) channel.receive();
+			message = channel.receive();
 
 		} catch (ClassNotFoundException e) {
 			throw new ClassNotFoundException("Failed to receive decommitment. The error is: " + e.getMessage());
@@ -101,6 +113,11 @@ public class PedersenHashCTReceiver extends PedersenReceiverCore implements CTRe
 			throw new IOException("Failed to receive decommitment. The error is: " + e.getMessage());
 		}
 
+		if (!(message instanceof CTCPedersenDecommitmentMessage)){
+			throw new IllegalArgumentException("the received message is not an instance of CTCPedersenDecommitmentMessage");
+		}
+		CTCPedersenDecommitmentMessage msg = (CTCPedersenDecommitmentMessage) message;
+		
 		//Hash the input x with the hash function
 		byte[] x  = msg.getX().toByteArray();
 		//calculate H(x) = Hash(x)
@@ -108,12 +125,23 @@ public class PedersenHashCTReceiver extends PedersenReceiverCore implements CTRe
 		hash.update(x, 0, x.length);
 		hash.hashFinal(hashValArray, 0);
 		
-		CommitValue val = processDecommitment(id, new BigInteger(hashValArray), msg.getR());
+		CommitValue val = processDecommitment(id, new BigInteger(hashValArray), msg.getR().getR());
 		//If the inner Pedersen core algorithm returned null it means that it rejected the decommitment, so Pedersen Hash also rejects the answer and returns null
 		if (val == null)
 			return null;
 		//The decommitment was accpeted by Pedersen core. Now, Pedersen Hash has to return the original value before the hashing.
 		return new ByteArrayCommitValue(x);
+	}
+	
+	/**
+	 * This function converts the given commit value to a byte array. 
+	 * @param value
+	 * @return the generated bytes.
+	 */
+	public byte[] generateBytesFromCommitValue(CommitValue value){
+		if (!(value instanceof ByteArrayCommitValue))
+			throw new IllegalArgumentException("The given value must be of type ByteArrayCommitValue");
+		return (byte[]) value.getX();
 	}
 
 }
