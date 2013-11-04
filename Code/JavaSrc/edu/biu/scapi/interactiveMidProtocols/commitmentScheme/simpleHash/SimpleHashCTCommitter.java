@@ -1,82 +1,111 @@
 /**
- * 
- */
+* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+* 
+Copyright (c) 2012 - SCAPI (http://crypto.biu.ac.il/scapi)
+* This file is part of the SCAPI project.
+* DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+* 
+* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
+* to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+* and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+* 
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+* 
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+* FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+* 
+* We request that any publication and/or code referring to and/or based on SCAPI contain an appropriate citation to SCAPI, including a reference to
+* http://crypto.biu.ac.il/SCAPI.
+* 
+* SCAPI uses Crypto++, Miracl, NTL and Bouncy Castle. Please see these projects for any further licensing issues.
+* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+* 
+*/
 package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.simpleHash;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.util.Hashtable;
 import java.util.Map;
 
 import edu.biu.scapi.comm.Channel;
-import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.exceptions.CommitValueException;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.BigIntegerCommitValue;
+import edu.biu.scapi.interactiveMidProtocols.ByteArrayRandomValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.ByteArrayCommitValue;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCDecommitmentMessage;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitmentPair;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitmentPhaseValues;
 import edu.biu.scapi.primitives.hash.CryptographicHash;
 import edu.biu.scapi.securityLevel.SecureCommit;
 
 /**
- * <!-- begin-UML-doc --> <!-- end-UML-doc -->
+ * This class implements the committer side of Simple Hash commitment.
  * 
- * @author user
- * @generated 
- *            "UML to Java (com.ibm.xtools.transform.uml2.java5.internal.UML2JavaTransform)"
+ * This is a commitment scheme based on hash functions. 
+ * It can be viewed as a random-oracle scheme, but its security can also be viewed as a 
+ * standard assumption on modern hash functions. Note that computational binding follows 
+ * from the standard collision resistance assumption. 
+ * 
+ * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
+ *
  */
 public class SimpleHashCTCommitter implements CTCommitter, SecureCommit {
+	
+	/*
+	 * runs the following protocol:
+	 * "Commit phase
+	 *		SAMPLE a random value r <- {0, 1}^n
+	 *		COMPUTE c = H(r,x) (c concatenated with r)
+	 *		SEND c to R
+	 *	Decommit phase
+	 *		SEND (r, x)  to R
+	 *		OUTPUT nothing"	 
+	 */
+	
 	private Channel channel;
 	private CryptographicHash hash;
-	private int t;
 	private int n;
-	//private byte[] x;
 	private SecureRandom random;
-	private  Map<Integer, CommitmentPair> commitmentMap;
-	
-	
-	public SimpleHashCTCommitter(Channel channel, CryptographicHash hash, int t, int n) {
-		super();
+	private  Map<Long, SimpleHashCommitmentValues> commitmentMap;
+
+	/**
+	 * Constructor that receives a connected channel (to the receiver), the hash function
+	 * agreed upon between them, a SecureRandom object and a security parameter n.
+	 * The Receiver needs to be instantiated with the same DlogGroup, otherwise nothing will work properly.
+	 * @param channel
+	 * @param hash
+	 * @param random
+	 * @param n security parameter
+	 * 
+	 */
+	public SimpleHashCTCommitter(Channel channel, CryptographicHash hash, SecureRandom random, int n) {
 		this.channel = channel;
 		this.hash = hash;
-		this.t = t;
 		this.n = n;
-		random = new SecureRandom();
+		this.random = random;
+		commitmentMap = new Hashtable<Long, SimpleHashCommitmentValues>();
 		
+		//No pre-process in SimpleHash Commitment
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter#preProcess()
+	/**
+	 * Runs the commit phase of the commitment scheme:
+	 * "SAMPLE a random value r <- {0, 1}^n
+	 *	COMPUTE c = H(r,x) (c concatenated with r)
+	 *	SEND c to R".
+	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter#commit(edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue, long)
 	 */
-	@Override
-	public void preProcess() throws ClassNotFoundException, IOException,CheatAttemptException {
+	public void commit(CommitValue input, long id) throws IOException {
 		
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter#commit(edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue, int)
-	 */
-	@Override
-	public void commit(CommitValue input, int id) throws IOException {
-		//SAMPLE a random value r in {0, 1}n
-		//COMPUTE c = H(r,x) (c concatenated with r)
-		//SEND c to R
 		if(!(input instanceof ByteArrayCommitValue))
 			throw new IllegalArgumentException("The input has to be of type ByteArrayCommitValue");
 		byte[] x = ((ByteArrayCommitValue)input).getX();
+		//Sample random byte array r
 		byte[] r = new byte[n];
 		random.nextBytes(r);
-		/*
-		//create an array that will hold the concatenation of r with x
-		byte[] c = new byte[n+t];
-		System.arraycopy(r,0, c, 0, r.length);
-		System.arraycopy(input.getX(), 0, c, r.length, x.length);
-		byte[] hashValArray = new byte[hash.getHashedMsgSize()];
-		hash.update(c, 0, c.length);
-		hash.hashFinal(hashValArray, 0);
-		*/
+
+		//Compute the hash function
 		byte[] hashValArray = computeCommitment(x, r);
 		try {
 			//Send the message by the channel.
@@ -85,60 +114,84 @@ public class SimpleHashCTCommitter implements CTCommitter, SecureCommit {
 			throw new IOException("failed to send the message. The error is: " + e.getMessage());
 		}	
 		//After succeeding in sending the commitment, keep the committed value in the map together with its ID.
-		commitmentMap.put(Integer.valueOf(id), new CommitmentPair(new BigInteger(r), input));
-		System.out.println("x = " + x);
-		System.out.println("r = " + r);
-		//System.out.println("c = " + c);
-		
-	}
-	private byte[] computeCommitment(byte[] x, byte[] r){
-		//create an array that will hold the concatenation of r with x
-				byte[] c = new byte[n+t];
-				System.arraycopy(r,0, c, 0, r.length);
-				System.arraycopy(x, 0, c, r.length, x.length);
-				byte[] hashValArray = new byte[hash.getHashedMsgSize()];
-				hash.update(c, 0, c.length);
-				hash.hashFinal(hashValArray, 0);
-				return hashValArray;
+		commitmentMap.put(Long.valueOf(id), new SimpleHashCommitmentValues(new ByteArrayRandomValue(r), input, hashValArray));
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter#decommit(int)
+	/**
+	 * Computes the hash function on the concatination of the inputs.
+	 * @param x user input
+	 * @param r random value
+	 * @return the hash result.
 	 */
-	@Override
-	public void decommit(int id) throws IOException {
+	private byte[] computeCommitment(byte[] x, byte[] r){
+		//create an array that will hold the concatenation of r with x
+		byte[] c = new byte[n+x.length];
 		
+		System.arraycopy(r,0, c, 0, r.length);
+		System.arraycopy(x, 0, c, r.length, x.length);
+		byte[] hashValArray = new byte[hash.getHashedMsgSize()];
+		hash.update(c, 0, c.length);
+		hash.hashFinal(hashValArray, 0);
+		return hashValArray;
+	}
+
+	/**
+	 * Runs the decommit phase of the commitment scheme:
+	 * "SEND (r, x) to R
+	 *	OUTPUT nothing."
+	 */
+	public void decommit(long id) throws IOException {
+		//fetch the commitment according to the requested ID
+		SimpleHashCommitmentValues vals = commitmentMap.get(Long.valueOf(id));
+		byte[] x = ((ByteArrayCommitValue)vals.getX()).getX();
+		CTCSimpleHashDecommitmentMessage msg =  new CTCSimpleHashDecommitmentMessage(vals.getR(), x);
 		try{
-			channel.send((CTCSimpleHashDecommitmentMessage)computeDecommit(id));
+			channel.send(msg);
 		}
 		catch (IOException e) {
 			throw new IOException("failed to send the message. The error is: " + e.getMessage());
 		}
-		//This is not according to the pseudo-code but for our programming needs. TODO Check if can be left.
-		//return (CTCDecommitmentMessage) msg;
+	
 	}	
 
-	private CTCDecommitmentMessage computeDecommit(int id){
-		//fetch the commitment according to the requested ID
-		CommitmentPair pair = commitmentMap.get(Integer.valueOf(id));
-		byte[] x = ((ByteArrayCommitValue)pair.getX()).getX();
-		return (CTCDecommitmentMessage) new CTCSimpleHashDecommitmentMessage(pair.getR().toByteArray(), x);
+	/**
+	 * This function samples random commit value and returns it.
+	 * @return the sampled commit value
+	 */
+	public CommitValue sampleRandomCommitValue(){
+		byte[] val = new byte[32];
+		random.nextBytes(val);
+		return new ByteArrayCommitValue(val);
 	}
 	
-	//This function is for testing purposes only. It should be deleted before publishing this part of SCAPI.
-	//To be used immediately after commit function.
-	public Object getCommitment(int id){
-			CommitmentPair pair = commitmentMap.get(Integer.valueOf(id));
-			ByteArrayCommitValue xCVal = (ByteArrayCommitValue)pair.getX();
-			return computeCommitment(xCVal.getX(), pair.getR().toByteArray());
-		}
-
-	/* (non-Javadoc)
-	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter#generateCommitValue(byte[])
-	 */
 	@Override
 	public CommitValue generateCommitValue(byte[] x)throws CommitValueException {
 		return new ByteArrayCommitValue(x);
+	}
+
+	/**
+	 * No pre-process is performed for Simple Hash Committer, therefore this function 
+	 * returns null! 
+	 */
+	@Override
+	public Object[] getPreProcessValues() {
+		return null;
+	}
+
+	@Override
+	public CommitmentPhaseValues getCommitmentPhaseValues(long id) {
+		return commitmentMap.get(id);
+	}
+	
+	/**
+	 * This function converts the given commit value to a byte array. 
+	 * @param value
+	 * @return the generated bytes.
+	 */
+	public byte[] generateBytesFromCommitValue(CommitValue value){
+		if (!(value instanceof ByteArrayCommitValue))
+			throw new IllegalArgumentException("The given value must be of type ByteArrayCommitValue");
+		return (byte[]) value.getX();
 	}
 
 }
