@@ -35,7 +35,7 @@ import edu.biu.scapi.midLayer.plaintext.Plaintext;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-public interface CommitValue {
+public interface CmtCommitValue {
 	
 	/**
 	 * The committed values can vary, therefore returns an Object instance.

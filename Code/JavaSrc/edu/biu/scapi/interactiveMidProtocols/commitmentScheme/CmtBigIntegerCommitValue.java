@@ -36,14 +36,14 @@ import edu.biu.scapi.midLayer.plaintext.BigIntegerPlainText;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-public class BigIntegerCommitValue implements CommitValue {
+public class CmtBigIntegerCommitValue implements CmtCommitValue {
 	BigInteger x; //The committed value
 
 	/**
 	 * Constructor that sets the commit value.
 	 * @param x BigInteger to commit on.
 	 */
-	public BigIntegerCommitValue(BigInteger x) {
+	public CmtBigIntegerCommitValue(BigInteger x) {
 		super();
 		this.x = x;
 	}

@@ -31,7 +31,7 @@ package edu.biu.scapi.interactiveMidProtocols.commitmentScheme;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-public class BasicReceiverCommitPhaseOutput implements ReceiverCommitPhaseOutput {
+public class CmtRBasicCommitPhaseOutput implements CmtRCommitPhaseOutput {
 	
 	private static final long serialVersionUID = 4388527503559716095L;
 	long commitmentId;
@@ -40,7 +40,7 @@ public class BasicReceiverCommitPhaseOutput implements ReceiverCommitPhaseOutput
 	 * Constructor tha sets the given commitment id.
 	 * @param commitmentId the id of the received commitment message.
 	 */
-	public BasicReceiverCommitPhaseOutput(long commitmentId) {
+	public CmtRBasicCommitPhaseOutput(long commitmentId) {
 		super();
 		this.commitmentId = commitmentId;
 	}

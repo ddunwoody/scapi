@@ -35,14 +35,14 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-public class GroupElementCommitValue implements CommitValue {
+public class CmtGroupElementCommitValue implements CmtCommitValue {
 	private GroupElement x; //The committed value
 
 	/**
 	 * Constructor that sets the commit value.
 	 * @param x GroupElement to commit on.
 	 */
-	public GroupElementCommitValue(GroupElement x) {
+	public CmtGroupElementCommitValue(GroupElement x) {
 		super();
 		this.x = x;
 	}

@@ -32,7 +32,7 @@ import java.math.BigInteger;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class TrapdoorReceiverCommitPhaseOutput extends BasicReceiverCommitPhaseOutput{
+public class CmtRTrapdoorCommitPhaseOutput extends CmtRBasicCommitPhaseOutput{
 
 	private static final long serialVersionUID = 359254858935659625L;
 	private BigInteger trap; 
@@ -42,7 +42,7 @@ public class TrapdoorReceiverCommitPhaseOutput extends BasicReceiverCommitPhaseO
 	 * @param trapdoor the receiver's trapdoor for this commitment.
 	 * @param commitmentId the id of the received commitment message.
 	 */
-	public TrapdoorReceiverCommitPhaseOutput(BigInteger trapdoor, long commitmentId) {
+	public CmtRTrapdoorCommitPhaseOutput(BigInteger trapdoor, long commitmentId) {
 		super(commitmentId);
 		this.trap = trapdoor;
 	}

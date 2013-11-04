@@ -35,14 +35,14 @@ import edu.biu.scapi.midLayer.plaintext.ByteArrayPlaintext;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-public class ByteArrayCommitValue implements CommitValue {
+public class CmtByteArrayCommitValue implements CmtCommitValue {
 	private byte[] x; //The committed value
 
 	/**
 	 * Constructor that sets the commit value.
 	 * @param x byte[] to commit on.
 	 */
-	public ByteArrayCommitValue(byte[] x) {
+	public CmtByteArrayCommitValue(byte[] x) {
 		super();
 		this.x = x;
 	}
