@@ -46,7 +46,7 @@ import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersenTrapdoor.C
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class ZKPOKFromSigmaCommitPedersenVerifier implements ZKPOKVerifier{
+public class ZKPOKFromSigmaCmtPedersenVerifier implements ZKPOKVerifier{
 
 	private Channel channel;
 	private SigmaVerifierComputation sVerifier; //Underlying verifier that computes the proof of the sigma protocol.
@@ -62,7 +62,7 @@ public class ZKPOKFromSigmaCommitPedersenVerifier implements ZKPOKVerifier{
 	 * @throws IOException 
 	 * @throws ClassNotFoundException 
 	 */
-	public ZKPOKFromSigmaCommitPedersenVerifier(Channel channel, SigmaVerifierComputation sVerifier, SecureRandom random) throws ClassNotFoundException, IOException, CheatAttemptException{
+	public ZKPOKFromSigmaCmtPedersenVerifier(Channel channel, SigmaVerifierComputation sVerifier, SecureRandom random) throws ClassNotFoundException, IOException, CheatAttemptException{
 	
 		this.channel = channel;
 		this.sVerifier = sVerifier;

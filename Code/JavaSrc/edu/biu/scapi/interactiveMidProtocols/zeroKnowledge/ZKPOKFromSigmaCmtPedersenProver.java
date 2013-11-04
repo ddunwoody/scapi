@@ -45,7 +45,7 @@ import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtRCommitPhaseOut
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class ZKPOKFromSigmaCommitPedersenProver implements ZKPOKProver{
+public class ZKPOKFromSigmaCmtPedersenProver implements ZKPOKProver{
 
 	private Channel channel;
 	private SigmaProverComputation sProver; //Underlying prover that computes the proof of the sigma protocol.
@@ -59,7 +59,7 @@ public class ZKPOKFromSigmaCommitPedersenProver implements ZKPOKProver{
 	 * @param sProver
 	 * @throws IOException 
 	 */
-	public ZKPOKFromSigmaCommitPedersenProver(Channel channel, SigmaProverComputation sProver) throws IOException{
+	public ZKPOKFromSigmaCmtPedersenProver(Channel channel, SigmaProverComputation sProver) throws IOException{
 		
 		this.sProver = sProver;
 		this.receiver = new CmtPedersenTrapdoorReceiver(channel);
