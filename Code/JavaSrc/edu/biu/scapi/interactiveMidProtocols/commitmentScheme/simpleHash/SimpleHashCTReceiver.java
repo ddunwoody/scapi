@@ -25,108 +25,165 @@
 package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.simpleHash;
 
 import java.io.IOException;
-import java.security.SecureRandom;
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Hashtable;
 import java.util.Map;
 
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.BasicReceiverCommitPhaseOutput;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.BigIntegerCommitValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.ByteArrayCommitValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTReceiver;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.ReceiverCommitPhaseOutput;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.elGamal.CTCElGamalCommitmentMessage;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.elGamal.CTCElGamalDecommitmentMessage;
-import edu.biu.scapi.midLayer.asymmetricCrypto.encryption.ElGamalEnc;
-import edu.biu.scapi.primitives.dlog.DlogGroup;
-import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.hash.CryptographicHash;
 import edu.biu.scapi.securityLevel.SecureCommit;
 
 /**
+ * This class implements the receiver side of Simple Hash commitment.
+ * 
+ * This is a commitment scheme based on hash functions. 
+ * It can be viewed as a random-oracle scheme, but its security can also be viewed as a 
+ * standard assumption on modern hash functions. Note that computational binding follows 
+ * from the standard collision resistance assumption. 
+ * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
 public class SimpleHashCTReceiver implements CTReceiver, SecureCommit {
-	protected Map<Integer , CTCSimpleHashCommitmentMessage> commitmentMap;
-	protected DlogGroup dlog;
-	protected Channel channel;	
+	
+	/*
+	 * runs the following protocol:
+	 * "Commit phase
+	 *		WAIT for a value c
+	 *		STORE c
+	 *	Decommit phase
+	 *		WAIT for (r, x)  from C
+	 *		IF NOT
+	 *		•	c = H(r,x), AND
+	 *		•	x <- {0, 1}^t
+	 *		      OUTPUT REJ
+	 *		ELSE
+	 *		      OUTPUT ACC and value x"	 
+	 */
+	
+	private Map<Long , byte[]> commitmentMap;
+	private Channel channel;	
 	private CryptographicHash hash;
-	private int t;
-	private int n;
+	private int n; //security parameter.
 
-	public SimpleHashCTReceiver(Channel channel, CryptographicHash hash, int t, int n) {
+	/**
+	 * Constructor that receives a connected channel (to the receiver), the hash function
+	 * agreed upon between them and a security parameter n.
+	 * The committer needs to be instantiated with the same DlogGroup, otherwise nothing will work properly.
+	 * @param channel
+	 * @param hash
+	 * @param n security parameter
+	 * 
+	 */
+	public SimpleHashCTReceiver(Channel channel, CryptographicHash hash, int n) {
 		this.channel = channel;
 		this.hash = hash;
-		this.t = t;
 		this.n = n;
-	}
-
-	@Override
-	public void preProcess() throws IOException {
+		commitmentMap = new Hashtable<Long, byte[]>();
+		
 		//No pre-process in SimpleHash Commitment
 	}
 
-	@Override
+	/**
+	 * Run the commit phase of the protocol:
+	 * "WAIT for a value c
+	 *	STORE c".
+	 */
 	public ReceiverCommitPhaseOutput receiveCommitment() throws ClassNotFoundException, IOException {
-		CTCSimpleHashCommitmentMessage msg = null;
+		Serializable message = null;
 		try{
-			msg = (CTCSimpleHashCommitmentMessage) channel.receive();
+			message = channel.receive();
 		} catch (ClassNotFoundException e) {
 			throw new ClassNotFoundException("Failed to receive commitment. The error is: " + e.getMessage());
 		} catch (IOException e) {
 			throw new IOException("Failed to receive commitment. The error is: " + e.getMessage());
 		}
-
-		commitmentMap.put(Integer.valueOf(msg.getId()), msg);
+		if (!(message instanceof CTCSimpleHashCommitmentMessage)){
+			throw new IllegalArgumentException("the received message is not an instance of CTCSimpleHashCommitmentMessage");
+		}
+		
+		CTCSimpleHashCommitmentMessage msg = (CTCSimpleHashCommitmentMessage) message;
+		commitmentMap.put(Long.valueOf(msg.getId()), msg.getCommitment());
 		return new BasicReceiverCommitPhaseOutput(msg.getId());
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTReceiver#receiveDecommitment(int)
+	/**
+	 * Run the decommit phase of the protocol:
+	 * "WAIT for (r, x)  from C
+	 *	IF NOT
+	 *	•	c = H(r,x), AND
+	 *	•	x <- {0, 1}^t
+	 *		OUTPUT REJ
+	 *	ELSE
+	 *	  	OUTPUT ACC and value x".
 	 */
-	@Override
-	public CommitValue receiveDecommitment(int id) throws ClassNotFoundException, IOException{
-		CTCSimpleHashDecommitmentMessage msg = null;
+	public CommitValue receiveDecommitment(long id) throws ClassNotFoundException, IOException{
+		//Receive the message from the committer.
+		Serializable message = null;
 		try {
-			msg = (CTCSimpleHashDecommitmentMessage) channel.receive();
+			message = channel.receive();
 
 		} catch (ClassNotFoundException e) {
 			throw new ClassNotFoundException("Failed to receive decommitment. The error is: " + e.getMessage());
 		} catch (IOException e) {
 			throw new IOException("Failed to receive decommitment. The error is: " + e.getMessage());
 		}
-
-		return processDecommitment(id, msg);
-	}
-
-	private CommitValue processDecommitment(int id, CTCSimpleHashDecommitmentMessage msg){
-		//Calculate c' = H(r|x)
-		//If c' == c and x is a binary string of length t then ACCEPT
-		//Else, REJECT
 		
-	
-		byte[] x = msg.getX();
-		//Reject already here if the length of x is not t
-		if(x.length != t){
-			System.out.println("Rejecting because length of x is: " + x.length + " is different from t: " + t);
-			return null;
+		if (!(message instanceof CTCSimpleHashDecommitmentMessage)){
+			throw new IllegalArgumentException("the received message is not an instance of CTCSimpleHashDecommitmentMessage");
 		}
-		byte[] r = msg.getR();
+		CTCSimpleHashDecommitmentMessage msg = (CTCSimpleHashDecommitmentMessage) message;
+		
+		//Compute c = H(r,x)
+		byte[] x = msg.getX();
+		byte[] r = msg.getR().getR();
+		
 		//create an array that will hold the concatenation of r with x
-		byte[] cTag = new byte[n+t];
+		byte[] cTag = new byte[n + x.length];
 		System.arraycopy(r,0, cTag, 0, r.length);
 		System.arraycopy(x, 0, cTag, r.length, x.length);
 		byte[] hashValArrayTag = new byte[hash.getHashedMsgSize()];
 		hash.update(cTag, 0, cTag.length);
 		hash.hashFinal(hashValArrayTag, 0);
+		
 		//Fetch received commitment according to ID
-		byte[] receivedCommitment = commitmentMap.get(Integer.valueOf(id)).getC();
-		if (receivedCommitment.equals(hashValArrayTag))
+		byte[] receivedCommitment = commitmentMap.get(Long.valueOf(id));
+		
+		//Checks that c = H(r,x)
+		if (Arrays.equals(receivedCommitment, hashValArrayTag))
 			return new ByteArrayCommitValue(x);
 		//In the pseudocode it says to return X and ACCEPT if valid commitment else, REJECT.
 		//For now we return null as a mode of reject. If the returned value of this function is not null then it means ACCEPT
 		return null;
+	}
+	
+	/**
+	 * No pre-process is performed for Simple Hash Receiver, therefore this function returns null! 
+	 */
+	@Override
+	public Object[] getPreProcessedValues() {
+		return null;
+	}
 
+	@Override
+	public Object getCommitmentPhaseValues(long id) {
+		return commitmentMap.get(id);
+	}
+	
+	/**
+	 * This function converts the given commit value to a byte array. 
+	 * @param value
+	 * @return the generated bytes.
+	 */
+	public byte[] generateBytesFromCommitValue(CommitValue value){
+		if (!(value instanceof ByteArrayCommitValue))
+			throw new IllegalArgumentException("The given value must be of type ByteArrayCommitValue");
+		return (byte[]) value.getX();
 	}
 }
