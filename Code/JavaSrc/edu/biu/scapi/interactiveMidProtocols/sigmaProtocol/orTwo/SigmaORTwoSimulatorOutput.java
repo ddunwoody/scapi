@@ -22,9 +22,9 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.orTwo;
+package edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.orTwo;
 
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaSimulatorOutput;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaSimulatorOutput;
 
 /**
  * Concrete implementation of SigmaSimulatorOutput, used by SigmaORTwoSimulator.

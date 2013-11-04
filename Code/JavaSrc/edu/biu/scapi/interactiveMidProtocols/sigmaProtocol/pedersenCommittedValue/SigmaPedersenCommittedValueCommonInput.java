@@ -22,13 +22,13 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.pedersenCommittedValue;
+package edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.pedersenCommittedValue;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.math.BigInteger;
 
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**

@@ -22,11 +22,11 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog;
+package edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.dlog;
 
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaBIMsg;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaGroupElementMsg;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaSimulatorOutput;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaBIMsg;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaGroupElementMsg;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaSimulatorOutput;
 
 /**
  * Concrete implementation of SigmaSimulatorOutput, used by SigmaDlogSimulator.

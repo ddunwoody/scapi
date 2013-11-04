@@ -22,17 +22,17 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.elGamalCommittedValue;
+package edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.elGamalCommittedValue;
 
 import java.security.SecureRandom;
 
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.DlogBasedSigma;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaVerifierComputation;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHCommonInput;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHVerifierComputation;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.DlogBasedSigma;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.SigmaVerifierComputation;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.dh.SigmaDHCommonInput;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.dh.SigmaDHVerifierComputation;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaCommonInput;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProtocolMsg;
 import edu.biu.scapi.midLayer.ciphertext.ElGamalOnGroupElementCiphertext.ElGamalOnGrElSendableData;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;

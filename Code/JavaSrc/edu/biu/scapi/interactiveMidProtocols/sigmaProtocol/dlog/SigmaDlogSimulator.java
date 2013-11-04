@@ -22,7 +22,7 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog;
+package edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.dlog;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
@@ -30,11 +30,11 @@ import java.security.SecureRandom;
 import org.bouncycastle.util.BigIntegers;
 
 import edu.biu.scapi.exceptions.CheatAttemptException;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaSimulator;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaBIMsg;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaGroupElementMsg;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaSimulatorOutput;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.SigmaSimulator;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaBIMsg;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaCommonInput;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaGroupElementMsg;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaSimulatorOutput;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 

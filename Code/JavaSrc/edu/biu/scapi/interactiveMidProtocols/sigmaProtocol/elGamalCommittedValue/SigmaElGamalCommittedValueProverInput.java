@@ -22,11 +22,11 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.elGamalCommittedValue;
+package edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.elGamalCommittedValue;
 
 import java.math.BigInteger;
 
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProverInput;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProverInput;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ElGamalPublicKey;
 import edu.biu.scapi.midLayer.ciphertext.ElGamalCiphertextSendableData;
 import edu.biu.scapi.primitives.dlog.GroupElement;

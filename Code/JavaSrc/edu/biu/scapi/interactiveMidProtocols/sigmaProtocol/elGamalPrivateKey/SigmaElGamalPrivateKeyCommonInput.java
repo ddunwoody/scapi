@@ -22,12 +22,12 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.elGamalPrivateKey;
+package edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.elGamalPrivateKey;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ElGamalPublicKey;
 
 /**

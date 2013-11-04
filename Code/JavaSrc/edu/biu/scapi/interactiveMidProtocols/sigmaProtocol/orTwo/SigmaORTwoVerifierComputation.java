@@ -22,13 +22,13 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.orTwo;
+package edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.orTwo;
 
 import java.security.SecureRandom;
 
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaVerifierComputation;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.SigmaVerifierComputation;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaCommonInput;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProtocolMsg;
 
 /**
  * Concrete implementation of Sigma Protocol verifier computation.

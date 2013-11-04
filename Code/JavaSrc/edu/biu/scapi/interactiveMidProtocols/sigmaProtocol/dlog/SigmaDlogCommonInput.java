@@ -22,12 +22,12 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog;
+package edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.dlog;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaCommonInput;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**

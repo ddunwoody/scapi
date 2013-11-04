@@ -22,19 +22,19 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.elGamalEncryptedValue;
+package edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.elGamalEncryptedValue;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
 import edu.biu.scapi.exceptions.CheatAttemptException;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.DlogBasedSigma;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaProverComputation;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaSimulator;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHProverComputation;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dh.SigmaDHProverInput;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProverInput;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.DlogBasedSigma;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.SigmaProverComputation;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.SigmaSimulator;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.dh.SigmaDHProverComputation;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.dh.SigmaDHProverInput;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProverInput;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProtocolMsg;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 

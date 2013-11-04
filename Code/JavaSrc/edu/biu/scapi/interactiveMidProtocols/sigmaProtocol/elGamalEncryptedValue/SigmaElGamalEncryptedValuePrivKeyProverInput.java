@@ -22,9 +22,9 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.elGamalEncryptedValue;
+package edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.elGamalEncryptedValue;
 
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProverInput;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProverInput;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ElGamalPrivateKey;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ElGamalPublicKey;
 import edu.biu.scapi.midLayer.ciphertext.ElGamalOnGroupElementCiphertext;

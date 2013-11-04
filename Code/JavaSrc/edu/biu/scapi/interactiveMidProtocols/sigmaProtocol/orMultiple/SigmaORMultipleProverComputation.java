@@ -22,7 +22,7 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.orMultiple;
+package edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.orMultiple;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -30,13 +30,13 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 
 import edu.biu.scapi.exceptions.CheatAttemptException;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaProverComputation;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaSimulator;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaMultipleMsg;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProverInput;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaSimulatorOutput;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.SigmaProverComputation;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.SigmaSimulator;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaCommonInput;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaMultipleMsg;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProverInput;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProtocolMsg;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaSimulatorOutput;
 
 /**
  * Concrete implementation of Sigma Protocol prover computation.

@@ -22,10 +22,10 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.orTwo;
+package edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.orTwo;
 
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProverInput;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaCommonInput;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProverInput;
 
 /**
  * Concrete implementation of SigmaProtocol input, used by the SigmaProtocolORTwoProver.

@@ -22,11 +22,11 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.orMultiple;
+package edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.orMultiple;
 
 import java.util.ArrayList;
 
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaCommonInput;
 
 /**
  * Concrete implementation of SigmaProtocol input, used by the SigmaProtocolORMultiple verifier and simulator.

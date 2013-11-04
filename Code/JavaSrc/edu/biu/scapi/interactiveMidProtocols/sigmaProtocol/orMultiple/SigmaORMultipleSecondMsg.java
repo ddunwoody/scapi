@@ -22,11 +22,11 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.orMultiple;
+package edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.orMultiple;
 
 import java.util.ArrayList;
 
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProtocolMsg;
 
 /**
  * Concrete implementation of SigmaProtocol message. 

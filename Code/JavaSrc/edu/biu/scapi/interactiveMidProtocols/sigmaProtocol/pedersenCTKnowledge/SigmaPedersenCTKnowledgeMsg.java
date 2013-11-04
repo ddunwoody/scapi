@@ -22,11 +22,11 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.pedersenCTKnowledge;
+package edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.pedersenCTKnowledge;
 
 import java.math.BigInteger;
 
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaProtocolMsg;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProtocolMsg;
 
 /**
  * Concrete implementation of SigmaProtocol message. 

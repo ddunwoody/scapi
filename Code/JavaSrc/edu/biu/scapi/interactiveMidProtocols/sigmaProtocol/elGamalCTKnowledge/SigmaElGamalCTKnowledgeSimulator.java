@@ -22,16 +22,16 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-package edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.elGamalCTKnowledge;
+package edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.elGamalCTKnowledge;
 
 import java.security.SecureRandom;
 
 import edu.biu.scapi.exceptions.CheatAttemptException;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.SigmaSimulator;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog.SigmaDlogCommonInput;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.dlog.SigmaDlogSimulator;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaCommonInput;
-import edu.biu.scapi.interactiveMidProtocols.SigmaProtocol.utility.SigmaSimulatorOutput;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.SigmaSimulator;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.dlog.SigmaDlogCommonInput;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.dlog.SigmaDlogSimulator;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaCommonInput;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaSimulatorOutput;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
