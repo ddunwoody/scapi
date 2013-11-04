@@ -29,21 +29,29 @@ import java.io.Serializable;
 import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
 
 /**
+ * This class holds the value sent by the receiver to the committer in the pre-process phase which is part of the initialization stage. 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-public class CTRPedersenMessage implements Serializable {
-	/**
-	 * 
-	 */
+class CTRPedersenMessage implements Serializable {
 	private static final long serialVersionUID = -3924307031205721761L;
 	GroupElementSendableData h;
 
+	/**
+	 * Constructor that sets the given groupElement.
+	 * @param h the value sent by the receiver to the committer in the pre-process phase
+	 */
 	public CTRPedersenMessage(GroupElementSendableData h) {
 		super();
 		this.h = h;
 	}
 
+	/**
+	 * This function return the h values which is calculated by the receiver in the pre-process phase as follows:
+	 * SAMPLE a random value a in  Zq
+	 * COMPUTE h = g^a
+     * SEND h to Committer.
+	 */
 	public GroupElementSendableData getH() {
 		return h;
 	}
