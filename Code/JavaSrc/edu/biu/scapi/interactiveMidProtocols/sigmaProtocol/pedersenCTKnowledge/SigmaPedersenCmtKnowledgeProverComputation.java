@@ -47,7 +47,7 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaPedersenCTKnowledgeProverComputation implements SigmaProverComputation, DlogBasedSigma{
+public class SigmaPedersenCmtKnowledgeProverComputation implements SigmaProverComputation, DlogBasedSigma{
 	
 	/*	
 	  This class computes the following calculations:
@@ -59,7 +59,7 @@ public class SigmaPedersenCTKnowledgeProverComputation implements SigmaProverCom
 	private DlogGroup dlog;								// Underlying DlogGroup.
 	private int t; 										// soundness parameter in BITS.
 	private SecureRandom random;
-	private SigmaPedersenCTKnowledgeProverInput input;	// Contains h, c, x, r.
+	private SigmaPedersenCmtKnowledgeProverInput input;	// Contains h, c, x, r.
 	private BigInteger alpha, beta;						//random values used in the protocol.
 	
 	/**
@@ -69,7 +69,7 @@ public class SigmaPedersenCTKnowledgeProverComputation implements SigmaProverCom
 	 * @param random
 	 * @throws IllegalArgumentException if soundness parameter is invalid.
 	 */
-	public SigmaPedersenCTKnowledgeProverComputation(DlogGroup dlog, int t, SecureRandom random) {
+	public SigmaPedersenCmtKnowledgeProverComputation(DlogGroup dlog, int t, SecureRandom random) {
 		
 		//Sets the parameters.
 		this.dlog = dlog;
@@ -112,10 +112,10 @@ public class SigmaPedersenCTKnowledgeProverComputation implements SigmaProverCom
 	 * @return the computed message
 	 */
 	public SigmaProtocolMsg computeFirstMsg(SigmaProverInput in) {
-		if (!(in instanceof SigmaPedersenCTKnowledgeProverInput)){
+		if (!(in instanceof SigmaPedersenCmtKnowledgeProverInput)){
 			throw new IllegalArgumentException("the given input must be an instance of SigmaPedersenCTKnowledgeProverInput");
 		}
-		this.input = (SigmaPedersenCTKnowledgeProverInput) in;
+		this.input = (SigmaPedersenCmtKnowledgeProverInput) in;
 		
 		//Sample random alpha, beta.
 		BigInteger qMinusOne = dlog.getOrder().subtract(BigInteger.ONE);
@@ -162,7 +162,7 @@ public class SigmaPedersenCTKnowledgeProverComputation implements SigmaProverCom
 		beta = BigInteger.ZERO;
 		
 		//Create and return SigmaPedersenCTKnowledgeMsg with z.
-		return new SigmaPedersenCTKnowledgeMsg(u, v);
+		return new SigmaPedersenCmtKnowledgeMsg(u, v);
 		
 	}
 	
@@ -180,7 +180,7 @@ public class SigmaPedersenCTKnowledgeProverComputation implements SigmaProverCom
 	 * @return SigmaDlogSimulator
 	 */
 	public SigmaSimulator getSimulator(){
-		return new SigmaPedersenCTKnowledgeSimulator(dlog, t, random);
+		return new SigmaPedersenCmtKnowledgeSimulator(dlog, t, random);
 	}
 
 }

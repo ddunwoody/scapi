@@ -44,7 +44,7 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaPedersenCTKnowledgeVerifierComputation implements SigmaVerifierComputation, DlogBasedSigma{
+public class SigmaPedersenCmtKnowledgeVerifierComputation implements SigmaVerifierComputation, DlogBasedSigma{
 	
 	/*	
 	  This class computes the following calculations:
@@ -65,7 +65,7 @@ public class SigmaPedersenCTKnowledgeVerifierComputation implements SigmaVerifie
 	 * @throws InvalidDlogGroupException if the given DlogGroup is not valid.
 	 * @throws IllegalArgumentException if soundness parameter is invalid.
 	 */
-	public SigmaPedersenCTKnowledgeVerifierComputation(DlogGroup dlog, int t, SecureRandom random) throws InvalidDlogGroupException {
+	public SigmaPedersenCmtKnowledgeVerifierComputation(DlogGroup dlog, int t, SecureRandom random) throws InvalidDlogGroupException {
 		
 		if(!dlog.validateGroup())
 			throw new InvalidDlogGroupException();
@@ -143,7 +143,7 @@ public class SigmaPedersenCTKnowledgeVerifierComputation implements SigmaVerifie
 	 * @throws IllegalArgumentException if the second message of the prover is not an instance of SigmaPedersenCTKnowledgeMsg
 	 */
 	public boolean verify(SigmaCommonInput input, SigmaProtocolMsg a, SigmaProtocolMsg z) {
-		if (!(input instanceof SigmaPedersenCTKnowledgeCommonInput)){
+		if (!(input instanceof SigmaPedersenCmtKnowledgeCommonInput)){
 			throw new IllegalArgumentException("the given input must be an instance of SigmaPedersenCTKnowledgeCommonInput");
 		}
 		
@@ -155,11 +155,11 @@ public class SigmaPedersenCTKnowledgeVerifierComputation implements SigmaVerifie
 		if (!(a instanceof SigmaGroupElementMsg)){
 			throw new IllegalArgumentException("first message must be an instance of SigmaGroupElementMsg");
 		}
-		if (!(z instanceof SigmaPedersenCTKnowledgeMsg)){
+		if (!(z instanceof SigmaPedersenCmtKnowledgeMsg)){
 			throw new IllegalArgumentException("second message must be an instance of SigmaPedersenCTKnowledgeMsg");
 		}
 		
-		SigmaPedersenCTKnowledgeCommonInput params = (SigmaPedersenCTKnowledgeCommonInput) input;
+		SigmaPedersenCmtKnowledgeCommonInput params = (SigmaPedersenCmtKnowledgeCommonInput) input;
 		
 		//Get the h from the input and verify that it is in the Dlog Group.
 		GroupElement h = params.getH();
@@ -170,7 +170,7 @@ public class SigmaPedersenCTKnowledgeVerifierComputation implements SigmaVerifie
 		//Get the element of the first message from the prover.
 		SigmaGroupElementMsg firstMsg = (SigmaGroupElementMsg) a;
 		
-		SigmaPedersenCTKnowledgeMsg secondMsg = (SigmaPedersenCTKnowledgeMsg) z;
+		SigmaPedersenCmtKnowledgeMsg secondMsg = (SigmaPedersenCmtKnowledgeMsg) z;
 		
 		//check that h^u*g^v=a*c^e:
 		

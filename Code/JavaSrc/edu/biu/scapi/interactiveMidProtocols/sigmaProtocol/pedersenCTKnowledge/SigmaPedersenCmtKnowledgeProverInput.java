@@ -38,14 +38,14 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaPedersenCTKnowledgeProverInput implements SigmaProverInput{
+public class SigmaPedersenCmtKnowledgeProverInput implements SigmaProverInput{
 	
-	private SigmaPedersenCTKnowledgeCommonInput params;
+	private SigmaPedersenCmtKnowledgeCommonInput params;
 	private BigInteger x;
 	private BigInteger r;
 	
-	public SigmaPedersenCTKnowledgeProverInput(GroupElement h, GroupElement commitment, BigInteger x, BigInteger r){
-		params = new SigmaPedersenCTKnowledgeCommonInput(h, commitment);
+	public SigmaPedersenCmtKnowledgeProverInput(GroupElement h, GroupElement commitment, BigInteger x, BigInteger r){
+		params = new SigmaPedersenCmtKnowledgeCommonInput(h, commitment);
 		this.x = x;
 		this.r = r;
 	}
@@ -59,7 +59,7 @@ public class SigmaPedersenCTKnowledgeProverInput implements SigmaProverInput{
 	}
 
 	@Override
-	public SigmaPedersenCTKnowledgeCommonInput getCommonParams() {
+	public SigmaPedersenCmtKnowledgeCommonInput getCommonParams() {
 		return params;
 	}
 

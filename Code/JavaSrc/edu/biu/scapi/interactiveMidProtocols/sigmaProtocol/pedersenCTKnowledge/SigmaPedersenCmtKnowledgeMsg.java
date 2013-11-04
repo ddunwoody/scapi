@@ -35,13 +35,13 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProtocol
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-class SigmaPedersenCTKnowledgeMsg implements SigmaProtocolMsg {
+class SigmaPedersenCmtKnowledgeMsg implements SigmaProtocolMsg {
 
 	private static final long serialVersionUID = 1443613833827988336L;
 	private BigInteger u;
 	private BigInteger v;
 	
-	SigmaPedersenCTKnowledgeMsg(BigInteger u, BigInteger v){
+	SigmaPedersenCmtKnowledgeMsg(BigInteger u, BigInteger v){
 		this.u = u;
 		this.v = v;
 	}

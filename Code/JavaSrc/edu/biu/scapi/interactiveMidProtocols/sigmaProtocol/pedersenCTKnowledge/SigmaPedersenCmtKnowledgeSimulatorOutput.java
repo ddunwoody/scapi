@@ -35,13 +35,13 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaSimulato
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaPedersenCTKnowledgeSimulatorOutput implements SigmaSimulatorOutput{
+public class SigmaPedersenCmtKnowledgeSimulatorOutput implements SigmaSimulatorOutput{
 
 	private SigmaGroupElementMsg a;
 	private byte[] e;
-	private SigmaPedersenCTKnowledgeMsg z;
+	private SigmaPedersenCmtKnowledgeMsg z;
 	
-	public SigmaPedersenCTKnowledgeSimulatorOutput(SigmaGroupElementMsg a, byte[] e, SigmaPedersenCTKnowledgeMsg z){
+	public SigmaPedersenCmtKnowledgeSimulatorOutput(SigmaGroupElementMsg a, byte[] e, SigmaPedersenCmtKnowledgeMsg z){
 		this.a = a;
 		this.e = e;
 		this.z = z;
@@ -55,7 +55,7 @@ public class SigmaPedersenCTKnowledgeSimulatorOutput implements SigmaSimulatorOu
 		return e;
 	}
 
-	public SigmaPedersenCTKnowledgeMsg getZ() {
+	public SigmaPedersenCmtKnowledgeMsg getZ() {
 		return z;
 	}
 

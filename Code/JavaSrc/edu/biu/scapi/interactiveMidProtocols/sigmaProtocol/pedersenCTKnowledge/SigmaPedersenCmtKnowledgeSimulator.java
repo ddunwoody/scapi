@@ -44,7 +44,7 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaPedersenCTKnowledgeSimulator implements SigmaSimulator{
+public class SigmaPedersenCmtKnowledgeSimulator implements SigmaSimulator{
 	/*	
 	  This class computes the following calculations:
 		  	SAMPLE random values u, v in Zq  
@@ -63,7 +63,7 @@ public class SigmaPedersenCTKnowledgeSimulator implements SigmaSimulator{
 	 * @param random
 	 * @throws IllegalArgumentException if soundness parameter is invalid.
 	 */
-	public SigmaPedersenCTKnowledgeSimulator(DlogGroup dlog, int t, SecureRandom random) {
+	public SigmaPedersenCmtKnowledgeSimulator(DlogGroup dlog, int t, SecureRandom random) {
 		
 		//Sets the parameters.
 		this.dlog = dlog;
@@ -118,10 +118,10 @@ public class SigmaPedersenCTKnowledgeSimulator implements SigmaSimulator{
 			throw new CheatAttemptException("the length of the given challenge is differ from the soundness parameter");
 		}
 		
-		if (!(input instanceof SigmaPedersenCTKnowledgeCommonInput)){
+		if (!(input instanceof SigmaPedersenCmtKnowledgeCommonInput)){
 			throw new IllegalArgumentException("the given input must be an instance of SigmaPedersenCTKnowledgeCommonInput");
 		}
-		SigmaPedersenCTKnowledgeCommonInput params = (SigmaPedersenCTKnowledgeCommonInput) input;
+		SigmaPedersenCmtKnowledgeCommonInput params = (SigmaPedersenCmtKnowledgeCommonInput) input;
 		
 		//SAMPLE a random u, v <- Zq
 		BigInteger qMinusOne = dlog.getOrder().subtract(BigInteger.ONE);
@@ -143,8 +143,8 @@ public class SigmaPedersenCTKnowledgeSimulator implements SigmaSimulator{
 		
 		//OUTPUT (a,e,z).
 		SigmaGroupElementMsg first = new SigmaGroupElementMsg(a.generateSendableData());
-		SigmaPedersenCTKnowledgeMsg second = new SigmaPedersenCTKnowledgeMsg(u,v);
-		return new SigmaPedersenCTKnowledgeSimulatorOutput(first, challenge, second);
+		SigmaPedersenCmtKnowledgeMsg second = new SigmaPedersenCmtKnowledgeMsg(u,v);
+		return new SigmaPedersenCmtKnowledgeSimulatorOutput(first, challenge, second);
 				
 	}
 	

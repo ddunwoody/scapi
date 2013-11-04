@@ -38,13 +38,13 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaPedersenCTKnowledgeCommonInput implements SigmaCommonInput{
+public class SigmaPedersenCmtKnowledgeCommonInput implements SigmaCommonInput{
 	
 	private static final long serialVersionUID = 6360210454705006144L;
 	private GroupElement h;
 	private GroupElement commitment;
 	
-	public SigmaPedersenCTKnowledgeCommonInput(GroupElement h, GroupElement commitment){
+	public SigmaPedersenCmtKnowledgeCommonInput(GroupElement h, GroupElement commitment){
 		this.h = h;
 		this.commitment = commitment;
 	}
