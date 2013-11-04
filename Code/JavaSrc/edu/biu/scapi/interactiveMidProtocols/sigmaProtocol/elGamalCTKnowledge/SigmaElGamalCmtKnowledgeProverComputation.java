@@ -45,7 +45,7 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaElGamalCTKnowledgeProverComputation implements SigmaProverComputation, DlogBasedSigma{
+public class SigmaElGamalCmtKnowledgeProverComputation implements SigmaProverComputation, DlogBasedSigma{
 
 	/*	
 	  This class uses an instance of SigmaDlogProver with:
@@ -62,7 +62,7 @@ public class SigmaElGamalCTKnowledgeProverComputation implements SigmaProverComp
 	 * @param t Soundness parameter in BITS.
 	 * @param random
 	 */
-	public SigmaElGamalCTKnowledgeProverComputation(DlogGroup dlog, int t, SecureRandom random) {
+	public SigmaElGamalCmtKnowledgeProverComputation(DlogGroup dlog, int t, SecureRandom random) {
 		
 		//Creates the underlying SigmaDlogProver object with the given parameters.
 		sigmaDlog = new SigmaDlogProverComputation(dlog, t, random);
@@ -84,10 +84,10 @@ public class SigmaElGamalCTKnowledgeProverComputation implements SigmaProverComp
 	 * @throws IllegalArgumentException if input is not an instance of SigmaElGamalCTKnowledgeProverInput.
 	 */
 	private SigmaDlogProverInput convertInput(SigmaProverInput in) {
-		if (!(in instanceof SigmaElGamalCTKnowledgeProverInput)){
+		if (!(in instanceof SigmaElGamalCmtKnowledgeProverInput)){
 			throw new IllegalArgumentException("the given input must be an instance of SigmaElGamalCTKnowledgeProverInput");
 		}
-		SigmaElGamalCTKnowledgeProverInput input = (SigmaElGamalCTKnowledgeProverInput) in;
+		SigmaElGamalCmtKnowledgeProverInput input = (SigmaElGamalCmtKnowledgeProverInput) in;
 		
 		//Create an input object to the underlying sigma dlog prover.
 		GroupElement h = input.getCommonParams().getPublicKey().getH();
@@ -125,7 +125,7 @@ public class SigmaElGamalCTKnowledgeProverComputation implements SigmaProverComp
 	 * @return SigmaDlogSimulator
 	 */
 	public SigmaSimulator getSimulator(){
-		return new SigmaElGamalCTKnowledgeSimulator(sigmaDlog.getSimulator());
+		return new SigmaElGamalCmtKnowledgeSimulator(sigmaDlog.getSimulator());
 	}
 
 }

@@ -42,7 +42,7 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaElGamalCTKnowledgeSimulator implements SigmaSimulator{
+public class SigmaElGamalCmtKnowledgeSimulator implements SigmaSimulator{
 
 	/*	
 	  This class uses an instance of SigmaDlogSimulator with:
@@ -58,7 +58,7 @@ public class SigmaElGamalCTKnowledgeSimulator implements SigmaSimulator{
 	 * @param t Soundness parameter in BITS.
 	 * @param random
 	 */
-	public SigmaElGamalCTKnowledgeSimulator(DlogGroup dlog, int t, SecureRandom random){
+	public SigmaElGamalCmtKnowledgeSimulator(DlogGroup dlog, int t, SecureRandom random){
 		
 		//Creates the underlying SigmaDlogSimulator object with the given parameters.
 		dlogSim = new SigmaDlogSimulator(dlog, t, random);
@@ -74,7 +74,7 @@ public class SigmaElGamalCTKnowledgeSimulator implements SigmaSimulator{
 	 * @param simulator MUST be an instance of SigmaDlogSimulator.
 	 * @throws IllegalArgumentException if the given simulator is not an instance of SigmaDlogSimulator.
 	 */
-	SigmaElGamalCTKnowledgeSimulator(SigmaSimulator simulator) {
+	SigmaElGamalCmtKnowledgeSimulator(SigmaSimulator simulator) {
 		
 		if (!(simulator instanceof SigmaDlogSimulator)){
 			throw new IllegalArgumentException("The given simulator is not an instance of SigmaDlogSimulator");
@@ -115,10 +115,10 @@ public class SigmaElGamalCTKnowledgeSimulator implements SigmaSimulator{
 	 * @throws IllegalArgumentException if the given input is not an instance of SigmaElGamalCTKnowledgeCommonInput.
 	 */
 	private SigmaDlogCommonInput convertInput(SigmaCommonInput input) {
-		if (!(input instanceof SigmaElGamalCTKnowledgeCommonInput)){
+		if (!(input instanceof SigmaElGamalCmtKnowledgeCommonInput)){
 			throw new IllegalArgumentException("the given input must be an instance of SigmaElGamalCTKnowledgeCommonInput");
 		}
-		SigmaElGamalCTKnowledgeCommonInput params = (SigmaElGamalCTKnowledgeCommonInput) input;
+		SigmaElGamalCmtKnowledgeCommonInput params = (SigmaElGamalCmtKnowledgeCommonInput) input;
 		
 		//Convert the input to match the required SigmaDlogSimulator's input.
 		GroupElement h = params.getPublicKey().getH();

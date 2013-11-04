@@ -37,13 +37,13 @@ import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ElGamalPublicKey;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaElGamalCTKnowledgeProverInput implements SigmaProverInput{
+public class SigmaElGamalCmtKnowledgeProverInput implements SigmaProverInput{
 	
-	private SigmaElGamalCTKnowledgeCommonInput params;
+	private SigmaElGamalCmtKnowledgeCommonInput params;
 	private BigInteger w;
 	
-	public SigmaElGamalCTKnowledgeProverInput(ElGamalPublicKey publicKey, BigInteger w){
-		params = new SigmaElGamalCTKnowledgeCommonInput(publicKey);
+	public SigmaElGamalCmtKnowledgeProverInput(ElGamalPublicKey publicKey, BigInteger w){
+		params = new SigmaElGamalCmtKnowledgeCommonInput(publicKey);
 		this.w = w;
 	}
 	
@@ -52,7 +52,7 @@ public class SigmaElGamalCTKnowledgeProverInput implements SigmaProverInput{
 	}
 
 	@Override
-	public SigmaElGamalCTKnowledgeCommonInput getCommonParams() {
+	public SigmaElGamalCmtKnowledgeCommonInput getCommonParams() {
 		return params;
 	}
 }

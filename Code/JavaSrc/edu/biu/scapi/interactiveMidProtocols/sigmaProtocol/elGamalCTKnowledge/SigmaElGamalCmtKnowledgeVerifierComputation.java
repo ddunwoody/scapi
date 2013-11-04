@@ -44,7 +44,7 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaElGamalCTKnowledgeVerifierComputation implements SigmaVerifierComputation, DlogBasedSigma{
+public class SigmaElGamalCmtKnowledgeVerifierComputation implements SigmaVerifierComputation, DlogBasedSigma{
 
 	/*	
 	  This class uses an instance of SigmaDlogVerifier with:
@@ -61,7 +61,7 @@ public class SigmaElGamalCTKnowledgeVerifierComputation implements SigmaVerifier
 	 * @param random
 	 * @throws InvalidDlogGroupException if the given dlog is invalid.
 	 */
-	public SigmaElGamalCTKnowledgeVerifierComputation(DlogGroup dlog, int t, SecureRandom random) throws InvalidDlogGroupException {
+	public SigmaElGamalCmtKnowledgeVerifierComputation(DlogGroup dlog, int t, SecureRandom random) throws InvalidDlogGroupException {
 		
 		//Create the underlying SigmaDlogVerifier object with the given parameters.
 		sigmaDlog = new SigmaDlogVerifierComputation(dlog, t, random);
@@ -82,10 +82,10 @@ public class SigmaElGamalCTKnowledgeVerifierComputation implements SigmaVerifier
 	 * @throws IllegalArgumentException if input is not an instance of SigmaElGamalCTKnowledgeCommonInput.
 	 */
 	private SigmaDlogCommonInput convertInput(SigmaCommonInput in) {
-		if (!(in instanceof SigmaElGamalCTKnowledgeCommonInput)){
+		if (!(in instanceof SigmaElGamalCmtKnowledgeCommonInput)){
 			throw new IllegalArgumentException("the given input must be an instance of SigmaElGamalCTKnowledgeCommonInput");
 		}
-		SigmaElGamalCTKnowledgeCommonInput params = (SigmaElGamalCTKnowledgeCommonInput) in;
+		SigmaElGamalCmtKnowledgeCommonInput params = (SigmaElGamalCmtKnowledgeCommonInput) in;
 		
 		//Create an input object to the underlying sigma dlog prover.
 		GroupElement h = params.getPublicKey().getH();

@@ -37,12 +37,12 @@ import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ElGamalPublicKey;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class SigmaElGamalCTKnowledgeCommonInput implements SigmaCommonInput{
+public class SigmaElGamalCmtKnowledgeCommonInput implements SigmaCommonInput{
 
 	private static final long serialVersionUID = 761506828568805999L;
 	private ElGamalPublicKey publicKey;
 	
-	public SigmaElGamalCTKnowledgeCommonInput(ElGamalPublicKey publicKey){
+	public SigmaElGamalCmtKnowledgeCommonInput(ElGamalPublicKey publicKey){
 		this.publicKey = publicKey;
 	}
 	
