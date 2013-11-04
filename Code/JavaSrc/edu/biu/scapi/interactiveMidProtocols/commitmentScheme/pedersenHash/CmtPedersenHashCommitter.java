@@ -37,13 +37,13 @@ import edu.biu.scapi.exceptions.CommitValueException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.BigIntegerRandomValue;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.BigIntegerCommitValue;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.ByteArrayCommitValue;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.OnByteArrayCommitmentScheme;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.CTCPedersenDecommitmentMessage;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.PedersenCommitterCore;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtBigIntegerCommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtByteArrayCommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitter;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtOnByteArray;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.CmtPedersenDecommitmentMessage;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.CmtPedersenCommitterCore;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.hash.CryptographicHash;
 import edu.biu.scapi.primitives.hash.bc.BcSHA224;
@@ -58,7 +58,7 @@ import edu.biu.scapi.securityLevel.PerfectlyHidingCT;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-public class PedersenHashCTCommitter extends PedersenCommitterCore implements CTCommitter, PerfectlyHidingCT, OnByteArrayCommitmentScheme{
+public class CmtPedersenHashCommitter extends CmtPedersenCommitterCore implements CmtCommitter, PerfectlyHidingCT, CmtOnByteArray{
 	/*
 	 * runs the following protocol:
 	 * "Run COMMIT_PEDERSEN to commit to value H(x). 
@@ -77,7 +77,7 @@ public class PedersenHashCTCommitter extends PedersenCommitterCore implements CT
 	 * @throws IOException 
 	 * @throws ClassNotFoundException 
 	 */
-	public PedersenHashCTCommitter(Channel channel) throws ClassNotFoundException, IOException, CheatAttemptException{
+	public CmtPedersenHashCommitter(Channel channel) throws ClassNotFoundException, IOException, CheatAttemptException{
 		super(channel);
 		this.hash = new BcSHA224(); 	//This default hash suits the default DlogGroup of the underlying Committer.
 		hashCommitmentMap = new Hashtable<Long, byte[]>();
@@ -100,7 +100,7 @@ public class PedersenHashCTCommitter extends PedersenCommitterCore implements CT
 	 * @throws IOException if there was a problem during the communication
 	 * @throws ClassNotFoundException if there was a problem with the serialization mechanism.
 	 */
-	public PedersenHashCTCommitter(Channel channel, DlogGroup dlog, CryptographicHash hash, SecureRandom random) throws IllegalArgumentException, SecurityLevelException, InvalidDlogGroupException, ClassNotFoundException, IOException, CheatAttemptException{
+	public CmtPedersenHashCommitter(Channel channel, DlogGroup dlog, CryptographicHash hash, SecureRandom random) throws IllegalArgumentException, SecurityLevelException, InvalidDlogGroupException, ClassNotFoundException, IOException, CheatAttemptException{
 		super(channel,dlog, random);
 		if (hash.getHashedMsgSize()> (dlog.getOrder().bitLength()/8)){
 			throw new IllegalArgumentException("The size in bytes of the resulting hash is bigger than the size in bytes of the order of the DlogGroup.");
@@ -118,12 +118,12 @@ public class PedersenHashCTCommitter extends PedersenCommitterCore implements CT
 	 * Run COMMIT_PEDERSEN to commit to value H(x).
 	 */
 	@Override
-	public void commit(CommitValue input, long id) throws IOException, IllegalArgumentException {
+	public void commit(CmtCommitValue input, long id) throws IOException, IllegalArgumentException {
 		//Check that the input x is in the end a byte[]
-		if (!(input instanceof ByteArrayCommitValue))
+		if (!(input instanceof CmtByteArrayCommitValue))
 			throw new IllegalArgumentException("The input must be of type ByteArrayCommitValue");
 		//Hash the input x with the hash function
-		byte[] x  = ((ByteArrayCommitValue)input).getX();
+		byte[] x  = ((CmtByteArrayCommitValue)input).getX();
 		//Keep the original commit value x and its id in the commitmentMap, needed for later (during the decommit phase).
 		hashCommitmentMap.put(Long.valueOf(id), x);
 		
@@ -132,7 +132,7 @@ public class PedersenHashCTCommitter extends PedersenCommitterCore implements CT
 		hash.update(x, 0, x.length);
 		hash.hashFinal(hashValArray, 0);
 		//Use Pedersen commitment on the hashed value 
-		super.commit(new BigIntegerCommitValue(new BigInteger(hashValArray)), id);
+		super.commit(new CmtBigIntegerCommitValue(new BigInteger(hashValArray)), id);
 	}
 
 	/**
@@ -146,7 +146,7 @@ public class PedersenHashCTCommitter extends PedersenCommitterCore implements CT
 		//Get the relevant random value used in the commitment phase
 		BigIntegerRandomValue r = (commitmentMap.get(id)).getR();
 		
-		CTCPedersenDecommitmentMessage msg = new CTCPedersenDecommitmentMessage(new BigInteger(x),r);
+		CmtPedersenDecommitmentMessage msg = new CmtPedersenDecommitmentMessage(new BigInteger(x),r);
 		try{
 			channel.send(msg);
 		}
@@ -159,16 +159,16 @@ public class PedersenHashCTCommitter extends PedersenCommitterCore implements CT
 	 * This function samples random commit value and returns it.
 	 * @return the sampled commit value
 	 */
-	public CommitValue sampleRandomCommitValue(){
+	public CmtCommitValue sampleRandomCommitValue(){
 		byte[] val = new byte[32];
 		random.nextBytes(val);
-		return new ByteArrayCommitValue(val);
+		return new CmtByteArrayCommitValue(val);
 	}
 	
 	
 	@Override
-	public CommitValue generateCommitValue(byte[] x) throws CommitValueException {
-		return new ByteArrayCommitValue(x);
+	public CmtCommitValue generateCommitValue(byte[] x) throws CommitValueException {
+		return new CmtByteArrayCommitValue(x);
 	}
 	
 	/**
@@ -176,8 +176,8 @@ public class PedersenHashCTCommitter extends PedersenCommitterCore implements CT
 	 * @param value
 	 * @return the generated bytes.
 	 */
-	public byte[] generateBytesFromCommitValue(CommitValue value){
-		if (!(value instanceof ByteArrayCommitValue))
+	public byte[] generateBytesFromCommitValue(CmtCommitValue value){
+		if (!(value instanceof CmtByteArrayCommitValue))
 			throw new IllegalArgumentException("The given value must be of type ByteArrayCommitValue");
 		return (byte[]) value.getX();
 	}
