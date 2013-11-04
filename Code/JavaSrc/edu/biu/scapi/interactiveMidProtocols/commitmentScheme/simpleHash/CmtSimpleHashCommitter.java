@@ -37,6 +37,7 @@ import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitter;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitmentPhaseValues;
 import edu.biu.scapi.primitives.hash.CryptographicHash;
+import edu.biu.scapi.primitives.hash.bc.BcSHA256;
 import edu.biu.scapi.securityLevel.SecureCommit;
 
 /**
@@ -70,9 +71,18 @@ public class CmtSimpleHashCommitter implements CmtCommitter, SecureCommit {
 	private  Map<Long, CmtSimpleHashCommitmentValues> commitmentMap;
 
 	/**
+	 * Constructor that receives a connected channel (to the receiver) and chosses default 
+	 * values for the hash function, SecureRandom object and a security parameter n.
+	 *  @param channel
+	 */
+	public CmtSimpleHashCommitter(Channel channel) {
+		this(channel, new BcSHA256(), new SecureRandom(), 32);	
+	}
+	
+	/**
 	 * Constructor that receives a connected channel (to the receiver), the hash function
 	 * agreed upon between them, a SecureRandom object and a security parameter n.
-	 * The Receiver needs to be instantiated with the same DlogGroup, otherwise nothing will work properly.
+	 * The Receiver needs to be instantiated with the same hash, otherwise nothing will work properly.
 	 * @param channel
 	 * @param hash
 	 * @param random

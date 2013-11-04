@@ -37,6 +37,7 @@ import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtReceiver;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtRCommitPhaseOutput;
 import edu.biu.scapi.primitives.hash.CryptographicHash;
+import edu.biu.scapi.primitives.hash.bc.BcSHA256;
 import edu.biu.scapi.securityLevel.SecureCommit;
 
 /**
@@ -72,6 +73,16 @@ public class CmtSimpleHashReceiver implements CmtReceiver, SecureCommit {
 	private CryptographicHash hash;
 	private int n; //security parameter.
 
+	/**
+	 * Constructor that receives a connected channel (to the receiver) and chosses default 
+	 * values for the hash function, SecureRandom object and a security parameter n.
+	 *  @param channel
+	 */
+	public CmtSimpleHashReceiver(Channel channel) {
+		this(channel, new BcSHA256(), 32);	
+	}
+	
+	
 	/**
 	 * Constructor that receives a connected channel (to the receiver), the hash function
 	 * agreed upon between them and a security parameter n.
