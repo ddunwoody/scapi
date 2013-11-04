@@ -27,7 +27,7 @@ package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen;
 import java.io.Serializable;
 
 
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCtrCommitmentMsg;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCCommitmentMsg;
 import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
 
 /**
@@ -35,7 +35,7 @@ import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-class CTCPedersenCommitmentMessage implements CmtCtrCommitmentMsg, Serializable {
+class CmtPedersenCommitmentMessage implements CmtCCommitmentMsg, Serializable {
 	private static final long serialVersionUID = -4867238837511177003L;
 	
 	// In Pedersen schemes the commitment object is a groupElement. 
@@ -48,7 +48,7 @@ class CTCPedersenCommitmentMessage implements CmtCtrCommitmentMsg, Serializable 
 	 * @param c the actual commitment object. In Pedersen schemes the commitment object is a groupElement.
 	 * @param id the commitment id.
 	 */
-	public CTCPedersenCommitmentMessage(GroupElementSendableData c, long id) {
+	public CmtPedersenCommitmentMessage(GroupElementSendableData c, long id) {
 		super();
 		this.c = c;
 		this.id = id;

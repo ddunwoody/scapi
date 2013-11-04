@@ -38,10 +38,10 @@ import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.generals.ScapiDefaultConfiguration;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.BasicReceiverCommitPhaseOutput;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.BigIntegerCommitValue;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTReceiver;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtRBasicCommitPhaseOutput;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtBigIntegerCommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtReceiver;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitValue;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.securityLevel.DDH;
@@ -53,7 +53,7 @@ import edu.biu.scapi.tools.Factories.DlogGroupFactory;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-public abstract class PedersenReceiverCore implements CTReceiver{
+public abstract class CmtPedersenReceiverCore implements CmtReceiver{
 	
 	/*
 	 * runs the following protocol:
@@ -93,7 +93,7 @@ public abstract class PedersenReceiverCore implements CTReceiver{
 	 * This constructor only needs to get a connected channel (to the committer). All the other needed elements have default values.
 	 * If this constructor is used for the recevier then also the default constructor needs to be used by the committer.  
 	 */
-	protected PedersenReceiverCore(Channel channel) throws IOException{
+	protected CmtPedersenReceiverCore(Channel channel) throws IOException{
 		String dlogGroupName = ScapiDefaultConfiguration.getInstance().getProperty("DDHDlogGroup");
 		try {
 			doConstruct(channel, DlogGroupFactory.getInstance().getObject(dlogGroupName) , new SecureRandom());
@@ -110,7 +110,7 @@ public abstract class PedersenReceiverCore implements CTReceiver{
 	 * Constructor that receives a connected channel (to the committer),the DlogGroup agreed upon between them and a SecureRandom object.
 	 * The Committer needs to be instantiated with the same DlogGroup, otherwise nothing will work properly.
 	 */
-	protected PedersenReceiverCore(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException, IOException{
+	protected CmtPedersenReceiverCore(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException, IOException{
 		doConstruct(channel, dlog, random);
 	}
 
@@ -156,7 +156,7 @@ public abstract class PedersenReceiverCore implements CTReceiver{
 		trapdoor = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
 		h = dlog.exponentiate(dlog.getGenerator(), trapdoor);
 		
-		CTRPedersenMessage msg = new CTRPedersenMessage(h.generateSendableData());
+		CmtPedersenPreprocessMessage msg = new CmtPedersenPreprocessMessage(h.generateSendableData());
 		try{
 			channel.send(msg);
 		} catch (IOException e) {
@@ -174,7 +174,7 @@ public abstract class PedersenReceiverCore implements CTReceiver{
 	 * "WAIT for message c from C
 	 *  STORE values (h,c)".
 	 */
-	public BasicReceiverCommitPhaseOutput receiveCommitment() throws ClassNotFoundException, IOException {
+	public CmtRBasicCommitPhaseOutput receiveCommitment() throws ClassNotFoundException, IOException {
 		Serializable message = null;
 		try{
 			message = channel.receive();
@@ -184,13 +184,13 @@ public abstract class PedersenReceiverCore implements CTReceiver{
 			throw new IOException("Failed to receive commitment. The error is: " + e.getMessage());
 		}
 
-		if (!(message instanceof CTCPedersenCommitmentMessage)){
+		if (!(message instanceof CmtPedersenCommitmentMessage)){
 			throw new IllegalArgumentException("The received message should be an instance of CTCPedersenCommitmentMessage");
 		}
-		CTCPedersenCommitmentMessage msg = (CTCPedersenCommitmentMessage) message;
+		CmtPedersenCommitmentMessage msg = (CmtPedersenCommitmentMessage) message;
 		GroupElement receivedCommitment = dlog.reconstructElement(true,msg.getCommitment());
 		commitmentMap.put(Long.valueOf(msg.getId()), receivedCommitment);
-		return new BasicReceiverCommitPhaseOutput(msg.getId());
+		return new CmtRBasicCommitPhaseOutput(msg.getId());
 	}
 
 	/**
@@ -199,20 +199,20 @@ public abstract class PedersenReceiverCore implements CTReceiver{
 	 * otherwise reject.
 	 * 
 	 */
-	public CommitValue receiveDecommitment(long id) throws ClassNotFoundException, IOException {
-		CTCPedersenDecommitmentMessage message = null;
+	public CmtCommitValue receiveDecommitment(long id) throws ClassNotFoundException, IOException {
+		CmtPedersenDecommitmentMessage message = null;
 		try {
-			message = (CTCPedersenDecommitmentMessage) channel.receive();
+			message = (CmtPedersenDecommitmentMessage) channel.receive();
 
 		} catch (ClassNotFoundException e) {
 			throw new ClassNotFoundException("Failed to receive decommitment. The error is: " + e.getMessage());
 		} catch (IOException e) {
 			throw new IOException("Failed to receive decommitment. The error is: " + e.getMessage());
 		}
-		if (!(message instanceof CTCPedersenDecommitmentMessage)){
+		if (!(message instanceof CmtPedersenDecommitmentMessage)){
 			throw new IllegalArgumentException("The received message should be an instance of CTCPedersenDecommitmentMessage");
 		}
-		CTCPedersenDecommitmentMessage msg = (CTCPedersenDecommitmentMessage) message;
+		CmtPedersenDecommitmentMessage msg = (CmtPedersenDecommitmentMessage) message;
 		
 		return processDecommitment(id, msg.getX(), msg.getR().getR());
 	}
@@ -228,14 +228,14 @@ public abstract class PedersenReceiverCore implements CTReceiver{
 	 * @param r
 	 * @return
 	 */
-	protected CommitValue processDecommitment(long id, BigInteger x, BigInteger r) {
+	protected CmtCommitValue processDecommitment(long id, BigInteger x, BigInteger r) {
 		//Calculate c = g^r * h^x
 		GroupElement gTor = dlog.exponentiate(dlog.getGenerator(),r);
 		GroupElement hTox = dlog.exponentiate(h,x);
 		//Fetch received commitment according to ID
 		GroupElement receivedCommitment = commitmentMap.get(Long.valueOf(id));
 		if (receivedCommitment.equals(dlog.multiplyGroupElements(gTor, hTox)))
-			return new BigIntegerCommitValue(x);
+			return new CmtBigIntegerCommitValue(x);
 		//In the pseudocode it says to return X and ACCEPT if valid commitment else, REJECT.
 		//For now we return null as a mode of reject. If the returned value of this function is not null then it means ACCEPT
 		return null;

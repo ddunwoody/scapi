@@ -40,9 +40,9 @@ import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.generals.ScapiDefaultConfiguration;
 import edu.biu.scapi.interactiveMidProtocols.BigIntegerRandomValue;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.BigIntegerCommitValue;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtBigIntegerCommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitter;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitValue;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.securityLevel.DDH;
@@ -54,7 +54,7 @@ import edu.biu.scapi.tools.Factories.DlogGroupFactory;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-public abstract class PedersenCommitterCore implements CTCommitter{
+public abstract class CmtPedersenCommitterCore implements CmtCommitter{
 	
 	/*
 	 * runs the following protocol:
@@ -83,7 +83,7 @@ public abstract class PedersenCommitterCore implements CTCommitter{
 	//Each committed value is sent together with an ID so that the receiver can keep it in some data structure. This is necessary
 	//in the cases that the same instances of committer and receiver can be used for performing various commitments utilizing the values calculated
 	//during the pre-process stage for the sake of efficiency.
-	protected Map<Long, PedersenCommitmentPhaseValues> commitmentMap;		
+	protected Map<Long, CmtPedersenCommitmentPhaseValues> commitmentMap;		
 	
 	//The content of the message obtained from the receiver during the pre-process phase which occurs upon construction.
     protected GroupElement h; 		 
@@ -92,7 +92,7 @@ public abstract class PedersenCommitterCore implements CTCommitter{
 	 * Constructor that receives a connected channel (to the receiver) and chooses default dlog and random. 
 	 * The receiver needs to be instantiated with the default constructor too.
 	 */
-	protected PedersenCommitterCore(Channel channel) throws ClassNotFoundException, IOException, CheatAttemptException {
+	protected CmtPedersenCommitterCore(Channel channel) throws ClassNotFoundException, IOException, CheatAttemptException {
 		String dlogGroupName = ScapiDefaultConfiguration.getInstance().getProperty("DDHDlogGroup");
 		try {
 			doConstruct(channel, DlogGroupFactory.getInstance().getObject(dlogGroupName) , new SecureRandom());
@@ -109,7 +109,7 @@ public abstract class PedersenCommitterCore implements CTCommitter{
 	 * Constructor that receives a connected channel (to the receiver), the DlogGroup agreed upon between them and a SecureRandom object.
 	 * The Receiver needs to be instantiated with the same DlogGroup, otherwise nothing will work properly.
 	 */
-	protected PedersenCommitterCore(Channel channel, DlogGroup dlog, SecureRandom random) throws IllegalArgumentException, SecurityLevelException, InvalidDlogGroupException, ClassNotFoundException, IOException, CheatAttemptException{
+	protected CmtPedersenCommitterCore(Channel channel, DlogGroup dlog, SecureRandom random) throws IllegalArgumentException, SecurityLevelException, InvalidDlogGroupException, ClassNotFoundException, IOException, CheatAttemptException{
 			doConstruct(channel, dlog, random);
 	}
 	
@@ -137,7 +137,7 @@ public abstract class PedersenCommitterCore implements CTCommitter{
 		this.dlog = dlog;
 		this.random = random;
 		qMinusOne =  dlog.getOrder().subtract(BigInteger.ONE);
-		commitmentMap = new Hashtable<Long, PedersenCommitmentPhaseValues>();
+		commitmentMap = new Hashtable<Long, CmtPedersenCommitmentPhaseValues>();
 		//The pre-process phase is actually performed at construction
 		preProcess();
 	}
@@ -152,7 +152,7 @@ public abstract class PedersenCommitterCore implements CTCommitter{
 	 * @throws CheatAttemptException if the receiver h is not in the DlogGroup.
 	 */
 	private void preProcess() throws ClassNotFoundException, IOException, CheatAttemptException {
-		CTRPedersenMessage msg = waitForMessageFromReceiver();
+		CmtPedersenPreprocessMessage msg = waitForMessageFromReceiver();
 		h = dlog.reconstructElement(true, msg.getH());
 		if(!dlog.isMember(h))
 				throw new CheatAttemptException("h element is not a member of the current DlogGroup");
@@ -163,24 +163,24 @@ public abstract class PedersenCommitterCore implements CTCommitter{
 	 * "SAMPLE a random value r <- Zq
 	 * 	COMPUTE  c = g^r * h^x
 	 * 	SEND c".
-	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCommitter#commit(edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CommitValue, long)
+	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitter#commit(edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitValue, long)
 	 */
-	public void  commit(CommitValue in, long id) throws IOException, IllegalArgumentException {
+	public void  commit(CmtCommitValue in, long id) throws IOException, IllegalArgumentException {
 		
-		if (!(in instanceof BigIntegerCommitValue))
+		if (!(in instanceof CmtBigIntegerCommitValue))
 			throw new IllegalArgumentException("The input must be of type BigIntegerCommitValue");
 		
 		//Sample a random value r <- Zq
 		BigInteger r = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);	
 		
 		//Compute  c = g^r * h^x
-		BigInteger x = ((BigIntegerCommitValue)in).getX();
+		BigInteger x = ((CmtBigIntegerCommitValue)in).getX();
 		GroupElement gToR = dlog.exponentiate(dlog.getGenerator(), r);
 		GroupElement hToX = dlog.exponentiate(h, x);
 		GroupElement c = dlog.multiplyGroupElements(gToR, hToX);
 		
 		//Send c
-		CTCPedersenCommitmentMessage msg = new CTCPedersenCommitmentMessage(c.generateSendableData(), id);
+		CmtPedersenCommitmentMessage msg = new CmtPedersenCommitmentMessage(c.generateSendableData(), id);
 		try {
 			//Send the message by the channel.
 			channel.send(msg);
@@ -189,7 +189,7 @@ public abstract class PedersenCommitterCore implements CTCommitter{
 		}	
 		
 		//After succeeding in sending the commitment, keep the committed value in the map together with its ID.
-		commitmentMap.put(Long.valueOf(id), new PedersenCommitmentPhaseValues(new BigIntegerRandomValue(r), new BigIntegerCommitValue(x), c));
+		commitmentMap.put(Long.valueOf(id), new CmtPedersenCommitmentPhaseValues(new BigIntegerRandomValue(r), new CmtBigIntegerCommitValue(x), c));
 		
 	}
 
@@ -200,9 +200,9 @@ public abstract class PedersenCommitterCore implements CTCommitter{
 	 */
 	public void decommit(long id) throws IOException {
 		//fetch the commitment according to the requested ID
-		PedersenCommitmentPhaseValues values = commitmentMap.get(Long.valueOf(id));
-		BigIntegerCommitValue xCVal = (BigIntegerCommitValue)values.getX();
-		CTCPedersenDecommitmentMessage msg = new CTCPedersenDecommitmentMessage(xCVal.getX(),values.getR());
+		CmtPedersenCommitmentPhaseValues values = commitmentMap.get(Long.valueOf(id));
+		CmtBigIntegerCommitValue xCVal = (CmtBigIntegerCommitValue)values.getX();
+		CmtPedersenDecommitmentMessage msg = new CmtPedersenDecommitmentMessage(xCVal.getX(),values.getR());
 		try{
 			channel.send(msg);
 		}
@@ -217,7 +217,7 @@ public abstract class PedersenCommitterCore implements CTCommitter{
 	 * @throws ClassNotFoundException if there was a problem during serialization.
 	 * @throws IOException if there was a problem in the communication level.
 	 */
-	private CTRPedersenMessage waitForMessageFromReceiver() throws ClassNotFoundException, IOException{
+	private CmtPedersenPreprocessMessage waitForMessageFromReceiver() throws ClassNotFoundException, IOException{
 		Serializable message = null;
 		try {
 			message = channel.receive();
@@ -226,10 +226,10 @@ public abstract class PedersenCommitterCore implements CTCommitter{
 		} catch (IOException e) {
 			throw new IOException("Failed to receive message. The error is: " + e.getMessage());
 		}
-		if (!(message instanceof CTRPedersenMessage)){
+		if (!(message instanceof CmtPedersenPreprocessMessage)){
 			throw new IllegalArgumentException("The received message should be an instance of CTRPedersenMessage");
 		}
-		return (CTRPedersenMessage) message;
+		return (CmtPedersenPreprocessMessage) message;
 	}
 	
 	@Override
@@ -240,7 +240,7 @@ public abstract class PedersenCommitterCore implements CTCommitter{
 	}
 
 	@Override
-	public PedersenCommitmentPhaseValues getCommitmentPhaseValues(long id) {
+	public CmtPedersenCommitmentPhaseValues getCommitmentPhaseValues(long id) {
 		return commitmentMap.get(id);
 	}
 

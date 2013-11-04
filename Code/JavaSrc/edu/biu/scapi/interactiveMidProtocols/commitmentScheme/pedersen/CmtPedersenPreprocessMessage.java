@@ -33,7 +33,7 @@ import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-class CTRPedersenMessage implements Serializable {
+class CmtPedersenPreprocessMessage implements Serializable {
 	private static final long serialVersionUID = -3924307031205721761L;
 	GroupElementSendableData h;
 
@@ -41,7 +41,7 @@ class CTRPedersenMessage implements Serializable {
 	 * Constructor that sets the given groupElement.
 	 * @param h the value sent by the receiver to the committer in the pre-process phase
 	 */
-	public CTRPedersenMessage(GroupElementSendableData h) {
+	public CmtPedersenPreprocessMessage(GroupElementSendableData h) {
 		super();
 		this.h = h;
 	}

@@ -28,14 +28,14 @@ import java.io.Serializable;
 import java.math.BigInteger;
 
 import edu.biu.scapi.interactiveMidProtocols.BigIntegerRandomValue;
-import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CTCDecommitmentMessage;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCDecommitmentMessage;
 
 /**
  * Concrete implementation of decommitment message used by Pedersen commitment scheme.
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-public class CTCPedersenDecommitmentMessage implements CTCDecommitmentMessage, Serializable {
+public class CmtPedersenDecommitmentMessage implements CmtCDecommitmentMessage, Serializable {
 
 	
 	private static final long serialVersionUID = 510887524381013384L;
@@ -48,7 +48,7 @@ public class CTCPedersenDecommitmentMessage implements CTCDecommitmentMessage, S
 	 * @param x the committed value
 	 * @param r the random value used for commit.
 	 */
-	public CTCPedersenDecommitmentMessage(BigInteger x, BigIntegerRandomValue r) {
+	public CmtPedersenDecommitmentMessage(BigInteger x, BigIntegerRandomValue r) {
 		super();
 		this.x = x;
 		this.r = r;
