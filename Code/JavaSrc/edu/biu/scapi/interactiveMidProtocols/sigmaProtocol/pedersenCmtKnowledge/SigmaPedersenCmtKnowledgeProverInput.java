@@ -22,7 +22,7 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-package edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.pedersenCTKnowledge;
+package edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.pedersenCmtKnowledge;
 
 import java.math.BigInteger;
 
