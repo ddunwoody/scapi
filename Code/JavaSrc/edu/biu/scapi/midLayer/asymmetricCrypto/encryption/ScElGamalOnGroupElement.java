@@ -30,26 +30,17 @@ import java.math.BigInteger;
 import java.security.KeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.SecureRandom;
 
 import org.bouncycastle.util.BigIntegers;
 
 import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
-import edu.biu.scapi.midLayer.asymmetricCrypto.keys.DamgardJurikPrivateKey;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ElGamalPrivateKey;
-import edu.biu.scapi.midLayer.asymmetricCrypto.keys.KeySendableData;
-import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScCramerShoupPublicKey;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScElGamalPrivateKey;
-import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScCramerShoupPublicKey.ScCramerShoupPublicKeySendableData;
-import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScElGamalPublicKey;
-import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScElGamalPublicKey.ScElGamalPublicKeySendableData;
 import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertext;
 import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertextSendableData;
-import edu.biu.scapi.midLayer.ciphertext.ElGamalOnByteArrayCiphertext;
 import edu.biu.scapi.midLayer.ciphertext.ElGamalOnGroupElementCiphertext;
-import edu.biu.scapi.midLayer.ciphertext.ElGamalOnByteArrayCiphertext.ElGamalOnByteArraySendableData;
 import edu.biu.scapi.midLayer.ciphertext.ElGamalOnGroupElementCiphertext.ElGamalOnGrElSendableData;
 import edu.biu.scapi.midLayer.plaintext.GroupElementPlaintext;
 import edu.biu.scapi.midLayer.plaintext.Plaintext;
@@ -70,10 +61,8 @@ public class ScElGamalOnGroupElement extends ElGamalAbs implements AsymMultiplic
 	
 	/**
 	 * Default constructor. Uses the default implementations of DlogGroup, CryptographicHash and SecureRandom.
-	 * @throws SecurityLevelException theoretically it might be thrown if the Dlog Group did not meet the required Security level. 
-	 * 								  Practically, it does not get thrown since SCAPI chooses elements that comply with the Security Level required.
 	 */
-	public ScElGamalOnGroupElement() throws SecurityLevelException{
+	public ScElGamalOnGroupElement() {
 		super();
 	}
 

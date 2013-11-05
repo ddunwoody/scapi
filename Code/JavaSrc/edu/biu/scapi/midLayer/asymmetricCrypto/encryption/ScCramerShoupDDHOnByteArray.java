@@ -56,10 +56,8 @@ public class ScCramerShoupDDHOnByteArray extends CramerShoupAbs{
 	
 	/**
 	 * Default constructor. It uses a default Dlog group and CryptographicHash.
-	 * @throws SecurityLevelException theoretically it might be thrown if the Dlog Group and CryptographicHash chosen did not meet their respective required Security level. 
-	 * 								  Practically, it does not get thrown since SCAPI chooses elements that comply with the Security Level required. 
 	 */
-	public ScCramerShoupDDHOnByteArray() throws SecurityLevelException {
+	public ScCramerShoupDDHOnByteArray() {
 		super();
 		//Creates a default implementation of KDF.
 		setKdf(new HKDF(new BcHMAC()));

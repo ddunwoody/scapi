@@ -37,9 +37,7 @@ import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ElGamalPrivateKey;
 import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertext;
 import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertextSendableData;
-import edu.biu.scapi.midLayer.ciphertext.CramerShoupOnByteArrayCiphertext;
 import edu.biu.scapi.midLayer.ciphertext.ElGamalOnByteArrayCiphertext;
-import edu.biu.scapi.midLayer.ciphertext.CramerShoupOnByteArrayCiphertext.CrShOnByteArraySendableData;
 import edu.biu.scapi.midLayer.ciphertext.ElGamalOnByteArrayCiphertext.ElGamalOnByteArraySendableData;
 import edu.biu.scapi.midLayer.plaintext.ByteArrayPlaintext;
 import edu.biu.scapi.midLayer.plaintext.Plaintext;
@@ -65,10 +63,8 @@ public class ScElGamalOnByteArray extends ElGamalAbs{
 	
 	/**
 	 * Default constructor. Uses the default implementations of DlogGroup and SecureRandom.
-	 * @throws SecurityLevelException theoretically it might be thrown if the Dlog Group did not meet the required Security level. 
-	 * 								  Practically, it does not get thrown since SCAPI chooses elements that comply with the Security Level required.
 	 */
-	public ScElGamalOnByteArray() throws SecurityLevelException{
+	public ScElGamalOnByteArray() {
 		super();
 		//Creates a default implementation of KDF.
 		setKdf(new HKDF(new BcHMAC()));

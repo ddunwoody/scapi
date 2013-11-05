@@ -37,7 +37,6 @@ import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.*;
 import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertext;
 import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertextSendableData;
-import edu.biu.scapi.midLayer.ciphertext.CramerShoupCiphertext;
 import edu.biu.scapi.midLayer.ciphertext.CramerShoupOnGroupElementCiphertext;
 import edu.biu.scapi.midLayer.ciphertext.CramerShoupOnGroupElementCiphertext.CrShOnGroupElSendableData;
 import edu.biu.scapi.midLayer.plaintext.GroupElementPlaintext;
@@ -56,10 +55,8 @@ public class ScCramerShoupDDHOnGroupElement extends CramerShoupAbs {
 	
 	/**
 	 * Default constructor. It uses a default Dlog group and CryptographicHash.
-	 * @throws SecurityLevelException theoretically it might be thrown if the Dlog Group and CryptographicHash chosen did not meet their respective Security level. 
-	 * 								  Practically, it does not get thrown since SCAPI chooses elements that comply with the Security Level required. 
 	 */
-	public ScCramerShoupDDHOnGroupElement() throws SecurityLevelException {
+	public ScCramerShoupDDHOnGroupElement(){
 		super();
 	}
 
