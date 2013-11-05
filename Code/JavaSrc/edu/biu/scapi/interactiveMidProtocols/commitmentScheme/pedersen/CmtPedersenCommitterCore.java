@@ -170,11 +170,15 @@ public abstract class CmtPedersenCommitterCore implements CmtCommitter{
 		if (!(in instanceof CmtBigIntegerCommitValue))
 			throw new IllegalArgumentException("The input must be of type BigIntegerCommitValue");
 		
+		BigInteger x = ((CmtBigIntegerCommitValue)in).getX();
+		if ((x.compareTo(BigInteger.ZERO)<0) || (x.compareTo(dlog.getOrder())>0)){
+			throw new IllegalArgumentException("The input must be in Zq");
+		}
+		
 		//Sample a random value r <- Zq
 		BigInteger r = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);	
 		
 		//Compute  c = g^r * h^x
-		BigInteger x = ((CmtBigIntegerCommitValue)in).getX();
 		GroupElement gToR = dlog.exponentiate(dlog.getGenerator(), r);
 		GroupElement hToX = dlog.exponentiate(h, x);
 		GroupElement c = dlog.multiplyGroupElements(gToR, hToX);

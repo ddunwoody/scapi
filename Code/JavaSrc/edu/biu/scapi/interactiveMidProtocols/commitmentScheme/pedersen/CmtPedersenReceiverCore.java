@@ -229,6 +229,11 @@ public abstract class CmtPedersenReceiverCore implements CmtReceiver{
 	 * @return
 	 */
 	protected CmtCommitValue processDecommitment(long id, BigInteger x, BigInteger r) {
+		//if x is not in Zq return null
+		if ((x.compareTo(BigInteger.ZERO)<0) || (x.compareTo(dlog.getOrder())>0)){
+			return null; 
+		}
+		
 		//Calculate c = g^r * h^x
 		GroupElement gTor = dlog.exponentiate(dlog.getGenerator(),r);
 		GroupElement hTox = dlog.exponentiate(h,x);
