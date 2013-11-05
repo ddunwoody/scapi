@@ -59,7 +59,12 @@ public class CmtPedersenReceiver extends CmtPedersenReceiverCore implements CmtR
 	public byte[] generateBytesFromCommitValue(CmtCommitValue value){
 		if (!(value instanceof CmtBigIntegerCommitValue))
 			throw new IllegalArgumentException("The given value must be of type BigIntegerCommitValue");
-		return ((BigInteger)value.getX()).toByteArray();
+		//Remove the first byte of BigInteger in order to get the original x.
+		byte[] biBytes = ((BigInteger)value.getX()).toByteArray();
+		byte[] x = new byte[biBytes.length - 1];
+		System.arraycopy(biBytes, 1, x, 0, biBytes.length - 1);
+		
+		return x;
 	}
 	
 }

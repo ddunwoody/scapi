@@ -99,7 +99,15 @@ public class CmtPedersenTrapdoorCommitter extends CmtPedersenCommitterCore imple
 	
 	@Override
 	public CmtCommitValue generateCommitValue(byte[] x)  {
-		return new CmtBigIntegerCommitValue(new BigInteger(x));
+		//In case that x is negative, pad the byte array with the byte '1' to make it positive.
+		//This is also solve the case that the first byte in x is zero. 
+		//In that case the conversion to BigInteger ignores the first byte and therefore 
+		//the conversion back to byte array is wrong.
+		byte[] positiveArr = new byte[x.length + 1];
+		positiveArr[0] = 1;
+		System.arraycopy(x, 0, positiveArr, 1, x.length);
+		
+		return new CmtBigIntegerCommitValue(new BigInteger(positiveArr));
 	}
 	
 	/**
@@ -110,7 +118,11 @@ public class CmtPedersenTrapdoorCommitter extends CmtPedersenCommitterCore imple
 	public byte[] generateBytesFromCommitValue(CmtCommitValue value){
 		if (!(value instanceof CmtBigIntegerCommitValue))
 			throw new IllegalArgumentException("The given value must be of type BigIntegerCommitValue");
-		return ((BigInteger)value.getX()).toByteArray();
+		//Remove the first byte of BigInteger in order to get the original x.
+		byte[] biBytes = ((BigInteger)value.getX()).toByteArray();
+		byte[] x = new byte[biBytes.length - 1];
+		System.arraycopy(biBytes, 1, x, 0, biBytes.length - 1);
+		return x;
 	}
 	
 	/**
