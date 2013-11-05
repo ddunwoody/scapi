@@ -70,7 +70,7 @@ public class ZKFromSigmaProver implements ZKProver{
 		}
 		//receiver must be a commitment scheme on ByteArray or on BigInteger
 		if (!(receiver instanceof CmtOnBigInteger) && !(receiver instanceof CmtOnByteArray)){
-			throw new IllegalArgumentException("the given CTReceiver must be a commitment scheme on ByteArray or on BigInteger");
+			throw new IllegalArgumentException("the given receiver must be a commitment scheme on ByteArray or on BigInteger");
 		}
 
 		this.sProver = sProver;

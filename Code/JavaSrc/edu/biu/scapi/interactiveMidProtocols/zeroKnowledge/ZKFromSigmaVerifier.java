@@ -72,7 +72,7 @@ public class ZKFromSigmaVerifier implements ZKVerifier{
 		}
 		//committer must be an instance of PerfectlyHidingCT
 		if (!(committer instanceof CmtOnBigInteger) && !(committer instanceof CmtOnByteArray)){
-			throw new IllegalArgumentException("the given CTCommitter must be a commitment scheme on ByteArray or on BigInteger");
+			throw new IllegalArgumentException("the given committer must be a commitment scheme on ByteArray or on BigInteger");
 		}
 
 		this.sVerifier = sVerifier;
