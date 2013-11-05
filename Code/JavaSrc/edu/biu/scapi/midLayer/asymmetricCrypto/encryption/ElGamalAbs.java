@@ -74,15 +74,19 @@ public abstract class ElGamalAbs implements ElGamalEnc{
 	
 	/**
 	 * Default constructor. Uses the default implementations of DlogGroup, CryptographicHash and SecureRandom.
-	 * @throws SecurityLevelException theoretically it might be thrown if the Dlog Group chosen did not meet the required Security level. 
-	 * 								  Practically, it does not get thrown since SCAPI chooses default elements that comply with the Security Level required.  
 	 */
-	public ElGamalAbs() throws SecurityLevelException{
+	public ElGamalAbs() {
 		
 		try {
 			createMembers(new MiraclDlogECFp("P-192"), new SecureRandom());
 		} catch (IOException e) {
-			createMembers(new CryptoPpDlogZpSafePrime(), new SecureRandom());
+			try {
+				createMembers(new CryptoPpDlogZpSafePrime(), new SecureRandom());
+			} catch (SecurityLevelException e1) {
+				// Shouldn't occur since the DlogGroup is DDH - secure.
+			}
+		} catch (SecurityLevelException e) {
+			// Shouldn't occur since the DlogGroup is DDH - secure.
 		}
 	}
 

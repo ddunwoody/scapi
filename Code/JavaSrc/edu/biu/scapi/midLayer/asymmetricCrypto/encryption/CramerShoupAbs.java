@@ -70,11 +70,13 @@ public abstract class CramerShoupAbs implements CramerShoupDDHEnc{
 	
 	/**
 	 * Default constructor. It uses a default Dlog group and CryptographicHash.
-	 * @throws SecurityLevelException theoretically it might be thrown if the Dlog Group and CryptographicHash chosen did not meet their respective required Security level. 
-	 * 								  Practically, it does not get thrown since SCAPI chooses default elements that comply with the Security Level required. 
 	 */
-	public CramerShoupAbs() throws SecurityLevelException {
-		this(new CryptoPpDlogZpSafePrime("1024"), new CryptoPpSHA1(), new SecureRandom());
+	public CramerShoupAbs()  {
+		try {
+			doConstruct(new CryptoPpDlogZpSafePrime("1024"), new CryptoPpSHA1(), new SecureRandom());
+		} catch (SecurityLevelException e) {
+			// Shouldn't occur since the DlogGroup is DDH - secure.
+		}
 	}
 
 	/**
@@ -84,7 +86,7 @@ public abstract class CramerShoupAbs implements CramerShoupDDHEnc{
 	 * @throws SecurityLevelException if the Dlog Group or the Hash function do not meet the required Security Level
 	 */
 	public CramerShoupAbs(DlogGroup dlogGroup, CryptographicHash hash) throws SecurityLevelException{
-		this(dlogGroup, hash, new SecureRandom());
+		doConstruct(dlogGroup, hash, new SecureRandom());
 	}
 
 	/**
@@ -97,6 +99,18 @@ public abstract class CramerShoupAbs implements CramerShoupDDHEnc{
 	 * @throws SecurityLevelException if the Dlog Group or the Hash function do not meet the required Security Level
 	 */
 	public CramerShoupAbs(DlogGroup dlogGroup, CryptographicHash hash, SecureRandom random) throws SecurityLevelException{
+		doConstruct(dlogGroup, hash, random);
+	}
+
+	/**
+	 * Sets the given members.
+	 * @param dlogGroup
+	 * @param hash
+	 * @param random
+	 * @throws SecurityLevelException if the Dlog Group or the Hash function do not meet the required Security Level
+	 */
+	private void doConstruct(DlogGroup dlogGroup, CryptographicHash hash,
+			SecureRandom random) throws SecurityLevelException {
 		//The Cramer-Shoup encryption scheme must work with a Dlog Group that has DDH security level
 		//and a Hash function that has CollisionResistant security level. If any of this conditions is not 
 		//met then cannot construct an object of type Cramer-Shoup encryption scheme; therefore throw exception.
