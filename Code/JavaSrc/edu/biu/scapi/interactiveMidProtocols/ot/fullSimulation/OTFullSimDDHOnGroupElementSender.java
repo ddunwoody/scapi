@@ -39,6 +39,7 @@ import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnGroupElementMsg;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.securityLevel.Malicious;
+import edu.biu.scapi.securityLevel.StandAlone;
 
 /**
  * Concrete implementation of the sender side in oblivious transfer based on the DDH assumption that achieves full simulation.
@@ -51,7 +52,7 @@ import edu.biu.scapi.securityLevel.Malicious;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTFullSimDDHOnGroupElementSender extends OTFullSimDDHSenderAbs implements Malicious{
+public class OTFullSimDDHOnGroupElementSender extends OTFullSimDDHSenderAbs implements Malicious, StandAlone{
 	
 	/**
 	 * Constructor that gets the channel and chooses default values of DlogGroup and SecureRandom.

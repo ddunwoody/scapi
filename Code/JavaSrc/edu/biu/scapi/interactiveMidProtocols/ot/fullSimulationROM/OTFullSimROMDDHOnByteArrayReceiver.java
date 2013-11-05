@@ -40,6 +40,7 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
 import edu.biu.scapi.primitives.randomOracle.RandomOracle;
 import edu.biu.scapi.securityLevel.Malicious;
+import edu.biu.scapi.securityLevel.StandAlone;
 import edu.biu.scapi.tools.Factories.KdfFactory;
 
 /**
@@ -52,7 +53,7 @@ import edu.biu.scapi.tools.Factories.KdfFactory;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTFullSimROMDDHOnByteArrayReceiver extends OTFullSimROMDDHReceiverAbs implements Malicious{
+public class OTFullSimROMDDHOnByteArrayReceiver extends OTFullSimROMDDHReceiverAbs implements Malicious, StandAlone{
 
 	private KeyDerivationFunction kdf; //Used in the calculation.
 	

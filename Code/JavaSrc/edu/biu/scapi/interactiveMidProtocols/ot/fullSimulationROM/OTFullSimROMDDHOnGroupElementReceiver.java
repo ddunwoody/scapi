@@ -39,6 +39,7 @@ import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.randomOracle.RandomOracle;
 import edu.biu.scapi.securityLevel.Malicious;
+import edu.biu.scapi.securityLevel.StandAlone;
 
 /**
  * Concrete implementation of the receiver side in oblivious transfer based on the DDH assumption
@@ -50,7 +51,7 @@ import edu.biu.scapi.securityLevel.Malicious;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTFullSimROMDDHOnGroupElementReceiver extends OTFullSimROMDDHReceiverAbs implements Malicious{
+public class OTFullSimROMDDHOnGroupElementReceiver extends OTFullSimROMDDHReceiverAbs implements Malicious, StandAlone{
 	
 	/**
 	 * Constructor that choose default values of DlogGroup, random oracle and SecureRandom.
