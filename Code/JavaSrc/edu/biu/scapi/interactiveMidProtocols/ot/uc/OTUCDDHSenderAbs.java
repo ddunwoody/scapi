@@ -39,7 +39,6 @@ import edu.biu.scapi.interactiveMidProtocols.ot.OTUtil.RandOutput;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.securityLevel.DDH;
-import edu.biu.scapi.securityLevel.UC;
 
 /**
  * Abstract class for oblivious transfer sender based on the DDH assumption that achieves UC security in
@@ -51,7 +50,7 @@ import edu.biu.scapi.securityLevel.UC;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-abstract class OTUCDDHSenderAbs implements OTSender, UC{
+abstract class OTUCDDHSenderAbs implements OTSender{
 
 	/*	
 	  This class runs the following protocol:

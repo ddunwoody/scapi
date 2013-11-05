@@ -36,6 +36,7 @@ import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnGroupElementMsg;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.securityLevel.Malicious;
+import edu.biu.scapi.securityLevel.UC;
 
 /**
  * Concrete class for OT receiver based on the DDH assumption that achieves UC security in
@@ -47,7 +48,7 @@ import edu.biu.scapi.securityLevel.Malicious;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTUCDDHOnGroupElementReceiver extends OTUCDDHReceiverAbs implements Malicious{
+public class OTUCDDHOnGroupElementReceiver extends OTUCDDHReceiverAbs implements Malicious, UC{
 	
 	/**
 	 * Constructor that sets the given common reference string composed of a DLOG 

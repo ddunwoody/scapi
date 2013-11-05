@@ -43,7 +43,6 @@ import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.securityLevel.DDH;
-import edu.biu.scapi.securityLevel.UC;
 
 /**
  * Abstract class for oblivious transfer receiver based on the DDH assumption that achieves UC security in
@@ -55,7 +54,7 @@ import edu.biu.scapi.securityLevel.UC;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-abstract class OTUCDDHReceiverAbs implements OTReceiver, UC{
+abstract class OTUCDDHReceiverAbs implements OTReceiver{
 	/*	
  	This class runs the following protocol:
 	 	SAMPLE a random value r <- {0, . . . , q-1} 
