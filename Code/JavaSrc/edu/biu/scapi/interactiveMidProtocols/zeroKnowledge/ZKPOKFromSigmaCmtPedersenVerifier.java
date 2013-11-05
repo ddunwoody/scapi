@@ -182,7 +182,7 @@ public class ZKPOKFromSigmaCmtPedersenVerifier implements ZKPOKVerifier{
 		}
 		//If the given message is not an instance of ReceiverCommitPhaseOutput, throw exception.
 		if (!(msg instanceof CmtRCommitPhaseOutput)){
-			throw new IllegalArgumentException("the given message should be an instance of ReceiverCommitPhaseOutput");
+			throw new IllegalArgumentException("the given message should be an instance of CmtRCommitPhaseOutput");
 		}
 		//Return the given message.
 		return (CmtRCommitPhaseOutput) msg;
