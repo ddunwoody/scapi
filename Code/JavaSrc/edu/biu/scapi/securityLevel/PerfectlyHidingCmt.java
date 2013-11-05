@@ -25,9 +25,10 @@
 package edu.biu.scapi.securityLevel;
 
 /** 
+  * Any commitment scheme that is perfectly hiding should implement this interface. 
   * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  */
 
-public interface PerfectlyHidingCT extends StatisticallyHidingCT {
+public interface PerfectlyHidingCmt extends StatisticallyHidingCmt {
 }

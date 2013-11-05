@@ -25,9 +25,9 @@
 package edu.biu.scapi.securityLevel;
 
 /** 
-  * 
+  * Any commitment scheme that is perfectly binding should implement this interface. 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  */
 
-public interface PerfectlyBindingCT extends SecureCommit {
+public interface PerfectlyBindingCmt extends SecureCommit {
 }
