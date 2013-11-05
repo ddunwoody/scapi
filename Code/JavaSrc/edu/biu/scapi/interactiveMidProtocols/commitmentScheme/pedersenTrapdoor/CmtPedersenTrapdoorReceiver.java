@@ -104,7 +104,7 @@ public class CmtPedersenTrapdoorReceiver extends CmtPedersenReceiverCore impleme
 	 */
 	public byte[] generateBytesFromCommitValue(CmtCommitValue value){
 		if (!(value instanceof CmtBigIntegerCommitValue))
-			throw new IllegalArgumentException("The given value must be of type BigIntegerCommitValue");
+			throw new IllegalArgumentException("The given value must be of type CmtBigIntegerCommitValue");
 		//Remove the first byte of BigInteger in order to get the original x.
 		byte[] biBytes = ((BigInteger)value.getX()).toByteArray();
 		byte[] x = new byte[biBytes.length - 1];

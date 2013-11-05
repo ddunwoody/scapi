@@ -147,7 +147,7 @@ public class CmtElGamalOnGroupElementReceiver extends CmtElGamalReceiverCore imp
 	 */
 	public byte[] generateBytesFromCommitValue(CmtCommitValue value){
 		if (!(value instanceof  CmtGroupElementCommitValue))
-			throw new IllegalArgumentException("The given value must be of type  GroupElementCommitValue");
+			throw new IllegalArgumentException("The given value must be of type CmtGroupElementCommitValue");
 		return dlog.mapAnyGroupElementToByteArray((GroupElement) value.getX());
 	}
 	

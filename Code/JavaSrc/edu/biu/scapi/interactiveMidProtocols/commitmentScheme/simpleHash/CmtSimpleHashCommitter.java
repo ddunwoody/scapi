@@ -109,7 +109,7 @@ public class CmtSimpleHashCommitter implements CmtCommitter, SecureCommit {
 	public void commit(CmtCommitValue input, long id) throws IOException {
 		
 		if(!(input instanceof CmtByteArrayCommitValue))
-			throw new IllegalArgumentException("The input has to be of type ByteArrayCommitValue");
+			throw new IllegalArgumentException("The input has to be of type CmtByteArrayCommitValue");
 		byte[] x = ((CmtByteArrayCommitValue)input).getX();
 		//Sample random byte array r
 		byte[] r = new byte[n];
@@ -200,7 +200,7 @@ public class CmtSimpleHashCommitter implements CmtCommitter, SecureCommit {
 	 */
 	public byte[] generateBytesFromCommitValue(CmtCommitValue value){
 		if (!(value instanceof CmtByteArrayCommitValue))
-			throw new IllegalArgumentException("The given value must be of type ByteArrayCommitValue");
+			throw new IllegalArgumentException("The given value must be of type CmtByteArrayCommitValue");
 		return (byte[]) value.getX();
 	}
 

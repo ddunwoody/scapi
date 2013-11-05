@@ -185,7 +185,7 @@ public abstract class CmtPedersenReceiverCore implements CmtReceiver{
 		}
 
 		if (!(message instanceof CmtPedersenCommitmentMessage)){
-			throw new IllegalArgumentException("The received message should be an instance of CTCPedersenCommitmentMessage");
+			throw new IllegalArgumentException("The received message should be an instance of CmtPedersenCommitmentMessage");
 		}
 		CmtPedersenCommitmentMessage msg = (CmtPedersenCommitmentMessage) message;
 		GroupElement receivedCommitment = dlog.reconstructElement(true,msg.getCommitment());
@@ -210,7 +210,7 @@ public abstract class CmtPedersenReceiverCore implements CmtReceiver{
 			throw new IOException("Failed to receive decommitment. The error is: " + e.getMessage());
 		}
 		if (!(message instanceof CmtPedersenDecommitmentMessage)){
-			throw new IllegalArgumentException("The received message should be an instance of CTCPedersenDecommitmentMessage");
+			throw new IllegalArgumentException("The received message should be an instance of CmtPedersenDecommitmentMessage");
 		}
 		CmtPedersenDecommitmentMessage msg = (CmtPedersenDecommitmentMessage) message;
 		

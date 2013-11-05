@@ -107,7 +107,7 @@ public class CmtElGamalOnByteArrayCommitter extends CmtElGamalCommitterCore impl
 	 */
 	public void commit(CmtCommitValue input, long id) throws IOException {
 		if (!(input instanceof CmtByteArrayCommitValue))
-			throw new IllegalArgumentException("The input must be of type ByteArrayCommitValue");
+			throw new IllegalArgumentException("The input must be of type CmtByteArrayCommitValue");
 		super.commit(input, id);
 		
 	}
@@ -134,7 +134,7 @@ public class CmtElGamalOnByteArrayCommitter extends CmtElGamalCommitterCore impl
 	 */
 	public byte[] generateBytesFromCommitValue(CmtCommitValue value){
 		if (!(value instanceof CmtByteArrayCommitValue))
-			throw new IllegalArgumentException("The given value must be of type ByteArrayCommitValue");
+			throw new IllegalArgumentException("The given value must be of type CmtByteArrayCommitValue");
 		return (byte[]) value.getX();
 	}
 

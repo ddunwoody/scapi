@@ -168,9 +168,10 @@ public abstract class CmtPedersenCommitterCore implements CmtCommitter{
 	public void  commit(CmtCommitValue in, long id) throws IOException, IllegalArgumentException {
 		
 		if (!(in instanceof CmtBigIntegerCommitValue))
-			throw new IllegalArgumentException("The input must be of type BigIntegerCommitValue");
+			throw new IllegalArgumentException("The input must be of type CmtBigIntegerCommitValue");
 		
 		BigInteger x = ((CmtBigIntegerCommitValue)in).getX();
+		//Check that the input is in Zq.
 		if ((x.compareTo(BigInteger.ZERO)<0) || (x.compareTo(dlog.getOrder())>0)){
 			throw new IllegalArgumentException("The input must be in Zq");
 		}
@@ -231,7 +232,7 @@ public abstract class CmtPedersenCommitterCore implements CmtCommitter{
 			throw new IOException("Failed to receive message. The error is: " + e.getMessage());
 		}
 		if (!(message instanceof CmtPedersenPreprocessMessage)){
-			throw new IllegalArgumentException("The received message should be an instance of CTRPedersenMessage");
+			throw new IllegalArgumentException("The received message should be an instance of CmtPedersenPreprocessMessage");
 		}
 		return (CmtPedersenPreprocessMessage) message;
 	}

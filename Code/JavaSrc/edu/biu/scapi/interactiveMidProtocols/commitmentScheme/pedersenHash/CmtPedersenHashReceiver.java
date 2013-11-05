@@ -114,7 +114,7 @@ public class CmtPedersenHashReceiver extends CmtPedersenReceiverCore implements 
 		}
 
 		if (!(message instanceof CmtPedersenDecommitmentMessage)){
-			throw new IllegalArgumentException("the received message is not an instance of CTCPedersenDecommitmentMessage");
+			throw new IllegalArgumentException("the received message is not an instance of CmtPedersenDecommitmentMessage");
 		}
 		CmtPedersenDecommitmentMessage msg = (CmtPedersenDecommitmentMessage) message;
 		
@@ -140,7 +140,7 @@ public class CmtPedersenHashReceiver extends CmtPedersenReceiverCore implements 
 	 */
 	public byte[] generateBytesFromCommitValue(CmtCommitValue value){
 		if (!(value instanceof CmtByteArrayCommitValue))
-			throw new IllegalArgumentException("The given value must be of type ByteArrayCommitValue");
+			throw new IllegalArgumentException("The given value must be of type CmtByteArrayCommitValue");
 		return (byte[]) value.getX();
 	}
 

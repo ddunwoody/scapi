@@ -205,7 +205,7 @@ public abstract class CmtElGamalReceiverCore implements CmtReceiver{
 			throw new IOException("Failed to receive decommitment. The error is: " + e.getMessage());
 		}
 		if (!(message instanceof CmtElGamalDecommitmentMessage)){
-			throw new IllegalArgumentException("the received message is not an instance of CTCElGamalDecommitmentMessage");
+			throw new IllegalArgumentException("the received message is not an instance of CmtElGamalDecommitmentMessage");
 		}
 		return processDecommitment(id, (CmtElGamalDecommitmentMessage) message);
 	}

@@ -116,7 +116,7 @@ public class CmtSimpleHashReceiver implements CmtReceiver, SecureCommit {
 			throw new IOException("Failed to receive commitment. The error is: " + e.getMessage());
 		}
 		if (!(message instanceof CmtSimpleHashCommitmentMessage)){
-			throw new IllegalArgumentException("the received message is not an instance of CTCSimpleHashCommitmentMessage");
+			throw new IllegalArgumentException("the received message is not an instance of CmtSimpleHashCommitmentMessage");
 		}
 		
 		CmtSimpleHashCommitmentMessage msg = (CmtSimpleHashCommitmentMessage) message;
@@ -147,7 +147,7 @@ public class CmtSimpleHashReceiver implements CmtReceiver, SecureCommit {
 		}
 		
 		if (!(message instanceof CmtSimpleHashDecommitmentMessage)){
-			throw new IllegalArgumentException("the received message is not an instance of CTCSimpleHashDecommitmentMessage");
+			throw new IllegalArgumentException("the received message is not an instance of CmtSimpleHashDecommitmentMessage");
 		}
 		CmtSimpleHashDecommitmentMessage msg = (CmtSimpleHashDecommitmentMessage) message;
 		
@@ -194,7 +194,7 @@ public class CmtSimpleHashReceiver implements CmtReceiver, SecureCommit {
 	 */
 	public byte[] generateBytesFromCommitValue(CmtCommitValue value){
 		if (!(value instanceof CmtByteArrayCommitValue))
-			throw new IllegalArgumentException("The given value must be of type ByteArrayCommitValue");
+			throw new IllegalArgumentException("The given value must be of type CmtByteArrayCommitValue");
 		return (byte[]) value.getX();
 	}
 }

@@ -142,7 +142,7 @@ public class CmtElGamalHashReceiver extends CmtElGamalReceiverCore implements Cm
 	 */
 	public byte[] generateBytesFromCommitValue(CmtCommitValue value){
 		if (!(value instanceof CmtByteArrayCommitValue))
-			throw new IllegalArgumentException("The given value must be of type ByteArrayCommitValue");
+			throw new IllegalArgumentException("The given value must be of type CmtByteArrayCommitValue");
 		return (byte[]) value.getX();
 	}
 }

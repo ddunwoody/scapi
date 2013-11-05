@@ -121,7 +121,7 @@ public class CmtPedersenHashCommitter extends CmtPedersenCommitterCore implement
 	public void commit(CmtCommitValue input, long id) throws IOException, IllegalArgumentException {
 		//Check that the input x is in the end a byte[]
 		if (!(input instanceof CmtByteArrayCommitValue))
-			throw new IllegalArgumentException("The input must be of type ByteArrayCommitValue");
+			throw new IllegalArgumentException("The input must be of type CmtByteArrayCommitValue");
 		//Hash the input x with the hash function
 		byte[] x  = ((CmtByteArrayCommitValue)input).getX();
 		//Keep the original commit value x and its id in the commitmentMap, needed for later (during the decommit phase).
@@ -178,7 +178,7 @@ public class CmtPedersenHashCommitter extends CmtPedersenCommitterCore implement
 	 */
 	public byte[] generateBytesFromCommitValue(CmtCommitValue value){
 		if (!(value instanceof CmtByteArrayCommitValue))
-			throw new IllegalArgumentException("The given value must be of type ByteArrayCommitValue");
+			throw new IllegalArgumentException("The given value must be of type CmtByteArrayCommitValue");
 		return (byte[]) value.getX();
 	}
 
