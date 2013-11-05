@@ -39,7 +39,7 @@ import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtOnBigInteger;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtOnByteArray;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtRCommitPhaseOutput;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.CmtPedersenReceiver;
-import edu.biu.scapi.securityLevel.PerfectlyHidingCT;
+import edu.biu.scapi.securityLevel.PerfectlyHidingCmt;
 
 /**
  * Concrete implementation of Zero Knowledge prover.
@@ -65,8 +65,8 @@ public class ZKFromSigmaProver implements ZKProver{
 	 */
 	public ZKFromSigmaProver(Channel channel, SigmaProverComputation sProver, CmtReceiver receiver) throws SecurityLevelException{
 		//receiver must be an instance of PerfectlyHidingCT
-		if (!(receiver instanceof PerfectlyHidingCT)){
-			throw new SecurityLevelException("the given CTReceiver must be an instance of PerfectlyHidingCT");
+		if (!(receiver instanceof PerfectlyHidingCmt)){
+			throw new SecurityLevelException("the given CTReceiver must be an instance of PerfectlyHidingCmt");
 		}
 		//receiver must be a commitment scheme on ByteArray or on BigInteger
 		if (!(receiver instanceof CmtOnBigInteger) && !(receiver instanceof CmtOnByteArray)){

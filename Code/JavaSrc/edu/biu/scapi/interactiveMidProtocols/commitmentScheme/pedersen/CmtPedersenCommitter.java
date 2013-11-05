@@ -40,14 +40,14 @@ import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitter;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtOnBigInteger;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
-import edu.biu.scapi.securityLevel.PerfectlyHidingCT;
+import edu.biu.scapi.securityLevel.PerfectlyHidingCmt;
 
 /**
  * Concrete implementation of committer that executes the Pedersen commitment scheme in the committer's point of view.
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-public class CmtPedersenCommitter extends CmtPedersenCommitterCore implements CmtCommitter, PerfectlyHidingCT, CmtOnBigInteger {
+public class CmtPedersenCommitter extends CmtPedersenCommitterCore implements CmtCommitter, PerfectlyHidingCmt, CmtOnBigInteger {
 		
 	/**
 	 * Constructor that receives a connected channel (to the receiver) and chooses default dlog and random. 

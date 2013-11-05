@@ -42,7 +42,7 @@ import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.CmtPeders
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.hash.CryptographicHash;
 import edu.biu.scapi.primitives.hash.bc.BcSHA224;
-import edu.biu.scapi.securityLevel.PerfectlyHidingCT;
+import edu.biu.scapi.securityLevel.PerfectlyHidingCmt;
 
 /**
  * Concrete implementation of receiver that executes the Pedersen hash commitment 
@@ -53,7 +53,7 @@ import edu.biu.scapi.securityLevel.PerfectlyHidingCT;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-public class CmtPedersenHashReceiver extends CmtPedersenReceiverCore implements CmtReceiver, PerfectlyHidingCT, CmtOnByteArray{
+public class CmtPedersenHashReceiver extends CmtPedersenReceiverCore implements CmtReceiver, PerfectlyHidingCmt, CmtOnByteArray{
 	
 	/*
 	 * runs the following protocol:

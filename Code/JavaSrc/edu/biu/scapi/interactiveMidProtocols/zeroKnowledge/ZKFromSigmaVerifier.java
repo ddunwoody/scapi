@@ -40,7 +40,7 @@ import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtOnBigInteger;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtOnByteArray;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.CmtPedersenCommitter;
-import edu.biu.scapi.securityLevel.PerfectlyHidingCT;
+import edu.biu.scapi.securityLevel.PerfectlyHidingCmt;
 
 /**
  * Concrete implementation of Zero Knowledge verifier.
@@ -67,8 +67,8 @@ public class ZKFromSigmaVerifier implements ZKVerifier{
 	 */
 	public ZKFromSigmaVerifier(Channel channel, SigmaVerifierComputation sVerifier, CmtCommitter committer, SecureRandom random) throws SecurityLevelException{
 		//committer must be an instance of PerfectlyHidingCT
-		if (!(committer instanceof PerfectlyHidingCT)){
-			throw new SecurityLevelException("the given CTCommitter must be an instance of PerfectlyHidingCT");
+		if (!(committer instanceof PerfectlyHidingCmt)){
+			throw new SecurityLevelException("the given CTCommitter must be an instance of PerfectlyHidingCmt");
 		}
 		//committer must be an instance of PerfectlyHidingCT
 		if (!(committer instanceof CmtOnBigInteger) && !(committer instanceof CmtOnByteArray)){

@@ -47,7 +47,7 @@ import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.CmtPeders
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.hash.CryptographicHash;
 import edu.biu.scapi.primitives.hash.bc.BcSHA224;
-import edu.biu.scapi.securityLevel.PerfectlyHidingCT;
+import edu.biu.scapi.securityLevel.PerfectlyHidingCmt;
 
 /**
  * Concrete implementation of committer that executes the Pedersen hash commitment 
@@ -58,7 +58,7 @@ import edu.biu.scapi.securityLevel.PerfectlyHidingCT;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-public class CmtPedersenHashCommitter extends CmtPedersenCommitterCore implements CmtCommitter, PerfectlyHidingCT, CmtOnByteArray{
+public class CmtPedersenHashCommitter extends CmtPedersenCommitterCore implements CmtCommitter, PerfectlyHidingCmt, CmtOnByteArray{
 	/*
 	 * runs the following protocol:
 	 * "Run COMMIT_PEDERSEN to commit to value H(x). 

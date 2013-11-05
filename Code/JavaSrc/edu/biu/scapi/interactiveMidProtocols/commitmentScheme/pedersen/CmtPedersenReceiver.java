@@ -15,7 +15,7 @@ import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtOnBigInteger;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtReceiver;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
-import edu.biu.scapi.securityLevel.PerfectlyHidingCT;
+import edu.biu.scapi.securityLevel.PerfectlyHidingCmt;
 
 /**
  * Concrete implementation of receiver that executes the Pedersen commitment scheme in the receiver's point of view.
@@ -23,7 +23,7 @@ import edu.biu.scapi.securityLevel.PerfectlyHidingCT;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-public class CmtPedersenReceiver extends CmtPedersenReceiverCore implements CmtReceiver, PerfectlyHidingCT, CmtOnBigInteger {
+public class CmtPedersenReceiver extends CmtPedersenReceiverCore implements CmtReceiver, PerfectlyHidingCmt, CmtOnBigInteger {
 	
 
 	/**

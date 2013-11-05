@@ -41,7 +41,7 @@ import edu.biu.scapi.midLayer.ciphertext.ElGamalOnGroupElementCiphertext.ElGamal
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
-import edu.biu.scapi.securityLevel.PerfectlyBindingCT;
+import edu.biu.scapi.securityLevel.PerfectlyBindingCmt;
 import edu.biu.scapi.tools.Factories.DlogGroupFactory;
 
 /**
@@ -52,7 +52,7 @@ import edu.biu.scapi.tools.Factories.DlogGroupFactory;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-public class CmtElGamalOnGroupElementReceiver extends CmtElGamalReceiverCore implements CmtReceiver, PerfectlyBindingCT, CmtOnGroupElement {
+public class CmtElGamalOnGroupElementReceiver extends CmtElGamalReceiverCore implements CmtReceiver, PerfectlyBindingCmt, CmtOnGroupElement {
 
 	/**
 	 * This constructor lets the caller pass the channel and the dlog group to work with.

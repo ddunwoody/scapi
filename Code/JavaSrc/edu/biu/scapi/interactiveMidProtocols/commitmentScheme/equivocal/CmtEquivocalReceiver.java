@@ -13,7 +13,7 @@ import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtWithProofsRecei
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtRCommitPhaseOutput;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.CmtPedersenWithProofsReceiver;
-import edu.biu.scapi.securityLevel.EquivocalCT;
+import edu.biu.scapi.securityLevel.EquivocalCmt;
 
 /**
  * Concrete implementation of Equivocal commitment scheme in the receiver's point of view.
@@ -25,7 +25,7 @@ import edu.biu.scapi.securityLevel.EquivocalCT;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class CmtEquivocalReceiver implements CmtReceiver, EquivocalCT {
+public class CmtEquivocalReceiver implements CmtReceiver, EquivocalCmt {
 	
 	/*
 	  Runs the following pseudo code:

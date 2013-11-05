@@ -36,8 +36,8 @@ import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtOnByteArray;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtRCommitPhaseOutput;
 import edu.biu.scapi.securityLevel.OneSidedSimulation;
-import edu.biu.scapi.securityLevel.PerfectlyBindingCT;
-import edu.biu.scapi.securityLevel.PerfectlyHidingCT;
+import edu.biu.scapi.securityLevel.PerfectlyBindingCmt;
+import edu.biu.scapi.securityLevel.PerfectlyHidingCmt;
 
 /**
  * This class plays as party two of coin tossing protocol which tosses a string.
@@ -65,11 +65,11 @@ public class CTSemiSimulatablePartyTwo implements CTPartyTwo, OneSidedSimulation
 	 * @param l determining the length of the output
 	 */
 	public CTSemiSimulatablePartyTwo(CmtReceiver receiver, CmtCommitter committer, int l, SecureRandom random){
-		if (!(receiver instanceof PerfectlyHidingCT)){
+		if (!(receiver instanceof PerfectlyHidingCmt)){
 			throw new IllegalArgumentException("The given receiver is not perfectly Hiding secure");
 		}
 		
-		if (!(committer instanceof PerfectlyBindingCT)){
+		if (!(committer instanceof PerfectlyBindingCmt)){
 			throw new IllegalArgumentException("The given committer is not perfectly Binding secure");
 		}
 		if (!(committer instanceof CmtOnByteArray)){

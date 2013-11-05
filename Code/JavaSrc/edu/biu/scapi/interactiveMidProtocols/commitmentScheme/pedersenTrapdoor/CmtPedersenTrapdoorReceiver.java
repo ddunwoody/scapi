@@ -39,7 +39,7 @@ import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtOnBigInteger;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtRTrapdoorCommitPhaseOutput;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.CmtPedersenReceiverCore;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
-import edu.biu.scapi.securityLevel.PerfectlyHidingCT;
+import edu.biu.scapi.securityLevel.PerfectlyHidingCmt;
 
 /**
  * Concrete implementation of receiver that executes the Pedersen trapdoor commitment 
@@ -54,7 +54,7 @@ import edu.biu.scapi.securityLevel.PerfectlyHidingCT;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-public class CmtPedersenTrapdoorReceiver extends CmtPedersenReceiverCore implements  CmtReceiver, PerfectlyHidingCT, CmtOnBigInteger {
+public class CmtPedersenTrapdoorReceiver extends CmtPedersenReceiverCore implements  CmtReceiver, PerfectlyHidingCmt, CmtOnBigInteger {
 	
 	/**
 	 * Constructor that receives a connected channel (to the receiver) and chooses default dlog and random. 

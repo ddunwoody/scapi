@@ -42,7 +42,7 @@ import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.kdf.HKDF;
 import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
 import edu.biu.scapi.primitives.prf.bc.BcHMAC;
-import edu.biu.scapi.securityLevel.PerfectlyBindingCT;
+import edu.biu.scapi.securityLevel.PerfectlyBindingCmt;
 import edu.biu.scapi.tools.Factories.DlogGroupFactory;
 
 /**
@@ -53,7 +53,7 @@ import edu.biu.scapi.tools.Factories.DlogGroupFactory;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class CmtElGamalOnByteArrayCommitter extends CmtElGamalCommitterCore implements CmtCommitter, PerfectlyBindingCT, CmtOnByteArray {
+public class CmtElGamalOnByteArrayCommitter extends CmtElGamalCommitterCore implements CmtCommitter, PerfectlyBindingCmt, CmtOnByteArray {
 	
 	/**
 	 * This constructor lets the caller pass the channel, the dlog group and the 

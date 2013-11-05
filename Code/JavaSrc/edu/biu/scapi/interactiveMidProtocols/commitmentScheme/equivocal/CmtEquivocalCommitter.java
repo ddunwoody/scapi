@@ -13,7 +13,7 @@ import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtWithProofsCommi
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitmentPhaseValues;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.CmtPedersenWithProofsCommitter;
-import edu.biu.scapi.securityLevel.EquivocalCT;
+import edu.biu.scapi.securityLevel.EquivocalCmt;
 
 /**
  * Concrete implementation of Equivocal commitment scheme in the committer's point of view.
@@ -25,7 +25,7 @@ import edu.biu.scapi.securityLevel.EquivocalCT;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class CmtEquivocalCommitter implements CmtCommitter, EquivocalCT{
+public class CmtEquivocalCommitter implements CmtCommitter, EquivocalCmt{
 	
 	/*
 	  Runs the following pseudo code:

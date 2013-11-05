@@ -40,7 +40,7 @@ import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtOnGroupElement;
 import edu.biu.scapi.midLayer.asymmetricCrypto.encryption.ScElGamalOnGroupElement;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
-import edu.biu.scapi.securityLevel.PerfectlyBindingCT;
+import edu.biu.scapi.securityLevel.PerfectlyBindingCmt;
 import edu.biu.scapi.tools.Factories.DlogGroupFactory;
 
 /**
@@ -50,7 +50,7 @@ import edu.biu.scapi.tools.Factories.DlogGroupFactory;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-public class CmtElGamalOnGroupElementCommitter extends CmtElGamalCommitterCore implements CmtCommitter, PerfectlyBindingCT, CmtOnGroupElement {
+public class CmtElGamalOnGroupElementCommitter extends CmtElGamalCommitterCore implements CmtCommitter, PerfectlyBindingCmt, CmtOnGroupElement {
 	 
 	/**
 	 * This constructor lets the caller pass the channel and the dlog group to work with. The El Gamal option (ScElGamalOnGroupElement)is set by default by the constructor and cannot be changed.
