@@ -28,14 +28,11 @@ package edu.biu.scapi.primitives.dlog.bc;
 
 import java.math.BigInteger;
 
-import org.bouncycastle.math.ec.ECFieldElement;
 import org.bouncycastle.math.ec.ECPoint;
-import org.bouncycastle.math.ec.ECFieldElement.Fp;
 
 import edu.biu.scapi.primitives.dlog.ECFpPoint;
 import edu.biu.scapi.primitives.dlog.ECFpUtility;
 import edu.biu.scapi.primitives.dlog.groupParams.ECFpGroupParams;
-import edu.biu.scapi.primitives.dlog.groupParams.ECGroupParams;
 
 /**
  * This class is an adapter for ECPoint.Fp of BC
@@ -46,31 +43,6 @@ import edu.biu.scapi.primitives.dlog.groupParams.ECGroupParams;
 public class ECFpPointBc extends ECPointBc implements ECFpPoint{
 
 	private ECFpUtility util = new ECFpUtility();
-	
-	/**
-	 * Constructor that accepts x,y possible values of a point on the requested curve. 
-	 * If the values are valid - set the point. Else, throw IllegalArgumentException.<p>
-	 * This constructor is kept for backward compatibility, it is the same as calling 
-	 * ECFpPointBc(BigInteger x, BigInteger y, BcDlogECFp curve, boolean bCheckMembership)
-	 * with bCheckMembership always set to true.
-	 * @param x coordinate of candidate point
-	 * @param y coordinate of candidate point
-	 * @param curve - DlogGroup for which we want to create the point
-	 * @throws IllegalArgumentException if the coordinates x and y do not represent a valid point in the curve
-	 */
-	/*
-	ECFpPointBc(BigInteger x, BigInteger y, BcDlogECFp curve) throws IllegalArgumentException{
-		//checks if the given parameters are valid point on the curve.
-		boolean valid = util.checkCurveMembership((ECFpGroupParams) curve.getGroupParams(), x, y);
-		// checks validity
-		if (valid == false) // if not valid, throws exception
-			throw new IllegalArgumentException("x, y values are not a point on this curve");
-
-		// create point with the given parameters 
-		point = curve.createPoint(x, y);
-	}
-	
-	*/
 	
 	/**
 	 * Constructor that accepts x,y possible values of a point on the requested curve.

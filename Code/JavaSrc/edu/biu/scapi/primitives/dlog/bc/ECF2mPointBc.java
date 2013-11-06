@@ -27,19 +27,11 @@
 package edu.biu.scapi.primitives.dlog.bc;
 
 import java.math.BigInteger;
-import java.security.SecureRandom;
-
-import org.bouncycastle.math.ec.ECFieldElement;
-import org.bouncycastle.math.ec.ECFieldElement.F2m;
 import org.bouncycastle.math.ec.ECPoint;
 
 import edu.biu.scapi.primitives.dlog.ECF2mPoint;
 import edu.biu.scapi.primitives.dlog.ECF2mUtility;
 import edu.biu.scapi.primitives.dlog.groupParams.ECF2mGroupParams;
-import edu.biu.scapi.primitives.dlog.groupParams.ECF2mKoblitz;
-import edu.biu.scapi.primitives.dlog.groupParams.ECF2mPentanomialBasis;
-import edu.biu.scapi.primitives.dlog.groupParams.ECF2mTrinomialBasis;
-import edu.biu.scapi.primitives.dlog.groupParams.GroupParams;
 
 /**
  * This class is an adapter for ECPoint.F2m of BC
@@ -49,29 +41,6 @@ import edu.biu.scapi.primitives.dlog.groupParams.GroupParams;
 public class ECF2mPointBc extends ECPointBc implements ECF2mPoint {
 	private ECF2mUtility util = new ECF2mUtility();
 	
-	/**
-	 * Constructor that accepts x,y possible values of a point on the requested curve. 
-	 * If the values are valid - set the point. Else, throw IllegalArgumentException.<p>
-	 * This constructor is kept for backward compatibility, it is the same as calling 
-	 * ECF2mPointBc(BigInteger x, BigInteger y, BcDlogECFp curve, boolean bCheckMembership)
-	 * with bCheckMembership always set to true.
-	 * @param x coordinate of candidate point
-	 * @param y coordinate of candidate point
-	 * @param curve - DlogGroup for which we want to create the point
-	 * @throws IllegalArgumentException if the coordinates x and y do not represent a valid point in the curve
-	 */
-	/*ECF2mPointBc(BigInteger x, BigInteger y, BcDlogECF2m curve) throws IllegalArgumentException{
-
-		boolean valid = util.checkCurveMembership((ECF2mGroupParams) curve.getGroupParams(), x, y);
-		// checks validity
-		if (valid == false) // if not valid, throws exception
-			throw new IllegalArgumentException("x, y values are not a point on this curve");
-
-		// create point with the given parameters
-		point = curve.createPoint(x, y);
-	}
-	*/
-
 	/**
 	 * Constructor that accepts x,y possible values of a point on the requested curve.
 	 * If bCheckMembership is set to true it checks if the values are valid and if so, sets the point. If not valid, throws IllegalArgumentException
@@ -102,18 +71,6 @@ public class ECF2mPointBc extends ECPointBc implements ECF2mPoint {
 	 */
 	ECF2mPointBc(ECPoint point) {
 		this.point = point;
-	}
-	
-	private void getBasis(GroupParams params, int[] k) {
-		
-		if (params instanceof ECF2mTrinomialBasis) {
-			k[0] = ((ECF2mTrinomialBasis) params).getK1();
-		}
-		if (params instanceof ECF2mPentanomialBasis) {
-			k[0] = ((ECF2mPentanomialBasis) params).getK1();
-			k[1] = ((ECF2mPentanomialBasis) params).getK2();
-			k[2] = ((ECF2mPentanomialBasis) params).getK3();
-		}
 	}
 
 }
