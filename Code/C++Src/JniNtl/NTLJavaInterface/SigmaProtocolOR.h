@@ -2,8 +2,8 @@
 #include <jni.h>
 /* Header for class edu_biu_scapi_interactiveMidProtocols_SigmaProtocol_orMultiple_SigmaORMultipleProver */
 
-#ifndef _Included_edu_biu_scapi_interactiveMidProtocols_SigmaProtocol_orMultiple
-#define _Included_edu_biu_scapi_interactiveMidProtocols_SigmaProtocol_orMultiple
+#ifndef _Included_edu_biu_scapi_interactiveMidProtocols_sigmaProtocol_orMultiple
+#define _Included_edu_biu_scapi_interactiveMidProtocols_sigmaProtocol_orMultiple
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -12,7 +12,7 @@ extern "C" {
  * Method:    initField
  * Signature: (II)V
  */
-JNIEXPORT void JNICALL Java_edu_biu_scapi_interactiveMidProtocols_SigmaProtocol_orMultiple_SigmaORMultipleProverComputation_initField
+JNIEXPORT void JNICALL Java_edu_biu_scapi_interactiveMidProtocols_sigmaProtocol_orMultiple_SigmaORMultipleProverComputation_initField
   (JNIEnv *, jobject, jint, jint);
 
 /*
@@ -20,7 +20,7 @@ JNIEXPORT void JNICALL Java_edu_biu_scapi_interactiveMidProtocols_SigmaProtocol_
  * Method:    createRandomFieldElements
  * Signature: (I[J)[[B
  */
-JNIEXPORT jobjectArray JNICALL Java_edu_biu_scapi_interactiveMidProtocols_SigmaProtocol_orMultiple_SigmaORMultipleProverComputation_createRandomFieldElements
+JNIEXPORT jobjectArray JNICALL Java_edu_biu_scapi_interactiveMidProtocols_sigmaProtocol_orMultiple_SigmaORMultipleProverComputation_createRandomFieldElements
   (JNIEnv *, jobject, jint, jlongArray);
 
 /*
@@ -28,7 +28,7 @@ JNIEXPORT jobjectArray JNICALL Java_edu_biu_scapi_interactiveMidProtocols_SigmaP
  * Method:    interpolate
  * Signature: (I[B[J[I)J
  */
-JNIEXPORT jlong JNICALL Java_edu_biu_scapi_interactiveMidProtocols_SigmaProtocol_orMultiple_SigmaORMultipleProverComputation_interpolate
+JNIEXPORT jlong JNICALL Java_edu_biu_scapi_interactiveMidProtocols_sigmaProtocol_orMultiple_SigmaORMultipleProverComputation_interpolate
   (JNIEnv *, jobject, jbyteArray, jlongArray, jintArray);
 
 /*
@@ -36,7 +36,7 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_interactiveMidProtocols_SigmaProtocol
  * Method:    getRestChallenges
  * Signature: (J[II)[[B
  */
-JNIEXPORT jobjectArray JNICALL Java_edu_biu_scapi_interactiveMidProtocols_SigmaProtocol_orMultiple_SigmaORMultipleProverComputation_getRestChallenges
+JNIEXPORT jobjectArray JNICALL Java_edu_biu_scapi_interactiveMidProtocols_sigmaProtocol_orMultiple_SigmaORMultipleProverComputation_getRestChallenges
   (JNIEnv *, jobject, jlong, jintArray);
 
 /*
@@ -44,7 +44,7 @@ JNIEXPORT jobjectArray JNICALL Java_edu_biu_scapi_interactiveMidProtocols_SigmaP
  * Method:    getPolynomialBytes
  * Signature: (J)[[B
  */
-JNIEXPORT jobjectArray JNICALL Java_edu_biu_scapi_interactiveMidProtocols_SigmaProtocol_orMultiple_SigmaORMultipleProverComputation_getPolynomialBytes
+JNIEXPORT jobjectArray JNICALL Java_edu_biu_scapi_interactiveMidProtocols_sigmaProtocol_orMultiple_SigmaORMultipleProverComputation_getPolynomialBytes
   (JNIEnv *, jobject, jlong);
 
 /*
@@ -52,7 +52,7 @@ JNIEXPORT jobjectArray JNICALL Java_edu_biu_scapi_interactiveMidProtocols_SigmaP
  * Method:    deletePointers
  * Signature: (J[J)V
  */
-JNIEXPORT void JNICALL Java_edu_biu_scapi_interactiveMidProtocols_SigmaProtocol_orMultiple_SigmaORMultipleProverComputation_deletePointers
+JNIEXPORT void JNICALL Java_edu_biu_scapi_interactiveMidProtocols_sigmaProtocol_orMultiple_SigmaORMultipleProverComputation_deletePointers
   (JNIEnv *, jobject, jlong, jlongArray);
 
 /*
@@ -60,7 +60,7 @@ JNIEXPORT void JNICALL Java_edu_biu_scapi_interactiveMidProtocols_SigmaProtocol_
  * Method:    initField
  * Signature: (II)V
  */
-JNIEXPORT void JNICALL Java_edu_biu_scapi_interactiveMidProtocols_SigmaProtocol_orMultiple_SigmaORMultipleVerifierComputation_initField
+JNIEXPORT void JNICALL Java_edu_biu_scapi_interactiveMidProtocols_sigmaProtocol_orMultiple_SigmaORMultipleVerifierComputation_initField
   (JNIEnv *, jobject, jint, jint);
 
 /*
@@ -68,7 +68,7 @@ JNIEXPORT void JNICALL Java_edu_biu_scapi_interactiveMidProtocols_SigmaProtocol_
  * Method:    sampleChallenge
  * Signature: ([J)[B
  */
-JNIEXPORT jbyteArray JNICALL Java_edu_biu_scapi_interactiveMidProtocols_SigmaProtocol_orMultiple_SigmaORMultipleVerifierComputation_sampleChallenge
+JNIEXPORT jbyteArray JNICALL Java_edu_biu_scapi_interactiveMidProtocols_sigmaProtocol_orMultiple_SigmaORMultipleVerifierComputation_sampleChallenge
   (JNIEnv *, jobject, jlongArray);
 
 /*
@@ -76,7 +76,7 @@ JNIEXPORT jbyteArray JNICALL Java_edu_biu_scapi_interactiveMidProtocols_SigmaPro
  * Method:    checkPolynomialValidity
  * Signature: ([[BIJ[[BI)Z
  */
-JNIEXPORT jboolean JNICALL Java_edu_biu_scapi_interactiveMidProtocols_SigmaProtocol_orMultiple_SigmaORMultipleVerifierComputation_checkPolynomialValidity
+JNIEXPORT jboolean JNICALL Java_edu_biu_scapi_interactiveMidProtocols_sigmaProtocol_orMultiple_SigmaORMultipleVerifierComputation_checkPolynomialValidity
   (JNIEnv *, jobject, jobjectArray, jint, jlong, jobjectArray);
 
 /*
@@ -84,7 +84,7 @@ JNIEXPORT jboolean JNICALL Java_edu_biu_scapi_interactiveMidProtocols_SigmaProto
  * Method:    initField
  * Signature: (II)V
  */
-JNIEXPORT void JNICALL Java_edu_biu_scapi_interactiveMidProtocols_SigmaProtocol_orMultiple_SigmaORMultipleSimulator_initField
+JNIEXPORT void JNICALL Java_edu_biu_scapi_interactiveMidProtocols_sigmaProtocol_orMultiple_SigmaORMultipleSimulator_initField
   (JNIEnv *, jobject, jint, jint);
 
 /*
@@ -92,7 +92,7 @@ JNIEXPORT void JNICALL Java_edu_biu_scapi_interactiveMidProtocols_SigmaProtocol_
  * Method:    createRandomFieldElements
  * Signature: (I[J)[[B
  */
-JNIEXPORT jobjectArray JNICALL Java_edu_biu_scapi_interactiveMidProtocols_SigmaProtocol_orMultiple_SigmaORMultipleSimulator_createRandomFieldElements
+JNIEXPORT jobjectArray JNICALL Java_edu_biu_scapi_interactiveMidProtocols_sigmaProtocol_orMultiple_SigmaORMultipleSimulator_createRandomFieldElements
   (JNIEnv *, jobject, jint, jlongArray);
 
 /*
@@ -100,7 +100,7 @@ JNIEXPORT jobjectArray JNICALL Java_edu_biu_scapi_interactiveMidProtocols_SigmaP
  * Method:    interpolate
  * Signature: (I[B[J[I)J
  */
-JNIEXPORT jlong JNICALL Java_edu_biu_scapi_interactiveMidProtocols_SigmaProtocol_orMultiple_SigmaORMultipleSimulator_interpolate
+JNIEXPORT jlong JNICALL Java_edu_biu_scapi_interactiveMidProtocols_sigmaProtocol_orMultiple_SigmaORMultipleSimulator_interpolate
   (JNIEnv *, jobject, jbyteArray, jlongArray, jintArray);
 
 /*
@@ -108,7 +108,7 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_interactiveMidProtocols_SigmaProtocol
  * Method:    getRestChallenges
  * Signature: (JIII[I)[[B
  */
-JNIEXPORT jobjectArray JNICALL Java_edu_biu_scapi_interactiveMidProtocols_SigmaProtocol_orMultiple_SigmaORMultipleSimulator_getRestChallenges
+JNIEXPORT jobjectArray JNICALL Java_edu_biu_scapi_interactiveMidProtocols_sigmaProtocol_orMultiple_SigmaORMultipleSimulator_getRestChallenges
   (JNIEnv *, jobject, jlong, jint, jint, jintArray);
 
 /*
@@ -116,7 +116,7 @@ JNIEXPORT jobjectArray JNICALL Java_edu_biu_scapi_interactiveMidProtocols_SigmaP
  * Method:    getPolynomialBytes
  * Signature: (J)[[B
  */
-JNIEXPORT jobjectArray JNICALL Java_edu_biu_scapi_interactiveMidProtocols_SigmaProtocol_orMultiple_SigmaORMultipleSimulator_getPolynomialBytes
+JNIEXPORT jobjectArray JNICALL Java_edu_biu_scapi_interactiveMidProtocols_sigmaProtocol_orMultiple_SigmaORMultipleSimulator_getPolynomialBytes
   (JNIEnv *, jobject, jlong);
 
 /*
@@ -124,7 +124,7 @@ JNIEXPORT jobjectArray JNICALL Java_edu_biu_scapi_interactiveMidProtocols_SigmaP
  * Method:    deletePointers
  * Signature: (J[J)V
  */
-JNIEXPORT void JNICALL Java_edu_biu_scapi_interactiveMidProtocols_SigmaProtocol_orMultiple_SigmaORMultipleSimulator_deletePointers
+JNIEXPORT void JNICALL Java_edu_biu_scapi_interactiveMidProtocols_sigmaProtocol_orMultiple_SigmaORMultipleSimulator_deletePointers
   (JNIEnv *, jobject, jlong, jlongArray);
 
 

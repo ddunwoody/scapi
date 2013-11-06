@@ -38,7 +38,7 @@
  * param t			  : degree of the irreducible polynomial
  * param randomNum	  : seed for the random calculations.
  */
-JNIEXPORT void JNICALL Java_edu_biu_scapi_interactiveMidProtocols_SigmaProtocol_orMultiple_SigmaORMultipleProverComputation_initField
+JNIEXPORT void JNICALL Java_edu_biu_scapi_interactiveMidProtocols_sigmaProtocol_orMultiple_SigmaORMultipleProverComputation_initField
   (JNIEnv * env, jobject, jint t, jint randomNum){
 	  //call the function that does the initialization.
 	  initField(t, randomNum);
@@ -67,7 +67,7 @@ void initField(jint t, jint randomNum){
  * param pointerToElements		      : an array to fill with the sampled elements' pointers.
  * return jobjectArray				  : array of element's coefficients
  */
-JNIEXPORT jobjectArray JNICALL Java_edu_biu_scapi_interactiveMidProtocols_SigmaProtocol_orMultiple_SigmaORMultipleProverComputation_createRandomFieldElements
+JNIEXPORT jobjectArray JNICALL Java_edu_biu_scapi_interactiveMidProtocols_sigmaProtocol_orMultiple_SigmaORMultipleProverComputation_createRandomFieldElements
   (JNIEnv * env, jobject, jint numElements, jlongArray pointerToElements){
 	 
 	  //call the function that samples the elements.
@@ -155,7 +155,7 @@ GF2E convertBytesToGF2E(JNIEnv * env, jbyteArray byteArr){
  * param sampledIndexes		: indexes of the pre calculated GF2E polynomials, such that the points are (sampledIndexes[i], fieldElements[i]).
  * return jlong				: pointer to the interpolated polynomial.
  */
-JNIEXPORT jlong JNICALL Java_edu_biu_scapi_interactiveMidProtocols_SigmaProtocol_orMultiple_SigmaORMultipleProverComputation_interpolate
+JNIEXPORT jlong JNICALL Java_edu_biu_scapi_interactiveMidProtocols_sigmaProtocol_orMultiple_SigmaORMultipleProverComputation_interpolate
   (JNIEnv * env, jobject, jbyteArray challenge, jlongArray fieldElements, jintArray sampledIndexes){
 	  
 	  //Call the function that does the interpolate.
@@ -235,7 +235,7 @@ GF2E generateIndexPolynomial(int i){
  * param indexesInI					: x coordinates to calculate their y coordinats (the challenges).
  * return jobjectArray				: array of element's coefficients
  */
-JNIEXPORT jobjectArray JNICALL Java_edu_biu_scapi_interactiveMidProtocols_SigmaProtocol_orMultiple_SigmaORMultipleProverComputation_getRestChallenges
+JNIEXPORT jobjectArray JNICALL Java_edu_biu_scapi_interactiveMidProtocols_sigmaProtocol_orMultiple_SigmaORMultipleProverComputation_getRestChallenges
   (JNIEnv *env, jobject, jlong polynomial, jintArray indexesInI){
 	   
 	  //call the function that calculate the rest of the challenges.
@@ -293,7 +293,7 @@ jobjectArray calcRestChallenges(JNIEnv *env, jlong polynomial, jintArray indexes
  * param poly						: pointer to the interpolated polynomial
  * return jobjectArray				: array of polynomial's coefficients.
  */
-JNIEXPORT jobjectArray JNICALL Java_edu_biu_scapi_interactiveMidProtocols_SigmaProtocol_orMultiple_SigmaORMultipleProverComputation_getPolynomialBytes
+JNIEXPORT jobjectArray JNICALL Java_edu_biu_scapi_interactiveMidProtocols_sigmaProtocol_orMultiple_SigmaORMultipleProverComputation_getPolynomialBytes
   (JNIEnv *env, jobject, jlong poly){
 	  
 	  //call the function that calculate the polynomial bytes.
@@ -330,7 +330,7 @@ jobjectArray calcPolynomialBytes(JNIEnv *env, jlong poly){
  * param polynomial				: pointer to the polynomial
  * param fieldElements			: array of pointers to field elements.
  */
-JNIEXPORT void JNICALL Java_edu_biu_scapi_interactiveMidProtocols_SigmaProtocol_orMultiple_SigmaORMultipleProverComputation_deletePointers
+JNIEXPORT void JNICALL Java_edu_biu_scapi_interactiveMidProtocols_sigmaProtocol_orMultiple_SigmaORMultipleProverComputation_deletePointers
   (JNIEnv * env, jobject, jlong polynomial, jlongArray fieldElements){
 	  
 	  //call the function that deletes the allocated memory.
@@ -358,7 +358,7 @@ void deleteMemory(JNIEnv *env, jlong polynomial, jlongArray fieldElements){
  * param t			  : degree of the irreducible polynomial
  * param randomNum	  : seed for the random calculations.
  */
-JNIEXPORT void JNICALL Java_edu_biu_scapi_interactiveMidProtocols_SigmaProtocol_orMultiple_SigmaORMultipleVerifierComputation_initField
+JNIEXPORT void JNICALL Java_edu_biu_scapi_interactiveMidProtocols_sigmaProtocol_orMultiple_SigmaORMultipleVerifierComputation_initField
   (JNIEnv * env, jobject, jint t, jint randomNum){
 	 //call the function that does the initialization.
 	  initField(t, randomNum);
@@ -368,7 +368,7 @@ JNIEXPORT void JNICALL Java_edu_biu_scapi_interactiveMidProtocols_SigmaProtocol_
  * param pointerToChallenge	: will hold the pointer to the sampled element
  * return jobjectArray		: array of element coefficients
  */
-JNIEXPORT jbyteArray JNICALL Java_edu_biu_scapi_interactiveMidProtocols_SigmaProtocol_orMultiple_SigmaORMultipleVerifierComputation_sampleChallenge
+JNIEXPORT jbyteArray JNICALL Java_edu_biu_scapi_interactiveMidProtocols_sigmaProtocol_orMultiple_SigmaORMultipleVerifierComputation_sampleChallenge
   (JNIEnv *env, jobject, jlongArray pointerToChallenge){
 	  
 	//sample random field element.	
@@ -398,7 +398,7 @@ JNIEXPORT jbyteArray JNICALL Java_edu_biu_scapi_interactiveMidProtocols_SigmaPro
  * param t							: degree of the challenges polynomials.
  * return jboolean					: true if all checks return true.
  */
-JNIEXPORT jboolean JNICALL Java_edu_biu_scapi_interactiveMidProtocols_SigmaProtocol_orMultiple_SigmaORMultipleVerifierComputation_checkPolynomialValidity
+JNIEXPORT jboolean JNICALL Java_edu_biu_scapi_interactiveMidProtocols_sigmaProtocol_orMultiple_SigmaORMultipleVerifierComputation_checkPolynomialValidity
   (JNIEnv *env, jobject, jobjectArray polynomial, jint k, jlong verifierChallenge, jobjectArray proverChallenges){
 	  
 	  bool valid = true;
@@ -469,7 +469,7 @@ GF2EX createPolynomial(JNIEnv *env, jobjectArray polynomialBytes){
  * param t			  : degree of the irreducible polynomial
  * param randomNum	  : seed for the random calculations.
  */
-JNIEXPORT void JNICALL Java_edu_biu_scapi_interactiveMidProtocols_SigmaProtocol_orMultiple_SigmaORMultipleSimulator_initField
+JNIEXPORT void JNICALL Java_edu_biu_scapi_interactiveMidProtocols_sigmaProtocol_orMultiple_SigmaORMultipleSimulator_initField
   (JNIEnv *env, jobject, jint t, jint randomNum){
 	  
 	  //call the function that does the initialization.
@@ -477,35 +477,35 @@ JNIEXPORT void JNICALL Java_edu_biu_scapi_interactiveMidProtocols_SigmaProtocol_
 }
 
 
-JNIEXPORT jobjectArray JNICALL Java_edu_biu_scapi_interactiveMidProtocols_SigmaProtocol_orMultiple_SigmaORMultipleSimulator_createRandomFieldElements
+JNIEXPORT jobjectArray JNICALL Java_edu_biu_scapi_interactiveMidProtocols_sigmaProtocol_orMultiple_SigmaORMultipleSimulator_createRandomFieldElements
   (JNIEnv *env, jobject, jint numElements, jlongArray pointerToElements){
 	  
 	  //Call the function that samples the elements.
 	  return sampleRandomFieldElements(env, numElements, pointerToElements);
 }
 
-JNIEXPORT jlong JNICALL Java_edu_biu_scapi_interactiveMidProtocols_SigmaProtocol_orMultiple_SigmaORMultipleSimulator_interpolate
+JNIEXPORT jlong JNICALL Java_edu_biu_scapi_interactiveMidProtocols_sigmaProtocol_orMultiple_SigmaORMultipleSimulator_interpolate
   (JNIEnv *env, jobject, jbyteArray challenge, jlongArray fieldElements, jintArray indexes){
 
 	  //Call the function that does the interpolate.
 	  return interpolate(env, challenge, fieldElements, indexes);
 }
 
-JNIEXPORT jobjectArray JNICALL Java_edu_biu_scapi_interactiveMidProtocols_SigmaProtocol_orMultiple_SigmaORMultipleSimulator_getRestChallenges
+JNIEXPORT jobjectArray JNICALL Java_edu_biu_scapi_interactiveMidProtocols_sigmaProtocol_orMultiple_SigmaORMultipleSimulator_getRestChallenges
   (JNIEnv *env, jobject, jlong polynomial, jint start, jint end, jintArray indexes){
 
 	  //call the function that calculate the rest of the challenges.
 	  return calcRestChallenges(env, polynomial, indexes);
 }
 
-JNIEXPORT jobjectArray JNICALL Java_edu_biu_scapi_interactiveMidProtocols_SigmaProtocol_orMultiple_SigmaORMultipleSimulator_getPolynomialBytes
+JNIEXPORT jobjectArray JNICALL Java_edu_biu_scapi_interactiveMidProtocols_sigmaProtocol_orMultiple_SigmaORMultipleSimulator_getPolynomialBytes
   (JNIEnv *env, jobject, jlong poly){
 
 	  //call the function that calculate the polynomial bytes.
 	  return calcPolynomialBytes(env, poly);
 }
 
-JNIEXPORT void JNICALL Java_edu_biu_scapi_interactiveMidProtocols_SigmaProtocol_orMultiple_SigmaORMultipleSimulator_deletePointers
+JNIEXPORT void JNICALL Java_edu_biu_scapi_interactiveMidProtocols_sigmaProtocol_orMultiple_SigmaORMultipleSimulator_deletePointers
   (JNIEnv *env, jobject, jlong polynomial, jlongArray fieldElements){
 
 	  //call the function that deletes the allocated memory.
