@@ -38,7 +38,7 @@ public interface DlogEllipticCurve extends DlogGroup {
 
 	
 	/**
-	 *@deprecated
+	 * Deprecated. Use generateElment(boolean bCheckMembership, BigInteger...values)
 	 */
 	@Deprecated public ECElement generateElement(BigInteger x, BigInteger y) throws IllegalArgumentException;
 	
