@@ -25,21 +25,25 @@
 package edu.biu.scapi.interactiveMidProtocols.ot.fullSimulation;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.security.SecureRandom;
 
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CheatAttemptException;
+import edu.biu.scapi.exceptions.CommitValueException;
+import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTROnGroupElementOutput;
+import edu.biu.scapi.generals.ScapiDefaultConfiguration;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTRInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTROutput;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnGroupElementMsg;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTReceiver;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.dh.SigmaDHProverComputation;
+import edu.biu.scapi.interactiveMidProtocols.zeroKnowledge.ZKPOKFromSigmaCmtPedersenProver;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
-import edu.biu.scapi.primitives.dlog.GroupElement;
+import edu.biu.scapi.securityLevel.DDH;
 import edu.biu.scapi.securityLevel.Malicious;
 import edu.biu.scapi.securityLevel.StandAlone;
+import edu.biu.scapi.tools.Factories.DlogGroupFactory;
 
 /**
  * Concrete implementation of the receiver side in oblivious transfer based on the DDH assumption that achieves full simulation.
@@ -52,17 +56,39 @@ import edu.biu.scapi.securityLevel.StandAlone;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTFullSimDDHOnGroupElementReceiver extends OTFullSimDDHReceiverAbs implements Malicious, StandAlone{
+public class OTFullSimDDHOnGroupElementReceiver implements OTReceiver, Malicious, StandAlone{
+	
+	private DlogGroup dlog;
+	private SecureRandom random;
+	
+	private OTFullSimPreprocessPhaseValues preprocessOutput; //Values calculated by the preprocess phase.
 	
 	/**
-	 * Constructor that gets the channel and choose default values of DlogGroup and SecureRandom.
+	 * Constructor that gets the channel and chooses default values of DlogGroup and SecureRandom.
 	 * @param channel
 	 * @throws ClassNotFoundException 
 	 * @throws CheatAttemptException 
 	 * @throws IOException 
+	 * @throws CommitValueException 
 	 */
-	public OTFullSimDDHOnGroupElementReceiver(Channel channel) throws IOException, CheatAttemptException, ClassNotFoundException{
-		super(channel);
+	public OTFullSimDDHOnGroupElementReceiver(Channel channel) throws IOException, CheatAttemptException, ClassNotFoundException, CommitValueException{
+		//Read the default DlogGroup name from a configuration file.
+		String dlogName = ScapiDefaultConfiguration.getInstance().getProperty("DDHDlogGroup");
+		DlogGroup dlog = null;
+		try {
+			//Create the default DlogGroup by the factory.
+			dlog = DlogGroupFactory.getInstance().getObject(dlogName);
+		} catch (FactoriesException e1) {
+			// Should not occur since the dlog name in the configuration file is valid.
+		}
+		
+		try {
+			doConstruct(channel, dlog, new SecureRandom());
+		} catch (SecurityLevelException e1) {
+			// Should not occur since the dlog in the configuration file is as secure as needed.
+		} catch (InvalidDlogGroupException e) {
+			// Should not occur since the dlog in the configuration file is valid.
+		}
 	}
 	
 	/**
@@ -70,90 +96,94 @@ public class OTFullSimDDHOnGroupElementReceiver extends OTFullSimDDHReceiverAbs 
 	 * @param channel
 	 * @param dlog must be DDH secure.
 	 * @param random
-	 * @throws SecurityLevelException if the given DlogGroup is not DDH secure.
-	 * @throws InvalidDlogGroupException if the given dlog is invalid.
+	 * @throws SecurityLevelException if the given dlog is not DDH secure
+	 * @throws InvalidDlogGroupException if the given DlogGroup is not valid.
 	 * @throws ClassNotFoundException 
 	 * @throws CheatAttemptException 
 	 * @throws IOException 
+	 * @throws CommitValueException 
 	 */
-	public OTFullSimDDHOnGroupElementReceiver(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException, IOException, CheatAttemptException, ClassNotFoundException{
+	public OTFullSimDDHOnGroupElementReceiver(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException, IOException, CheatAttemptException, ClassNotFoundException, CommitValueException{
 		
-		super(channel, dlog, random);
+		doConstruct(channel, dlog, random);
 	}
-
+	
 	/**
-	 * Run the following line from the protocol:
-	 * "IF  NOT 
-	 *		1. u0, u1, c0, c1 in the DlogGroup
-	 *	REPORT ERROR"
-	 * @param c1 
-	 * @param c0 
-	 * @param u1 
-	 * @param u0 
-	 * @throws CheatAttemptException if there was a cheat attempt during the execution of the protocol.
-	 */
-	protected void checkReceivedTuple(GroupElement u0, GroupElement u1, GroupElement c0, GroupElement c1) throws CheatAttemptException{
-		
-		if (!(dlog.isMember(u0))){
-			throw new CheatAttemptException("u0 element is not a member in the current DlogGroup");
-		}
-		if (!(dlog.isMember(u1))){
-			throw new CheatAttemptException("u1 element is not a member in the current DlogGroup");
-		}
-		if (!(dlog.isMember(c0))){
-			throw new CheatAttemptException("c0 element is not a member in the current DlogGroup");
-		}
-		if (!(dlog.isMember(c1))){
-			throw new CheatAttemptException("c1 element is not a member in the current DlogGroup");
-		}
-		
-	}
-
-	/**
-	 * Run the following lines from the protocol:
-	 * "COMPUTE xSigma = cSigma * (uSigma)^(-r)"
-	 * @param sigma input of the protocol
-	 * @param r random value sampled in the protocol
-	 * @param message received from the sender
-	 * @return OTROutput contains xSigma
+	 * Sets the given members.
+	 * Runs the following line from the protocol:
+	 * "IF NOT VALID_PARAMS(G,q,g)
+	 *   		REPORT ERROR and HALT".
+	 * @param channel
+	 * @param dlog must be DDH secure.
+	 * @param random
+	 * @throws SecurityLevelException if the given dlog is not DDH secure
+	 * @throws InvalidDlogGroupException if the given DlogGroup is not valid.
+	 * @throws ClassNotFoundException 
 	 * @throws CheatAttemptException 
+	 * @throws IOException 
+	 * @throws CommitValueException 
 	 */
-	protected OTROutput checkMessgeAndComputeX(byte sigma, BigInteger r, OTSMsg message) throws CheatAttemptException {
-		//If message is not instance of OTSOnGroupElementMessage, throw Exception.
-		if(!(message instanceof OTSOnGroupElementMsg)){
-			throw new IllegalArgumentException("message should be instance of OTSOnGroupElementMessage");
+	private void doConstruct(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException, IOException, CheatAttemptException, ClassNotFoundException, CommitValueException {
+		//The underlying dlog group must be DDH secure.
+		if (!(dlog instanceof DDH)){
+			throw new SecurityLevelException("DlogGroup should have DDH security level");
 		}
+		//Check that the given dlog is valid.
+		// In Zp case, the check is done by Crypto++ library.
+		//In elliptic curves case, by default SCAPI uploads a file with NIST recommended curves, 
+		//and in this case we assume the parameters are always correct and the validateGroup function always return true.
+		//It is also possible to upload a user-defined configuration file. In this case,
+		//it is the user's responsibility to check the validity of the parameters by override the implementation of this function.
+		if(!dlog.validateGroup())
+			throw new InvalidDlogGroupException();
 		
-		OTSOnGroupElementMsg msg = (OTSOnGroupElementMsg)message;
+		this.dlog = dlog;
+		this.random = random;
+
+		//read the default statistical parameter used in sigma protocols from a configuration file.
+		String statisticalParameter = ScapiDefaultConfiguration.getInstance().getProperty("StatisticalParameter");
+		int t = Integer.parseInt(statisticalParameter);	
+		//Creates the underlying ZKPOK. 
+		ZKPOKFromSigmaCmtPedersenProver zkProver = new ZKPOKFromSigmaCmtPedersenProver(channel, new SigmaDHProverComputation(dlog, t, random));
 		
-		//Reconstruct the group elements from the given message.
-		GroupElement u0 = dlog.reconstructElement(true, msg.getW0());
-		GroupElement u1 = dlog.reconstructElement(true, msg.getW1());
-		GroupElement c0 = dlog.reconstructElement(true, msg.getC0());
-		GroupElement c1 = dlog.reconstructElement(true, msg.getC1());
-				
-		//Compute the validity checks of the given message.		
-		checkReceivedTuple(u0, u1, c0, c1);
-				
-		GroupElement xSigma = null;
-		GroupElement cSigma = null;
-		BigInteger minusR = dlog.getOrder().subtract(r);
+		// Some OT protocols have a pre-process stage before the transfer. 
+		// Usually, pre process is done once at the beginning of the protocol and will not be executed later, 
+		// and then the transfer function could be called multiple times.
+		// We implement the preprocess stage at construction time. 
+		// A protocol that needs to call preprocess after the construction time, should create a new instance.
+		//Call the utility function that executes the preprocess phase.
+		preprocessOutput = OTFullSimReceiverPreprocessUtil.preProcess(dlog, zkProver, channel, random);
 		
-		//If sigma = 0, compute (uSigma)^(-r) and set cSigma to c0.
-		if (sigma == 0){
-			xSigma = dlog.exponentiate(u0, minusR);
-			cSigma = c0;
-		} 
-		
-		//If sigma = 1, compute w1^beta and set cSigma to c1.
-		if (sigma == 1) {
-			xSigma = dlog.exponentiate(u1, minusR);
-			cSigma = c1;
-		}
-		
-		xSigma = dlog.multiplyGroupElements(cSigma, xSigma);
-		
-		//Create and return the output containing xSigma
-		return new OTROnGroupElementOutput(xSigma);
+	}
+	
+	/**
+	 * 
+	 * Run the following part of the protocol:
+	 * Transfer Phase (with inputs x0,x1) <p>
+	 *		SAMPLE a random value r <- {0, . . . , q-1} <p>
+	 *		COMPUTE<p>
+	 *		4.	g = (gSigma)^r<p>
+	 *		5.	h = (hSigma)^r<p>
+	 *		SEND (g,h) to S<p>
+	 *		WAIT for messages (u0,c0) and (u1,c1) from S<p>
+	 *		IF  NOT<p>
+	 *		•	u0, u1, c0, c1 in G<p>
+	 *		      REPORT ERROR<p>
+	 *		OUTPUT  xSigma = cSigma * (uSigma)^(-r)<p>
+	 * The transfer stage of OT protocol which can be called several times in parallel.
+	 * In order to enable the parallel calls, each transfer call should use a different channel to send and receive messages.
+	 * This way the parallel executions of the function will not block each other.
+	 * The parameters given in the input must match the DlogGroup member of this class, which given in the constructor.
+	 * @param channel
+	 * @param input MUST be OTRBasicInput.
+	 * @return OTROutput, the output of the protocol.
+	 * @throws CheatAttemptException if there was a cheat attempt during the execution of the protocol.
+	 * @throws IOException if the send or receive functions failed.
+	 * @throws ClassNotFoundException if the receive failed.
+	 */
+	public OTROutput transfer(Channel channel, OTRInput input) throws IOException, ClassNotFoundException, CheatAttemptException {
+		//Creates the utility class that executes the transfer phase.
+		OTFullSimOnGroupElementReceiverTransferUtil transferUtil = new OTFullSimOnGroupElementReceiverTransferUtil(dlog, random);
+		return transferUtil.transfer(channel, input, preprocessOutput);
 	}
 }

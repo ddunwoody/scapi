@@ -33,13 +33,14 @@ import edu.biu.scapi.exceptions.CommitValueException;
 import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
+import edu.biu.scapi.generals.ScapiDefaultConfiguration;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSInput;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnByteArrayInput;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnByteArrayMsg;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTSender;
+import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.dh.SigmaDHVerifierComputation;
+import edu.biu.scapi.interactiveMidProtocols.zeroKnowledge.ZKPOKFromSigmaCmtPedersenVerifier;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
-import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
+import edu.biu.scapi.securityLevel.DDH;
 import edu.biu.scapi.securityLevel.Malicious;
 import edu.biu.scapi.securityLevel.StandAlone;
 import edu.biu.scapi.tools.Factories.KdfFactory;
@@ -55,94 +56,125 @@ import edu.biu.scapi.tools.Factories.KdfFactory;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTFullSimDDHOnByteArraySender extends OTFullSimDDHSenderAbs implements Malicious, StandAlone{
+public class OTFullSimDDHOnByteArraySender implements OTSender, Malicious, StandAlone{
 	
+	private DlogGroup dlog;
 	private KeyDerivationFunction kdf; //Used in the calculation.
+	private SecureRandom random;
+	
+	private OTFullSimPreprocessPhaseValues preprocessOutput; //Values calculated by the preprocess phase.
 	
 	/**
-	 * Constructor that gets the channel and chooses default values of DlogGroup and SecureRandom.
-	 * @param channel
+	 * Constructor that gets the channel and chooses default values of DlogGroup, ZKPOK and SecureRandom.
 	 * @throws CheatAttemptException 
 	 * @throws IOException if failed to receive a message during pre process.
 	 * @throws ClassNotFoundException 
 	 * @throws CommitValueException 
 	 */
-	public OTFullSimDDHOnByteArraySender(Channel channel) throws ClassNotFoundException, IOException, CheatAttemptException, CommitValueException {
-		super(channel);
+	public OTFullSimDDHOnByteArraySender(Channel channel) throws ClassNotFoundException, IOException, CheatAttemptException, CommitValueException{
+		KeyDerivationFunction kdf = null;
 		try {
-			this.kdf = KdfFactory.getInstance().getObject("HKDF(HMac(SHA-256))");
-		} catch (FactoriesException e) {
-			// will not occur since the given KDF name is valid.
+			kdf = KdfFactory.getInstance().getObject("HKDF(HMac(SHA-256))");
+		} catch (FactoriesException e1) {
+			// Should not occur since the dlog name in the configuration file is valid.
+		}
+		
+		try {
+			doConstruct(channel, dlog, kdf, new SecureRandom());
+		} catch (SecurityLevelException e1) {
+			// Should not occur since the dlog in the configuration file is as secure as needed.
+		} catch (InvalidDlogGroupException e) {
+			// Should not occur since the dlog in the configuration file is valid.
 		}
 	}
-	
+
 	/**
-	 * Constructor that sets the given channel, dlogGroup, kdf and random.
+	 * Constructor that sets the given channel, dlogGroup and random.
 	 * @param channel
 	 * @param dlog must be DDH secure.
 	 * @param kdf
 	 * @param random
-	 * @throws SecurityLevelException if the given DlogGroup is not DDH secure.
-	 * @throws InvalidDlogGroupException if the given dlog is invalid.
+	 * @throws SecurityLevelException if the given dlog is not DDH secure
+	 * @throws InvalidDlogGroupException 
 	 * @throws CheatAttemptException 
 	 * @throws IOException if failed to receive a message during pre process.
 	 * @throws ClassNotFoundException 
 	 * @throws CommitValueException 
 	 */
 	public OTFullSimDDHOnByteArraySender(Channel channel, DlogGroup dlog, KeyDerivationFunction kdf, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException, ClassNotFoundException, IOException, CheatAttemptException, CommitValueException{
-		super(channel, dlog, random);
-		this.kdf = kdf;
+
+		doConstruct(channel, dlog, kdf, random);
 	}
 
 	/**
-	 * Runs the following lines from the protocol:
-	 * "COMPUTE:
-	 *		COMPUTE c0 = x0 XOR KDF(|x0|,v0)
-	 *		COMPUTE c1 = x1 XOR KDF(|x1|,v1)"
-	 * @param input must be a OTSOnByteArrayInput.
-	 * @param u0
-	 * @param u1
-	 * @param v0
-	 * @param v1
-	 * @return tuple contains (u0, c0, u1, c1) to send to the receiver.
+	 * Sets the given members.
+	 * @param channel
+	 * @param dlog must be DDH secure.
+	 * @param kdf
+	 * @param random
+	 * @throws SecurityLevelException if the given dlog is not DDH secure.
+	 * @throws InvalidDlogGroupException 
+	 * @throws CheatAttemptException 
+	 * @throws IOException if failed to receive a message during pre process.
+	 * @throws ClassNotFoundException 
+	 * @throws CommitValueException 
 	 */
-	protected OTSMsg computeTuple(OTSInput input, GroupElement u0, GroupElement u1, GroupElement v0, GroupElement v1) {
-		//If input is not instance of OTSOnByteArrayInput, throw Exception.
-		if (!(input instanceof OTSOnByteArrayInput)){
-			throw new IllegalArgumentException("x0 and x1 should be binary strings.");
+	private void doConstruct(Channel channel, DlogGroup dlog, KeyDerivationFunction kdf, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException, ClassNotFoundException, IOException, CheatAttemptException, CommitValueException {
+		//The underlying dlog group must be DDH secure.
+		if (!(dlog instanceof DDH)){
+			throw new SecurityLevelException("DlogGroup should have DDH security level");
 		}
-		OTSOnByteArrayInput inputStrings = (OTSOnByteArrayInput)input;
-		
-		//If x0, x1 are not of the same length, throw Exception.
-		if (inputStrings.getX0().length != inputStrings.getX1().length){
-			throw new IllegalArgumentException("x0 and x1 should be of the same length.");
-		}
-		
-		//Get x0, x1.
-		byte[] x0 = inputStrings.getX0();
-		byte[] x1 = inputStrings.getX1();
-				
-		//Calculate c0:
-		byte[] v0Bytes = dlog.mapAnyGroupElementToByteArray(v0);
-		int len = x0.length;
-		byte[] c0 = kdf.deriveKey(v0Bytes, 0, v0Bytes.length, len).getEncoded();
-		
-		//Xores the result from the kdf with x0.
-		for(int i=0; i<len; i++){
-			c0[i] = (byte) (c0[i] ^ x0[i]);
-		}
-		
-		//Calculate c1:
-		byte[] v1Bytes = dlog.mapAnyGroupElementToByteArray(v1);
-		byte[] c1 = kdf.deriveKey(v1Bytes, 0, v1Bytes.length, len).getEncoded();
-		
-		//Xores the result from the kdf with x1.
-		for(int i=0; i<len; i++){
-			c1[i] = (byte) (c1[i] ^ x1[i]);
-		}
-		
-		//Create and return sender message.
-		return new OTSOnByteArrayMsg(u0.generateSendableData(), c0, u1.generateSendableData(), c1);
-	}
+		// Runs the following part of the protocol:
+		//	IF NOT VALID_PARAMS(G,q,g0)
+	    //    REPORT ERROR and HALT.
+		if(!dlog.validateGroup())
+			throw new InvalidDlogGroupException();
 
+		this.dlog = dlog;
+		this.kdf = kdf;
+		this.random = random;
+		
+		//read the default statistical parameter used in sigma protocols from a configuration file.
+		String statisticalParameter = ScapiDefaultConfiguration.getInstance().getProperty("StatisticalParameter");
+		int t = Integer.parseInt(statisticalParameter);
+		
+		//Create the underlying ZKPOK
+		ZKPOKFromSigmaCmtPedersenVerifier zkVerifier = new ZKPOKFromSigmaCmtPedersenVerifier(channel, new SigmaDHVerifierComputation(dlog, t, random), random);
+		
+		
+		// Some OT protocols have a pre-process stage before the transfer. 
+		// Usually, pre process is done once at the beginning of the protocol and will not be executed later, 
+		// and then the transfer function could be called multiple times.
+		// We implement the preprocess stage at construction time. 
+		// A protocol that needs to call preprocess after the construction time, should create a new instance.
+		//Call the utility function that executes the preprocess phase.
+		preprocessOutput = OTFullSimSenderPreprocessUtil.preProcess(channel, dlog, zkVerifier);
+	}
+	
+	/**
+	 * Runs the part of the protocol where the sender's input is necessary as follows:<p>
+	 *		Transfer Phase (with inputs x0,x1)
+	 *		WAIT for message from R
+	 *		DENOTE the values received by (g,h) 
+	 *		COMPUTE (u0,v0) = RAND(g0,g,h0,h)
+	 *		COMPUTE (u1,v1) = RAND(g1,g,h1,h)
+	 *		COMPUTE c0 = x0 XOR KDF(|x0|,v0)
+	 *		COMPUTE c1 = x1 XOR KDF(|x1|,v1)
+	 *		SEND (u0,c0) and (u1,c1) to R
+	 *		OUTPUT nothing<p>
+	 * The transfer stage of OT protocol which can be called several times in parallel.
+	 * In order to enable the parallel calls, each transfer call should use a different channel to send and receive messages.
+	 * This way the parallel executions of the function will not block each other.
+	 * The parameters given in the input must match the DlogGroup member of this class, which given in the constructor.
+	 * @param channel
+	 * @param input 
+	 * @throws IOException if failed to send the message.
+	 * @throws ClassNotFoundException 
+	 */
+	public void transfer(Channel channel, OTSInput input) throws IOException, ClassNotFoundException{
+		//Creates the utility class that executes the transfer phase.
+		OTFullSimOnByteArraySenderTransferUtil transferUtil = new OTFullSimOnByteArraySenderTransferUtil(dlog, kdf, random);
+		transferUtil.transfer(channel, input, preprocessOutput);
+		
+	}
 }
