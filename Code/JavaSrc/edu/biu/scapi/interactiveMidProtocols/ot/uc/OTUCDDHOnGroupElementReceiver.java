@@ -24,17 +24,20 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.ot.uc;
 
-import java.math.BigInteger;
+import java.io.IOException;
 import java.security.SecureRandom;
 
+import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTROnGroupElementOutput;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTRInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTROutput;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnGroupElementMsg;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTReceiver;
+import edu.biu.scapi.interactiveMidProtocols.ot.fullSimulation.OTFullSimOnGroupElementReceiverTransferUtil;
+import edu.biu.scapi.interactiveMidProtocols.ot.fullSimulation.OTFullSimPreprocessPhaseValues;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
+import edu.biu.scapi.securityLevel.DDH;
 import edu.biu.scapi.securityLevel.Malicious;
 import edu.biu.scapi.securityLevel.UC;
 
@@ -48,7 +51,11 @@ import edu.biu.scapi.securityLevel.UC;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTUCDDHOnGroupElementReceiver extends OTUCDDHReceiverAbs implements Malicious, UC{
+public class OTUCDDHOnGroupElementReceiver implements OTReceiver, Malicious, UC{
+	
+	private DlogGroup dlog;
+	private SecureRandom random;
+	private GroupElement g0, g1, h0, h1; //Common reference string
 	
 	/**
 	 * Constructor that sets the given common reference string composed of a DLOG 
@@ -64,86 +71,45 @@ public class OTUCDDHOnGroupElementReceiver extends OTUCDDHReceiverAbs implements
 	 */
 	public OTUCDDHOnGroupElementReceiver(DlogGroup dlog, GroupElement g0, GroupElement g1, 
 			GroupElement h0, GroupElement h1, SecureRandom random) throws SecurityLevelException{
-		super(dlog, g0, g1, h0, h1, random);
+		//The underlying dlog group must be DDH secure.
+		if (!(dlog instanceof DDH)){
+			throw new SecurityLevelException("DlogGroup should have DDH security level");
+		}
 		
+		this.dlog = dlog;
+		this.random = random;
+		this.g0 = g0;
+		this.g1 = g1;
+		this.h0 = h0;
+		this.h1 = h1;
+		
+		// This protocol has no pre process stage.	
 	}
 
 	/**
-	 * Run the following line from the protocol:
-	 * "IF  NOT 
-	 *		1. u0, u1, c0, c1 in the DlogGroup
-	 *	REPORT ERROR"
-	 * @param c12 
-	 * @param c02 
-	 * @param u1 
-	 * @param u0 
-	 * @throws CheatAttemptException if there was a cheat attempt during the execution of the protocol.
-	 */
-	private void checkReceivedTuple(GroupElement u0, GroupElement u1, GroupElement c0, GroupElement c1) throws CheatAttemptException{
-		
-		if (!(dlog.isMember(u0))){
-			throw new CheatAttemptException("u0 element is not a member in the current DlogGroup");
-		}
-		if (!(dlog.isMember(u1))){
-			throw new CheatAttemptException("u1 element is not a member in the current DlogGroup");
-		}
-		if (!(dlog.isMember(c0))){
-			throw new CheatAttemptException("c0 element is not a member in the current DlogGroup");
-		}
-		if (!(dlog.isMember(c1))){
-			throw new CheatAttemptException("c1 element is not a member in the current DlogGroup");
-		}
-		
-	}
-
-	/**
-	 * Run the following lines from the protocol:
-	 * "IF  NOT
-	 *		•	u0, u1, c0, c1 in G
-	 *				 REPORT ERROR
-	 * OUTPUT  xSigma = cSigma * (uSigma)^(-r)".
-	 * @param sigma input for the protocol
-	 * @param r random value sampled by the protocol
-	 * @param message received from the sender. MUST be an instance of OTSOnGroupElementMessage.
-	 * @return OTROutput contains xSigma
+	 * Runs the part of the protocol where the receiver input is necessary as follows:
+	 * "SAMPLE a random value r <- {0, . . . , q-1}
+	 *  COMPUTE g = (gSigma)^r and h = (hSigma)^r
+	 *  SEND (g,h) to S
+	 *  WAIT for messages (u0,c0) and (u1,c1) from S
+	 *	IF  NOT
+	 *	•	u0, u1, c0, c1 in G
+	 *		REPORT ERROR
+	 *	OUTPUT  xSigma = cSigma * (uSigma)^(-r)".
+	 * The transfer stage of OT protocol which can be called several times in parallel.
+	 * In order to enable the parallel calls, each transfer call should use a different channel to send and receive messages.
+	 * This way the parallel executions of the function will not block each other.
+	 * The parameters given in the input must match the DlogGroup member of this class, which given in the constructor.
+	 * @param channel
+	 * @param input MUST be OTRBasicInput.
+	 * @return OTROutput, the output of the protocol.
+	 * @throws IOException if failed to send or receive a message.
+	 * @throws ClassNotFoundException
 	 * @throws CheatAttemptException 
 	 */
-	protected OTROutput checkMessgeAndComputeX(byte sigma, BigInteger r, OTSMsg message) throws CheatAttemptException {
-		//If message is not instance of OTSOnGroupElementPrivacyMessage, throw Exception.
-		if(!(message instanceof OTSOnGroupElementMsg)){
-			throw new IllegalArgumentException("message should be instance of OTSOnGroupElementPrivacyOnlyMessage");
-		}
-		
-		OTSOnGroupElementMsg msg = (OTSOnGroupElementMsg)message;
-		
-		//Reconstruct the group elements from the given message.
-		GroupElement u0 = dlog.reconstructElement(true, msg.getW0());
-		GroupElement u1 = dlog.reconstructElement(true, msg.getW1());
-		GroupElement c0 = dlog.reconstructElement(true, msg.getC0());
-		GroupElement c1 = dlog.reconstructElement(true, msg.getC1());
-			
-		//Compute the validity checks of the given message.
-		checkReceivedTuple(u0, u1, c0, c1);		
-				
-		GroupElement xSigma = null;
-		GroupElement cSigma = null;
-		BigInteger minusR = dlog.getOrder().subtract(r);
-		
-		//If sigma = 0, compute (uSigma)^(-r) and set cSigma to c0.
-		if (sigma == 0){
-			xSigma = dlog.exponentiate(u0, minusR);
-			cSigma = c0;
-		} 
-		
-		//If sigma = 0, compute w1^beta and set cSigma to c1.
-		if (sigma == 1) {
-			xSigma = dlog.exponentiate(u1, minusR);
-			cSigma = c1;
-		}
-		
-		xSigma = dlog.multiplyGroupElements(cSigma, xSigma);
-		
-		//Create and return the output containing xSigma
-		return new OTROnGroupElementOutput(xSigma);
+	public OTROutput transfer(Channel channel, OTRInput input) throws IOException, ClassNotFoundException, CheatAttemptException{
+		//Creates the utility class that executes the transfer phase.
+		OTFullSimOnGroupElementReceiverTransferUtil transferUtil = new OTFullSimOnGroupElementReceiverTransferUtil(dlog, random);
+		return transferUtil.transfer(channel, input, new OTFullSimPreprocessPhaseValues(g0, g1, h0, h1));
 	}
 }
