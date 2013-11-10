@@ -29,7 +29,7 @@ import java.security.SecureRandom;
 
 import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTROnByteArrayOutput;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTOnByteArrayROutput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTROutput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
@@ -115,7 +115,7 @@ public class OTSemiHonestDDHOnByteArrayReceiver extends OTSemiHonestDDHReceiverA
 		}
 		
 		//Create and return the output containing xSigma
-		return new OTROnByteArrayOutput(xSigma);
+		return new OTOnByteArrayROutput(xSigma);
 	}
 	
 	

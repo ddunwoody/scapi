@@ -28,7 +28,7 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 
 import edu.biu.scapi.exceptions.SecurityLevelException;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTROnGroupElementOutput;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTOnGroupElementROutput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTROutput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
@@ -99,7 +99,7 @@ public class OTSemiHonestDDHOnGroupElementReceiver extends OTSemiHonestDDHReceiv
 		GroupElement xSigma = dlog.multiplyGroupElements(vSigma, kSigma);
 		
 		//Create and return the output containing xSigma
-		return new OTROnGroupElementOutput(xSigma);
+		return new OTOnGroupElementROutput(xSigma);
 	
 	}
 }

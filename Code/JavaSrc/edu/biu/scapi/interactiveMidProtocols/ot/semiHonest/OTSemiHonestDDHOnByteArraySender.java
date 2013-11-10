@@ -30,7 +30,7 @@ import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnByteArrayInput;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTOnByteArraySInput;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
@@ -85,12 +85,12 @@ public class OTSemiHonestDDHOnByteArraySender extends OTSemiHonestDDHSenderAbs i
 	 */
 	protected OTSMsg computeTuple(OTSInput input, GroupElement u, GroupElement k0, GroupElement k1) {
 		//If input is not instance of OTSOnByteArrayInput, throw Exception.
-		if (!(input instanceof OTSOnByteArrayInput)){
+		if (!(input instanceof OTOnByteArraySInput)){
 			throw new IllegalArgumentException("x0 and x1 should be binary strings.");
 		}
 		
-		byte[] x0 = ((OTSOnByteArrayInput) input).getX0();
-		byte[] x1 = ((OTSOnByteArrayInput) input).getX1();
+		byte[] x0 = ((OTOnByteArraySInput) input).getX0();
+		byte[] x1 = ((OTOnByteArraySInput) input).getX1();
 		
 		//If x0, x1 are not of the same length, throw Exception.
 		if (x0.length != x1.length){

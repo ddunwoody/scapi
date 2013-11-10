@@ -29,7 +29,7 @@ import java.security.SecureRandom;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnGroupElementInput;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTOnGroupElementSInput;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.securityLevel.SemiHonest;
@@ -74,13 +74,13 @@ public class OTSemiHonestDDHOnGroupElementSender extends OTSemiHonestDDHSenderAb
 	 */
 	protected OTSMsg computeTuple(OTSInput input, GroupElement u, GroupElement k0, GroupElement k1) {
 		//If input is not instance of OTSOnGroupElementInput, throw Exception.
-		if (!(input instanceof OTSOnGroupElementInput)){
+		if (!(input instanceof OTOnGroupElementSInput)){
 			throw new IllegalArgumentException("x0 and x1 should be DlogGroup elements.");
 		}
 				
 		//Set x0, x1.
-		GroupElement x0 = ((OTSOnGroupElementInput) input).getX0();
-		GroupElement x1 = ((OTSOnGroupElementInput) input).getX1();
+		GroupElement x0 = ((OTOnGroupElementSInput) input).getX0();
+		GroupElement x1 = ((OTOnGroupElementSInput) input).getX1();
 				
 		//Calculate v0:
 		GroupElement v0 = dlog.multiplyGroupElements(x0, k0);
