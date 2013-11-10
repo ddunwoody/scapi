@@ -31,11 +31,11 @@ package edu.biu.scapi.interactiveMidProtocols.ot;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTROnByteArrayOutput implements OTROutput {
+public class OTOnByteArrayROutput implements OTROutput {
 
 	private byte[] xSigma;
 	
-	public OTROnByteArrayOutput(byte[] xSigma){
+	public OTOnByteArrayROutput(byte[] xSigma){
 		this.xSigma = xSigma;
 	}
 	

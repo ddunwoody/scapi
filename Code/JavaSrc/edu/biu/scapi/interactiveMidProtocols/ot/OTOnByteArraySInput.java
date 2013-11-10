@@ -31,12 +31,12 @@ package edu.biu.scapi.interactiveMidProtocols.ot;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTSOnByteArrayInput implements OTSInput{
+public class OTOnByteArraySInput implements OTSInput{
 
 	private byte[] x0;
 	private byte[] x1;
 	
-	public OTSOnByteArrayInput(byte[] x0, byte[] x1){
+	public OTOnByteArraySInput(byte[] x0, byte[] x1){
 		this.x0 = x0;
 		this.x1 = x1;
 	}

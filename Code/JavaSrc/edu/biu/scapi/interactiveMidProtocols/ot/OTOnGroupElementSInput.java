@@ -33,11 +33,11 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTSOnGroupElementInput implements OTSInput{
+public class OTOnGroupElementSInput implements OTSInput{
 	private GroupElement x0;
 	private GroupElement x1;
 	
-	public OTSOnGroupElementInput(GroupElement x0, GroupElement x1){
+	public OTOnGroupElementSInput(GroupElement x0, GroupElement x1){
 		this.x0 = x0;
 		this.x1 = x1;
 	}
