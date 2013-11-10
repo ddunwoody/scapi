@@ -31,10 +31,10 @@ import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTROnByteArrayOutput;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTOnByteArrayROutput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTROutput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnByteArrayMsg;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTOnByteArraySMsg;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
@@ -121,11 +121,11 @@ public class OTPrivacyOnlyDDHOnByteArrayReceiver extends OTPrivacyOnlyDDHReceive
 	 */
 	protected OTROutput checkMessgeAndComputeX(byte sigma, BigInteger beta, OTSMsg message) throws CheatAttemptException {
 		//If message is not instance of OTSOnByteArrayMessage, throw Exception.
-		if(!(message instanceof OTSOnByteArrayMsg)){
+		if(!(message instanceof OTOnByteArraySMsg)){
 			throw new IllegalArgumentException("message should be instance of OTSOnByteArrayMessage");
 		}
 		
-		OTSOnByteArrayMsg msg = (OTSOnByteArrayMsg)message;
+		OTOnByteArraySMsg msg = (OTOnByteArraySMsg)message;
 		
 		//Reconstruct the group elements from the given message.
 		GroupElement w0 = dlog.reconstructElement(true, msg.getW0());
@@ -164,7 +164,7 @@ public class OTPrivacyOnlyDDHOnByteArrayReceiver extends OTPrivacyOnlyDDHReceive
 		}
 		
 		//Create and return the output containing xSigma
-		return new OTROnByteArrayOutput(xSigma);
+		return new OTOnByteArrayROutput(xSigma);
 	}
 
 }
