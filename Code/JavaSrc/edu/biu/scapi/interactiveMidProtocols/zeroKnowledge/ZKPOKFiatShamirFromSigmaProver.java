@@ -108,16 +108,25 @@ public class ZKPOKFiatShamirFromSigmaProver implements ZKPOKProver{
 	 * @throws IOException 
 	 */
 	public ZKPOKFiatShamirProof generateFiatShamirProof(ZKProverInput input) throws CheatAttemptException, IOException{
-		//The given input must be an instance of ZKPOKFiatShamirProverInput that holds input for the underlying sigma protocol and possible context information cont.
-		if (!(input instanceof ZKPOKFiatShamirProverInput)){
-			throw new IllegalArgumentException("the given input must be an instance of ZKPOKFiatShamirProverInput");
+		//The given input must be an instance of ZKPOKFiatShamirProverInput that holds input for the underlying sigma protocol 
+		//and possible context information cont, or just the input for the underlying sigma protocol
+		if (!(input instanceof ZKPOKFiatShamirProverInput) && !(input instanceof SigmaProverInput)){
+			throw new IllegalArgumentException("the given input must be an instance of ZKPOKFiatShamirProverInput or SigmaProverInput");
+		}
+		
+		ZKPOKFiatShamirProverInput fsInput;
+		//In case the input is the input for the underlying sigma protocol, create input for this protocol with no context information.
+		if (input instanceof SigmaProverInput){
+			fsInput = new ZKPOKFiatShamirProverInput((SigmaProverInput) input);
+		} else{
+			fsInput = (ZKPOKFiatShamirProverInput) input;
 		}
 		
 		//Compute the first message a in sigma, using (x,w) as input and 
-		SigmaProtocolMsg a = sProver.computeFirstMsg(((ZKPOKFiatShamirProverInput) input).getSigmaInput());
+		SigmaProtocolMsg a = sProver.computeFirstMsg(fsInput.getSigmaInput());
 		
 		//Compute e=H(x,a,cont)
-		byte[] e = computeChallenge((ZKPOKFiatShamirProverInput) input, a);
+		byte[] e = computeChallenge(fsInput, a);
 		
 		//Compute the response z to (a,e) according to sigma
 		SigmaProtocolMsg z = sProver.computeSecondMsg(e);

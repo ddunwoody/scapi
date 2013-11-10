@@ -111,16 +111,25 @@ public class ZKPOKFiatShamirFromSigmaVerifier implements ZKPOKVerifier{
 	 * @throws IllegalArgumentException if the given input is not an instance of ZKPOKFiatShamirInput.
 	 */
 	public boolean verifyFiatShamirProof(ZKCommonInput input, ZKPOKFiatShamirProof msg) throws IOException{
-		//The given input must be an instance of ZKPOKFiatShamirInput that holds input for the underlying sigma protocol and possible context information cont.
-		if (!(input instanceof ZKPOKFiatShamirCommonInput)){
-			throw new IllegalArgumentException("the given input must be an instance of ZKPOKFiatShamirInput");
+		//The given input can be an instance of ZKPOKFiatShamirInput that holds input for the underlying sigma protocol and 
+		//possible context information cont, or just the input for the underlying sigma protocol.
+		if (!(input instanceof ZKPOKFiatShamirCommonInput) && !(input instanceof SigmaCommonInput)){
+			throw new IllegalArgumentException("the given input must be an instance of ZKPOKFiatShamirInput or SigmaCommonInput");
+		}
+		
+		ZKPOKFiatShamirCommonInput fsInput;
+		//In case the input is the input for the underlying sigma protocol, create input for this protocol with no context information.
+		if (input instanceof SigmaCommonInput){
+			fsInput = new ZKPOKFiatShamirCommonInput((SigmaCommonInput) input);
+		} else{
+			fsInput = (ZKPOKFiatShamirCommonInput) input;
 		}
 		
 		//get the given a
 		SigmaProtocolMsg a = msg.getA();
 		
 		//Compute e=H(x,a,cont)
-		byte[] computedE = computeChallenge((ZKPOKFiatShamirCommonInput) input, a);
+		byte[] computedE = computeChallenge(fsInput, a);
 		
 		//get the given challenge.
 		byte[] receivedE = msg.getE();
@@ -144,7 +153,7 @@ public class ZKPOKFiatShamirFromSigmaVerifier implements ZKPOKVerifier{
 		
 		//If transcript (a, e, z) is accepting in sigma on input x, output ACC
 		//Else outupt REJ
-		valid = valid && proccessVerify(((ZKPOKFiatShamirCommonInput) input).getSigmaInput(), a, computedE, z);
+		valid = valid && proccessVerify(fsInput.getSigmaInput(), a, computedE, z);
 		
 		return valid;
 	}
