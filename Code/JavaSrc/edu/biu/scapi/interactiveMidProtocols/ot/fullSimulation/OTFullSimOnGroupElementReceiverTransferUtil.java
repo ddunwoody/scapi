@@ -35,6 +35,11 @@ import edu.biu.scapi.interactiveMidProtocols.ot.OTOnGroupElementSMsg;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
+/**
+ * This class executes the computations in the transfer function that related to the GroupElement inputs.
+ * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
+ *
+ */
 public class OTFullSimOnGroupElementReceiverTransferUtil extends OTFullSimReceiverTransferUtilAbs{
 
 	public OTFullSimOnGroupElementReceiverTransferUtil(DlogGroup dlog, SecureRandom random) {

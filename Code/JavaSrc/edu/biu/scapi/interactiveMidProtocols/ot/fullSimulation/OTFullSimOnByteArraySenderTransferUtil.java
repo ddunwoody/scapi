@@ -34,6 +34,11 @@ import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
 
+/**
+ * This class executes the computations in the transfer function that related to the byte[] inputs.
+ * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
+ *
+ */
 public class OTFullSimOnByteArraySenderTransferUtil extends OTFullSimSenderTransferUtilAbs{
 
 	private KeyDerivationFunction kdf; 

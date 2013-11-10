@@ -41,6 +41,11 @@ import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
+/**
+ * This class execute the common functionality of the transfer function of all OT's that achieve full simulation. 
+ * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
+ *
+ */
 public abstract class OTFullSimReceiverTransferUtilAbs {
 	
 	protected DlogGroup dlog;

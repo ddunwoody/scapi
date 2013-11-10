@@ -35,6 +35,11 @@ import edu.biu.scapi.interactiveMidProtocols.zeroKnowledge.ZKPOKVerifier;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
+/**
+ * This class execute  the preprocess phase of OT's that achieve full simulation. 
+ * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
+ *
+ */
 public class OTFullSimSenderPreprocessUtil {
 
 	/**
