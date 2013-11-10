@@ -32,8 +32,8 @@ import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnGroupElementInput;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnGroupElementMsg;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTOnGroupElementSInput;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTOnGroupElementSMsg;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.securityLevel.OneSidedSimulation;
@@ -85,10 +85,10 @@ public class OTOneSidedSimDDHOnGroupElementSender extends OTOneSidedSimDDHSender
 	 */
 	protected OTSMsg computeTuple(OTSInput input, GroupElement w0, GroupElement w1, GroupElement k0, GroupElement k1) {
 		//If input is not instance of OTSOnGroupElementInput, throw Exception.
-		if (!(input instanceof OTSOnGroupElementInput)){
+		if (!(input instanceof OTOnGroupElementSInput)){
 			throw new IllegalArgumentException("x0 and x1 should be DlogGroup elements.");
 		}
-		OTSOnGroupElementInput inputElements = (OTSOnGroupElementInput)input;
+		OTOnGroupElementSInput inputElements = (OTOnGroupElementSInput)input;
 		
 		//Set x0, x1.
 		GroupElement x0 = inputElements.getX0();
@@ -101,7 +101,7 @@ public class OTOneSidedSimDDHOnGroupElementSender extends OTOneSidedSimDDHSender
 		GroupElement c1 = dlog.multiplyGroupElements(x1, k1);
 		
 		//Create and return sender message.
-		return new OTSOnGroupElementMsg(w0.generateSendableData(), 
+		return new OTOnGroupElementSMsg(w0.generateSendableData(), 
 				c0.generateSendableData(), w1.generateSendableData(), c1.generateSendableData());
 	}
 }

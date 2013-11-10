@@ -30,10 +30,10 @@ import java.security.SecureRandom;
 import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTROnGroupElementOutput;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTOnGroupElementROutput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTROutput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
-import edu.biu.scapi.interactiveMidProtocols.ot.OTSOnGroupElementMsg;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTOnGroupElementSMsg;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.securityLevel.OneSidedSimulation;
@@ -112,11 +112,11 @@ public class OTOneSidedSimDDHOnGroupElementReceiver extends OTOneSidedSimDDHRece
 	 */
 	protected OTROutput checkMessgeAndComputeX(byte sigma, BigInteger beta, OTSMsg message) throws CheatAttemptException {
 		//If message is not instance of OTSOnGroupElementPrivacyMessage, throw Exception.
-		if(!(message instanceof OTSOnGroupElementMsg)){
+		if(!(message instanceof OTOnGroupElementSMsg)){
 			throw new IllegalArgumentException("message should be instance of OTSOnGroupElementPrivacyOnlyMessage");
 		}
 		
-		OTSOnGroupElementMsg msg = (OTSOnGroupElementMsg)message;
+		OTOnGroupElementSMsg msg = (OTOnGroupElementSMsg)message;
 		
 		//Reconstruct the group elements from the given message.
 		GroupElement w0 = dlog.reconstructElement(true, msg.getW0());
@@ -146,7 +146,7 @@ public class OTOneSidedSimDDHOnGroupElementReceiver extends OTOneSidedSimDDHRece
 		GroupElement xSigma = dlog.multiplyGroupElements(cSigma, kSigma);
 		
 		//Create and return the output containing xSigma
-		return new OTROnGroupElementOutput(xSigma);
+		return new OTOnGroupElementROutput(xSigma);
 	}
 
 }
