@@ -148,11 +148,9 @@ public abstract class DlogGroupEC extends DlogGroupAbs implements DlogEllipticCu
 		return getInfinity();
 	}
 		
-	/* (non-Javadoc)
-	 * @see edu.biu.scapi.primitives.dlog.DlogGroup#generateElement(boolean, edu.biu.scapi.primitives.dlog.GroupElementSendableData)
-	 * @deprecated
+	/**
+	 * @deprecated As of SCAPI-V2_0_0 use generateElment(boolean bCheckMembership, BigInteger...values)
 	 */
-	@Override
 	@Deprecated public GroupElement generateElement(boolean bCheckMembership, GroupElementSendableData data) {
 		if (!(data instanceof ECElementSendableData))
 			throw new IllegalArgumentException("data type doesn't match the group type");

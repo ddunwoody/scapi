@@ -35,7 +35,7 @@ import java.math.BigInteger;
  */
 public interface DlogZp extends DlogGroup{
 	/**
-	 * Deprecated. Use generateElment(boolean bCheckMembership, BigInteger...values)
+	 * @deprecated As of SCAPI-V2_0_0 use generateElment(boolean bCheckMembership, BigInteger...values)
 	 */
 	@Deprecated public ZpElement generateElement (Boolean bCheckMembership, BigInteger x);
 }

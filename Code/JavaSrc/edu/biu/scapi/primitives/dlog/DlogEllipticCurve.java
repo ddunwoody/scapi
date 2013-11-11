@@ -38,7 +38,7 @@ public interface DlogEllipticCurve extends DlogGroup {
 
 	
 	/**
-	 * Deprecated. Use generateElment(boolean bCheckMembership, BigInteger...values)
+	 * @deprecated As of SCAPI-V2_0_0 use generateElment(boolean bCheckMembership, BigInteger...values)
 	 */
 	@Deprecated public ECElement generateElement(BigInteger x, BigInteger y) throws IllegalArgumentException;
 	

@@ -321,9 +321,8 @@ public class CryptoPpDlogZpSafePrime extends DlogGroupAbs implements DlogZpSafeP
 	}
 
 	/**
-	 * @deprecated
+	 * @deprecated As of SCAPI-V2_0_0 use generateElment(boolean bCheckMembership, BigInteger...values)
 	 */
-	
 	@Deprecated public ZpElement generateElement(Boolean bCheckMembership, BigInteger x) {
 
 		return new ZpSafePrimeElementCryptoPp(x, ((ZpGroupParams) groupParams).getP(), bCheckMembership);

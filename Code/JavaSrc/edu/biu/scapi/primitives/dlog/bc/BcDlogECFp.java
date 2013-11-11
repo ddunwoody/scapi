@@ -28,12 +28,10 @@ package edu.biu.scapi.primitives.dlog.bc;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.SecureRandom;
 import java.util.Properties;
 
 import org.bouncycastle.math.ec.ECCurve;
 import org.bouncycastle.math.ec.ECPoint;
-import org.bouncycastle.util.encoders.Hex;
 
 import edu.biu.scapi.primitives.dlog.DlogECFp;
 import edu.biu.scapi.primitives.dlog.ECElement;
@@ -41,7 +39,6 @@ import edu.biu.scapi.primitives.dlog.ECFpUtility;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.dlog.groupParams.ECFpGroupParams;
 import edu.biu.scapi.primitives.dlog.groupParams.GroupParams;
-import edu.biu.scapi.primitives.dlog.miracl.ECFpPointMiracl;
 import edu.biu.scapi.securityLevel.DDH;
 
 
@@ -150,7 +147,7 @@ public class BcDlogECFp extends BcAdapterDlogEC implements DlogECFp, DDH {
 	}
 	
 	/**
-	 * @deprecated
+	 * @deprecated As of SCAPI-V2_0_0 use generateElment(boolean bCheckMembership, BigInteger...values)
 	 */
 	@Deprecated public ECElement generateElement(BigInteger x, BigInteger y) throws IllegalArgumentException{
 		//Creates element with the given values.

@@ -28,7 +28,6 @@ package edu.biu.scapi.primitives.dlog.bc;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.SecureRandom;
 import java.util.Properties;
 
 import org.bouncycastle.math.ec.ECCurve;
@@ -157,7 +156,7 @@ public class BcDlogECF2m extends BcAdapterDlogEC implements DlogECF2m, DDH{
 	}
 	
 	/**
-	 * @deprecated 
+	 * @deprecated As of SCAPI-V2_0_0 use generateElment(boolean bCheckMembership, BigInteger...values)
 	 */
 	@Deprecated public ECElement generateElement(BigInteger x, BigInteger y) throws IllegalArgumentException{
 		//Creates element with the given values.

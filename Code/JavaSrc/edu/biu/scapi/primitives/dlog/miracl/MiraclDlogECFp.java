@@ -245,7 +245,7 @@ public class MiraclDlogECFp extends MiraclAdapterDlogEC implements DlogECFp, DDH
 
 	
 	/**
-	 *@deprecated
+	 * @deprecated As of SCAPI-V2_0_0 use generateElment(boolean bCheckMembership, BigInteger...values)
 	 */
 	@Deprecated public ECElement generateElement(BigInteger x, BigInteger y) throws IllegalArgumentException{
 		//Creates element with the given values.
