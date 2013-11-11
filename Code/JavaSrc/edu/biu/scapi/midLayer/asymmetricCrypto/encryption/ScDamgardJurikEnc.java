@@ -543,8 +543,9 @@ public class ScDamgardJurikEnc implements DamgardJurikEnc {
 		return d;
 	}
 
-	/* (non-Javadoc)
+	/** 
 	 * @see edu.biu.scapi.midLayer.asymmetricCrypto.encryption.AsymmetricEnc#generateCiphertext(edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertextSendableData)
+	 @deprecated As of SCAPI-V1-0-2-2 use reconstructCiphertext(AsymmetricCiphertextSendableData data)
 	 */
 	@Override
 	@Deprecated public AsymmetricCiphertext generateCiphertext(AsymmetricCiphertextSendableData data) {
