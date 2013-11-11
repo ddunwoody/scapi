@@ -40,7 +40,7 @@ import edu.biu.scapi.securityLevel.PerfectlyBindingCmt;
 import edu.biu.scapi.securityLevel.PerfectlyHidingCmt;
 
 /**
- * This class plays as party one of coin tossing protocol which tosses a string.
+ * This class plays as party one of coin tossing protocol which tosses a string.<p>
  * This protocol is fully secure (with simulation) when P1 is corrupted and fulfills a 
  * definition of “pseudorandomness” when P2 is corrupted. <p>
  * 
@@ -63,6 +63,7 @@ public class CTSemiSimulatablePartyOne implements CTPartyOne, OneSidedSimulation
 	 * @param committer MUST be a PerfectlyHiding secure.
 	 * @param receiver MUST be a PerfectlyBinding secure.
 	 * @param l determining the length of the output
+	 * @param random
 	 */
 	public CTSemiSimulatablePartyOne(CmtCommitter committer, CmtReceiver receiver, int l, SecureRandom random){
 		if (!(committer instanceof PerfectlyHidingCmt)){
@@ -84,17 +85,13 @@ public class CTSemiSimulatablePartyOne implements CTPartyOne, OneSidedSimulation
 	}
 
 	/**
-	 * Runs the following protocol:
-	 * "SAMPLE a random L-bit string s1 <- {0,1}^L
-	 *	RUN the committer in subprotocol COMMIT_PERFECT_HIDING.commit on s1 
-	 *	RUN the receiver in subprotocol COMMIT_PERFECT_BINDING.commit
-	 *	RUN the committer in subprotocol COMMIT_PERFECT_HIDING.decommit to reveal s1
-	 *	RUN the receiver in subprotocol COMMIT_PERFECT_BINDING.decommit to receive s2
+	 * Runs the following protocol:<p>
+	 * "SAMPLE a random L-bit string s1 <- {0,1}^L<p>
+	 *	RUN the committer in subprotocol COMMIT_PERFECT_HIDING.commit on s1 <p>
+	 *	RUN the receiver in subprotocol COMMIT_PERFECT_BINDING.commit<p>
+	 *	RUN the committer in subprotocol COMMIT_PERFECT_HIDING.decommit to reveal s1<p>
+	 *	RUN the receiver in subprotocol COMMIT_PERFECT_BINDING.decommit to receive s2<p>
 	 *	OUTPUT s1 XOR s2"
-	 * @throws IOException 
-	 * @throws ClassNotFoundException 
-	 * @throws CommitValueException 
-	 * @throws CheatAttemptException 
 	 *
 	 */
 	public CTOutput toss() throws ClassNotFoundException, IOException, CommitValueException, CheatAttemptException {

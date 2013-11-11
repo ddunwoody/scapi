@@ -40,7 +40,7 @@ import edu.biu.scapi.securityLevel.PerfectlyBindingCmt;
 import edu.biu.scapi.securityLevel.PerfectlyHidingCmt;
 
 /**
- * This class plays as party two of coin tossing protocol which tosses a string.
+ * This class plays as party two of coin tossing protocol which tosses a string.<p>
  * This protocol is fully secure (with simulation) when P1 is corrupted and fulfills a 
  * definition of “pseudorandomness” when P2 is corrupted. <p>
  * 
@@ -60,9 +60,10 @@ public class CTSemiSimulatablePartyTwo implements CTPartyTwo, OneSidedSimulation
 	
 	/**
 	 * Constructor that sets the given committer and receiver.
-	 * @param committer 
-	 * @param receiver
+	 * @param committer MUST be a PerfectlyBinding secure.
+	 * @param receiver MUST be a PerfectlyHiding secure.
 	 * @param l determining the length of the output
+	 * @param random
 	 */
 	public CTSemiSimulatablePartyTwo(CmtReceiver receiver, CmtCommitter committer, int l, SecureRandom random){
 		if (!(receiver instanceof PerfectlyHidingCmt)){
@@ -85,18 +86,13 @@ public class CTSemiSimulatablePartyTwo implements CTPartyTwo, OneSidedSimulation
 	}
 
 	/**
-	 * Runs the following protocol:
-	 * "SAMPLE a random L-bit string s2 <- {0,1}^L
-	 *	RUN the receiver in subprotocol COMMIT_PERFECT_HIDING.commit 
-	 *	RUN the committer in subprotocol COMMIT_PERFECT_BINDING.commit on s2
-	 *	RUN the receiver in subprotocol COMMIT_PERFECT_HIDING.decommit to receive s1
-	 *	RUN the committer in subprotocol COMMIT_PERFECT_BINDING.decommit to reveal s2
+	 * Runs the following protocol:<p>
+	 * "SAMPLE a random L-bit string s2 <- {0,1}^L<p>
+	 *	RUN the receiver in subprotocol COMMIT_PERFECT_HIDING.commit <p>
+	 *	RUN the committer in subprotocol COMMIT_PERFECT_BINDING.commit on s2<p>
+	 *	RUN the receiver in subprotocol COMMIT_PERFECT_HIDING.decommit to receive s1<p>
+	 *	RUN the committer in subprotocol COMMIT_PERFECT_BINDING.decommit to reveal s2<p>
 	 *	OUTPUT s1 XOR s2"
-	 * @throws IOException 
-	 * @throws ClassNotFoundException 
-	 * @throws CommitValueException 
-	 * @throws CheatAttemptException 
-	 *
 	 */
 	public CTOutput toss() throws ClassNotFoundException, IOException, CommitValueException, CheatAttemptException {
 		//Sample a random L-bit string s2 <- {0,1}^L.

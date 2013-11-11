@@ -33,10 +33,18 @@ public class CTStringOutput implements CTOutput{
 
 	private byte[] outputedString;
 	
+	/**
+	 * Constructor that sets the given output String.
+	 * @param output
+	 */
 	public CTStringOutput(byte[] result){
 		outputedString = result;
 	}
 	
+	/**
+	 * Returns the tossed String.
+	 * @return the output String
+	 */
 	public byte[] getOutput(){
 		return outputedString;
 	}

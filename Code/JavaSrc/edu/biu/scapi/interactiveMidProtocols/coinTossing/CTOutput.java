@@ -32,5 +32,14 @@ package edu.biu.scapi.interactiveMidProtocols.coinTossing;
  *
  */
 public interface CTOutput {
+	
+	/**
+	 * Returns the output of the coin tossing protocol.<p>
+	 * 
+	 * The tossed value of the Coin Tossing protocol can vary. 
+	 * Returns Object instance to enable any return value.
+	 * 
+	 * @return the tossed output. 
+	 */
 	public Object getOutput();
 }

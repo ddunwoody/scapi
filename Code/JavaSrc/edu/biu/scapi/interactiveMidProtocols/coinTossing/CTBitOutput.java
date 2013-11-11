@@ -33,10 +33,18 @@ public class CTBitOutput implements CTOutput{
 
 	private byte outputedBit;
 	
+	/**
+	 * Constructor that sets the given output byte.
+	 * @param output
+	 */
 	public CTBitOutput(byte output){
 		outputedBit = output;
 	}
 	
+	/**
+	 * Returns the tossed byte.
+	 * @return the output byte
+	 */
 	public Byte getOutput(){
 		return outputedBit;
 	}

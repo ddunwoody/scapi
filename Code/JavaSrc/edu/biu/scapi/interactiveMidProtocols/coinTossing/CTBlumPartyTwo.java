@@ -36,7 +36,7 @@ import edu.biu.scapi.securityLevel.Malicious;
 import edu.biu.scapi.securityLevel.StandAlone;
 
 /**
- * This class plays as party two of coin tossing Blum protocol, which tosses a single bit.
+ * This class plays as party two of coin tossing Blum protocol, which tosses a single bit. <p>
  * This protocol is fully secure under the stand-alone simulation-based definitions.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
@@ -49,7 +49,9 @@ public class CTBlumPartyTwo implements CTPartyTwo, StandAlone, Malicious{
 	private CmtReceiver receiver;
 	
 	/**
-	 * Constructor that sets the given random
+	 * Constructor that sets the given values.
+	 * @param channel to use in the communication phase
+	 * @param receiver the underlying receiver used in this protocol
 	 * @param random source of randomness.
 	 */
 	public CTBlumPartyTwo(Channel channel, CmtReceiver receiver, SecureRandom random){
@@ -59,21 +61,15 @@ public class CTBlumPartyTwo implements CTPartyTwo, StandAlone, Malicious{
 	}
 
 	/**
-	 * Execute the following protocol:
-	 * "SAMPLE a random bit b2 <- {0,1}
-	 *	WAIT for COMMIT.commit on b1
-	 *	SEND b2 to P1
-	 *	RUN subprotocol COMMIT.decommit to receive b1
+	 * Execute the following protocol: <p>
+	 * "SAMPLE a random bit b2 <- {0,1} <p>
+	 *	WAIT for COMMIT.commit on b1 <p>
+	 *	SEND b2 to P1 <p>
+	 *	RUN subprotocol COMMIT.decommit to receive b1 <p>
 	 *	IF COMMIT.decommit returns INVALID
-	 *	      REPORT ERROR (cheat attempt)
+	 *	      REPORT ERROR (cheat attempt) <p>
 	 *	ELSE
 	 *	      OUTPUT b1 XOR b2."
-	 * @throws IOException 
-	 * @throws ClassNotFoundException 
-	 * @throws CheatAttemptException 
-	 * @throws CommitValueException 
- 	 *
-	 * 
 	 */
 	public CTOutput toss() throws ClassNotFoundException, IOException, CommitValueException, CheatAttemptException {
 		//We represent bit in byte, which is the smallest data type in java.

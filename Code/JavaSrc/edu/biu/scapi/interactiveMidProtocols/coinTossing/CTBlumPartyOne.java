@@ -36,7 +36,7 @@ import edu.biu.scapi.securityLevel.Malicious;
 import edu.biu.scapi.securityLevel.StandAlone;
 
 /**
- * This class plays as party one of coin tossing Blum protocol, which tosses a single bit.
+ * This class plays as party one of coin tossing Blum protocol, which tosses a single bit. <p>
  * This protocol is fully secure under the stand-alone simulation-based definitions.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
@@ -49,7 +49,9 @@ public class CTBlumPartyOne implements CTPartyOne, StandAlone, Malicious{
 	private CmtCommitter committer;
 	
 	/**
-	 * Constructor that sets the given random
+	 * Constructor that sets the given values.
+	 * @param channel to use in the communication phase
+	 * @param committer the underlying committer used in this protocol
 	 * @param random source of randomness.
 	 */
 	public CTBlumPartyOne(Channel channel, CmtCommitter committer, SecureRandom random){
@@ -59,16 +61,12 @@ public class CTBlumPartyOne implements CTPartyOne, StandAlone, Malicious{
 	}
 
 	/**
-	 * Execute the following protocol:
-	 * "SAMPLE a random bit b1 <- {0,1}
-	 *	RUN sub protocol COMMIT.commit on b1
-	 *	WAIT for a bit b2 from P2
-	 *	RUN sub protocol COMMIT.decommit to reveal b1
+	 * Execute the following protocol: <p>
+	 * "SAMPLE a random bit b1 <- {0,1} <p>
+	 *	RUN sub protocol COMMIT.commit on b1<p>
+	 *	WAIT for a bit b2 from P2<p>
+	 *	RUN sub protocol COMMIT.decommit to reveal b1<p>
 	 *	OUTPUT b1 XOR b2."
-	 * @throws IOException can occur inn the commit phase.
-	 * @throws CommitValueException in case the committer is an ElGamal committer.
-	 * @throws CheatAttemptException in case there was a cheat attempt in the decommit stage.
-	 * @throws ClassNotFoundException 
 	 */
 	public CTOutput toss() throws IOException, CommitValueException, CheatAttemptException, ClassNotFoundException {
 		//We represent bit in byte, which is the smallest data type in java.

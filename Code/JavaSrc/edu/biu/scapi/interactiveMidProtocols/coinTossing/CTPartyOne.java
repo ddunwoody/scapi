@@ -31,9 +31,9 @@ import edu.biu.scapi.exceptions.CommitValueException;
 
 /**
  * Coin tossing is the practice of throwing a coin in the air to choose between two alternatives, 
- * sometimes to resolve a dispute between two parties. 
+ * sometimes to resolve a dispute between two parties. <p>
  * 
- * This is a general interface plays as party one of a coin tossing protocol. 
+ * This is a general interface plays as party one of a coin tossing protocol. <p>
  * Each concrete party one class of a coin tossing protocol should implement this interface.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
@@ -44,10 +44,10 @@ public interface CTPartyOne {
 	/**
 	 * Executes party one role of this coin tossing protocol.
 	 * @return CTOutput contains the tossed "coin".
-	 * @throws IOException can occur inn the commit phase.
-	 * @throws CommitValueException in case the committer is an ElGamal committer.
-	 * @throws ClassNotFoundException 
-	 * @throws CheatAttemptException 
+	 * @throws IOException can occur in the commit phase.
+	 * @throws CommitValueException can occur in case the protocol uses an ElGamal committer.
+	 * @throws ClassNotFoundException if there was a problem in the serialization mechanism
+	 * @throws CheatAttemptException if party one suspects that party two is trying to cheat.
 	 */
 	public CTOutput toss() throws IOException, CommitValueException, CheatAttemptException, ClassNotFoundException;
 	

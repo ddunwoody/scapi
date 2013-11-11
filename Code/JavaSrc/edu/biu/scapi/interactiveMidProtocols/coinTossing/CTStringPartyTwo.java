@@ -33,8 +33,6 @@ import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.exceptions.CommitValueException;
 import edu.biu.scapi.exceptions.FactoriesException;
-import edu.biu.scapi.exceptions.InvalidDlogGroupException;
-import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtWithProofsReceiver;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtRCommitPhaseOutput;
@@ -45,7 +43,7 @@ import edu.biu.scapi.securityLevel.StandAlone;
 import edu.biu.scapi.tools.Factories.KdfFactory;
 
 /**
- * Concrete implementation of a protocol for tossing a string from party two's point of view.
+ * Concrete implementation of a protocol for tossing a string from party two's point of view.<p>
  * This protocol is fully secure under the stand-alone simulation-based definitions.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
@@ -60,37 +58,28 @@ public class CTStringPartyTwo implements CTPartyTwo, StandAlone, Malicious{
 	private KeyDerivationFunction kdf;
 	
 	/**
-	 * Constructor that set the given parameters and creates receiver, ZKPOK verifier and ZK verifier.
-	 * @param channel
-	 * @param receiver
-	 * @param kdf
+	 * Constructor that set the given parameters and creates receiver and KDF.
+	 * @param channel used to communicate between two parties.
+	 * @param receiver that also has ZK proofs.
+	 * @param kdf Key Derivation Function
 	 * @param l determining the length of the output
 	 * @param random source of randomness
-	 * @throws IOException
-	 * @throws IllegalArgumentException
-	 * @throws SecurityLevelException
-	 * @throws InvalidDlogGroupException
-	 * @throws ClassNotFoundException
-	 * @throws CheatAttemptException
 	 */
 	public CTStringPartyTwo(Channel channel, CmtWithProofsReceiver receiver,
-			KeyDerivationFunction kdf, int l, SecureRandom random) throws IOException, IllegalArgumentException, SecurityLevelException, InvalidDlogGroupException, ClassNotFoundException, CheatAttemptException {
+			KeyDerivationFunction kdf, int l, SecureRandom random) {
 		doConstruct(channel, receiver, kdf, l, random);
 	}
 	
 	
 	/**
-	 * Default constructor that creates receiver, ZKPOK verifier and ZK verifier.
-	 * @param channel
+	 * Default constructor that creates receiver and KDF.
+	 * @param channel used to communicate between two parties.
 	 * @param l determining the length of the output
-	 * @throws IOException
-	 * @throws IllegalArgumentException
-	 * @throws SecurityLevelException
-	 * @throws InvalidDlogGroupException
-	 * @throws ClassNotFoundException
-	 * @throws CheatAttemptException
+	 * @throws CheatAttemptException 
+	 * @throws IOException 
+	 * @throws ClassNotFoundException 
 	 */
-	public CTStringPartyTwo(Channel channel, int l) throws IllegalArgumentException, SecurityLevelException, InvalidDlogGroupException, ClassNotFoundException, IOException, CheatAttemptException  {
+	public CTStringPartyTwo(Channel channel, int l) throws ClassNotFoundException, IOException, CheatAttemptException {
 		try {
 			kdf = KdfFactory.getInstance().getObject("HKDF(HMac(SHA-256))");
 		} catch (FactoriesException e) {
@@ -102,21 +91,15 @@ public class CTStringPartyTwo implements CTPartyTwo, StandAlone, Malicious{
 	}
 
 	/**
-	 * Sets the given parameters and creates receiver, ZKPOK verifier and ZK verifier.
-	 * @param channel
-	 * @param receiver
-	 * @param kdf
-	 * @param l 
-	 * @param random
-	 * @throws SecurityLevelException
-	 * @throws InvalidDlogGroupException
-	 * @throws ClassNotFoundException
-	 * @throws IOException
-	 * @throws CheatAttemptException
+	 * Sets the given parameters.
+	 * @param channel used to communicate between two parties.
+	 * @param receiver that also has ZK proofs.
+	 * @param kdf Key Derivation Function
+	 * @param l determining the length of the output
+	 * @param random source of randomness
 	 */
 	private void doConstruct(Channel channel, CmtWithProofsReceiver receiver,
-			KeyDerivationFunction kdf, int l, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException,
-					ClassNotFoundException, IOException, CheatAttemptException {
+			KeyDerivationFunction kdf, int l, SecureRandom random) {
 		
 		this.receiver = receiver;
 		this.kdf = kdf;
@@ -126,20 +109,16 @@ public class CTStringPartyTwo implements CTPartyTwo, StandAlone, Malicious{
 	}
 	
 	/**
-	 * Execute the following protocol:
-	 * "SAMPLE a random L-bit string s2 <- {0,1}^L
-	 *	WAIT to receive a COMMIT.commit from P1
-	 *	RUN the verifier in a ZKPOK_FROM_SIGMA applied to a SIGMA protocol that P1 knows the committed value. 
-	 *	If the verifier output is REJ, then HALT and REPORT ERROR.
-	 *	SEND s2 to P1
-	 *	WAIT for an L-bit string s1 from P1
-	 *	RUN the verifier in ZK_FROM_SIGMA applied to a SIGMA protocol that the committed value was s1. 
-	 *	If the verifier output is REJ, then HALT and REPORT ERROR.
-	 *	OUTPUT s1 XOR s2".
-	 * @throws IOException 
-	 * @throws ClassNotFoundException 
-	 * @throws CheatAttemptException 
-	 * @throws CommitValueException 
+	 * Execute the following protocol:<p>
+	 * "SAMPLE a random L-bit string s2 <- {0,1}^L<p>
+	 *	WAIT to receive a COMMIT.commit from P1<p>
+	 *	RUN the verifier in a ZKPOK_FROM_SIGMA applied to a SIGMA protocol that P1 knows the committed value. <p>
+	 *	If the verifier output is REJ, then HALT and REPORT ERROR.<p>
+	 *	SEND s2 to P1<p>
+	 *	WAIT for an L-bit string s1 from P1<p>
+	 *	RUN the verifier in ZK_FROM_SIGMA applied to a SIGMA protocol that the committed value was s1. <p>
+	 *	If the verifier output is REJ, then HALT and REPORT ERROR.<p>
+	 *	OUTPUT s1 XOR s2".s
 	 */
 	public CTOutput toss() throws ClassNotFoundException, IOException, CheatAttemptException, CommitValueException {
 		//Sample a random L-bit string s2 <- {0,1}^L
