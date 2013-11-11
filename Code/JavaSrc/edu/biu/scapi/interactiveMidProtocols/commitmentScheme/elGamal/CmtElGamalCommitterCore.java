@@ -157,9 +157,10 @@ public abstract class CmtElGamalCommitterCore implements CmtCommitter {
 	}
 
 	/**
-	 * Runs the commit phase of the commitment scheme:
-	 * "SAMPLE random values  r <- Zq
-	 *	COMPUTE u = g^r and v = h^r * x
+	 * Runs the commit phase of the commitment scheme. <p>
+	 * Pseudo code:<p>
+	 * "SAMPLE random values  r <- Zq <p>
+	 *	COMPUTE u = g^r and v = h^r * x <p>
 	 *	SEND c = (h,u,v) to R".
 	 */
 	public void commit(CmtCommitValue input, long id) throws IOException {
@@ -182,9 +183,10 @@ public abstract class CmtElGamalCommitterCore implements CmtCommitter {
 	}
 
 	/**
-	 * Runs the decommit phase of the commitment scheme:
-	 * "SEND (r, x)  to R
-	 *	OUTPUT nothing""
+	 * Runs the decommit phase of the commitment scheme.<p>
+	 * Pseudo code:<p>
+	 * "SEND (r, x)  to R<p>
+	 *	OUTPUT nothing"
 	 */
 	public void decommit(long id) throws IOException {
 

@@ -50,7 +50,7 @@ public interface CmtCommitValue {
 	public Plaintext convertToPlaintext();
 	
 	/**
-	 * 
+	 * Returns a serializable object from this commit value.
 	 * @return a serializable object from this commit value.
 	 */
 	public Serializable generateSendableData();

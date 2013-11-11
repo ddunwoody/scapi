@@ -49,7 +49,7 @@ import edu.biu.scapi.securityLevel.DDH;
 import edu.biu.scapi.tools.Factories.DlogGroupFactory;
 
 /**
- * This abstract class performs all the core functionality of the committer side of Pedersen commitment. 
+ * This abstract class performs all the core functionality of the committer side of Pedersen commitment. <p>
  * Specific implementations can extend this class and add or override functions as necessary.
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
@@ -159,9 +159,9 @@ public abstract class CmtPedersenCommitterCore implements CmtCommitter{
 	}
 
 	/**
-	 * Runs the commit phase of the commitment scheme:
-	 * "SAMPLE a random value r <- Zq
-	 * 	COMPUTE  c = g^r * h^x
+	 * Runs the commit phase of the commitment scheme. <P>
+	 * "SAMPLE a random value r <- Zq<P>
+	 * 	COMPUTE  c = g^r * h^x<P>
 	 * 	SEND c".
 	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitter#commit(edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitValue, long)
 	 */
@@ -199,8 +199,8 @@ public abstract class CmtPedersenCommitterCore implements CmtCommitter{
 	}
 
 	/**
-	 * Runs the decommit phase of the commitment scheme:
-	 * "SEND (r, x) to R
+	 * Runs the decommit phase of the commitment scheme.<P>
+	 * "SEND (r, x) to R<P>
 	 *	OUTPUT nothing."
 	 */
 	public void decommit(long id) throws IOException {
@@ -217,7 +217,7 @@ public abstract class CmtPedersenCommitterCore implements CmtCommitter{
 	}	
 
 	/**
-	 * Receives message from teh receiver.
+	 * Receives message from the receiver.
 	 * @return the received message
 	 * @throws ClassNotFoundException if there was a problem during serialization.
 	 * @throws IOException if there was a problem in the communication level.

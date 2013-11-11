@@ -37,13 +37,13 @@ import edu.biu.scapi.interactiveMidProtocols.RandomValue;
  */
 public interface CmtCDecommitmentMessage {
 	/**
-	 * 
+	 * Returns the committed value.
 	 * @return the serializable committed value.
 	 */
 	Serializable getX();
 	
 	/**
-	 * 
+	 * Returns the random value used to commit.
 	 * @return the random value used to commit.
 	 */
 	RandomValue getR();

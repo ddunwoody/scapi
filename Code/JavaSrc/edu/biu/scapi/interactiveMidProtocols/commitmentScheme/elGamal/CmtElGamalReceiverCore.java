@@ -94,7 +94,7 @@ public abstract class CmtElGamalReceiverCore implements CmtReceiver{
 	}
 
 	// default constructor is not enough since default encryption cannot be chosen.
-	public CmtElGamalReceiverCore(){}
+	protected CmtElGamalReceiverCore(){}
 
 	/**
 	 * Sets the given parameters and execute the preprocess phase of the scheme.
@@ -156,8 +156,9 @@ public abstract class CmtElGamalReceiverCore implements CmtReceiver{
 	}
 
 	/**
-	 * Runs the commit phase of the commitment scheme:
-	 * "WAIT for a value c
+	 * Runs the commit phase of the commitment scheme.<p>
+	 * Pseudo code:<p>
+	 * "WAIT for a value c<p>
 	 *	STORE c".
 	 * @return the output of the commit phase.
 	 * @throws ClassNotFoundException if there was a problem during serialization mechanism.
@@ -178,15 +179,16 @@ public abstract class CmtElGamalReceiverCore implements CmtReceiver{
 	}
 
 	/**
-	 * Runs the decommit phase of the commitment scheme:
-	 * "WAIT for (r, x)  from C
-	 *	Let c = (h,u,v); if not of this format, output REJ
-	 *	IF NOT
-	 *	•	u=g^r 
-	 *	•	v = h^r * x
-	 *	•	x in G
-	 *		OUTPUT REJ
-	 *	ELSE
+	 * Runs the decommit phase of the commitment scheme.<p>
+	 * Pseudo code:<p>
+	 * "WAIT for (r, x)  from C<p>
+	 *	Let c = (h,u,v); if not of this format, output REJ<p>
+	 *	IF NOT<p>
+	 *	•	u=g^r <p>
+	 *	•	v = h^r * x<p>
+	 *	•	x in G<p>
+	 *		OUTPUT REJ<p>
+	 *	ELSE<p>
 	 *	    OUTPUT ACC and value x"
 	 * @param id
 	 * @return the committed value if the decommit succeeded; null, otherwise.

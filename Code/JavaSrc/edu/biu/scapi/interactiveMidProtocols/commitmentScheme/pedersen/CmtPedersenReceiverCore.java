@@ -169,9 +169,9 @@ public abstract class CmtPedersenReceiverCore implements CmtReceiver{
 	/**
 	 * Wait for the committer to send the commitment. When the message is received and 
 	 * after reconstructing the group element, save it in the commitmentMap using the id 
-	 * also received in the message.
-	 * Pseudo code:
-	 * "WAIT for message c from C
+	 * also received in the message.<P>
+	 * Pseudo code:<P>
+	 * "WAIT for message c from C<P>
 	 *  STORE values (h,c)".
 	 */
 	public CmtRBasicCommitPhaseOutput receiveCommitment() throws ClassNotFoundException, IOException {
@@ -218,15 +218,15 @@ public abstract class CmtPedersenReceiverCore implements CmtReceiver{
 	}
 	
 	/**
-	 * Run the decommitment phase of the protocol:
-	 * "IF  c = g^r * h^x AND x <- Zq
-	 *	    OUTPUT ACC and value x
-	 *	ELSE
-	 *	    OUTPUT REJ".	
-	 * @param id
-	 * @param x
+	 * Run the decommitment phase of the protocol:<P>
+	 * "IF  c = g^r * h^x AND x <- Zq<P>
+	 *	    OUTPUT ACC and value x<P>
+	 *	ELSE<P>
+	 *	    OUTPUT REJ".	<P>
+	 * @param id of the commitment
+	 * @param x 
 	 * @param r
-	 * @return
+	 * @return the committed value
 	 */
 	protected CmtCommitValue processDecommitment(long id, BigInteger x, BigInteger r) {
 		//if x is not in Zq return null

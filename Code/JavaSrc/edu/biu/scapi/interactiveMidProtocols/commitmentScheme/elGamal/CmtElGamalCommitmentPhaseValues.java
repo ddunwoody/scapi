@@ -59,25 +59,25 @@ public class CmtElGamalCommitmentPhaseValues implements CmtCommitmentPhaseValues
 		this.computedCommitment = computedCommitment;
 	}
 	
-	/**
-	 * @return The random value used in the computation of the commitment.
-	 */
+	
 	public BigIntegerRandomValue getR() {
 		return r;
 	}
 	
 	/**
-	 * @return The value that the committer commits about. 
+	 * Returns the value that the committer commits about. <p>
 	 * This value is not sent to the receiver in the commitment phase, 
 	 * it is sent in the decommitment phase.
+	 * @return The value that the committer commits about. 
 	 */
 	public CmtCommitValue getX(){
 		return commitval;
 	}
 	
 	/**
-	 * @return The value that the committer sends to the receiver in order to commit 
+	 * Returns the value that the committer sends to the receiver in order to commit 
 	 * commitval in the commitment phase.
+	 * @return the commitment value
 	 */
 	public AsymmetricCiphertext getComputedCommitment() {
 		return computedCommitment;

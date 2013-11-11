@@ -16,9 +16,9 @@ import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.CmtPeders
 import edu.biu.scapi.securityLevel.EquivocalCmt;
 
 /**
- * Concrete implementation of Equivocal commitment scheme in the committer's point of view.
+ * Concrete implementation of Equivocal commitment scheme in the committer's point of view.<p>
  * This is a protocol to obtain an equivocal commitment from any commitment with a ZK-protocol 
- * of the commitment value.
+ * of the commitment value.<p>
  * The equivocality property means that a simulator can decommit to any value it needs 
  * (needed for proofs of security).
  * 
@@ -58,7 +58,8 @@ public class CmtEquivocalCommitter implements CmtCommitter, EquivocalCmt{
 	}
 
 	/**
-	 * Runs the following line of the protocol:
+	 * Runs the commit phase of the protocol.<p>
+	 * Pseudo code:<p>
 	 * "RUN any COMMIT protocol for C to commit to x".
 	 */
 	public void commit(CmtCommitValue input, long id) throws IOException {
@@ -67,13 +68,10 @@ public class CmtEquivocalCommitter implements CmtCommitter, EquivocalCmt{
 	}
 
 	/**
-	 * Runs the following lines of the protocol:
-	 * "SEND x to R
-	 *	Run ZK protocol as the prover, that x is the correct decommitment value".
-	 * @throws IOException 
-	 * @throws ClassNotFoundException 
-	 * @throws CheatAttemptException 
-	 * @throws CommitValueException 
+	 * Runs the decommit phase of the protocol.<p>
+	 * Pseudo code:<p>
+	 * "SEND x to R<p>
+	 *	Run ZK protocol as the prover, that x is the correct decommitment value".<p>
 	 */
 	public void decommit(long id) throws IOException, CheatAttemptException, ClassNotFoundException, CommitValueException {
 		//During the execution of proveCommittedValue, the x is sent to the receiver.

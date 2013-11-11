@@ -30,9 +30,9 @@ import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.exceptions.CommitValueException;
 
 /**
- * This interface is used by the verifier to verify that:
- * 1. The committer knows the committed value.
- * 2. The committed value was x.
+ * This interface is used by the verifier to verify that:<p>
+ * 1. The committer knows the committed value.<p>
+ * 2. The committed value was x.<p>
  * 
  * All commitment scheme that have proofs should implement this interface.
  * 

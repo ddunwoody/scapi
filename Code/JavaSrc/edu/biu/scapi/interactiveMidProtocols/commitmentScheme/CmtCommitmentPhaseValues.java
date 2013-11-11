@@ -37,13 +37,13 @@ import edu.biu.scapi.interactiveMidProtocols.RandomValue;
 public interface CmtCommitmentPhaseValues {
 	
 	/**
-	 * 
+	 * Returns the random value used for commit the value.
 	 * @return the random value used for commit the value.
 	 */
 	public RandomValue getR();
 	
 	/**
-	 * 
+	 * Returns the committed value.
 	 * @return the committed value.
 	 */
 	public CmtCommitValue getX();

@@ -105,14 +105,14 @@ public class CmtElGamalOnByteArrayReceiver extends CmtElGamalReceiverCore implem
 	}
 
 	/**
-	 * Proccesses the decommitment phase.
-	 * "IF NOT
-	 *	•	u=g^r 
-	 *	•	v = h^r * x
-	 *	•	x in G
-	 *		OUTPUT REJ
-	 *	ELSE
-	 *	    OUTPUT ACC and value x"
+	 * Proccesses the decommitment phase.<p>
+	 * "IF NOT<p>
+	 *	•	u=g^r <p>
+	 *	•	v = h^r * x<p>
+	 *	•	x in G<p>
+	 *		OUTPUT REJ<p>
+	 *	ELSE<p>
+	 *	    OUTPUT ACC and value x"<p>
 	 * @param id the id of the commitment.
 	 * @param msg the receiver message from the committer
 	 * @return the committed value if the decommit succeeded; null, otherwise.

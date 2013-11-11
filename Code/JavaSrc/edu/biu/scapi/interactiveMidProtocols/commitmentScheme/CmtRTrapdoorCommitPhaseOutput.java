@@ -48,8 +48,8 @@ public class CmtRTrapdoorCommitPhaseOutput extends CmtRBasicCommitPhaseOutput{
 	}
 	
 	/**
-	 * 
-	 * @return the trapdoor for this commitment.
+	 * Returns the trapdoor of this commitment.
+	 * @return the trapdoor of this commitment.
 	 */
 	public BigInteger getTrap(){
 		return trap;

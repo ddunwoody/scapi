@@ -92,10 +92,11 @@ public class CmtElGamalOnGroupElementCommitter extends CmtElGamalCommitterCore i
 	}
 
 	/**
-	 * Runs the commit phase of the commitment scheme:
-	 * "SAMPLE random values  r <- Zq
-	 *	COMPUTE u = g^r and v = h^r * x
-	 *	SEND c = (h,u,v) to R".
+	 * Runs the commit phase of the commitment scheme.<p>
+	 * Pseudo code:<p>
+	 * "SAMPLE random values  r <- Zq<p>
+	 *	COMPUTE u = g^r and v = h^r * x<p>
+	 *	SEND c = (h,u,v) to R".<p>
 	 */
 	public void commit(CmtCommitValue input, long id) throws IOException {
 		if (!(input instanceof CmtGroupElementCommitValue))

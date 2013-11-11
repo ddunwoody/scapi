@@ -33,7 +33,7 @@ package edu.biu.scapi.interactiveMidProtocols.commitmentScheme;
  */
 public interface CmtCCommitmentMsg {
 	/**
-	 * 
+	 * Returns the unique id of the commitment.
 	 * @return the commitment id
 	 */
 	long getId();

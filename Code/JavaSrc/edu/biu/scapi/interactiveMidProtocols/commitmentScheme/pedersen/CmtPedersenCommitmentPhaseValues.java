@@ -67,13 +67,15 @@ public class CmtPedersenCommitmentPhaseValues implements CmtCommitmentPhaseValue
 	}
 	
 	/**
-	 * @return The value that the committer commits about. This value is not sent to the receiver in the commitment phase, it is sent in the decommitment phase.
+	 * Returns the value that the committer commits about. This value is not sent to the receiver in the commitment phase, it is sent in the decommitment phase.
+	 * @return The value that the committer commits about. 
 	 */
 	public CmtCommitValue getX(){
 		return commitval;
 	}
 	
 	/**
+	 * Returns the value that the committer sends to the receiver in order to commit commitval in the commitment phase.
 	 * @return The value that the committer sends to the receiver in order to commit commitval in the commitment phase.
 	 */
 	public GroupElement getComputedCommitment() {

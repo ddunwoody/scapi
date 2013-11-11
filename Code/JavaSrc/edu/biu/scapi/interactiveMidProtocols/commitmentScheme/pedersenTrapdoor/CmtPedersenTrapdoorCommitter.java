@@ -47,10 +47,10 @@ import edu.biu.scapi.securityLevel.PerfectlyHidingCmt;
 
 /**
  * Concrete implementation of committer that executes the Pedersen trapdoor commitment 
- * scheme in the committer's point of view.
+ * scheme in the committer's point of view.<p>
  * This commitment is also a trapdoor commitment in the sense that the receiver after 
  * the commitment phase has a trapdoor value, that if known by the committer would enable
- * it to decommit to any value. 
+ * it to decommit to any value. <p>
  * This trapdoor is output by the receiver and can be used by a higher-level application 
  * (e.g., by the ZK transformation of a sigma protocol to a zero-knowledge proof of knowledge).
  * 
@@ -127,7 +127,7 @@ public class CmtPedersenTrapdoorCommitter extends CmtPedersenCommitterCore imple
 	
 	/**
 	 * Validate the h value received from the receiver in the pre process phase.
-	 * @param trap
+	 * @param trap the trapdoor outputed from the receiver's commit phase.
 	 * @return true, if valif; false, otherwise.
 	 */
 	public boolean validate(CmtRCommitPhaseOutput trap){

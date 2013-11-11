@@ -37,7 +37,7 @@ public class CmtRBasicCommitPhaseOutput implements CmtRCommitPhaseOutput {
 	long commitmentId;
 	
 	/**
-	 * Constructor tha sets the given commitment id.
+	 * Constructor that sets the given commitment id.
 	 * @param commitmentId the id of the received commitment message.
 	 */
 	public CmtRBasicCommitPhaseOutput(long commitmentId) {

@@ -16,9 +16,9 @@ import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.CmtPeders
 import edu.biu.scapi.securityLevel.EquivocalCmt;
 
 /**
- * Concrete implementation of Equivocal commitment scheme in the receiver's point of view.
+ * Concrete implementation of Equivocal commitment scheme in the receiver's point of view.Pseudo code:<p>
  * This is a protocol to obtain an equivocal commitment from any commitment with a ZK-protocol 
- * of the commitment value.
+ * of the commitment value.Pseudo code:<p>
  * The equivocality property means that a simulator can decommit to any value it needs 
  * (needed for proofs of security).
  * 
@@ -62,7 +62,7 @@ public class CmtEquivocalReceiver implements CmtReceiver, EquivocalCmt {
 	}
 	
 	/**
-	 * Runs the following line of the protocol:
+	 * Runs the commit phase of the protocol:<P>
 	 * "RUN any COMMIT protocol for C to commit to x".
 	 */
 	public CmtRCommitPhaseOutput receiveCommitment() throws ClassNotFoundException, IOException {
@@ -71,16 +71,12 @@ public class CmtEquivocalReceiver implements CmtReceiver, EquivocalCmt {
 	}
 
 	/**
-	 * Runs the following lines of the protocol:
-	 * "Run ZK protocol as the verifier, that x is the correct decommitment value
-	 *		IF verifier-output of ZK is ACC
-	 *          OUTPUT ACC and x
-	 *    	ELSE
-	 *          OUTPUT REJ".
-	 * @throws CommitValueException 
-	 * @throws CheatAttemptException 
-	 * @throws ClassNotFoundException 
-	 * @throws IOException 
+	 * Runs the decommit phase of the protocol:<P>
+	 * "Run ZK protocol as the verifier, that x is the correct decommitment value<P>
+	 *		IF verifier-output of ZK is ACC<P>
+	 *          OUTPUT ACC and x<P>
+	 *    	ELSE<P>
+	 *          OUTPUT REJ". 
 	 */
 	public CmtCommitValue receiveDecommitment(long id) throws IOException, ClassNotFoundException, CheatAttemptException, CommitValueException {
 		//During the execution of verifyCommittedValue, the x is received by the receiver.

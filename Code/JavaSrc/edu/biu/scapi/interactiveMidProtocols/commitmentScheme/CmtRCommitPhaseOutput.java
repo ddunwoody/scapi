@@ -37,7 +37,7 @@ import java.io.Serializable;
 public interface CmtRCommitPhaseOutput extends Serializable{
 	
 	/**
-	 * 
+	 * Returns the id of the received commitment message.
 	 * @return the id of the received commitment message.
 	 */
 	public long getCommitmentId();

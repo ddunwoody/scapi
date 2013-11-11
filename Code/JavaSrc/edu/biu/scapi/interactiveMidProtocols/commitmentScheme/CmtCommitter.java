@@ -51,7 +51,7 @@ public interface CmtCommitter {
 	 * @throws IOException if there is any problem at the communication level
 	 * @throws CheatAttemptException if the committer suspects that the receiver attempted cheating
 	 * @throws ClassNotFoundException if the commitment cannot be serialized
-	 * @throws CommitValueException
+	 * @throws CommitValueException if the commit value does not match the implementing commitment.
 	 */
 	public void decommit(long id) throws IOException, CheatAttemptException, ClassNotFoundException, CommitValueException;
 	
@@ -77,7 +77,7 @@ public interface CmtCommitter {
 	public byte[] generateBytesFromCommitValue(CmtCommitValue value);
 	
 	/**
-	 * This function returns the values calculated during the preprocess phase.
+	 * This function returns the values calculated during the preprocess phase.<p>
 	 * This function is used for protocols that need values of the commitment, 
 	 * like ZK protocols during proofs on the commitment.
 	 * We recommended not to call this function from somewhere else.
@@ -86,7 +86,7 @@ public interface CmtCommitter {
 	public Object[] getPreProcessValues();
 	
 	/**
-	 * This function returns the values calculated during the commit phase for a specific commitment.
+	 * This function returns the values calculated during the commit phase for a specific commitment.<p>
 	 * This function is used for protocols that need values of the commitment, 
 	 * like ZK protocols during proofs on the commitment.
 	 * We recommended not to call this function from somewhere else.
