@@ -26,8 +26,6 @@
 
 package edu.biu.scapi.primitives.dlog.miracl;
 
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 import java.math.BigInteger;
 
 import edu.biu.scapi.primitives.dlog.ECElement;
@@ -35,7 +33,6 @@ import edu.biu.scapi.primitives.dlog.ECElementSendableData;
 import edu.biu.scapi.primitives.dlog.ECFpPoint;
 import edu.biu.scapi.primitives.dlog.ECFpUtility;
 import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
-import edu.biu.scapi.primitives.dlog.groupParams.ECFpGroupParams;
 
 /**
  * This class is an adapter for Fp points of miracl

@@ -26,9 +26,6 @@
 
 package edu.biu.scapi.primitives.dlog.miracl;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.math.BigInteger;
 
 import edu.biu.scapi.primitives.dlog.ECElement;
@@ -36,7 +33,6 @@ import edu.biu.scapi.primitives.dlog.ECElementSendableData;
 import edu.biu.scapi.primitives.dlog.ECF2mPoint;
 import edu.biu.scapi.primitives.dlog.ECF2mUtility;
 import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
-import edu.biu.scapi.primitives.dlog.groupParams.ECF2mGroupParams;
 /**
  * This class is an adapter for F2m points of miracl
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
