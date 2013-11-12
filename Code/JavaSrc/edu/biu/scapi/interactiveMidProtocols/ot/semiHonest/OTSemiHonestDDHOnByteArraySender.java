@@ -38,7 +38,7 @@ import edu.biu.scapi.securityLevel.SemiHonest;
 import edu.biu.scapi.tools.Factories.KdfFactory;
 
 /**
- * Concrete class for Semi-Honest OT assuming DDH sender ON BYTE ARRAY.
+ * Concrete class for Semi-Honest OT assuming DDH sender ON BYTE ARRAY.<p>
  * This class derived from OTSemiHonestDDHSenderAbs and implements the functionality 
  * related to the byte array inputs.
  * 
@@ -49,7 +49,7 @@ public class OTSemiHonestDDHOnByteArraySender extends OTSemiHonestDDHSenderAbs i
 	private KeyDerivationFunction kdf; //Used in the calculation.
 	
 	/**
-	 * Constructor that chooses default values of DlogGroup and SecureRandom.
+	 * Constructor that chooses default values of DlogGroup, kdf and SecureRandom.
 	 */
 	public OTSemiHonestDDHOnByteArraySender(){
 		super();

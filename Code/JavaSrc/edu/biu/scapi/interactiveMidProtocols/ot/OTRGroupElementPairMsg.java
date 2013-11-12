@@ -29,7 +29,7 @@ import java.io.Serializable;
 import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
 
 /**
- * Concrete implementation of OT receiver message. This implementation is common for OT on byteArray and on GroupElement.
+ * Concrete implementation of OT receiver message. <p>This implementation is common for OT on byteArray and on GroupElement.<p>
  * The message contains tuple of two GroupElements - (h0, h1).
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)

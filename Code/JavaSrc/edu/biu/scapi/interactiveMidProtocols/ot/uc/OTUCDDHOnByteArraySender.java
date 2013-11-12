@@ -42,8 +42,8 @@ import edu.biu.scapi.securityLevel.UC;
 
 /**
  * Concrete class for OT sender based on the DDH assumption that achieves UC security in
- * the common reference string model.
- * This is implementation in BYTE ARRAY mode.
+ * the common reference string model.<p>
+ * This is implementation in BYTE ARRAY mode.<p>
  * This class derived from OTUCDDHSenderAbs and implements the functionality 
  * related to the byte array inputs.
  * 
@@ -89,23 +89,17 @@ public class OTUCDDHOnByteArraySender implements OTSender, Malicious, UC{
 	}
 
 	/**
-	 * Runs the part of the protocol where the sender's input is necessary as follows:<p>
-	 *	WAIT for message (g,h) from R
-	 *	COMPUTE (u0,v0) = RAND(g0,g,h0,h)
-	 *	COMPUTE (u1,v1) = RAND(g1,g,h1,h)		
-	 *	COMPUTE:<p> 
-	 *		•   c0 = x0 XOR KDF(|x0|,v0)
-	 *		•   c1 = x1 XOR KDF(|x1|,v1)
+	 * Runs the transfer phase of the OT protocol.<p>
+	 * This is the part of the protocol where the sender's input is necessary as follows:<p>
+	 *	Transfer Phase (with inputs x0,x1)<p>
+	 *	WAIT for message from R<p>
+	 *	DENOTE the values received by (g,h) <p>
+	 *	COMPUTE (u0,v0) = RAND(g0,g,h0,h)<p>
+	 *	COMPUTE (u1,v1) = RAND(g1,g,h1,h)<p>
+	 *	COMPUTE c0 = x0 XOR KDF(|x0|,v0)<p>
+	 *	COMPUTE c1 = x1 XOR KDF(|x1|,v1)<p>
 	 *	SEND (u0,c0) and (u1,c1) to R<p>
 	 *	OUTPUT nothing<p>
-	 * The transfer stage of OT protocol which can be called several times in parallel.
-	 * In order to enable the parallel calls, each transfer call should use a different channel to send and receive messages.
-	 * This way the parallel executions of the function will not block each other.
-	 * The parameters given in the input must match the DlogGroup member of this class, which given in the constructor.
-	 * @param channel 
-	 * @param input
-	 * @throws IOException if failed to send the message.
-	 * @throws ClassNotFoundException 
 	 */
 	public void transfer(Channel channel, OTSInput input) throws IOException, NullPointerException, ClassNotFoundException{
 		//Creates the utility class that executes the transfer phase.

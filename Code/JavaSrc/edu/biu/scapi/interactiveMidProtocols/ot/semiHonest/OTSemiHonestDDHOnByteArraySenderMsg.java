@@ -28,7 +28,7 @@ import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
 import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
 
 /**
- * Concrete implementation of OT sender (on byteArray) message.
+ * Concrete implementation of OT sender (on byteArray) message.<p>
  * In the byteArray scenario, the sender sends GroupElement u and two binary strings v0, v1.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
@@ -41,6 +41,12 @@ public class OTSemiHonestDDHOnByteArraySenderMsg implements OTSMsg{
 	private byte[] v0;
 	private byte[] v1;
 	
+	/**
+	 * Constructor that sets the given values calculated by the protocol.
+	 * @param u
+	 * @param v0
+	 * @param v1
+	 */
 	public OTSemiHonestDDHOnByteArraySenderMsg(GroupElementSendableData u, byte[] v0, byte[] v1){
 		this.u = u;
 		this.v0 = v0;

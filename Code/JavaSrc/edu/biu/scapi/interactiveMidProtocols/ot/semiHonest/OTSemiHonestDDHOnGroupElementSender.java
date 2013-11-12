@@ -35,7 +35,7 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.securityLevel.SemiHonest;
 
 /**
- * Concrete class for Semi-Honest OT assuming DDH sender ON GROUP ELEMENT.
+ * Concrete class for Semi-Honest OT assuming DDH sender ON GROUP ELEMENT.<p>
  * This class derived from OTSemiHonestDDHSenderAbs and implements the functionality 
  * related to the GroupElement inputs.
  * 

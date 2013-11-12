@@ -47,21 +47,24 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
 public class OTFullSimReceiverPreprocessUtil {
 
 	/**
-	 * Runs the part of the protocol where the receiver input is not yet necessary:
-	 * 	"SAMPLE random values y, alpha0 <- {0, . . . , q-1} 
-	 *	SET alpha1 = alpha0 + 1 
-	 *	COMPUTE 
-	 *    1. g1 = (g0)^y
-	 *	  2. h0 = (g0)^(alpha0)
-	 *	  3. h1 = (g1)^(alpha1)
-	 *	SEND (g1,h0,h1) to S
+	 * Runs the preprocess phase of the protocol, where the receiver input is not yet necessary.<p>
+	 * 	"SAMPLE random values y, alpha0 <- {0, . . . , q-1} <p>
+	 *	SET alpha1 = alpha0 + 1 <p>
+	 *	COMPUTE <p>
+	 *    1. g1 = (g0)^y<p>
+	 *	  2. h0 = (g0)^(alpha0)<p>
+	 *	  3. h1 = (g1)^(alpha1)<p>
+	 *	SEND (g1,h0,h1) to S<p>
 	 *  Run the prover in ZKPOK_FROM_SIGMA with Sigma protocol SIGMA_DH. Use common input (g0,g1,h0,h1/g1) and private input alpha0."
 	 * @param channel
-	 * @return 
-	 * @throws ClassNotFoundException 
-	 * @throws CheatAttemptException 
-	 * @throws IOException 
-	 * @throws CommitValueException 
+	 * @param dlog
+	 * @param zkProver used to prove the ZKPOK_FROM_SIGMA
+	 * @param random
+	 * @return the values calculated in the preprocess
+	 * @throws ClassNotFoundException if there was a problem during the serialization mechanism in the preprocess phase.
+	 * @throws CheatAttemptException if the receiver suspects that the sender is trying to cheat in the preprocess phase.
+	 * @throws IOException if there was a problem during the communication in the preprocess phase.
+	 * @throws CommitValueException can occur in case of ElGamal commitment scheme.
 	 */
 	public static OTFullSimPreprocessPhaseValues preProcess(DlogGroup dlog, ZKPOKProver zkProver, Channel channel, SecureRandom random) throws IOException, CheatAttemptException, ClassNotFoundException, CommitValueException{
 		BigInteger qMinusOne = dlog.getOrder().subtract(BigInteger.ONE);

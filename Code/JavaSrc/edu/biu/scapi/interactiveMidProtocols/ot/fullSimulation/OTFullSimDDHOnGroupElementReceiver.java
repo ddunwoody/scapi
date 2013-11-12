@@ -46,9 +46,10 @@ import edu.biu.scapi.securityLevel.StandAlone;
 import edu.biu.scapi.tools.Factories.DlogGroupFactory;
 
 /**
- * Concrete implementation of the receiver side in oblivious transfer based on the DDH assumption that achieves full simulation.
- * This implementation can also be used as batch OT that achieves full simulation. In batch oblivious transfer, 
- * the parties run an initialization phase and then can carry out concrete OTs later whenever they have new inputs and wish to carry out an OT. <p>
+ * Concrete implementation of the receiver side in oblivious transfer based on the DDH assumption that achieves full simulation.<p>
+ * This implementation can also be used as batch OT that achieves full simulation. <p>
+ * In batch oblivious transfer, the parties run an initialization phase and then can carry out concrete OTs later 
+ * whenever they have new inputs and wish to carry out an OT. <p>
  * 
  * This class derived from OTFullSimDDHReceiverAbs and implements the functionality 
  * related to the GroupElement inputs.
@@ -66,10 +67,10 @@ public class OTFullSimDDHOnGroupElementReceiver implements OTReceiver, Malicious
 	/**
 	 * Constructor that gets the channel and chooses default values of DlogGroup and SecureRandom.
 	 * @param channel
-	 * @throws ClassNotFoundException 
-	 * @throws CheatAttemptException 
-	 * @throws IOException 
-	 * @throws CommitValueException 
+	 * @throws ClassNotFoundException if there was a problem during the serialization mechanism in the preprocess phase.
+	 * @throws CheatAttemptException if the receiver suspects that the sender is trying to cheat in the preprocess phase.
+	 * @throws IOException if there was a problem during the communication in the preprocess phase.
+	 * @throws CommitValueException can occur in case of ElGamal commitment scheme.
 	 */
 	public OTFullSimDDHOnGroupElementReceiver(Channel channel) throws IOException, CheatAttemptException, ClassNotFoundException, CommitValueException{
 		//Read the default DlogGroup name from a configuration file.
@@ -98,10 +99,10 @@ public class OTFullSimDDHOnGroupElementReceiver implements OTReceiver, Malicious
 	 * @param random
 	 * @throws SecurityLevelException if the given dlog is not DDH secure
 	 * @throws InvalidDlogGroupException if the given DlogGroup is not valid.
-	 * @throws ClassNotFoundException 
-	 * @throws CheatAttemptException 
-	 * @throws IOException 
-	 * @throws CommitValueException 
+	 * @throws ClassNotFoundException if there was a problem during the serialization mechanism in the preprocess phase.
+	 * @throws CheatAttemptException if the receiver suspects that the sender is trying to cheat in the preprocess phase.
+	 * @throws IOException if there was a problem during the communication in the preprocess phase.
+	 * @throws CommitValueException can occur in case of ElGamal commitment scheme.
 	 */
 	public OTFullSimDDHOnGroupElementReceiver(Channel channel, DlogGroup dlog, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException, IOException, CheatAttemptException, ClassNotFoundException, CommitValueException{
 		
@@ -158,8 +159,8 @@ public class OTFullSimDDHOnGroupElementReceiver implements OTReceiver, Malicious
 	
 	/**
 	 * 
-	 * Run the following part of the protocol:
-	 * Transfer Phase (with inputs x0,x1) <p>
+	 * Run the transfer phase of the OT protocol.<p>
+	 * Transfer Phase (with input sigma) <p>
 	 *		SAMPLE a random value r <- {0, . . . , q-1} <p>
 	 *		COMPUTE<p>
 	 *		4.	g = (gSigma)^r<p>
@@ -170,16 +171,6 @@ public class OTFullSimDDHOnGroupElementReceiver implements OTReceiver, Malicious
 	 *		•	u0, u1, c0, c1 in G<p>
 	 *		      REPORT ERROR<p>
 	 *		OUTPUT  xSigma = cSigma * (uSigma)^(-r)<p>
-	 * The transfer stage of OT protocol which can be called several times in parallel.
-	 * In order to enable the parallel calls, each transfer call should use a different channel to send and receive messages.
-	 * This way the parallel executions of the function will not block each other.
-	 * The parameters given in the input must match the DlogGroup member of this class, which given in the constructor.
-	 * @param channel
-	 * @param input MUST be OTRBasicInput.
-	 * @return OTROutput, the output of the protocol.
-	 * @throws CheatAttemptException if there was a cheat attempt during the execution of the protocol.
-	 * @throws IOException if the send or receive functions failed.
-	 * @throws ClassNotFoundException if the receive failed.
 	 */
 	public OTROutput transfer(Channel channel, OTRInput input) throws IOException, ClassNotFoundException, CheatAttemptException {
 		//Creates the utility class that executes the transfer phase.

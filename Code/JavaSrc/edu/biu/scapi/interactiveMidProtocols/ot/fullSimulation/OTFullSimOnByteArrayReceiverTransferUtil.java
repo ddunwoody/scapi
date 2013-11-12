@@ -45,6 +45,12 @@ public class OTFullSimOnByteArrayReceiverTransferUtil extends OTFullSimReceiverT
 
 	private KeyDerivationFunction kdf; 
 	
+	/**
+	 * Sets the given dlog, kdf and random.
+	 * @param dlog
+	 * @param kdf
+	 * @param random
+	 */
 	public OTFullSimOnByteArrayReceiverTransferUtil(DlogGroup dlog, KeyDerivationFunction kdf, SecureRandom random) {
 		super(dlog, random);
 		this.kdf = kdf;

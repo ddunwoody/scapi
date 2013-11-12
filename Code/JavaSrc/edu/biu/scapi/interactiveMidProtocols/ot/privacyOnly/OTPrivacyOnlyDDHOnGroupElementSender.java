@@ -37,7 +37,7 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.securityLevel.PrivacyOnly;
 
 /**
- * Concrete class for OT Privacy assuming DDH sender ON GroupElement.
+ * Concrete class for OT Privacy assuming DDH sender ON GroupElement.<p>
  * This class derived from OTPrivacyOnlyDDHSenderAbs and implements the functionality 
  * related to the GroupElement inputs.
  * 

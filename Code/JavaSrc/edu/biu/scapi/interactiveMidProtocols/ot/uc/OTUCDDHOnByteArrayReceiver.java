@@ -44,8 +44,8 @@ import edu.biu.scapi.securityLevel.UC;
 
 /**
  * Concrete class for OT receiver based on the DDH assumption that achieves UC security in
- * the common reference string model.
- * This is implementation in BYTE ARRAY mode.
+ * the common reference string model. <p>
+ * This is implementation in BYTE ARRAY mode.<p>
  * This class derived from OTUCDDHReceiverAbs and implements the functionality 
  * related to the byte array inputs.
  * 
@@ -91,26 +91,19 @@ public class OTUCDDHOnByteArrayReceiver implements OTReceiver, Malicious, UC{
 	}
 	
 	/**
-	 * Runs the part of the protocol where the receiver input is necessary as follows:
-	 * "SAMPLE a random value r <- {0, . . . , q-1}
-	 *  COMPUTE g = (gSigma)^r and h = (hSigma)^r
-	 *  SEND (g,h) to S
-	 *  WAIT for messages (u0,c0) and (u1,c1) from S
-	 *	IF  NOT
-	 *	•	u0, u1 in G, AND
-	 *	•	c0, c1 are binary strings of the same length
-	 *		     REPORT ERROR
-	 *	OUTPUT  xSigma = cSigma XOR KDF(|cSigma|,(uSigma)^r)
-	 * The transfer stage of OT protocol which can be called several times in parallel.
-	 * In order to enable the parallel calls, each transfer call should use a different channel to send and receive messages.
-	 * This way the parallel executions of the function will not block each other.
-	 * The parameters given in the input must match the DlogGroup member of this class, which given in the constructor.
-	 * @param channel
-	 * @param input MUST be OTRBasicInput.
-	 * @return OTROutput, the output of the protocol.
-	 * @throws IOException if failed to send or receive a message.
-	 * @throws ClassNotFoundException
-	 * @throws CheatAttemptException 
+	 * Run the transfer phase of the protocol.<p>
+	 * Transfer Phase (with input sigma) <p>
+	 *	SAMPLE a random value r <- {0, . . . , q-1} <p>
+	 *	COMPUTE<p>
+	 *	4.	g = (gSigma)^r<p>
+	 *	5.	h = (hSigma)^r<p>
+	 *	SEND (g,h) to S<p>
+	 *	WAIT for messages (u0,c0) and (u1,c1) from S<p>
+	 *	IF  NOT<p>
+	 *	•	u0, u1 in G, AND<p>
+	 *	•	c0, c1 are binary strings of the same length<p>
+	 *		   REPORT ERROR<p>
+	 *	OUTPUT  xSigma = cSigma XOR KDF(|cSigma|,(uSigma)^r)<p>
 	 */
 	public OTROutput transfer(Channel channel, OTRInput input) throws IOException, ClassNotFoundException, CheatAttemptException{
 		//Creates the utility class that executes the transfer phase.

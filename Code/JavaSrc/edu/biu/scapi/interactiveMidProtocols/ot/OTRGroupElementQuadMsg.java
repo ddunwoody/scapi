@@ -29,8 +29,8 @@ import java.io.Serializable;
 import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
 
 /**
- * Concrete implementation of OT receiver message used by some OT receivers implementations. 
- * This implementation is common for OT on byteArray and on GroupElement.
+ * Concrete implementation of OT receiver message used by some OT receivers implementations. <p>
+ * This implementation is common for OT on byteArray and on GroupElement.<p>
  * The message contains tuple of four GroupElements - (x, y, z0, z1).
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)

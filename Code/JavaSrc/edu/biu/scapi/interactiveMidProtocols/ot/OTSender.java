@@ -31,7 +31,7 @@ import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 
 /**
- * Marker interface. Every class that implements it is signed as Oblivious Transfer sender.
+ * Marker interface. Every class that implements it is signed as Oblivious Transfer sender.<p>
  * 
  * Oblivious Transfer is the situation where a sender has n messages, and the receiver has an 
  * index i. The receiver wishes to receive the i-th among the sender's messages, 
@@ -50,15 +50,17 @@ public interface OTSender {
 	// A protocol that needs to call pre process after the construction time, should create a new instance.
 	
 	/**
-	 * The transfer stage of OT protocol which can be called several times in parallel.
+	 * The transfer stage of OT protocol which can be called several times in parallel.<p>
+	 * The OT implementation support usage of many calls to transfer, with single preprocess execution. <p>
+	 * This way, one can execute batch OT by creating the OT sender once and call the transfer function for each input couple.<p>
 	 * In order to enable the parallel calls, each transfer call should use a different channel to send and receive messages.
 	 * This way the parallel executions of the function will not block each other.
 	 * @param channel each call should get a different one.
 	 * @param input The parameters given in the input must match the DlogGroup member of this class, which given in the constructor.
-	 * @throws IOException if failed to send the message.
-	 * @throws ClassNotFoundException 
-	 * @throws CheatAttemptException
-	 * @throws InvalidDlogGroupException 
+	 * @throws IOException if there was a problem during the communication.
+	 * @throws ClassNotFoundException if there was a problem in the serialization mechanism.
+	 * @throws CheatAttemptException if the sender suspects that the receiver is trying to cheat.
+	 * @throws InvalidDlogGroupException if the given DlogGRoup is not valid.
 	 */
 	public void transfer(Channel channel, OTSInput input) throws IOException, ClassNotFoundException, CheatAttemptException, InvalidDlogGroupException;
 }

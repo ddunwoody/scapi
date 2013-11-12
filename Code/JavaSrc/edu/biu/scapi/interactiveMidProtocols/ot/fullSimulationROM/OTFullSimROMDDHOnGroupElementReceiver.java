@@ -52,10 +52,10 @@ import edu.biu.scapi.tools.Factories.RandomOracleFactory;
 
 /**
  * Concrete implementation of the receiver side in oblivious transfer based on the DDH assumption
- *  that achieves full simulation in the random oracle model.
+ *  that achieves full simulation in the random oracle model.<p>
  * 
  * This class derived from OTFullSimROMDDHReceiverAbs and implements the functionality 
- * related to the GroupElement inputs.
+ * related to the GroupElement inputs.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
@@ -70,10 +70,10 @@ public class OTFullSimROMDDHOnGroupElementReceiver implements OTReceiver, Malici
 	
 	/**
 	 * Constructor that chooses default values of DlogGroup, random oracle and SecureRandom.
-	 * @throws CommitValueException 
-	 * @throws ClassNotFoundException 
-	 * @throws CheatAttemptException 
-	 * @throws IOException 
+	  * @throws ClassNotFoundException if there was a problem during the serialization mechanism in the preprocess phase.
+	 * @throws CheatAttemptException if the receiver suspects that the sender is trying to cheat in the preprocess phase.
+	 * @throws IOException if there was a problem during the communication in the preprocess phase.
+	 * @throws CommitValueException can occur in case of ElGamal commitment scheme.
 	 * 
 	 */
 	public OTFullSimROMDDHOnGroupElementReceiver(Channel channel) throws IOException, CheatAttemptException, ClassNotFoundException, CommitValueException {
@@ -105,10 +105,10 @@ public class OTFullSimROMDDHOnGroupElementReceiver implements OTReceiver, Malici
 	 * @param dlog must be DDH secure.
 	 * @param ro random oracle
 	 * @param random
-	 * @throws CommitValueException 
-	 * @throws ClassNotFoundException 
-	 * @throws CheatAttemptException 
-	 * @throws IOException 
+	 * @throws ClassNotFoundException if there was a problem during the serialization mechanism in the preprocess phase.
+	 * @throws CheatAttemptException if the receiver suspects that the sender is trying to cheat in the preprocess phase.
+	 * @throws IOException if there was a problem during the communication in the preprocess phase.
+	 * @throws CommitValueException can occur in case of ElGamal commitment scheme.
 	 * 
 	 */
 	public OTFullSimROMDDHOnGroupElementReceiver(Channel channel, DlogGroup dlog, RandomOracle ro, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException, IOException, CheatAttemptException, ClassNotFoundException, CommitValueException{
@@ -166,32 +166,18 @@ public class OTFullSimROMDDHOnGroupElementReceiver implements OTReceiver, Malici
 	
 	/**
 	 * 
-	 * Run the following part of the protocol:
-	 * "SAMPLE random values y, alpha0, r <- {0, . . . , q-1} 
-	 *	SET alpha1 = alpha0 + 1 
-	 *	COMPUTE 
-	 *	1.	g1 = (g0)^y
-	 *	2.	h0 = (g0)^alpha0
-	 *	3.	h1 = (g1)^alpha1
-	 *	4.	g = (gSigma)^r
-	 *	5.	h = (hSigma)^r
-	 *	Run ZKPOK_FS_SIGMA with Sigma protocol SIGMA_DH using common input (g0,g1,h0,h1/g1) 
-	 *		and private input alpha0. 
-	 *	Let tP denote the resulting proof transcript.
-	 *	SEND (g1,h0,h1), (g,h) and tP  to S
-	 *	WAIT for (u0,c0) and (u1,c1) from S
-	 *	IF  NOT
-	 *	•	u0, u1, c0, c1 in G
-	 *		 REPORT ERROR
-	 *	OUTPUT  xSigma = cSigma * (uSigma)^(-r)"<p>
-	 * The transfer stage of OT protocol which can be called several times in parallel.
-	 * In order to enable the parallel calls, each transfer call should use a different channel to send and receive messages.
-	 * This way the parallel executions of the function will not block each other.
-	 * The parameters given in the input must match the DlogGroup member of this class, which given in the constructor.
-	 * @param channel
-	 * @param input MUST be OTRBasicInput.
-	 * @return OTROutput, the output of the protocol.
-	 * 
+	 * Run the transfer phase of the OT protocol.<p>
+	 * Transfer Phase (with input sigma) <p>
+	 *		SAMPLE a random value r <- {0, . . . , q-1} <p>
+	 *		COMPUTE<p>
+	 *		4.	g = (gSigma)^r<p>
+	 *		5.	h = (hSigma)^r<p>
+	 *		SEND (g,h) to S<p>
+	 *		WAIT for messages (u0,c0) and (u1,c1) from S<p>
+	 *		IF  NOT<p>
+	 *		•	u0, u1, c0, c1 in G<p>
+	 *		      REPORT ERROR<p>
+	 *		OUTPUT  xSigma = cSigma * (uSigma)^(-r)<p>
 	 */
 	public OTROutput transfer(Channel channel, OTRInput input) throws IOException, ClassNotFoundException, CheatAttemptException {
 		//Creates the utility class that executes the transfer phase.

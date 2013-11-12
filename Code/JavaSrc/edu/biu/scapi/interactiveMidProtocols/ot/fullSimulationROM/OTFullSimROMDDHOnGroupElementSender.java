@@ -51,7 +51,7 @@ import edu.biu.scapi.tools.Factories.RandomOracleFactory;
 
 /**
  * Concrete implementation of the sender side in oblivious transfer based on the DDH assumption 
- * that achieves full simulation in the random oracle model.
+ * that achieves full simulation in the random oracle model.<p>
  * 
  * This class derived from OTFullSimROMDDHSenderAbs and implements the functionality 
  * related to the group elements inputs.
@@ -69,10 +69,10 @@ public class OTFullSimROMDDHOnGroupElementSender implements OTSender, Malicious,
 	
 	/**
 	 * Constructor that chooses default values of DlogGroup, randomOracle and SecureRandom.
-	 * @throws CommitValueException 
-	 * @throws CheatAttemptException 
-	 * @throws IOException 
-	 * @throws ClassNotFoundException 
+	 * @throws ClassNotFoundException if there was a problem during the serialization mechanism in the preprocess phase.
+	 * @throws CheatAttemptException if the sender suspects that the receiver is trying to cheat in the preprocess phase.
+	 * @throws IOException if there was a problem during the communication in the preprocess phase.
+	 * @throws CommitValueException can occur in case of ElGamal commitment scheme.
 	 * 
 	 */
 	public OTFullSimROMDDHOnGroupElementSender(Channel channel) throws ClassNotFoundException, IOException, CheatAttemptException, CommitValueException {
@@ -108,10 +108,10 @@ public class OTFullSimROMDDHOnGroupElementSender implements OTSender, Malicious,
 	 * @param random
 	 * @throws SecurityLevelException if the given DlogGroup is not DDH secure.
 	 * @throws InvalidDlogGroupException if the given dlog is invalid.
-	 * @throws CheatAttemptException 
-	 * @throws IOException if failed to receive a message during pre process.
-	 * @throws ClassNotFoundException 
-	 * @throws CommitValueException 
+	 * @throws ClassNotFoundException if there was a problem during the serialization mechanism in the preprocess phase.
+	 * @throws CheatAttemptException if the sender suspects that the receiver is trying to cheat in the preprocess phase.
+	 * @throws IOException if there was a problem during the communication in the preprocess phase.
+	 * @throws CommitValueException can occur in case of ElGamal commitment scheme.
 	 */
 	public OTFullSimROMDDHOnGroupElementSender(Channel channel, DlogGroup dlog, RandomOracle ro, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException, ClassNotFoundException, IOException, CheatAttemptException, CommitValueException{
 		doConstruct(channel, dlog, ro, new SecureRandom());
@@ -163,24 +163,16 @@ public class OTFullSimROMDDHOnGroupElementSender implements OTSender, Malicious,
 	}
 
 	/**
-	 * Runs the part of the protocol where the sender's input is necessary as follows:<p>
-	 *		Transfer Phase (with inputs x0,x1)
-	 *		WAIT for message from R
-	 *		DENOTE the values received by (g,h) 
-	 *		COMPUTE (u0,v0) = RAND(g0,g,h0,h)
-	 *		COMPUTE (u1,v1) = RAND(g1,g,h1,h)
-	 *		COMPUTE c0 = x0 * v0
-	 *		COMPUTE c1 = x1 * v1
-	 *		SEND (u0,c0) and (u1,c1) to R
+	 * Runs the transfer phase of the protocol.<p>
+	 *	Transfer Phase (with inputs x0,x1)<p>
+	 *		WAIT for message from R<p>
+	 *		DENOTE the values received by (g,h) <p>
+	 *		COMPUTE (u0,v0) = RAND(g0,g,h0,h)<p>
+	 *		COMPUTE (u1,v1) = RAND(g1,g,h1,h)<p>
+	 *		COMPUTE c0 = x0 * v0<p>
+	 *		COMPUTE c1 = x1 * v1<p>
+	 *		SEND (u0,c0) and (u1,c1) to R<p>
 	 *		OUTPUT nothing<p>
-	 * The transfer stage of OT protocol which can be called several times in parallel.
-	 * In order to enable the parallel calls, each transfer call should use a different channel to send and receive messages.
-	 * This way the parallel executions of the function will not block each other.
-	 * The parameters given in the input must match the DlogGroup member of this class, which given in the constructor.
-	 * @param channel
-	 * @param input 
-	 * @throws IOException if failed to send the message.
-	 * @throws ClassNotFoundException 
 	 */
 	public void transfer(Channel channel, OTSInput input) throws IOException, ClassNotFoundException{
 		//Creates the utility class that executes the transfer phase.

@@ -151,41 +151,30 @@ abstract class OTPrivacyOnlyDDHSenderAbs implements OTSender{
 	}
 
 	/**
-	 * Runs the part of the protocol where the sender input is necessary.
-	 * The transfer stage of OT protocol which can be called several times in parallel.
-	 * In order to enable the parallel calls, each transfer call should use a different channel to send and receive messages.
-	 * This way the parallel executions of the function will not block each other.
-	 * The parameters given in the input must match the DlogGroup member of this class, which given in the constructor.
-	 * @param channel
-	 * @param input
-	 * @throws IOException if failed to send the message.
-	 * @throws ClassNotFoundException 
-	 * @throws CheatAttemptException 
+	 * Runs the transfer phase of the protocol.<p>
+	 * This is the part of the protocol where the sender input is necessary.<p>
+	 * "WAIT for message a from R<p>
+	 *		DENOTE the tuple a received by S by (x, y, z0, z1)<p>
+	 *		IF NOT<p>
+	 *		•	z0 != z1<p>
+	 *		•	x, y, z0, z1 in the DlogGroup<p>
+	 *		REPORT ERROR (cheat attempt)<p>
+	 *		SAMPLE random values u0,u1,v0,v1 in  {0, . . . , q-1} <p>
+	 *		COMPUTE:<p>
+	 *		•	w0 = x^u0 • g^v0<p>
+	 *		•	k0 = (z0)^u0 • y^v0<p>
+	 *		•	w1 = x^u1 • g^v1<p>
+	 *		•	k1 = (z1)^u1 • y^v1 <p>
+	 *		in byteArray scenario:<p>
+	 *			•	c0 = x0 XOR KDF(|x0|,k0)<p>
+	 *			•	c1 = x1 XOR KDF(|x1|,k1) <p>
+	 *		OR in GroupElement scenario:<p>
+	 *			•	c0 = x0 * k0<p>
+	 *			•	c1 = x1 * k1<p>
+	 *		SEND (w0, c0) and (w1, c1) to R<p>
+	 *		OUTPUT nothing"
 	 */
 	public void transfer(Channel channel, OTSInput input) throws IOException, ClassNotFoundException, CheatAttemptException{
-		/*	
-		  Execute the following lins from the protocol:
-				WAIT for message a from R
-				DENOTE the tuple a received by S by (x, y, z0, z1)
-				IF NOT
-				•	z0 != z1
-				•	x, y, z0, z1 in the DlogGroup
-				REPORT ERROR (cheat attempt)
-				SAMPLE random values u0,u1,v0,v1 in  {0, . . . , q-1} 
-				COMPUTE:
-				•	w0 = x^u0 • g^v0
-				•	k0 = (z0)^u0 • y^v0
-				•	w1 = x^u1 • g^v1
-				•	k1 = (z1)^u1 • y^v1 
-				in byteArray scenario:
-					•	c0 = x0 XOR KDF(|x0|,k0)
-					•	c1 = x1 XOR KDF(|x1|,k1) 
-				OR in GroupElement scenario:
-					•	c0 = x0 * k0
-					•	c1 = x1 * k1
-				SEND (w0, c0) and (w1, c1) to R
-				OUTPUT nothing
-		*/	
 		
 		//Wait for message a from R
 		OTRGroupElementQuadMsg message = waitForMessageFromReceiver(channel);

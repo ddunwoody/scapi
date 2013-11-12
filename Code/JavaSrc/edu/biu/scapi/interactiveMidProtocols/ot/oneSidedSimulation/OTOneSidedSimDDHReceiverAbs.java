@@ -165,17 +165,29 @@ abstract class OTOneSidedSimDDHReceiverAbs implements OTReceiver{
 	}
 	
 	/**
-	 * Runs the part of the protocol where the receiver input is necessary.
-	 * The transfer stage of OT protocol which can be called several times in parallel.
-	 * In order to enable the parallel calls, each transfer call should use a different channel to send and receive messages.
-	 * This way the parallel executions of the function will not block each other.
-	 * The parameters given in the input must match the DlogGroup member of this class, which given in the constructor.
-	 * @param channel
-	 * @param input MUST be OTRBasicInput.
+	 * Runs the transfer phase of the OT protocol.<p>
+	 * This is the part of the protocol where the receiver input is necessary.<p>
+	 * "SAMPLE random values alpha, beta, gamma in {0, . . . , q-1} <p>
+	 *	COMPUTE a as follows:<p>
+	 *	1.	If sigma = 0 then a = (g^alpha, g^beta, g^(alpha*beta), g^gamma)<p>
+	 *	2.	If sigma = 1 then a = (g^alpha, g^beta, g^gamma, g^(alpha*beta))<p>
+	 *	SEND a to S<p>
+	 *	Run the prover in ZKPOK_FROM_SIGMA with Sigma protocol SIGMA_DLOG. Use common input x and private input alpha.<p>
+	 *	WAIT for message pairs (w0, c0) and (w1, c1)  from S<p>
+	 *	In ByteArray scenario:<p>
+	 *		IF  NOT <p>
+	 *			1. w0, w1 in the DlogGroup, AND<p>
+	 *			2. c0, c1 are binary strings of the same length<p>
+	 *			  REPORT ERROR<p>
+	 *		COMPUTE kSigma = (wSigma)^beta<p>
+	 *		OUTPUT  xSigma = cSigma XOR KDF(|cSigma|,kSigma)<p>
+	 *	In GroupElement scenario:<p>
+	 *		IF  NOT <p>
+	 *			1. w0, w1, c0, c1 in the DlogGroup<p>
+	 *			  REPORT ERROR<p>
+	 *		COMPUTE (kSigma)^(-1) = (wSigma)^(-beta)<p>
+	 *		OUTPUT  xSigma = cSigma * (kSigma)^(-1)"<p>
 	 * @return OTROutput, the output of the protocol.
-	 * @throws CheatAttemptException if there was a cheat attempt during the execution of the protocol.
-	 * @throws IOException if the send or receive functions failed.
-	 * @throws ClassNotFoundException if the receive failed.
 	 */
 	public OTROutput transfer(Channel channel, OTRInput input) throws CheatAttemptException, IOException, ClassNotFoundException{
 		//check if the input is valid.

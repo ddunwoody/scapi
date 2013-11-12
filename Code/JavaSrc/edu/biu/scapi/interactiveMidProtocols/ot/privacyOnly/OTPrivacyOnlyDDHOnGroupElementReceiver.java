@@ -39,7 +39,7 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.securityLevel.PrivacyOnly;
 
 /**
- * Concrete class for OT Privacy assuming DDH receiver ON GROUP ELEMENT.
+ * Concrete class for OT Privacy assuming DDH receiver ON GROUP ELEMENT.<p>
  * This class derived from OTPrivacyOnlyDDHReceiverAbs and implements the functionality 
  * related to the group element inputs.
  * 

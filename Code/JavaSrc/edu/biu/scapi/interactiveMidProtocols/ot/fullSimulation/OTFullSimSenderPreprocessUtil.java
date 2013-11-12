@@ -43,17 +43,19 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
 public class OTFullSimSenderPreprocessUtil {
 
 	/**
-	 * Runs the part of the protocol where the sender input is not yet necessary:
-	 * WAIT for message from R
-	 * DENOTE the values received by (g1,h0,h1) 
-	 * Run the verifier in ZKPOK_FROM_SIGMA with Sigma protocol SIGMA_DH. Use common input (g0,g1,h0,h1/g1).
-	 * If output is REJ, REPORT ERROR (cheat attempt) and HALT.
-	 * @param channel
-	 * @return 
-	 * @throws IOException if failed to receive a message.
-	 * @throws ClassNotFoundException 
-	 * @throws CheatAttemptException 
-	 * @throws CommitValueException 
+	 * Runs the preprocess phase of the OT protocol, where the sender input is not yet necessary.<p>
+	 * "WAIT for message from R<p>
+	 * DENOTE the values received by (g1,h0,h1) <p>
+	 * Run the verifier in ZKPOK_FROM_SIGMA with Sigma protocol SIGMA_DH. Use common input (g0,g1,h0,h1/g1).<p>
+	 * If output is REJ, REPORT ERROR (cheat attempt) and HALT."<p>
+	 * @param channel used to communicate between the parties.
+	 * @param dlog
+	 * @param zkVerifier used to verify the ZKPOK_FROM_SIGMA
+	 * @return the values calculated in the preprocess
+	 * @throws ClassNotFoundException if there was a problem during the serialization mechanism in the preprocess phase.
+	 * @throws CheatAttemptException if the sender suspects that the receiver is trying to cheat in the preprocess phase.
+	 * @throws IOException if there was a problem during the communication in the preprocess phase.
+	 * @throws CommitValueException can occur in case of ElGamal commitment scheme.
 	 */
 	public static OTFullSimPreprocessPhaseValues preProcess(Channel channel, DlogGroup dlog, ZKPOKVerifier zkVerifier) throws ClassNotFoundException, IOException, CheatAttemptException, CommitValueException{
 		

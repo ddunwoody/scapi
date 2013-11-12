@@ -25,7 +25,7 @@
 package edu.biu.scapi.interactiveMidProtocols.ot;
 
 /**
- * Concrete implementation of OT sender (on byteArray) input.
+ * Concrete implementation of OT sender (on byteArray) input.<p>
  * In the byteArray scenario, the sender gets two binary strings x0, x1 of the same (arbitrary) length.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
@@ -36,15 +36,28 @@ public class OTOnByteArraySInput implements OTSInput{
 	private byte[] x0;
 	private byte[] x1;
 	
+	/**
+	 * Constructor that sets two byte arrays - x0, x1.
+	 * @param x0
+	 * @param x1
+	 */
 	public OTOnByteArraySInput(byte[] x0, byte[] x1){
 		this.x0 = x0;
 		this.x1 = x1;
 	}
 	
+	/**
+	 * Returns the first byte array input.
+	 * @return the first byte array input.
+	 */
 	public byte[] getX0(){
 		return x0;
 	}
 	
+	/**
+	 * Returns the second byte array input.
+	 * @return the second byte array input.
+	 */
 	public byte[] getX1(){
 		return x1;
 	}

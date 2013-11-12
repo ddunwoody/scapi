@@ -26,7 +26,7 @@ package edu.biu.scapi.interactiveMidProtocols.ot;
 
 /**
  * Every OT receiver needs inputs during the protocol execution, but every concrete protocol needs 
- * different inputs.
+ * different inputs. <p>
  * This interface is a marker interface for OT receiver input, where there is an implementing class
  * for each OT protocol.
  * 

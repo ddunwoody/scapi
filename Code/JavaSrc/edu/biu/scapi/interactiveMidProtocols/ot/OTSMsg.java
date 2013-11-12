@@ -28,7 +28,7 @@ import java.io.Serializable;
 
 /**
  * Every OT sender should send a message to the receiver, but every concrete protocol sends 
- * different data.
+ * different data.<p>
  * This interface is a marker interface for OT sender message, where there is an implementing class
  * for each OT protocol.
  * 

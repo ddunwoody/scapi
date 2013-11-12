@@ -47,10 +47,10 @@ import edu.biu.scapi.securityLevel.DDH;
 import edu.biu.scapi.tools.Factories.DlogGroupFactory;
 
 /**
- * Abstract class for Semi-Honest OT assuming DDH receiver.
- * Semi-Honest OT have two modes: one is on ByteArray and the second is on GroupElement.
- * The different is in the input and output types and the way to process them. 
- * In spite that, there is a common behavior for both modes which this class is implementing.
+ * Abstract class for Semi-Honest OT assuming DDH receiver. <p>
+ * Semi-Honest OT have two modes: one is on ByteArray and the second is on GroupElement. <p>
+ * The different is in the input and output types and the way to process them.  <p>
+ * In spite that, there is a common behavior for both modes which this class is implementing.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
@@ -128,15 +128,17 @@ abstract class OTSemiHonestDDHReceiverAbs implements OTReceiver{
 	}
 	
 	/**
-	 * Runs the part of the protocol where the receiver input is necessary.
-	 * The transfer stage of OT protocol which can be called several times in parallel.
-	 * In order to enable the parallel calls, each transfer call should use a different channel to send and receive messages.
-	 * This way the parallel executions of the function will not block each other.
-	 * The parameters given in the input must match the DlogGroup member of this class, which given in the constructor.
-	 * @param input MUST be OTRBasicInput.
-	 * @return OTROutput, the output of the protocol.
-	 * @throws IOException if failed to send or receive a message.
-	 * @throws ClassNotFoundException
+	 * Run the transfer phase of the protocol.<p>
+	 * "SAMPLE random values alpha in Zq and h in the DlogGroup <p>
+	 *		COMPUTE h0,h1 as follows:<p>
+	 *			1.	If sigma = 0 then h0 = g^alpha  and h1 = h<p>
+	 *			2.	If sigma = 1 then h0 = h and h1 = g^alpha <p>
+	 *		SEND (h0,h1) to S<p>
+	 *		WAIT for the message (u, v0,v1) from S<p>
+	 *		COMPUTE kSigma = (u)^alpha							- in byte array scenario<p>
+	 *			 OR (kSigma)^(-1) = u^(-alpha)					- in GroupElement scenario<p>
+	 *		OUTPUT  xSigma = vSigma XOR KDF(|cSigma|,kSigma)	- in byte array scenario<p>
+	 *			 OR xSigma = vSigma * (kSigma)^(-1)" 			- in GroupElement scenario<p>
 	 */
 	public OTROutput transfer(Channel channel, OTRInput input) throws IOException, ClassNotFoundException{
 		//check if the input is valid.
@@ -150,19 +152,6 @@ abstract class OTSemiHonestDDHReceiverAbs implements OTReceiver{
 		if ((sigma != 0) && (sigma!= 1)){
 			throw new IllegalArgumentException("Sigma should be 0 or 1");
 		}
-		
-		/* Run the protocol:
-				SAMPLE random values alpha in  [0, . . . , q-1]  and h in the DlogGroup
-				COMPUTE h0,h1 as follows:
-					1.	If sigma = 0 then h0 = g^alpha  and h1 = h
-					2.	If sigma = 1 then h0 = h and h1 = g^alpha 
-				SEND (h0,h1) to S
-				WAIT for the message (u, v0,v1) from S
-				COMPUTE kSigma = (u)^alpha							- in byte array scenario
-					OR (kSigma)^(-1) = u^(-alpha)					- in GroupElement scenario
-				OUTPUT  xSigma = vSigma XOR KDF(|cSigma|,kSigma)	- in byte array scenario
-					 OR xSigma = vSigma * (kSigma)^(-1) 			- in GroupElement scenario
-		*/
 		
 		//Sample random alpha
 		BigInteger alpha = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);

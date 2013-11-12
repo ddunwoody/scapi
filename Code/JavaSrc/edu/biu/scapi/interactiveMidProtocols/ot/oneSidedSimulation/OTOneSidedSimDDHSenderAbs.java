@@ -157,17 +157,26 @@ abstract class OTOneSidedSimDDHSenderAbs implements OTSender{
 	}
 
 	/**
-	 * Runs the part of the protocol where the sender input is necessary.
-	 * The transfer stage of OT protocol which can be called several times in parallel.
-	 * In order to enable the parallel calls, each transfer call should use a different channel to send and receive messages.
-	 * This way the parallel executions of the function will not block each other.
-	 * The parameters given in the input must match the DlogGroup member of this class, which given in the constructor.
-	 * @param channel
-	 * @param input
-	 * @throws IOException if failed to send the message.
-	 * @throws ClassNotFoundException 
-	 * @throws CheatAttemptException 
-	 * @throws InvalidDlogGroupException 
+	 * Runs the transfer phase of the protocol. <p>
+	 * This is the part of the protocol where the sender input is necessary.<p>
+	 * "WAIT for message a from R<p>
+	 *	DENOTE the tuple a received by (x, y, z0, z1)<p>
+	 *	Run the verifier in ZKPOK_FROM_SIGMA with Sigma protocol SIGMA_DLOG. Use common input x.<p>
+	 *	If output is REJ, REPORT ERROR (cheat attempt) and HALT<p>
+	 *	IF NOT<p>
+	 *	•	z0 = z1<p>
+	 *	•	x, y, z0, z1 in G<p>
+	 *	REPORT ERROR (cheat attempt)<p>
+	 *	SAMPLE random values u0,u1,v0,v1 <-  {0, . . . , q-1} <p>
+	 *	COMPUTE:<p>
+	 *	•	w0 = x^u0 * g^v0<p>
+	 *	•	k0 = (z0)^u0 * y^v0<p>
+	 *	•	w1 = x^u1 * g^v1<p>
+	 *	•	k1 = (z1)^u1 * y^v1 <p>
+	 *	•	c0 = x0 XOR KDF(|x0|,k0)<p>
+	 *	•	c1 = x1 XOR KDF(|x1|,k1) <p>
+	 *	SEND (w0, c0) and (w1, c1) to R<p>
+	 *	OUTPUT nothing"
 	 */
 	public void transfer(Channel channel, OTSInput input) throws IOException, ClassNotFoundException, CheatAttemptException, InvalidDlogGroupException{
 		

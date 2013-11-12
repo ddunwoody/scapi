@@ -42,6 +42,11 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
  */
 public class OTFullSimOnGroupElementReceiverTransferUtil extends OTFullSimReceiverTransferUtilAbs{
 
+	/**
+	 * Sets the given dlog and random.
+	 * @param dlog
+	 * @param random
+	 */
 	public OTFullSimOnGroupElementReceiverTransferUtil(DlogGroup dlog, SecureRandom random) {
 		super(dlog, random);
 		

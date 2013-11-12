@@ -53,9 +53,9 @@ public abstract class OTFullSimReceiverTransferUtilAbs {
 	private BigInteger qMinusOne;
 	
 	/**
-	 * 
+	 * Sets the given dlog and random.
 	 * @param dlog
-	 * @param verifier
+	 * @param random
 	 */
 	public OTFullSimReceiverTransferUtilAbs(DlogGroup dlog, SecureRandom random){
 		this.dlog = dlog;
@@ -67,8 +67,8 @@ public abstract class OTFullSimReceiverTransferUtilAbs {
 	
 	/**
 	 * 
-	 * Run the following part of the protocol:
-	 * Transfer Phase (with inputs x0,x1) <p>
+	 * Run the transfer phase of the OT protocol.<p>
+	 * Transfer Phase (with inputs sigma) <p>
 	 *		SAMPLE a random value r <- {0, . . . , q-1} <p>
 	 *		COMPUTE<p>
 	 *		4.	g = (gSigma)^r<p>
@@ -86,16 +86,18 @@ public abstract class OTFullSimReceiverTransferUtilAbs {
 	 *		•	u0, u1, c0, c1 in G<p>
 	 *		      REPORT ERROR<p>
 	 *		OUTPUT  xSigma = cSigma * (uSigma)^(-r)<p>
-	 * The transfer stage of OT protocol which can be called several times in parallel.
+	 * This is the transfer stage of OT protocol which can be called several times in parallel.<p>
+	 * The OT implementation support usage of many calls to transfer, with single preprocess execution. <p>
+	 * This way, one can execute batch OT by creating the OT receiver once and call the transfer function for each input couple.<p>
 	 * In order to enable the parallel calls, each transfer call should use a different channel to send and receive messages.
 	 * This way the parallel executions of the function will not block each other.
-	 * The parameters given in the input must match the DlogGroup member of this class, which given in the constructor.
-	 * @param channel
-	 * @param input MUST be OTRBasicInput.
+	 * @param channel each call should get a different one.
+	 * @param input MUST be OTRBasicInput. The parameters given in the input must match the DlogGroup member of this class, which given in the constructor.
+	 * @param preprocessValues hold the values calculated in the preprocess phase.
 	 * @return OTROutput, the output of the protocol.
 	 * @throws CheatAttemptException if there was a cheat attempt during the execution of the protocol.
-	 * @throws IOException if the send or receive functions failed.
-	 * @throws ClassNotFoundException if the receive failed.
+	 * @throws IOException if the send or receive functions failed
+	 * @throws ClassNotFoundException if there was a problem during the serialization mechanism
 	 */
 	public OTROutput transfer(Channel channel, OTRInput input, OTFullSimPreprocessPhaseValues preprocessValues) throws IOException, ClassNotFoundException, CheatAttemptException {
 		//check if the input is valid.

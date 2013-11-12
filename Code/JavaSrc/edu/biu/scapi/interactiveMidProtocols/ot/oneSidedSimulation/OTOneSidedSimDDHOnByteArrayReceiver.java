@@ -44,7 +44,7 @@ import edu.biu.scapi.tools.Factories.KdfFactory;
 /**
  * Concrete implementation of the receiver side in oblivious transfer based on the DDH assumption that achieves 
  * privacy for the case that the sender is corrupted and simulation in the case that the receiver 
- * is corrupted.
+ * is corrupted.<p>
  * 
  * This class derived from OTOneSidedSimDDHReceiverAbs and implements the functionality 
  * related to the byte array inputs.

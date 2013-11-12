@@ -30,7 +30,7 @@ import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CheatAttemptException;
 
 /**
- * Marker interface. Every class that implements it is signed as Oblivious Transfer receiver.
+ * Marker interface. Every class that implements it is signed as Oblivious Transfer receiver.<p>
  * 
  * Oblivious Transfer is is a type of protocol in which a sender has n messages, and the receiver has an 
  * index i. The receiver wishes to receive the i-th among the sender's messages, 
@@ -49,7 +49,9 @@ public interface OTReceiver {
 	// A protocol that needs to call preprocess after the construction time, should create a new instance.
 	
 	/**
-	 * The transfer stage of OT protocol which can be called several times in parallel.
+	 * The transfer stage of OT protocol which can be called several times in parallel.<p>
+	 * The OT implementation support usage of many calls to transfer, with single preprocess execution. <p>
+	 * This way, one can execute batch OT by creating the OT receiver once and call the transfer function for each input couple.<p>
 	 * In order to enable the parallel calls, each transfer call should use a different channel to send and receive messages.
 	 * This way the parallel executions of the function will not block each other.
 	 * @param channel each call should get a different one.
@@ -57,7 +59,7 @@ public interface OTReceiver {
 	 * @return OTROutput, the output of the protocol.
 	 * @throws CheatAttemptException if there was a cheat attempt during the execution of the protocol.
 	 * @throws IOException if the send or receive functions failed
-	 * @throws ClassNotFoundException if the receive function failed
+	 * @throws ClassNotFoundException if there was a problem during the serialization mechanism
 	 */
 	public OTROutput transfer(Channel channel, OTRInput input) throws CheatAttemptException, IOException, ClassNotFoundException;
 }

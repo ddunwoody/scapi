@@ -37,15 +37,28 @@ public class OTOnGroupElementSInput implements OTSInput{
 	private GroupElement x0;
 	private GroupElement x1;
 	
+	/**
+	 * Constructor that sets two byte arrays - x0, x1.
+	 * @param x0
+	 * @param x1
+	 */
 	public OTOnGroupElementSInput(GroupElement x0, GroupElement x1){
 		this.x0 = x0;
 		this.x1 = x1;
 	}
 	
+	/**
+	 * Returns the first group element input.
+	 * @return the first group element input.
+	 */
 	public GroupElement getX0(){
 		return x0;
 	}
 	
+	/**
+	 * Returns the second group element input.
+	 * @return the second group element input.
+	 */
 	public GroupElement getX1(){
 		return x1;
 	}

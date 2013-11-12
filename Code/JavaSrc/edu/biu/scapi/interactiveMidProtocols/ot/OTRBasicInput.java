@@ -25,7 +25,7 @@
 package edu.biu.scapi.interactiveMidProtocols.ot;
 
 /**
- * Concrete implementation of OT receiver input.
+ * Concrete implementation of OT receiver input.<p>
  * In the basic scenario, the receiver gets a single bit representing 0/1.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
@@ -37,10 +37,18 @@ public class OTRBasicInput implements OTRInput{
 	//in order to use small memory space without use bit manipulation. 
 	private byte sigma;
 	
+	/**
+	 * Sets the given sigma.
+	 * @param sigma
+	 */
 	public OTRBasicInput(byte sigma){
 		this.sigma = sigma;
 	}
 	
+	/**
+	 * Returns the sigma input.
+	 * @return
+	 */
 	public byte getSigma(){
 		return sigma;
 	}

@@ -29,6 +29,7 @@ import java.io.Serializable;
 import java.security.SecureRandom;
 
 import edu.biu.scapi.comm.Channel;
+import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTRGroupElementPairMsg;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
@@ -48,7 +49,7 @@ public abstract class OTFullSimSenderTransferUtilAbs {
 	private SecureRandom random;
 	
 	/**
-	 * Constructor that sets the given parameters.
+	 * Sets the given dlog and random.
 	 * @param dlog
 	 * @param random
 	 */
@@ -59,28 +60,32 @@ public abstract class OTFullSimSenderTransferUtilAbs {
 	
 	
 	/**
-	 * Runs the part of the protocol where the sender's input is necessary as follows:<p>
-	 *		Transfer Phase (with inputs x0,x1)
-	 *		WAIT for message from R
-	 *		DENOTE the values received by (g,h) 
-	 *		COMPUTE (u0,v0) = RAND(g0,g,h0,h)
-	 *		COMPUTE (u1,v1) = RAND(g1,g,h1,h)
-	 *		in the byte array scenario:
-	 *			COMPUTE c0 = x0 XOR KDF(|x0|,v0)
-	 *			COMPUTE c1 = x1 XOR KDF(|x1|,v1)
-	 *		in the GroupElement scenario:
-	 *			COMPUTE c0 = x0 * v0
-	 *			COMPUTE c1 = x1 * v1
-	 *		SEND (u0,c0) and (u1,c1) to R
-	 *		OUTPUT nothing<p>
-	 * The transfer stage of OT protocol which can be called several times in parallel.
+	 * Runs the transfer phase of the OT protocol.<p>
+	 * Transfer Phase (with inputs x0,x1)<p>
+	 *	WAIT for message from R<p>
+	 *	DENOTE the values received by (g,h) <p>
+	 *	COMPUTE (u0,v0) = RAND(g0,g,h0,h)<p>
+	 *	COMPUTE (u1,v1) = RAND(g1,g,h1,h)<p>
+	 *	in the byte array scenario:<p>
+	 *		COMPUTE c0 = x0 XOR KDF(|x0|,v0)<p>
+	 *		COMPUTE c1 = x1 XOR KDF(|x1|,v1)<p>
+	 *	in the GroupElement scenario:<p>
+	 *		COMPUTE c0 = x0 * v0<p>
+	 *		COMPUTE c1 = x1 * v1<p>
+	 *	SEND (u0,c0) and (u1,c1) to R<p>
+	 *	OUTPUT nothing<p>
+	 * This is the transfer stage of OT protocol which can be called several times in parallel.<p>
+	 * The OT implementation support usage of many calls to transfer, with single preprocess execution. <p>
+	 * This way, one can execute batch OT by creating the OT receiver once and call the transfer function for each input couple.<p>
 	 * In order to enable the parallel calls, each transfer call should use a different channel to send and receive messages.
 	 * This way the parallel executions of the function will not block each other.
-	 * The parameters given in the input must match the DlogGroup member of this class, which given in the constructor.
-	 * @param channel
-	 * @param input 
-	 * @throws IOException if failed to send the message.
-	 * @throws ClassNotFoundException 
+	 * @param channel each call should get a different one.
+	 * @param input the parameters given in the input must match the DlogGroup member of this class, which given in the constructor.
+	 * @param preprocessValues hold the values calculated in the preprocess phase.
+	 * @return OTROutput, the output of the protocol.
+	 * @throws CheatAttemptException if there was a cheat attempt during the execution of the protocol.
+	 * @throws IOException if the send or receive functions failed
+	 * @throws ClassNotFoundException if there was a problem during the serialization mechanism
 	 */
 	public void transfer(Channel channel, OTSInput input, OTFullSimPreprocessPhaseValues preprocessValues) throws IOException, ClassNotFoundException{
 		

@@ -27,11 +27,11 @@ package edu.biu.scapi.interactiveMidProtocols.ot;
 import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
 
 /**
- * Concrete implementation of OT Privacy sender (on GroupElement) message.
- * In the GroupElement scenario, the sender sends four GroupElements - w0, w1, c0 and c1.
- * This class is used by most of OT implementations. 
+ * Concrete implementation of OT Privacy sender (on GroupElement) message.<p>
+ * In the GroupElement scenario, the sender sends four GroupElements - w0, w1, c0 and c1.<p>
+ * This class is used by most of OT implementations. <p>
  * An OT protocol that does not use this class (like OT SemiHonest) will create a separate 
- * class that matches what it needs.
+ * class that matches what it needs.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
@@ -44,6 +44,13 @@ public class OTOnGroupElementSMsg implements OTSMsg{
 	private GroupElementSendableData c0;
 	private GroupElementSendableData c1;
 	
+	/**
+	 * Constructor that sets the tuples (w0,c0), (w1, c1) calculated by the protocol.
+	 * @param w0 
+	 * @param c0
+	 * @param w1
+	 * @param c1
+	 */
 	public OTOnGroupElementSMsg(GroupElementSendableData  w0, 
 								GroupElementSendableData c0,
 								GroupElementSendableData w1,  

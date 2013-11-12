@@ -27,8 +27,11 @@ package edu.biu.scapi.interactiveMidProtocols.ot;
 import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
 
 /**
- * Concrete implementation of OT Privacy sender (on byte array) message.
+ * Concrete implementation of OT Privacy sender (on byte array) message.<p>
  * In the byteArray scenario, the sender sends two GroupElement - w0 and w1 and two byte arrays - c0 and c1.
+ * This class is used by most of OT implementations. <p>
+ * An OT protocol that does not use this class (like OT SemiHonest) will create a separate 
+ * class that matches what it needs.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
@@ -42,6 +45,13 @@ public class OTOnByteArraySMsg implements OTSMsg{
 	private byte[] c0;
 	private byte[] c1;
 	
+	/**
+	 * Constructor that sets the tuples (w0,c0), (w1, c1) calculated by the protocol.
+	 * @param w0 
+	 * @param c0
+	 * @param w1
+	 * @param c1
+	 */
 	public OTOnByteArraySMsg(GroupElementSendableData w0, byte[] c0, 
 										GroupElementSendableData w1, byte[] c1){
 		this.w0 = w0;

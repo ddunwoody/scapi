@@ -25,7 +25,7 @@
 package edu.biu.scapi.interactiveMidProtocols.ot;
 
 /**
- * Concrete implementation of OT receiver (on byteArray) output.
+ * Concrete implementation of OT receiver (on byteArray) output.<p>
  * In the byteArray scenario, the receiver outputs xSigma as a byte array.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
@@ -35,10 +35,18 @@ public class OTOnByteArrayROutput implements OTROutput {
 
 	private byte[] xSigma;
 	
+	/**
+	 * Constructor that sets the output array of the protocol.
+	 * @param xSigma outputed from the protocol.
+	 */
 	public OTOnByteArrayROutput(byte[] xSigma){
 		this.xSigma = xSigma;
 	}
 	
+	/**
+	 * Return the output array of the protocol.
+	 * @return the output array of the protocol.
+	 */
 	public byte[] getXSigma(){
 		return xSigma;
 	}

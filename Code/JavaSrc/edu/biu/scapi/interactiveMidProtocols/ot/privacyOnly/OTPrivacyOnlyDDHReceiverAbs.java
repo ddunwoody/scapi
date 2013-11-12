@@ -157,17 +157,29 @@ abstract class OTPrivacyOnlyDDHReceiverAbs implements OTReceiver{
 	}
 	
 	/**
-	 * Runs the part of the protocol where the receiver input is necessary.
-	 * The transfer stage of OT protocol which can be called several times in parallel.
-	 * In order to enable the parallel calls, each transfer call should use a different channel to send and receive messages.
-	 * This way the parallel executions of the function will not block each other.
-	 * The parameters given in the input must match the DlogGroup member of this class, which given in the constructor.
-	 * @param channel
-	 * @param input MUST be OTRBasicInput.
+	 * Runs the transfer phase of the OT protocol. <P>
+	 * This is the part of the protocol where the receiver input is necessary.<P>
+	 * "SAMPLE random values alpha, beta, gamma in {0, . . . , q-1} <P>
+	 *	COMPUTE a as follows:<P>
+	 *	1.	If sigma = 0 then a = (g^alpha, g^beta, g^(alpha*beta), g^gamma)<P>
+	 *	2.	If sigma = 1 then a = (g^alpha, g^beta, g^gamma, g^(alpha*beta))<P>
+	 *	SEND a to S<P>
+	 *	WAIT for message pairs (w0, c0) and (w1, c1)  from S<P>
+	 *	In ByteArray scenario:<P>
+	 *		IF  NOT <P>
+	 *			1. w0, w1 in the DlogGroup, AND<P>
+	 *			2. c0, c1 are binary strings of the same length<P>
+	 *			REPORT ERROR<P>
+	 *		COMPUTE kSigma = (wSigma)^beta<P>
+	 *		OUTPUT  xSigma = cSigma XOR KDF(|cSigma|,kSigma)<P>
+	 *	In GroupElement scenario:<P>
+	 *		IF  NOT <P>
+	 *			1. w0, w1, c0, c1 in the DlogGroup<P>
+	 *			REPORT ERROR<P>
+	 *		COMPUTE (kSigma)^(-1) = (wSigma)^(-beta)<P>
+	 *		OUTPUT  xSigma = cSigma * (kSigma)^(-1)"<P>
+	 * 
 	 * @return OTROutput, the output of the protocol.
-	 * @throws CheatAttemptException if there was a cheat attempt during the execution of the protocol.
-	 * @throws IOException if the send or receive functions failed.
-	 * @throws ClassNotFoundException if the receive failed.
 	 */
 	public OTROutput transfer(Channel channel, OTRInput input) throws CheatAttemptException, IOException, ClassNotFoundException{
 		
@@ -182,29 +194,6 @@ abstract class OTPrivacyOnlyDDHReceiverAbs implements OTReceiver{
 		if ((sigma != 0) && (sigma!= 1)){
 			throw new IllegalArgumentException("Sigma should be 0 or 1");
 		}
-		
-		/*
-		 * Run the following lines from the protocol:
-		    SAMPLE random values alpha, beta, gamma in {0, . . . , q-1} 
-			COMPUTE a as follows:
-			1.	If sigma = 0 then a = (g^alpha, g^beta, g^(alpha*beta), g^gamma)
-			2.	If sigma = 1 then a = (g^alpha, g^beta, g^gamma, g^(alpha*beta))
-			SEND a to S
-			WAIT for message pairs (w0, c0) and (w1, c1)  from S
-			In ByteArray scenario:
-				IF  NOT 
-					1. w0, w1 in the DlogGroup, AND
-					2. c0, c1 are binary strings of the same length
-				   REPORT ERROR
-				COMPUTE kSigma = (wSigma)^beta
-				OUTPUT  xSigma = cSigma XOR KDF(|cSigma|,kSigma)
-			In GroupElement scenario:
-				IF  NOT 
-					1. w0, w1, c0, c1 in the DlogGroup
-				   REPORT ERROR
-				COMPUTE (kSigma)^(-1) = (wSigma)^(-beta)
-				OUTPUT  xSigma = cSigma * (kSigma)^(-1)
-		 */
 		
 		//Values required for calculations:
 		BigInteger beta = sampleRandomBeta();

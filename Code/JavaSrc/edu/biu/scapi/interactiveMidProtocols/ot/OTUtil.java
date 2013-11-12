@@ -39,16 +39,13 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
  *
  */
 public class OTUtil {
-
-	public OTUtil(){
-		
-	}
 	
 	/**
-	 * Some OT protocols uses the function RAND(w,x,y,z) defined as follows:
-	 *	1.	SAMPLE random values s,t <- {0, . . . , q-1}
-	 *	2.	COMPUTE u = w^s * y^t
-	 *	3.	COMPUTE v = x^s * z^t
+	 * Some OT protocols uses the function RAND(w,x,y,z). 
+	 * This function defined as follows.<p>
+	 *	1.	SAMPLE random values s,t <- {0, . . . , q-1}<p>
+	 *	2.	COMPUTE u = w^s * y^t<p>
+	 *	3.	COMPUTE v = x^s * z^t<p>
 	 *	4.	OUTPUT (u,v)
 	 * @param w
 	 * @param x

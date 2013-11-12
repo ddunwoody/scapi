@@ -27,7 +27,7 @@ package edu.biu.scapi.interactiveMidProtocols.ot;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**
- * Concrete implementation of OT receiver (on GroupElement) output.
+ * Concrete implementation of OT receiver (on GroupElement) output.<p>
  * In the GroupElement scenario, the receiver outputs xSigma as a GroupElement.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
@@ -37,10 +37,18 @@ public class OTOnGroupElementROutput implements OTROutput {
 
 	private GroupElement xSigma;
 	
+	/**
+	 * Constructor that sets the output of the protocol.
+	 * @param xSigma outputed from the protocol.
+	 */
 	public OTOnGroupElementROutput(GroupElement xSigma){
 		this.xSigma = xSigma;
 	}
 	
+	/**
+	 * Return the output of the protocol.
+	 * @return the output of the protocol.
+	 */
 	public GroupElement getXSigma(){
 		return xSigma;
 	}

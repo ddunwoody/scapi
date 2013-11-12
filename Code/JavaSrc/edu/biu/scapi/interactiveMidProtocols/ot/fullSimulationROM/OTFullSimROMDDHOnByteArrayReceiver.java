@@ -54,7 +54,7 @@ import edu.biu.scapi.tools.Factories.RandomOracleFactory;
 
 /**
  * Concrete implementation of the receiver side in oblivious transfer based on the DDH assumption
- *  that achieves full simulation in the random oracle model.
+ *  that achieves full simulation in the random oracle model.<p>
  * 
  * This class derived from OTFullSimROMDDHReceiverAbs and implements the functionality 
  * related to the byte array inputs.
@@ -73,10 +73,10 @@ public class OTFullSimROMDDHOnByteArrayReceiver implements OTReceiver, Malicious
 	
 	/**
 	 * Constructor that chooses default values of DlogGroup, random oracle and SecureRandom.
-	 * @throws CommitValueException 
-	 * @throws ClassNotFoundException 
-	 * @throws CheatAttemptException 
-	 * @throws IOException 
+	 * @throws ClassNotFoundException if there was a problem during the serialization mechanism in the preprocess phase.
+	 * @throws CheatAttemptException if the receiver suspects that the sender is trying to cheat in the preprocess phase.
+	 * @throws IOException if there was a problem during the communication in the preprocess phase.
+	 * @throws CommitValueException can occur in case of ElGamal commitment scheme.
 	 * 
 	 */
 	public OTFullSimROMDDHOnByteArrayReceiver(Channel channel) throws IOException, CheatAttemptException, ClassNotFoundException, CommitValueException {
@@ -111,10 +111,10 @@ public class OTFullSimROMDDHOnByteArrayReceiver implements OTReceiver, Malicious
 	 * @param kdf
 	 * @param ro random oracle
 	 * @param random
-	 * @throws CommitValueException 
-	 * @throws ClassNotFoundException 
-	 * @throws CheatAttemptException 
-	 * @throws IOException 
+	 * @throws ClassNotFoundException if there was a problem during the serialization mechanism in the preprocess phase.
+	 * @throws CheatAttemptException if the receiver suspects that the sender is trying to cheat in the preprocess phase.
+	 * @throws IOException if there was a problem during the communication in the preprocess phase.
+	 * @throws CommitValueException can occur in case of ElGamal commitment scheme.
 	 * 
 	 */
 	public OTFullSimROMDDHOnByteArrayReceiver(Channel channel, DlogGroup dlog, KeyDerivationFunction kdf, RandomOracle ro, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException, IOException, CheatAttemptException, ClassNotFoundException, CommitValueException{
@@ -174,7 +174,7 @@ public class OTFullSimROMDDHOnByteArrayReceiver implements OTReceiver, Malicious
 	/**
 	 * 
 	 * Run the following part of the protocol:
-	 * Transfer Phase (with inputs x0,x1) <p>
+	 * Transfer Phase (with input sigma) <p>
 	 *		SAMPLE a random value r <- {0, . . . , q-1} <p>
 	 *		COMPUTE<p>
 	 *		4.	g = (gSigma)^r<p>
@@ -186,16 +186,6 @@ public class OTFullSimROMDDHOnByteArrayReceiver implements OTReceiver, Malicious
 	 *		•	c0, c1 are binary strings of the same length<p>
 	 *		      REPORT ERROR<p>
 	 *		OUTPUT  xSigma = cSigma XOR KDF(|cSigma|,(uSigma)^r)<p>
-	 * The transfer stage of OT protocol which can be called several times in parallel.
-	 * In order to enable the parallel calls, each transfer call should use a different channel to send and receive messages.
-	 * This way the parallel executions of the function will not block each other.
-	 * The parameters given in the input must match the DlogGroup member of this class, which given in the constructor.
-	 * @param channel
-	 * @param input MUST be OTRBasicInput.
-	 * @return OTROutput, the output of the protocol.
-	 * @throws CheatAttemptException if there was a cheat attempt during the execution of the protocol.
-	 * @throws IOException if the send or receive functions failed.
-	 * @throws ClassNotFoundException if the receive failed.
 	 */
 	@Override
 	public OTROutput transfer(Channel channel, OTRInput input) throws IOException, ClassNotFoundException, CheatAttemptException{

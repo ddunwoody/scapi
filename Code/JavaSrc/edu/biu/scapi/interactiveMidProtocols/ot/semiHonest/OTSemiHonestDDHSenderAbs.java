@@ -128,13 +128,14 @@ abstract class OTSemiHonestDDHSenderAbs implements OTSender{
 	}
 
 	/**
-	 * Runs the part of the protocol where the input is necessary as follows:<p>
-	 *	WAIT for message (h0,h1) from R
-	 *	SAMPLE a random value r in  [0, . . . , q-1] 
-	 *	COMPUTE:
-	 *		•	u = g^r
-	 *		•	k0 = h0^r
-	 *		•	k1 = h1^r
+	 * Runs the transfer phase of the OT protocol.<p>
+	 * This is the phase where the input is necessary as follows:<p>
+	 *	"WAIT for message (h0,h1) from R<p>
+	 *	SAMPLE a random value r in  [0, . . . , q-1] <p>
+	 *	COMPUTE:<p>
+	 *		•	u = g^r<p>
+	 *		•	k0 = h0^r<p>
+	 *		•	k1 = h1^r<p>
 	 *	COMPUTE:<p>
 	 *			in the byte array scenario<p>
 	 *				•	v0 = x0 XOR KDF(|x0|,k0)<p> 
@@ -143,17 +144,9 @@ abstract class OTSemiHonestDDHSenderAbs implements OTSender{
 	 *				•	v0 = x0 * k0<p>
 	 *				•	v1 = x1 * k1"<p>
 	 *		SEND (u,v0,v1) to R<p>
-	 *		OUTPUT nothing<p>
-	 * The transfer stage of OT protocol which can be called several times in parallel.
-	 * In order to enable the parallel calls, each transfer call should use a different channel to send and receive messages.
-	 * This way the parallel executions of the function will not block each other.
-	 * The parameters given in the input must match the DlogGroup member of this class, which given in the constructor.
-	 * @param channel
-	 * @param input
-	 * @throws IOException if failed to send the message.
-	 * @throws ClassNotFoundException 
+	 *		OUTPUT nothing"<p>
 	 */
-	public void transfer(Channel channel, OTSInput input) throws IOException, NullPointerException, ClassNotFoundException{
+	public void transfer(Channel channel, OTSInput input) throws IOException, ClassNotFoundException{
 		
 		//WAIT for message (h0,h1) from R
 		OTRGroupElementPairMsg message = waitForMessageFromReceiver(channel);

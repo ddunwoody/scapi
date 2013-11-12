@@ -26,7 +26,7 @@ package edu.biu.scapi.interactiveMidProtocols.ot;
 
 /**
  * Every OT receiver outputs a result in the end of the protocol execution, but every concrete 
- * protocol output different data.
+ * protocol output different data.<p>
  * This interface is a marker interface for OT receiver output, where there is an implementing class
  * for each OT protocol.
  * 
