@@ -30,7 +30,7 @@ import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
 import edu.biu.scapi.interactiveMidProtocols.ot.semiHonest.OTSemiHonestDDHOnByteArraySenderMsg;
 
 /**
- * Concrete implementation of batch OT sender (on byteArray) message.
+ * Concrete implementation of batch OT sender (on byteArray) message.<p>
  * In the byteArray scenario the sender sends tuples contain GroupElement u and two binary strings v0, v1.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
@@ -41,10 +41,18 @@ class OTSemiHonestDDHBatchOnByteArraySenderMsg implements OTSMsg{
 	private static final long serialVersionUID = -3200911064233246599L;
 	private ArrayList<OTSemiHonestDDHOnByteArraySenderMsg> tuples;
 	
+	/**
+	 * Sets the array contains messages of the underlying OT.
+	 * @param tuples contains messages of the underlying OT.
+	 */
 	public OTSemiHonestDDHBatchOnByteArraySenderMsg(ArrayList<OTSemiHonestDDHOnByteArraySenderMsg> tuples){
 		this.tuples = tuples;
 	}
 	
+	/**
+	 * Returns the array contains messages of the underlying OT.
+	 * @return array contains messages of the underlying OT.
+	 */
 	public ArrayList<OTSemiHonestDDHOnByteArraySenderMsg> getTuples(){
 		return tuples;
 	}

@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**
- * Concrete implementation of batch OT receiver (on group element) output.
+ * Concrete implementation of batch OT receiver (on group element) output.<p>
  * In the group element scenario, the receiver outputs xSigmaI as a group element array.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
@@ -39,10 +39,18 @@ public class OTBatchOnGroupElementROutput implements OTBatchROutput{
 
 	private ArrayList<GroupElement> xSigmaArr;
 	
+	/**
+	 * Sets the array of XSigma, the output of the batch OT.
+	 * @param xSigmaArr output of the batch OT.
+	 */
 	public OTBatchOnGroupElementROutput(ArrayList<GroupElement> xSigmaArr){
 		this.xSigmaArr = xSigmaArr;
 	}
 	
+	/**
+	 * Returns the output of the batch OT.
+	 * @return the output of the batch OT.
+	 */
 	public ArrayList<GroupElement> getXSigmaArr(){
 		return xSigmaArr;
 	}

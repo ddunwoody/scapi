@@ -36,16 +36,24 @@ import edu.biu.scapi.interactiveMidProtocols.ot.semiHonest.OTSemiHonestDDHOnGrou
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTSemiHonestDDHBatchOnGroupElementSenderMsg implements OTSMsg{
+class OTSemiHonestDDHBatchOnGroupElementSenderMsg implements OTSMsg{
 	
 	private static final long serialVersionUID = -8537704297372436165L;
 	
 	private ArrayList<OTSemiHonestDDHOnGroupElementSenderMsg> tuples;
 	
+	/**
+	 * Sets the array contains messages of the underlying OT.
+	 * @param tuples contains messages of the underlying OT.
+	 */
 	public OTSemiHonestDDHBatchOnGroupElementSenderMsg(ArrayList<OTSemiHonestDDHOnGroupElementSenderMsg> tuples){
 		this.tuples = tuples;
 	}
 	
+	/**
+	 * Returns the array contains messages of the underlying OT.
+	 * @return array contains messages of the underlying OT.
+	 */
 	public ArrayList<OTSemiHonestDDHOnGroupElementSenderMsg> getTuples(){
 		return tuples;
 	}

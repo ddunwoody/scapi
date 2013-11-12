@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**
- * Concrete implementation of batch OT sender (on GroupElement) input.
+ * Concrete implementation of batch OT sender (on GroupElement) input.<p>
  * In the GroupElement scenario, the sender gets for each i=1,...,m, two DlogGroup elements x0, x1.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
@@ -39,15 +39,28 @@ public class OTBatchOnGroupElementSInput implements OTBatchSInput{
 	private ArrayList<GroupElement> x0Arr;
 	private ArrayList<GroupElement> x1Arr;
 	
+	/**
+	 * Sets the input for the Batch OT, in case the OT is working on byte[].
+	 * @param x0Arr
+	 * @param x1Arr
+	 */
 	public OTBatchOnGroupElementSInput(ArrayList<GroupElement> x0Arr, ArrayList<GroupElement> x1Arr){
 		this.x0Arr = x0Arr;
 		this.x1Arr = x1Arr;
 	}
 	
+	/**
+	 * Returns x0 array, contains all xi0 values of the tuples (xi0, xi1).
+	 * @return x0 array.
+	 */
 	public ArrayList<GroupElement> getX0Arr(){
 		return x0Arr;
 	}
 	
+	/**
+	 * Returns x1 array, contains all xi1 values of the tuples (xi0, xi1).
+	 * @return x1 array.
+	 */
 	public ArrayList<GroupElement> getX1Arr(){
 		return x1Arr;
 	}

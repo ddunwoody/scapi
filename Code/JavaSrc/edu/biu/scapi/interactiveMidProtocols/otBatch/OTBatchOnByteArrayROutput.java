@@ -28,7 +28,7 @@ import java.util.ArrayList;
 
 
 /**
- * Concrete implementation of batch OT receiver (on byteArray) output.
+ * Concrete implementation of batch OT receiver (on byteArray) output.<p>
  * In the byteArray scenario, the receiver outputs xSigmaI as a byte array.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
@@ -38,10 +38,18 @@ public class OTBatchOnByteArrayROutput implements OTBatchROutput{
 
 	private ArrayList<byte[]> xSigmaArr;
 	
+	/**
+	 * Sets the array of XSigma, the output of the batch OT.
+	 * @param xSigmaArr output of the batch OT.
+	 */
 	public OTBatchOnByteArrayROutput(ArrayList<byte[]> xSigmaArr){
 		this.xSigmaArr = xSigmaArr;
 	}
 	
+	/**
+	 * Returns the output of the batch OT.
+	 * @return the output of the batch OT.
+	 */
 	public ArrayList<byte[]> getXSigmaArr(){
 		return xSigmaArr;
 	}

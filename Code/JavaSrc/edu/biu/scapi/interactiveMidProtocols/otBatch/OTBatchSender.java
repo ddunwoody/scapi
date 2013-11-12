@@ -30,18 +30,27 @@ import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 
+/**
+ * General interface for Batch OT Sender. <p>
+ * Every class that implements it is signed as Batch Oblivious Transfer sender.<p>
+ * 
+ * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
+ *
+ */
 public interface OTBatchSender {
 
 	/**
-	 * The transfer stage of OT Batch protocol which can be called several times in parallel.
-	 * In order to enable the parallel calls, each transfer call should use a different channel to send and receive messages.
-	 * This way the parallel executions of the function will not block each other.
+	 * The transfer stage of OT Batch protocol which can be called several times in parallel.<p>
+	 * The OT implementation support usage of many calls to transfer, with single preprocess execution. <p>
+	 * This way, one can execute batch OT by creating the OT receiver once and call the transfer function for each input couple.<p>
+	 * In order to enable the parallel calls, each transfer call should use a different channel to send and receive messages.<p>
+	 * This way the parallel executions of the function will not block each other.<p>
 	 * @param channel each call should get a different one.
 	 * @param input The parameters given in the input must match the DlogGroup member of this class, which given in the constructor.
 	 * @throws IOException if failed to send the message.
-	 * @throws ClassNotFoundException 
-	 * @throws InvalidDlogGroupException 
-	 * @throws CheatAttemptException 
+	 * @throws CheatAttemptException if there was a cheat attempt during the execution of the protocol.
+	 * @throws IOException if there was a problem during a communication phase.
+	 * @throws ClassNotFoundException if there was a problem during serialization mechanism.
 	 */
 	public void transfer(Channel channel, OTBatchSInput input) throws ClassNotFoundException, IOException, CheatAttemptException, InvalidDlogGroupException;
 }

@@ -29,18 +29,27 @@ import java.io.IOException;
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CheatAttemptException;
 
+/**
+ * General interface for Batch OT Receiver. <p>
+ * Every class that implements it is signed as Batch Oblivious Transfer receiver.<p>
+ * 
+ * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
+ *
+ */
 public interface OTBatchReceiver {
 
 	/**
-	 * The transfer stage of OT Batch protocol which can be called several times in parallel.
-	 * In order to enable the parallel calls, each transfer call should use a different channel to send and receive messages.
-	 * This way the parallel executions of the function will not block each other.
+	 * The transfer stage of OT Batch protocol which can be called several times in parallel.<p>
+	 * The OT implementation support usage of many calls to transfer, with single preprocess execution. <p>
+	 * This way, one can execute batch OT by creating the OT receiver once and call the transfer function for each input couple.<p>
+	 * In order to enable the parallel calls, each transfer call should use a different channel to send and receive messages.<p>
+	 * This way the parallel executions of the function will not block each other.<p>
 	 * @param channel each call should get a different one.
 	 * @param input The parameters given in the input must match the DlogGroup member of this class, which given in the constructor.
-	 * @return OTROutput, the output of the protocol.
+	 * @return OTBatchROutput, the output of the protocol.
 	 * @throws CheatAttemptException if there was a cheat attempt during the execution of the protocol.
-	 * @throws IOException if the send or receive functions failed
-	 * @throws ClassNotFoundException if the receive function failed
+	 * @throws IOException if there was a problem during a communication phase.
+	 * @throws ClassNotFoundException if there was a problem during serialization mechanism.
 	 */
 	public OTBatchROutput transfer(Channel channel, OTBatchRInput input) throws CheatAttemptException, IOException, ClassNotFoundException;
 }

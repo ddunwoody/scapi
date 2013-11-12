@@ -25,8 +25,8 @@
 package edu.biu.scapi.interactiveMidProtocols.otBatch;
 
 /**
- * Every OT Batch receiver outputs a result in the end of the protocol execution, but every concrete 
- * protocol output different data.
+ * Every Batch OT receiver outputs a result in the end of the protocol execution, but every concrete 
+ * protocol output different data.<p>
  * This interface is a marker interface for OT receiver output, where there is an implementing class
  * for each OT protocol.
  * 

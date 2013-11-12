@@ -131,15 +131,18 @@ abstract class OTSemiHonestDDHBatchReceiverAbs implements OTBatchReceiver{
 	}
 	
 	/**
-	 * Runs the part of the protocol where the receiver input is necessary.
-	 * The transfer stage of OT protocol which can be called several times in parallel.
-	 * In order to enable the parallel calls, each transfer call should use a different channel to send and receive messages.
-	 * This way the parallel executions of the function will not block each other.
-	 * The parameters given in the input must match the DlogGroup member of this class, which given in the constructor.
-	 * @param input MUST be OTRBasicInput.
-	 * @return OTROutput, the output of the protocol.
-	 * @throws IOException if failed to send or receive a message.
-	 * @throws ClassNotFoundException
+	 * Runs the transfer phase of the OT protocol.<p>
+	 * "For every i=1,…m, SAMPLE random values alphaI <- Zq and hi <- G <p>
+	 *	For every i=1,...,m, COMPUTE hi0,hi1 as follows:<p>
+	 *	1.	If SigmaI = 0 then hi0 = g^alphaI  and hi1=hi<p>
+	 *	2.	If SigmaI = 1 then hi0=hi and hi1 = g^alphaI <p>
+	 *	For every i=1,...,m, SEND (hi0,hi1) to S<p>
+	 *	In byte array scenario:<p>
+	 *		For every i=1,...,m, COMPUTE kISigma = u^alphaI<p>
+	 *		For every i=1,...,m, OUTPUT  xISigma = vISigma XOR KDF(|vISigma|,kISigma)<p>
+	 *	In group element scenario:<p>
+	 *		For every i=1,...,m, COMPUTE kISigma^(-1) = u^(-alphaI)<p>
+	 *		For every i=1,...,m, OUTPUT  xISigma = vISigma  * (kISigma)^(-1)"<p>
 	 */
 	public OTBatchROutput transfer(Channel channel, OTBatchRInput input) throws IOException, ClassNotFoundException{
 		//check if the input is valid.
@@ -157,20 +160,6 @@ abstract class OTSemiHonestDDHBatchReceiverAbs implements OTBatchReceiver{
 			}
 			
 		}
-		
-		/* Run the protocol:
-			For every i=1,…m, SAMPLE random values alphaI <- Zq and hi <- G 
-			For every i=1,...,m, COMPUTE hi0,hi1 as follows:
-			1.	If SigmaI = 0 then hi0 = g^alphaI  and hi1=hi
-			2.	If SigmaI = 1 then hi0=hi and hi1 = g^alphaI 
-			For every i=1,...,m, SEND (hi0,hi1) to S
-			In byte array scenario:
-				For every i=1,...,m, COMPUTE kISigma = u^alphaI
-				For every i=1,...,m, OUTPUT  xISigma = vISigma XOR KDF(|vISigma|,kISigma)
-			In group element scenario:
-				For every i=1,...,m, COMPUTE kISigma^(-1) = u^(-alphaI)
-				For every i=1,...,m, OUTPUT  xISigma = vISigma  * (kISigma)^(-1)
-		*/
 		
 		//For every i=1,…m, SAMPLE random values alphaI <- Zq.
 		ArrayList<BigInteger> alphaArr = new ArrayList<BigInteger>();

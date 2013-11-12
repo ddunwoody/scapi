@@ -27,7 +27,7 @@ package edu.biu.scapi.interactiveMidProtocols.otBatch;
 import java.util.ArrayList;
 
 /**
- * Concrete implementation of OT receiver input.
+ * Concrete implementation of OT receiver input. <p>
  * In the batch scenario the receiver gets i bits, each one represents 0/1.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
@@ -36,10 +36,18 @@ import java.util.ArrayList;
 public class OTBatchRBasicInput implements OTBatchRInput{
 	private ArrayList<Byte> sigmaArr;
 	
+	/**
+	 * Sets the input for the batch OT receiver, array of sigmaI.
+	 * @param sigmaArr
+	 */
 	public OTBatchRBasicInput(ArrayList<Byte> sigmaArr){
 		this.sigmaArr = sigmaArr;
 	}
 	
+	/**
+	 * Returns the input for the Batch OT Receiver, array of sigmaI.
+	 * @return
+	 */
 	public ArrayList<Byte> getSigmaArr(){
 		return sigmaArr;
 	}

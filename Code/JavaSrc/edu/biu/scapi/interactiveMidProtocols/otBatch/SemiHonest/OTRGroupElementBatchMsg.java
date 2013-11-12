@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTRGroupElementPairMsg;
 
 /**
- * Concrete implementation of OT receiver message used by batch OT receivers implementations. 
+ * Concrete implementation of OT receiver message used by batch OT receivers implementations. <p>
  * This implementation is common for OT on byteArray and on GroupElement.
  * The message contains tuples of two GroupElements.
  * 
@@ -43,10 +43,18 @@ import edu.biu.scapi.interactiveMidProtocols.ot.OTRGroupElementPairMsg;
 
 	private ArrayList<OTRGroupElementPairMsg> tuples;
 	
+	/**
+	 * Sets the array contains messages of the underlying OT.
+	 * @param tuples contains messages of the underlying OT.
+	 */
 	OTRGroupElementBatchMsg(ArrayList<OTRGroupElementPairMsg> tuples){
 		this.tuples = tuples;
 	}
 	
+	/**
+	 * Returns the messages array of underlying OT.
+	 * @return the messages array of underlying OT.
+	 */
 	ArrayList<OTRGroupElementPairMsg> getTuples(){
 		return tuples;
 	}

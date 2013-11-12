@@ -27,7 +27,7 @@ package edu.biu.scapi.interactiveMidProtocols.otBatch;
 import java.util.ArrayList;
 
 /**
- * Concrete implementation of batch OT sender (on byteArray) input.
+ * Concrete implementation of batch OT sender (on byteArray) input.<p>
  * In the byteArray scenario, the sender gets for each i=1,...,m, two binary strings x0, x1 of the same (arbitrary) length.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
@@ -38,15 +38,28 @@ public class OTBatchOnByteArraySInput implements OTBatchSInput{
 	private ArrayList<byte[]> x0Arr;
 	private ArrayList<byte[]> x1Arr;
 	
+	/**
+	 * Sets the input for the Batch OT, in case the OT is working on byte[].
+	 * @param x0Arr
+	 * @param x1Arr
+	 */
 	public OTBatchOnByteArraySInput(ArrayList<byte[]> x0Arr, ArrayList<byte[]> x1Arr){
 		this.x0Arr = x0Arr;
 		this.x1Arr = x1Arr;
 	}
 	
+	/**
+	 * Returns x0 array, contains all xi0 values of the tuples (xi0, xi1).
+	 * @return x0 array.
+	 */
 	public ArrayList<byte[]> getX0Arr(){
 		return x0Arr;
 	}
 	
+	/**
+	 * Returns x1 array, contains all xi1 values of the tuples (xi0, xi1).
+	 * @return x1 array.
+	 */
 	public ArrayList<byte[]> getX1Arr(){
 		return x1Arr;
 	}

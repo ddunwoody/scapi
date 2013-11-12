@@ -25,8 +25,8 @@
 package edu.biu.scapi.interactiveMidProtocols.otBatch;
 
 /**
- * Every OT Batch sender needs inputs during the protocol execution, but every concrete protocol needs 
- * different inputs.
+ * Every Batch OT sender needs inputs during the protocol execution, but every concrete protocol needs 
+ * different inputs.<p>
  * This interface is a marker interface for OT Batch sender input, where there is an implementing class
  * for each OT protocol.
  * 

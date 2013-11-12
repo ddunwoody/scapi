@@ -46,7 +46,7 @@ import edu.biu.scapi.securityLevel.DDH;
 import edu.biu.scapi.tools.Factories.DlogGroupFactory;
 
 /**
- * Abstract class for batch Semi-Honest OT assuming DDH sender.
+ * Abstract class for batch Semi-Honest OT assuming DDH sender.<p>
  * Batch Semi-Honest OT has two modes: one is on ByteArray and the second is on GroupElement.
  * The difference is in the input and output types and the way to process them. 
  * In spite that, there is a common behavior for both modes which this class implements.
@@ -131,28 +131,20 @@ abstract class OTSemiHonestDDHBatchSenderAbs implements OTBatchSender{
 	}
 
 	/**
-	 * Runs the part of the protocol where the input is necessary as follows:<p>
-	 *	WAIT for message (h0i,h1i) from R
-	 *	SAMPLE a single random value r <-  {0, . . . , q-1} and COMPUTE u=g^r
-	 *	For every i=1,...,m, COMPUTE:
-	 *		•	ki0 = (hi0)^r
-	 *		•	ki1 = (hi1)^r
-	 *		In the byte array scenario:
-	 *		•	vi0 = xi0 XOR KDF(|xi0|,ki0)
-	 *		•	vi1 = xi1 XOR KDF(|xi1|,ki1)
-	 *		In the group element scenario:
-	 *		•   vi0 = xi0 * ki0
-	 *		•	vi1 = xi1 * ki1
-	 *	For every i=1,...,m, SEND (u,vi0,vi1) to R
-	 *	OUTPUT nothing<p>
-	 * The transfer stage of OT protocol which can be called several times in parallel.
-	 * In order to enable the parallel calls, each transfer call should use a different channel to send and receive messages.
-	 * This way the parallel executions of the function will not block each other.
-	 * The parameters given in the input must match the DlogGroup member of this class, which given in the constructor.
-	 * @param channel
-	 * @param input
-	 * @throws IOException if failed to send the message.
-	 * @throws ClassNotFoundException 
+	 * Runs the transfer phase of the protocol.<p>
+	 *	"WAIT for message (h0i,h1i) from R<p>
+	 *	SAMPLE a single random value r <-  {0, . . . , q-1} and COMPUTE u=g^r<p>
+	 *	For every i=1,...,m, COMPUTE:<p>
+	 *		•	ki0 = (hi0)^r<p>
+	 *		•	ki1 = (hi1)^r<p>
+	 *		In the byte array scenario:<p>
+	 *		•	vi0 = xi0 XOR KDF(|xi0|,ki0)<p>
+	 *		•	vi1 = xi1 XOR KDF(|xi1|,ki1)<p>
+	 *		In the group element scenario:<p>
+	 *		•   vi0 = xi0 * ki0<p>
+	 *		•	vi1 = xi1 * ki1<p>
+	 *	For every i=1,...,m, SEND (u,vi0,vi1) to R<p>
+	 *	OUTPUT nothing"<p>
 	 */
 	public void transfer(Channel channel, OTBatchSInput input) throws ClassNotFoundException, IOException {
 		//WAIT for message (hi0,hi1) from R

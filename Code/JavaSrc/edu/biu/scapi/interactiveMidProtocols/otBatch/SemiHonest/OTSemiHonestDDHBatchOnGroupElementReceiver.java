@@ -38,7 +38,7 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.securityLevel.SemiHonest;
 
 /**
- * Concrete class for batch Semi-Honest OT assuming DDH receiver ON GROUP ELEMENT.
+ * Concrete class for batch Semi-Honest OT assuming DDH receiver ON GROUP ELEMENT.<p>
  * This class derived from OTSemiHonestDDHBatchReceiverAbs and implements the functionality 
  * related to the GroupElement inputs.
  * 
