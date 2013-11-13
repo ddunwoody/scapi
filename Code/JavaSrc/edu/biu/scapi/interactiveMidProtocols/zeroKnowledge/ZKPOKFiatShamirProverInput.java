@@ -26,6 +26,12 @@ package edu.biu.scapi.interactiveMidProtocols.zeroKnowledge;
 
 import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProverInput;
 
+/**
+ * Concrete input for ZKPOK FiatShamir prover.<p>
+ * It contains input for the underlying sigma protocol and possible context information.
+ * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
+ *
+ */
 public class ZKPOKFiatShamirProverInput implements ZKProverInput{
 
 	private SigmaProverInput input; //Input for the underlying sigma protocol.
@@ -33,8 +39,8 @@ public class ZKPOKFiatShamirProverInput implements ZKProverInput{
 	
 	/**
 	 * This constructor should be used when the user has a context information.
-	 * @param input
-	 * @param cont
+	 * @param input for the underlying sigma protocol.
+	 * @param cont context information
 	 */
 	public ZKPOKFiatShamirProverInput(SigmaProverInput input, byte[] cont){
 		this.input = input;
@@ -43,18 +49,25 @@ public class ZKPOKFiatShamirProverInput implements ZKProverInput{
 	
 	/**
 	 * This constructor should be used when the user has no context information.
-	 * @param input
-	 * @param cont
+	 * @param input for the underlying sigma protocol.
 	 */
 	public ZKPOKFiatShamirProverInput(SigmaProverInput input){
 		this.input = input;
 		this.context = null;
 	}
 	
+	/**
+	 * Returns the input for the underlying Sigma protocol.
+	 * @return the input for the underlying Sigma protocol.
+	 */
 	public SigmaProverInput getSigmaInput(){
 		return input;
 	}
 	
+	/**
+	 * Returns the context information. If there is no such thing, return null.
+	 * @return context information.
+	 */
 	public byte[] getContext(){
 		return context;
 	}

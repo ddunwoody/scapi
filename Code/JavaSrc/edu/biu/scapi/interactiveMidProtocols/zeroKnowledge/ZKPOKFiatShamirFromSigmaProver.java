@@ -38,7 +38,7 @@ import edu.biu.scapi.primitives.randomOracle.HKDFBasedRO;
 import edu.biu.scapi.primitives.randomOracle.RandomOracle;
 
 /**
- * Concrete implementation of Zero Knowledge prover.
+ * Concrete implementation of Zero Knowledge prover. <p>
  * 
  * This is a transformation that takes any Sigma protocol and a random oracle 
  * (instantiated with any hash function) H and yields a zero-knowledge proof of knowledge.
@@ -54,9 +54,9 @@ public class ZKPOKFiatShamirFromSigmaProver implements ZKPOKProver{
 	
 	/**
 	 * Constructor that accepts the underlying channel, sigma protocol's prover and random oracle to use.
-	 * @param channel
-	 * @param sProver
-	 * @param ro
+	 * @param channel used for communication
+	 * @param sProver underlying sigma protocol's prover.
+	 * @param ro random oracle
 	 */
 	public ZKPOKFiatShamirFromSigmaProver(Channel channel, SigmaProverComputation sProver, RandomOracle ro) {
 		
@@ -67,8 +67,8 @@ public class ZKPOKFiatShamirFromSigmaProver implements ZKPOKProver{
 	
 	/**
 	 * Constructor that accepts the underlying channel, sigma protocol's prover and sets default random oracle.
-	 * @param channel
-	 * @param sProver
+	 * @param channel used for communication
+	 * @param sProver underlying sigma protocol's prover.
 	 */
 	public ZKPOKFiatShamirFromSigmaProver(Channel channel, SigmaProverComputation sProver){
 		
@@ -79,13 +79,14 @@ public class ZKPOKFiatShamirFromSigmaProver implements ZKPOKProver{
 	
 	/**
 	 * Runs the prover side of the Zero Knowledge proof.
-	 * @param input must be an instance of ZKPOKFiatShamirInput that holds 
-	 * 				input for the underlying sigma protocol and possible context information cont.
-	 * @throws IllegalArgumentException if the given input is not an instance of ZKPOKFiatShamirProverInput.
+	 * @param input can be an instance of ZKPOKFiatShamirInput that holds 
+	 * 				input for the underlying sigma protocol and possible context information cont; 
+	 * 				Or input for the underlying Sigma prover.
+	 * @throws IllegalArgumentException if the given input is not an instance of ZKPOKFiatShamirProverInput or SigmaProverInput.
 	 * @throws IOException if failed to send the message.
-	 * @throws ClassNotFoundException 
+	 * @throws CheatAttemptException if the prover suspects the verifier is trying to cheat.
 	 */
-	public void prove(ZKProverInput input) throws IOException, CheatAttemptException, ClassNotFoundException {
+	public void prove(ZKProverInput input) throws IOException, CheatAttemptException {
 		ZKPOKFiatShamirProof msg = generateFiatShamirProof(input);
 		
 		//Send (a,e,z) to V and output nothing.
@@ -94,18 +95,19 @@ public class ZKPOKFiatShamirFromSigmaProver implements ZKPOKProver{
 	}
 
 	/**
-	 * Let (a,e,z) denote the prover1, verifier challenge and prover2 messages of the sigma protocol.
-	 * This function computes the following calculations:
+	 * Let (a,e,z) denote the prover1, verifier challenge and prover2 messages of the sigma protocol.<p>
+	 * This function computes the following calculations:<p>
 	 *
-	 *		 COMPUTE the first message a in sigma, using (x,w) as input
-	 *		 COMPUTE e=H(x,a,cont)
-	 *		 COMPUTE the response z to (a,e) according to sigma
-	 *		 RETURN (a,e,z)
-	 * @param input must be an instance of ZKPOKFiatShamirInput that holds 
-	 * 				input for the underlying sigma protocol and possible context information cont.
+	 *		 COMPUTE the first message a in sigma, using (x,w) as input<p>
+	 *		 COMPUTE e=H(x,a,cont)<p>
+	 *		 COMPUTE the response z to (a,e) according to sigma<p>
+	 *		 RETURN (a,e,z)<p>
+	 * @param input can be an instance of ZKPOKFiatShamirInput that holds 
+	 * 				input for the underlying sigma protocol and possible context information cont; 
+	 * 				Or input for the underlying Sigma prover.
 	 * @return ZKPOKFiatShamirMessage holds (a, e, z).
-	 * @throws CheatAttemptException
-	 * @throws IOException 
+	 * @throws CheatAttemptException if the prover suspects the verifier is trying to cheat.
+	 * @throws IOException if failed to send the message.
 	 */
 	public ZKPOKFiatShamirProof generateFiatShamirProof(ZKProverInput input) throws CheatAttemptException, IOException{
 		//The given input must be an instance of ZKPOKFiatShamirProverInput that holds input for the underlying sigma protocol 

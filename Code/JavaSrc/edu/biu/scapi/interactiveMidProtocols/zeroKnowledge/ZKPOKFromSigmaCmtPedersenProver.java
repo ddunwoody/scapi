@@ -37,7 +37,7 @@ import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersenTrapdoor.C
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtRCommitPhaseOutput;
 
 /**
- * Concrete implementation of Zero Knowledge prover.
+ * Concrete implementation of Zero Knowledge prover.<p>
  * 
  * This is a transformation that takes any Sigma protocol and any perfectly hiding trapdoor (equivocal) 
  * commitment scheme and yields a zero-knowledge proof of knowledge.
@@ -54,10 +54,10 @@ public class ZKPOKFromSigmaCmtPedersenProver implements ZKPOKProver{
 	
 	
 	/**
-	 * Constructor that accepts the underlying channel, sigma protocol's prover.
-	 * @param channel
-	 * @param sProver
-	 * @throws IOException 
+	 * Constructor that accepts the underlying channel and sigma protocol's prover.
+	 * @param channel used for communication
+	 * @param sProver underlying sigma prover to use.
+	 * @throws IOException if there was a problem to create the receiver.
 	 */
 	public ZKPOKFromSigmaCmtPedersenProver(Channel channel, SigmaProverComputation sProver) throws IOException{
 		
@@ -67,26 +67,26 @@ public class ZKPOKFromSigmaCmtPedersenProver implements ZKPOKProver{
 	}
 	
 	/**
-	 * Runs the prover side of the Zero Knowledge proof.
-	 * Let (a,e,z) denote the prover1, verifier challenge and prover2 messages of the sigma protocol.
-	 * This function computes the following calculations:
+	 * Runs the prover side of the Zero Knowledge proof.<p>
+	 * Let (a,e,z) denote the prover1, verifier challenge and prover2 messages of the sigma protocol.<p>
+	 * This function computes the following calculations:<p>
 	 *
-	 *		 RUN the receiver in TRAP_COMMIT.commit; let trap be the output
-	 * 		 COMPUTE the first message a in sigma, using (x,w) as input
-	 *		 SEND a to V
-	 *		 RUN the receiver in TRAP_COMMIT.decommit
-	 *		 IF TRAP_COMMIT.decommit returns some e
-     *		      COMPUTE the response z to (a,e) according to sigma
-     *		      SEND z and trap to V
-     *		      OUTPUT nothing
-	 *		 ELSE (IF COMMIT.decommit returns INVALID)
-     *			  OUTPUT ERROR (CHEAT_ATTEMPT_BY_V)
+	 *		 RUN the receiver in TRAP_COMMIT.commit; let trap be the output<p>
+	 * 		 COMPUTE the first message a in sigma, using (x,w) as input<p>
+	 *		 SEND a to V<p>
+	 *		 RUN the receiver in TRAP_COMMIT.decommit<p>
+	 *		 IF TRAP_COMMIT.decommit returns some e<p>
+     *		      COMPUTE the response z to (a,e) according to sigma<p>
+     *		      SEND z and trap to V<p>
+     *		      OUTPUT nothing<p>
+	 *		 ELSE (IF COMMIT.decommit returns INVALID)<p>
+     *			  OUTPUT ERROR (CHEAT_ATTEMPT_BY_V)<p>
      *
      * @param input must be an instance of SigmaProverInput.
      * @throws IllegalArgumentException if the given input is not an instance of SigmaProverInput
 	 * @throws IOException if failed to send the message.
 	 * @throws CheatAttemptException if the challenge's length is not as expected. 
-	 * @throws ClassNotFoundException 
+	 * @throws ClassNotFoundException if there was a problem with the serialization mechanism.
 	 */
 	public void prove(ZKProverInput input) throws IOException, CheatAttemptException, ClassNotFoundException {
 		//The given input must be an instance of SigmaProtocolInput.
@@ -152,10 +152,10 @@ public class ZKPOKFromSigmaCmtPedersenProver implements ZKPOKProver{
 	}
 	
 	/**
-	 * Processes the second message of the Zero Knowledge protocol:
-	 * 	"COMPUTE the response z to (a,e) according to sigma
-     *   SEND z to V
-     *   OUTPUT nothing".
+	 * Processes the second message of the Zero Knowledge protocol.<p>
+	 * 	"COMPUTE the response z to (a,e) according to sigma<p>
+     *   SEND z to V<p>
+     *   OUTPUT nothing".<p>
 	 * This is a blocking function!
 	 * @throws CheatAttemptException if the challenge's length is not as expected.
 	 * @throws IOException if failed to send the message.

@@ -43,7 +43,7 @@ import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.CmtPeders
 import edu.biu.scapi.securityLevel.PerfectlyHidingCmt;
 
 /**
- * Concrete implementation of Zero Knowledge verifier.
+ * Concrete implementation of Zero Knowledge verifier.<p>
  * 
  * This is a transformation that takes any Sigma protocol and any perfectly hiding commitment scheme and 
  * yields a zero-knowledge proof.
@@ -60,9 +60,9 @@ public class ZKFromSigmaVerifier implements ZKVerifier{
 	
 	/**
 	 * Constructor that accepts the underlying channel, sigma protocol's verifier and committer to use.
-	 * @param channel
-	 * @param sVerifier
-	 * @param committer
+	 * @param channel used to communicate between prover and verifier.
+	 * @param sVerifier underlying sigma verifier to use.
+	 * @param committer Must be an instance of PerfectlyHidingCT
 	 * @throws SecurityLevelException if the given CTCommitter is not an instance of PerfectlyHidingCT
 	 */
 	public ZKFromSigmaVerifier(Channel channel, SigmaVerifierComputation sVerifier, CmtCommitter committer, SecureRandom random) throws SecurityLevelException{
@@ -83,11 +83,11 @@ public class ZKFromSigmaVerifier implements ZKVerifier{
 	
 	/**
 	 * Constructor that accepts the underlying channel, sigma protocol's verifier and sets default committer.
-	 * @param channel
-	 * @param sVerifier
-	 * @throws CheatAttemptException 
-	 * @throws IOException 
-	 * @throws ClassNotFoundException 
+	 * @param channel used to communicate between prover and verifier.
+	 * @param sVerifier underlying sigma verifier to use.
+	 * @throws CheatAttemptException in case the verifier suspects the prover is trying to cheat.
+	 * @throws IOException in case there was a problem in the communication.
+	 * @throws ClassNotFoundException in case there was a problem in the serialization.
 	 */
 	public ZKFromSigmaVerifier(Channel channel, SigmaVerifierComputation sVerifier, SecureRandom random) throws ClassNotFoundException, IOException, CheatAttemptException{
 	
@@ -98,25 +98,25 @@ public class ZKFromSigmaVerifier implements ZKVerifier{
 	}
 	
 	/**
-	 * Runs the verifier side of the Zero Knowledge proof.
-	 * Let (a,e,z) denote the prover1, verifier challenge and prover2 messages of the sigma protocol.
-	 * This function computes the following calculations:
+	 * Runs the verifier side of the Zero Knowledge proof.<p>
+	 * Let (a,e,z) denote the prover1, verifier challenge and prover2 messages of the sigma protocol.<p>
+	 * This function computes the following calculations:<p>
 	 *
-	 *		 SAMPLE a random challenge  e <- {0, 1}^t 
-	 *		 RUN COMMIT.commit as the committer with input e
-	 *		 WAIT for a message a from P
-	 *		 RUN COMMIT.decommit as the decommitter
-	 * 		 WAIT for a message z from P
-	 * 		 IF  transcript (a, e, z) is accepting in sigma on input x
-     *			OUTPUT ACC
-	 *		 ELSE
-     *	 	    OUTPUT REJ
+	 *		 SAMPLE a random challenge  e <- {0, 1}^t <p>
+	 *		 RUN COMMIT.commit as the committer with input e<p>
+	 *		 WAIT for a message a from P<p>
+	 *		 RUN COMMIT.decommit as the decommitter<p>
+	 * 		 WAIT for a message z from P<p>
+	 * 		 IF  transcript (a, e, z) is accepting in sigma on input x<p>
+     *			OUTPUT ACC<p>
+	 *		 ELSE<p>
+     *	 	    OUTPUT REJ<p>
      * @param input must be an instance of SigmaCommonInput.
      * @throws IllegalArgumentException if the given input is not an instance of SigmaCommonInput
-	 * @throws IOException if failed to send the message.
-	 * @throws ClassNotFoundException 
-	 * @throws CheatAttemptException 
-	 * @throws CommitValueException 
+	 * @throws CheatAttemptException in case the verifier suspects the prover is trying to cheat.
+	 * @throws IOException in case there was a problem in the communication.
+	 * @throws ClassNotFoundException in case there was a problem in the serialization.
+	 * @throws CommitValueException can occur in case the commitment scheme is ElGamal.
 	 */
 	public boolean verify(ZKCommonInput input) throws ClassNotFoundException, IOException, CheatAttemptException, CommitValueException {
 		//The given input must be an instance of SigmaProtocolInput.

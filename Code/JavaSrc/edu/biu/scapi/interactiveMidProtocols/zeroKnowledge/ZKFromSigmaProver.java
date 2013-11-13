@@ -42,7 +42,7 @@ import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.CmtPeders
 import edu.biu.scapi.securityLevel.PerfectlyHidingCmt;
 
 /**
- * Concrete implementation of Zero Knowledge prover.
+ * Concrete implementation of Zero Knowledge prover.<p>
  * 
  * This is a transformation that takes any Sigma protocol and any perfectly hiding commitment scheme and 
  * yields a zero-knowledge proof.
@@ -58,9 +58,9 @@ public class ZKFromSigmaProver implements ZKProver{
 	
 	/**
 	 * Constructor that accepts the underlying channel, sigma protocol's prover and commitment's receiver to use.
-	 * @param channel
-	 * @param sProver
-	 * @param receiver
+	 * @param channel used to communicate between prover and verifier.
+	 * @param sProver underlying sigma prover to use.
+	 * @param receiver Must be an instance of PerfectlyHidingCT
 	 * @throws SecurityLevelException if the given CTReceiver is not an instance of PerfectlyHidingCT
 	 */
 	public ZKFromSigmaProver(Channel channel, SigmaProverComputation sProver, CmtReceiver receiver) throws SecurityLevelException{
@@ -80,8 +80,8 @@ public class ZKFromSigmaProver implements ZKProver{
 	
 	/**
 	 * Constructor that accepts the underlying channel, sigma protocol's prover and sets default commitment's receiver.
-	 * @param channel
-	 * @param sProver
+	 * @param channel used to communicate between prover and verifier.
+	 * @param sProver underlying sigma prover to use.
 	 * @throws IOException can be thrown in the pre-process stage of PedersenCTReceiver
 	 */
 	public ZKFromSigmaProver(Channel channel, SigmaProverComputation sProver) throws IOException{
@@ -92,26 +92,26 @@ public class ZKFromSigmaProver implements ZKProver{
 	}
 	
 	/**
-	 * Runs the prover side of the Zero Knowledge proof.
-	 * Let (a,e,z) denote the prover1, verifier challenge and prover2 messages of the sigma protocol.
-	 * This function computes the following calculations:
+	 * Runs the prover side of the Zero Knowledge proof.<p>
+	 * Let (a,e,z) denote the prover1, verifier challenge and prover2 messages of the sigma protocol.<p>
+	 * This function computes the following calculations:<p>
 	 *
-	 *		 RUN the receiver in COMMIT.commit 
-	 *		 COMPUTE the first message a in sigma, using (x,w) as input
-	 *		 SEND a to V
-	 *		 RUN the receiver in COMMIT.decommit 
-	 *			IF COMMIT.decommit returns some e
-     *     			COMPUTE the response z to (a,e) according to sigma
-     *      		SEND z to V
-     *      		OUTPUT nothing
-	 *			ELSE (IF COMMIT.decommit returns INVALID)
-     *      		OUTPUT ERROR (CHEAT_ATTEMPT_BY_V)
+	 *		 RUN the receiver in COMMIT.commit <p>
+	 *		 COMPUTE the first message a in sigma, using (x,w) as input<p>
+	 *		 SEND a to V<p>
+	 *		 RUN the receiver in COMMIT.decommit <p>
+	 *			IF COMMIT.decommit returns some e<p>
+     *     			COMPUTE the response z to (a,e) according to sigma<p>
+     *      		SEND z to V<p>
+     *      		OUTPUT nothing<p>
+	 *			ELSE (IF COMMIT.decommit returns INVALID)<p>
+     *      		OUTPUT ERROR (CHEAT_ATTEMPT_BY_V)<p>
      * @param input must be an instance of SigmaProverInput.
      * @throws IllegalArgumentException if the given input is not an instance of SigmaProverInput
 	 * @throws IOException if failed to send the message.
 	 * @throws CheatAttemptException if the challenge's length is not as expected. 
-	 * @throws ClassNotFoundException 
-	 * @throws CommitValueException 
+	 * @throws ClassNotFoundException if there was ap roblem in the serialization phase.
+	 * @throws CommitValueException can occur in case the commitment scheme is ElGamal.
 	 */
 	public void prove(ZKProverInput input) throws IOException, CheatAttemptException, ClassNotFoundException, CommitValueException {
 		//The given input must be an instance of SigmaProtocolInput.

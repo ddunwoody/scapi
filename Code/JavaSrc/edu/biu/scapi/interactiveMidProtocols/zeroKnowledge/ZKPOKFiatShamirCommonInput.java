@@ -26,7 +26,12 @@ package edu.biu.scapi.interactiveMidProtocols.zeroKnowledge;
 
 import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaCommonInput;
 
-
+/**
+ * Concrete input for ZKPOK FiatShamir scheme.<p>
+ * It contains input for the underlying sigma protocol and possible context information.
+ * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
+ *
+ */
 public class ZKPOKFiatShamirCommonInput implements ZKCommonInput{
 	
 	private SigmaCommonInput input; //Input for the underlying sigma protocol.
@@ -34,8 +39,8 @@ public class ZKPOKFiatShamirCommonInput implements ZKCommonInput{
 	
 	/**
 	 * This constructor should be used when the user has a context information.
-	 * @param input
-	 * @param cont
+	 * @param input for the underlying sigma protocol 
+	 * @param cont possible context information
 	 */
 	public ZKPOKFiatShamirCommonInput(SigmaCommonInput input, byte[] cont){
 		this.input = input;
@@ -44,18 +49,25 @@ public class ZKPOKFiatShamirCommonInput implements ZKCommonInput{
 	
 	/**
 	 * This constructor should be used when the user has no context information.
-	 * @param input
-	 * @param cont
+	 * @param input for the underlying sigma protocol 
 	 */
 	public ZKPOKFiatShamirCommonInput(SigmaCommonInput input){
 		this.input = input;
 		this.context = null;
 	}
 	
+	/**
+	 * Returns the input for the underlying sigma protocol.
+	 * @return the input for the underlying sigma protocol.
+	 */
 	public SigmaCommonInput getSigmaInput(){
 		return input;
 	}
 	
+	/**
+	 * Returns the context information. 
+	 * @return context information. 
+	 */
 	public byte[] getContext(){
 		return context;
 	}

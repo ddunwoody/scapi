@@ -24,6 +24,12 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.zeroKnowledge;
 
+/**
+ * Marker interface. Each concrete ZK prover's input class should implement this interface.
+ * 
+ * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
+ *
+ */
 public interface ZKProverInput {
 
 }

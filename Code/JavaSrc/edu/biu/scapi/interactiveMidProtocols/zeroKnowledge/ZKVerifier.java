@@ -32,7 +32,7 @@ import edu.biu.scapi.exceptions.CommitValueException;
 /**
  * A zero-knowledge proof or zero-knowledge protocol is a method by which one party (the prover) can prove
  * to another party (the verifier) that a given statement is true, without conveying any additional 
- * information apart from the fact that the statement is indeed true.
+ * information apart from the fact that the statement is indeed true.<p>
  * 
  * This interface is a general interface that simulates the verifier side of the Zero Knowledge proof. 
  * Every class that implements it is signed as Zero Knowledge verifier.
@@ -44,12 +44,12 @@ public interface ZKVerifier {
 
 	/**
 	 * Runs the verifier side of the Zero Knowledge proof.
-	 * @param input
+	 * @param input holds necessary values to the varification calculations.
 	 * @return true if the proof was verified; false, otherwise.
-	 * @throws IOException if failed to send the message.
-	 * @throws ClassNotFoundException 
-	 * @throws CheatAttemptException 
-	 * @throws CommitValueException 
+	 * @throws IOException if there was a problem during the communication.
+	 * @throws CheatAttemptException if the prover suspects the verifier is trying to cheat.
+	 * @throws ClassNotFoundException if there was a problem during the serialization mechanism.
+	 * @throws CommitValueException can occur when using ElGamal commitment scheme.
 	 */
 	public boolean verify(ZKCommonInput input) throws  IOException, ClassNotFoundException, CommitValueException, CheatAttemptException;
 }

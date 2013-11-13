@@ -25,7 +25,7 @@
 package edu.biu.scapi.interactiveMidProtocols.zeroKnowledge;
 
 /**
- * This interface is a general interface that simulates the verifier side of the Zero Knowledge proof of knowledge. 
+ * This interface is a general interface that simulates the verifier side of the Zero Knowledge proof of knowledge. <p>
  * Every class that implements it is signed as ZKPOK verifier.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)

@@ -37,7 +37,7 @@ import edu.biu.scapi.primitives.randomOracle.HKDFBasedRO;
 import edu.biu.scapi.primitives.randomOracle.RandomOracle;
 
 /**
- * Concrete implementation of Zero Knowledge verifier.
+ * Concrete implementation of Zero Knowledge verifier.<p>
  * 
  * This is a transformation that takes any Sigma protocol and a random oracle 
  * (instantiated with any hash function) H and yields a zero-knowledge proof of knowledge.
@@ -53,9 +53,9 @@ public class ZKPOKFiatShamirFromSigmaVerifier implements ZKPOKVerifier{
 	
 	/**
 	 * Constructor that accepts the underlying channel, sigma protocol's verifier and random oracle to use.
-	 * @param channel
-	 * @param sVerifier
-	 * @param ro
+	 * @param channel used for communication
+	 * @param sVerifier underlying sigma protocol's verifier.
+	 * @param ro random oracle
 	 */
 	public ZKPOKFiatShamirFromSigmaVerifier(Channel channel, SigmaVerifierComputation sVerifier, RandomOracle ro) {
 		
@@ -66,8 +66,8 @@ public class ZKPOKFiatShamirFromSigmaVerifier implements ZKPOKVerifier{
 	
 	/**
 	 * Constructor that accepts the underlying channel, sigma protocol's verifier and sets default random oracle.
-	 * @param channel
-	 * @param sVerifier
+	 * @param channel used for communication
+	 * @param sVerifier underlying sigma protocol's verifier.
 	 */
 	public ZKPOKFiatShamirFromSigmaVerifier(Channel channel, SigmaVerifierComputation sVerifier){
 	
@@ -78,10 +78,11 @@ public class ZKPOKFiatShamirFromSigmaVerifier implements ZKPOKVerifier{
 	
 	/**
 	 * Runs the verifier side of the Zero Knowledge proof.
-	 * @param input must be an instance of ZKPOKFiatShamirInput that holds 
-	 * 				input for the underlying sigma protocol and possible context information cont.
+	 * @param input can be an instance of ZKPOKFiatShamirInput that holds 
+	 * 				input for the underlying sigma protocol and possible context information cont; 
+	 * 				Or input for the underlying sigma protocol.
 	 * @throws IOException if failed to send the message.
-	 * @throws ClassNotFoundException 
+	 * @throws ClassNotFoundException if there was a problem with the serialization mechanism.
 	 */
 	public boolean verify(ZKCommonInput input) throws ClassNotFoundException, IOException{
 		
@@ -93,22 +94,23 @@ public class ZKPOKFiatShamirFromSigmaVerifier implements ZKPOKVerifier{
 	}
 	
 	/**
-	 *  Let (a,e,z) denote the prover1, verifier challenge and prover2 messages of the sigma protocol.
-	 * This function computes the following calculations:
+	 * Verifies Fiat Shamir proof.<p>
+	 * Let (a,e,z) denote the prover1, verifier challenge and prover2 messages of the sigma protocol.<p>
+	 * This function computes the following calculations:<p>
 	 *
-	 *		IF
-	 *			•	e=H(x,a,cont), AND
-	 *			•	Transcript (a, e, z) is accepting in sigma on input x
-	 *     		OUTPUT ACC
-	 *     ELSE
-	 *          OUTPUT REJ
-	 * @param input must be an instance of ZKPOKFiatShamirInput that holds 
-	 * 				input for the underlying sigma protocol and possible context information cont.
-	 * @param input
-	 * @param msg
+	 *		IF<p>
+	 *			•	e=H(x,a,cont), AND<p>
+	 *			•	Transcript (a, e, z) is accepting in sigma on input x<p>
+	 *     		OUTPUT ACC<p>
+	 *     ELSE<p>
+	 *          OUTPUT REJ<p>
+	 * @param input can be an instance of ZKPOKFiatShamirInput that holds 
+	 * 				input for the underlying sigma protocol and possible context information cont; 
+	 * 				Or input for the underlying sigma protocol.
+	 * @param msg Fiat Shamir proof received from the prover.
 	 * @return true if the proof is valid; false, otherwise.
-	 * @throws IOException 
-	 * @throws IllegalArgumentException if the given input is not an instance of ZKPOKFiatShamirInput.
+	 * @throws IOException if there was problem with the serialization of the data on order to achieve a challenge.
+	 * @throws IllegalArgumentException if the given input is not an instance of ZKPOKFiatShamirInput or SigmaCommonInput.
 	 */
 	public boolean verifyFiatShamirProof(ZKCommonInput input, ZKPOKFiatShamirProof msg) throws IOException{
 		//The given input can be an instance of ZKPOKFiatShamirInput that holds input for the underlying sigma protocol and 

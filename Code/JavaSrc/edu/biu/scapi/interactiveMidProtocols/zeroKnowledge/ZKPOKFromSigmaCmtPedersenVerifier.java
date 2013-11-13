@@ -38,7 +38,7 @@ import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtRCommitPhaseOut
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersenTrapdoor.CmtPedersenTrapdoorCommitter;
 
 /**
- * Concrete implementation of Zero Knowledge verifier.
+ * Concrete implementation of Zero Knowledge verifier.<p>
  * 
  * This is a transformation that takes any Sigma protocol and any perfectly hiding trapdoor (equivocal) 
  * commitment scheme and yields a zero-knowledge proof of knowledge.
@@ -55,12 +55,13 @@ public class ZKPOKFromSigmaCmtPedersenVerifier implements ZKPOKVerifier{
 	
 	
 	/**
-	 * Constructor that accepts the underlying channel, sigma protocol's verifier.
-	 * @param channel
-	 * @param sVerifier
-	 * @throws CheatAttemptException 
-	 * @throws IOException 
-	 * @throws ClassNotFoundException 
+	 * Constructor that accepts the underlying channel and sigma protocol's verifier.
+	 * @param channel used for communication
+	 * @param sVerifier underlying sigma verifier to use.
+	 * @param random
+	 * @throws CheatAttemptException in case the verifier suspects the prover is trying to cheat.
+	 * @throws IOException if there was a problem during the communication.
+	 * @throws ClassNotFoundException if there was a problem during the serialization mechanism.
 	 */
 	public ZKPOKFromSigmaCmtPedersenVerifier(Channel channel, SigmaVerifierComputation sVerifier, SecureRandom random) throws ClassNotFoundException, IOException, CheatAttemptException{
 	
@@ -71,27 +72,27 @@ public class ZKPOKFromSigmaCmtPedersenVerifier implements ZKPOKVerifier{
 	}
 	
 	/**
-	 * Runs the verifier side of the Zero Knowledge proof.
-	 * Let (a,e,z) denote the prover1, verifier challenge and prover2 messages of the sigma protocol.
-	 * This function computes the following calculations:
+	 * Runs the verifier side of the Zero Knowledge proof.<p>
+	 * Let (a,e,z) denote the prover1, verifier challenge and prover2 messages of the sigma protocol.<p>
+	 * This function computes the following calculations:<p>
 	 *
-	 *		 SAMPLE a random challenge  e <- {0, 1^t 
-	 *		 RUN TRAP_COMMIT.commit as the committer with input e
-	 *		 WAIT for a message a from P
-	 *		 RUN TRAP_COMMIT.decommit as the decommitter
-	 *		 WAIT for a message (z,trap) from P
-	 *		 IF  
-	 *			•	TRAP_COMMIT.valid(T,trap) = 1, where T  is the transcript from the commit phase, AND
-	 *			•	Transcript (a, e, z) is accepting in sigma on input x
-	 *          OUTPUT ACC
-	 *       ELSE 	
-	 *          OUTPUT REJ
+	 *		 SAMPLE a random challenge  e <- {0, 1^t <p>
+	 *		 RUN TRAP_COMMIT.commit as the committer with input e<p>
+	 *		 WAIT for a message a from P<p>
+	 *		 RUN TRAP_COMMIT.decommit as the decommitter<p>
+	 *		 WAIT for a message (z,trap) from P<p>
+	 *		 IF  <p>
+	 *			•	TRAP_COMMIT.valid(T,trap) = 1, where T  is the transcript from the commit phase, AND<p>
+	 *			•	Transcript (a, e, z) is accepting in sigma on input x<p>
+	 *          OUTPUT ACC<p>
+	 *       ELSE 	<p>
+	 *          OUTPUT REJ<p>
 
 	 * @param input must be an instance of SigmaCommonInput.
 	 * @throws IllegalArgumentException if the given input is not an instance of SigmaCommonInput
-	 * @throws IOException if failed to send the message.
-	 * @throws ClassNotFoundException 
-	 * @throws CheatAttemptException 
+	 * @throws CheatAttemptException in case the verifier suspects the prover is trying to cheat.
+	 * @throws IOException if there was a problem during the communication.
+	 * @throws ClassNotFoundException if there was a problem during the serialization mechanism.
 	 */
 	public boolean verify(ZKCommonInput input) throws ClassNotFoundException, IOException, CheatAttemptException{
 		//The given input must be an instance of SigmaProtocolInput.

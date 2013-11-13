@@ -29,7 +29,7 @@ import java.io.Serializable;
 import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProtocolMsg;
 
 /** 
- * This message contains two SigmaProtocolMessage and a challenge. 
+ * This message contains two SigmaProtocolMessage and a challenge. <p>
  * The message is sent by the prover of ZKPOK Fiat Shamir protocol to the verifier.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
@@ -43,20 +43,38 @@ public class ZKPOKFiatShamirProof implements Serializable{
 	private byte[] e;
 	private SigmaProtocolMsg z;
 	
+	/**
+	 * Sets the proof values.
+	 * @param a first message
+	 * @param e challenge
+	 * @param z second message
+	 */
 	public ZKPOKFiatShamirProof(SigmaProtocolMsg a, byte[] e, SigmaProtocolMsg z){
 		this.a = a;
 		this.e = e;
 		this.z = z;
 	}
 	
+	/**
+	 * Returns first message.
+	 * @return first message.
+	 */
 	public SigmaProtocolMsg getA(){
 		return a;
 	}
 	
+	/**
+	 * Returns the challenge.
+	 * @return the challenge.
+	 */
 	public byte[] getE(){
 		return e;
 	}
 	
+	/**
+	 * Returns second message.
+	 * @return second message.
+	 */
 	public SigmaProtocolMsg getZ(){
 		return z;
 	}
