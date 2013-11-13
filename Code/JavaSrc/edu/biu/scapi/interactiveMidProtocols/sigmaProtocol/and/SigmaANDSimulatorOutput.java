@@ -29,7 +29,7 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProtocol
 import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaSimulatorOutput;
 
 /**
- * Concrete implementation of SigmaSimulatorOutput, used by SigmaANDSimulator.
+ * Concrete implementation of SigmaSimulatorOutput, used by SigmaANDSimulator.<p>
  * 
  * It contains the a, e, z types used in the above mentioned concrete simulator.
  * 
@@ -42,20 +42,38 @@ public class SigmaANDSimulatorOutput implements SigmaSimulatorOutput {
 	private byte[] e;
 	private SigmaMultipleMsg z;
 	
+	/**
+	 * Sets the output of the simulator.
+	 * @param a first message
+	 * @param e challenge 
+	 * @param z second message
+	 */
 	public SigmaANDSimulatorOutput(SigmaMultipleMsg a, byte[] e, SigmaMultipleMsg z){
 		this.a = a;
 		this.e = e;
 		this.z = z;
 	}
 	
+	/**
+	 * Returns the first message.
+	 * @return the first message.
+	 */
 	public SigmaProtocolMsg getA() {
 		return a;
 	}
 
+	/**
+	 * Returns the challenge.
+	 * @return the challenge.
+	 */
 	public byte[] getE() {
 		return e;
 	}
 
+	/**
+	 * Returns the second message.
+	 * @return the second message.
+	 */
 	public SigmaProtocolMsg getZ() {
 		return z;
 	}

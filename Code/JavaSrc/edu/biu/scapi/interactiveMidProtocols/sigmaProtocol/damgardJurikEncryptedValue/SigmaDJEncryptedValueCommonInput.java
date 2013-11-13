@@ -33,7 +33,7 @@ import edu.biu.scapi.midLayer.ciphertext.BigIntegerCiphertext;
 import edu.biu.scapi.midLayer.plaintext.BigIntegerPlainText;
 
 /**
- * Concrete implementation of SigmaProtocol input, used by the SigmaDamgardJurikEncryptedValue verifier and simulator.
+ * Concrete implementation of SigmaProtocol input, used by the SigmaDamgardJurikEncryptedValue verifier and simulator.<p>
  * In SigmaProtocolDamgardJurikEncryptedValue, the common input contains DamgardJurikPublicKey, BigIntegerCiphertext and BigIntegerPlaintext.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
@@ -47,20 +47,38 @@ public class SigmaDJEncryptedValueCommonInput implements SigmaCommonInput{
 	private BigIntegerCiphertext cipher;
 	private BigIntegerPlainText plaintext;
 	
+	/**
+	 * Sets the given public key, ciphertext and plaintext.
+	 * @param publicKey used to encrypt.
+	 * @param cipher encryption on the given plaintext.
+	 * @param plaintext that has been encrypted.
+	 */
 	public SigmaDJEncryptedValueCommonInput(DamgardJurikPublicKey publicKey, BigIntegerCiphertext cipher, BigIntegerPlainText plaintext){
 		this.publicKey = publicKey;
 		this.cipher = cipher;
 		this.plaintext = plaintext;
 	}
 	
+	/**
+	 * Returns the public key used to encrypt.
+	 * @return public key used to encrypt.
+	 */
 	public DamgardJurikPublicKey getPublicKey(){
 		return publicKey;
 	}
 	
+	/**
+	 * Returns the ciphertext which is an encryption on the plaintext.
+	 * @return  ciphertext which is an encryption on the plaintext.
+	 */
 	public BigIntegerCiphertext getCiphertext(){
 		return cipher;
 	}
 	
+	/**
+	 * Returns the plaintext that has been encrypted.
+	 * @return the plaintext that has been encrypted.
+	 */
 	public BigIntegerPlainText getPlaintext(){
 		return plaintext;
 	}

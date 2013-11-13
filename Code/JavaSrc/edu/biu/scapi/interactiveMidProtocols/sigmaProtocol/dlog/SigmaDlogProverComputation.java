@@ -41,8 +41,8 @@ import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**
- * Concrete implementation of Sigma Protocol prover computation.
- * This implementation is based on Schnorr's sigma protocol for Dlog Group.
+ * Concrete implementation of Sigma Protocol prover computation.<p>
+ * This implementation is based on Schnorr's sigma protocol for Dlog Group.<p>
  * This protocol is used for a prover to convince a verifier that it knows the discrete log of the value h in G.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
@@ -109,9 +109,9 @@ public class SigmaDlogProverComputation implements SigmaProverComputation, DlogB
 	}
 
 	/**
-	 * Computes the following line from the protocol:
-	 * "SAMPLE a random r in Zq
-	 *  COMPUTE a = g^r". 
+	 * Computes the first message from the protocol.<p>
+	 * "SAMPLE a random r in Zq<p>
+	 *  COMPUTE a = g^r". <p>
 	 * @param input MUST be an instance of SigmaDlogProverInput.
 	 * @throws IllegalArgumentException if input is not an instance of SigmaDlogProverInput.
 	 * @return the computed message
@@ -133,9 +133,9 @@ public class SigmaDlogProverComputation implements SigmaProverComputation, DlogB
 	}
 
 	/**
-	 * Computes the following line from the protocol:
-	 * "COMPUTE z = (r + ew) mod q".
-	 * @param challenge
+	 * Computes the secong message from the protocol.<p>
+	 * "COMPUTE z = (r + ew) mod q".<p>
+	 * @param challenge<p>
 	 * @return the computed message.
 	 * @throws CheatAttemptException if the received challenge's length is not equal to the soundness parameter.
 	 */

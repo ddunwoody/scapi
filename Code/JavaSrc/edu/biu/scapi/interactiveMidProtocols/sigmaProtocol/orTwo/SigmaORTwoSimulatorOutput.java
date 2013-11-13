@@ -40,6 +40,12 @@ public class SigmaORTwoSimulatorOutput implements SigmaSimulatorOutput{
 	private byte[] e;
 	private SigmaORTwoSecondMsg z;
 	
+	/**
+	 * Sets the output of the simulator.
+	 * @param a first message
+	 * @param e challenge 
+	 * @param z second message
+	 */
 	public SigmaORTwoSimulatorOutput(SigmaORTwoFirstMsg a, byte[] e, SigmaORTwoSecondMsg z){
 		this.a = a;
 		this.e = e;

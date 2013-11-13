@@ -28,7 +28,7 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaBIMsg;
 import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaSimulatorOutput;
 
 /**
- * Concrete implementation of SigmaSimulatorOutput, used by SigmaDamgardJurikencryptedZeroSimulator.
+ * Concrete implementation of SigmaSimulatorOutput, used by SigmaDamgardJurikencryptedZeroSimulator.<p>
  * 
  * It contains the a, e, z types used in the above mentioned concrete simulator.
  * 
@@ -41,20 +41,38 @@ public class SigmaDJEncryptedZeroSimulatorOutput implements SigmaSimulatorOutput
 	private byte[] e;
 	private SigmaBIMsg z;
 	
+	/**
+	 * Sets the given messages and challenge.
+	 * @param a protocol's first message 
+	 * @param e protocol's challenge
+	 * @param z protocol's second message 
+	 */
 	public SigmaDJEncryptedZeroSimulatorOutput(SigmaBIMsg a, byte[] e, SigmaBIMsg z){
 		this.a = a;
 		this.e = e;
 		this.z = z;
 	}
 
+	/**
+	 * Returns the protocol's first message.
+	 * @return protocol's first message.
+	 */
 	public SigmaBIMsg getA() {
 		return a;
 	}
 
+	/**
+	 * Returns the protocol's challenge.
+	 * @return protocol's challenge.
+	 */
 	public byte[] getE() {
 		return e;
 	}
 
+	/**
+	 * Returns the protocol's second message.
+	 * @return protocol's second message.
+	 */
 	public SigmaBIMsg getZ() {
 		return z;
 	}

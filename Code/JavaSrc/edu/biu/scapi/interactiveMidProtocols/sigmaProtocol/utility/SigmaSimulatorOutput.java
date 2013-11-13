@@ -25,7 +25,7 @@
 package edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility;
 
 /**
- * Every sigma simulator outputs the result in the end of it's compute function, but each one can outputs different values. 
+ * Every sigma simulator outputs the result in the end of it's compute function, but each one can outputs different values. <p>
  * This interface is a marker interface for Sigma simulator output, where there is an implementing class
  * for each concrete Sigma protocol.
  * 
@@ -36,20 +36,20 @@ package edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility;
 public interface SigmaSimulatorOutput {
 
 	/**
-	 * All SigmaSimulators contains a, e, z. Returns a.
-	 * @return a
+	 * All SigmaSimulators contains first message, challenge and second message. Returns the first message.
+	 * @return a - first message
 	 */
 	public SigmaProtocolMsg getA();
 	
 	/**
-	 * All SigmaSimulators contains a, e, z. Returns e.
-	 * @return e
+	 * All SigmaSimulators contains first message, challenge and second message. Returns the challenge.
+	 * @return e - challenge
 	 */
 	public byte[] getE();
 	
 	/**
-	 * All SigmaSimulators contains a, e, z. Returns z.
-	 * @return z
+	 * All SigmaSimulators contains first message, challenge and second message. Returns the second message.
+	 * @return z - second message
 	 */
 	public SigmaProtocolMsg getZ();
 

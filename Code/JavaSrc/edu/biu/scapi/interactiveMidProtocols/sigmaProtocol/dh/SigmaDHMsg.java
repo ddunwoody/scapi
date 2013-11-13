@@ -28,7 +28,7 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProtocol
 import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
 
 /**
- * Concrete implementation SigmaProtocol message. 
+ * Concrete implementation SigmaProtocol message. <p>
  * This message contains two GroupElement sendable data and used when the DH prover send the first message to the verifier.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)

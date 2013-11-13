@@ -109,9 +109,9 @@ public class SigmaDHExtendedProverComputation implements SigmaProverComputation,
 	}
 
 	/**
-	 * Computes the following line from the protocol:
-	 * "SAMPLE a random r in Zq
-	 * COMPUTE ai = gi^r for all i". 
+	 * Computes the first message of the protocol.<p>
+	 * "SAMPLE a random r in Zq<p>
+	 * COMPUTE ai = gi^r for all i". <p>
 	 * @param input MUST be an instance of SigmaDHExtendedProverInput.
 	 * @return the computed message
 	 * @throws IllegalArgumentException if input is not an instance of SigmaDHExtendedProverInput.
@@ -149,8 +149,8 @@ public class SigmaDHExtendedProverComputation implements SigmaProverComputation,
 	}
 
 	/**
-	 * Computes the following line from the protocol:
-	 * "COMPUTE z = (r + ew) mod q".
+	 * Computes the second message of the protocol.<p>
+	 * "COMPUTE z = (r + ew) mod q".<p>
 	 * @param challenge
 	 * @return the computed message.
 	 * @throws CheatAttemptException if the received challenge's length is not equal to the soundness parameter.

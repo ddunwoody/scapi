@@ -33,7 +33,7 @@ import edu.biu.scapi.midLayer.ciphertext.CramerShoupOnGroupElementCiphertext;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**
- * Concrete implementation of SigmaProtocol input, used by the SigmaCramerShoupEncryptedValue verifier and simulator.
+ * Concrete implementation of SigmaProtocol input, used by the SigmaCramerShoupEncryptedValue verifier and simulator.<p>
  * 
  * In SigmaCramerShoupEncryptedValue protocol, the common input contains a GroupElement x, a CramerShoup public key
  * and the ciphertext of x using the CramerShoup encryption scheme.
@@ -48,20 +48,38 @@ public class SigmaCramerShoupEncryptedValueCommonInput implements SigmaCommonInp
 	private CramerShoupPublicKey publicKey;
 	private CramerShoupOnGroupElementCiphertext cipher;
 	
+	/**
+	 * Sets the ciphertext, public key and the encrypted element.
+	 * @param cipher ciphertext the output of the encryption scheme on the encrypted element.
+	 * @param publicKey used to encrypt.
+	 * @param x encrypted element.
+	 */
 	public SigmaCramerShoupEncryptedValueCommonInput(CramerShoupOnGroupElementCiphertext cipher, CramerShoupPublicKey publicKey, GroupElement x){
 		this.cipher = cipher;
 		this.publicKey = publicKey;
 		this.x = x;
 	}
 	
+	/**
+	 * Returns the encrypted element.
+	 * @return the encrypted element.
+	 */
 	public GroupElement getX() {
 		return x;
 	}
 
+	/**
+	 * Returns the public key used to encrypt.
+	 * @return the public key used to encrypt.
+	 */
 	public CramerShoupPublicKey getPublicKey() {
 		return publicKey;
 	}
 
+	/**
+	 * Returns the ciphertext.
+	 * @return the ciphertext.
+	 */
 	public CramerShoupOnGroupElementCiphertext getCipher() {
 		return cipher;
 	} 

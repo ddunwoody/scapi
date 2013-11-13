@@ -44,15 +44,28 @@ public class SigmaDJEncryptedZeroCommonInput implements SigmaCommonInput{
 	private DamgardJurikPublicKey publicKey;
 	private BigIntegerCiphertext cipher;
 	
+	/**
+	 * Sets the given public key and ciphertext.
+	 * @param publicKey used to encrypt.
+	 * @param cipher encryption on the given plaintext.
+	 */
 	public SigmaDJEncryptedZeroCommonInput(DamgardJurikPublicKey publicKey, BigIntegerCiphertext cipher){
 		this.publicKey = publicKey;
 		this.cipher = cipher;
 	}
 	
+	/**
+	 * Returns the public key used to encrypt.
+	 * @return public key used to encrypt.
+	 */
 	public DamgardJurikPublicKey getPublicKey(){
 		return publicKey;
 	}
 	
+	/**
+	 * Returns the ciphertext which is an encryption on the plaintext.
+	 * @return ciphertext which is an encryption on the plaintext.
+	 */
 	public BigIntegerCiphertext getCiphertext(){
 		return cipher;
 	}

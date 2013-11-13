@@ -28,7 +28,7 @@ import edu.biu.scapi.interactiveMidProtocols.zeroKnowledge.ZKProverInput;
 
 /**
  * Every Sigma protocol prover needs inputs during the protocol execution, but every concrete 
- * prover needs different inputs.
+ * prover needs different inputs.<p>
  * This interface is a marker interface for Sigma protocol input, where there is an implementing class
  * for each concrete Sigma protocol.
  * 
@@ -38,6 +38,7 @@ import edu.biu.scapi.interactiveMidProtocols.zeroKnowledge.ZKProverInput;
 public interface SigmaProverInput extends ZKProverInput{
 
 	/**
+	 * Returns the common parameters of the prover and the verifier.
 	 * @return the common parameters of the prover and the verifier.
 	 */
 	public SigmaCommonInput getCommonParams();

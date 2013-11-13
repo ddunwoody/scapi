@@ -106,8 +106,8 @@ public class SigmaPedersenCmtKnowledgeProverComputation implements SigmaProverCo
 	}
 
 	/**
-	 * Computes the following lines from the protocol:
-	 * "SAMPLE random values alpha, beta <- Zq
+	 * Computes the first message of the protocol.<p>
+	 * "SAMPLE random values alpha, beta <- Zq<p>
 	 *  COMPUTE a = (h^alpha)*(g^beta)". 
 	 * @return the computed message
 	 */
@@ -134,7 +134,7 @@ public class SigmaPedersenCmtKnowledgeProverComputation implements SigmaProverCo
 	}
 
 	/**
-	 * Computes the following line from the protocol:
+	 * Computes the second message of the protocol.<p>
 	 * "COMPUTE u = alpha + ex mod q and v = beta + er mod q".
 	 * @param challenge
 	 * @return the computed message.

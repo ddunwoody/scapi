@@ -28,7 +28,7 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaGroupEle
 import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaSimulatorOutput;
 
 /**
- * Concrete implementation of SigmaSimulatorOutput, used by SigmaPedersenCTKnowledgeSimulator.
+ * Concrete implementation of SigmaSimulatorOutput, used by SigmaPedersenCTKnowledgeSimulator. <p>
  * 
  * It contains the a, e, z types used in the above mentioned concrete simulator.
  * 
@@ -41,20 +41,38 @@ public class SigmaPedersenCmtKnowledgeSimulatorOutput implements SigmaSimulatorO
 	private byte[] e;
 	private SigmaPedersenCmtKnowledgeMsg z;
 	
+	/**
+	 * Sets the output of the simulator.
+	 * @param a first message
+	 * @param e challenge 
+	 * @param z second message
+	 */
 	public SigmaPedersenCmtKnowledgeSimulatorOutput(SigmaGroupElementMsg a, byte[] e, SigmaPedersenCmtKnowledgeMsg z){
 		this.a = a;
 		this.e = e;
 		this.z = z;
 	}
 
+	/**
+	 * Returns first message.
+	 * @return first message.
+	 */
 	public SigmaGroupElementMsg getA() {
 		return a;
 	}
 
+	/**
+	 * Returns the challenge.
+	 * @return the challenge.
+	 */
 	public byte[] getE() {
 		return e;
 	}
 
+	/**
+	 * Returns second message.
+	 * @return second message.
+	 */
 	public SigmaPedersenCmtKnowledgeMsg getZ() {
 		return z;
 	}

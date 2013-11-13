@@ -40,7 +40,7 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
 
 /**
- * Concrete implementation of Sigma Simulator.
+ * Concrete implementation of Sigma Simulator.<p>
  * This implementation simulates the case that the prover convince a verifier that the input tuple (g1,…,gm,h1,…,hm) is an 
  * extended Diffie-Hellman tuple, meaning that there exists a single w in Zq such that hi=gi^w for all i.
  * 
@@ -102,7 +102,7 @@ public class SigmaDHExtendedSimulator implements SigmaSimulator{
 	}
 	
 	/**
-	 * Computes the simulator computation.
+	 * Computes the simulator computation with the given challenge.
 	 * @param input MUST be an instance of SigmaDHExtendedCommonInput.
 	 * @param challenge
 	 * @return the output of the computation - (a, e, z).
@@ -161,7 +161,7 @@ public class SigmaDHExtendedSimulator implements SigmaSimulator{
 	}
 	
 	/**
-	 * Computes the simulator computation.
+	 * Computes the simulator computation with randomly chosen challenge.
 	 * @param input MUST be an instance of SigmaDHExtendedInput.
 	 * @return the output of the computation - (a, e, z).
 	 * @throws IllegalArgumentException if the given input is not an instance of SigmaDHExtendedInput.

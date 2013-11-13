@@ -35,7 +35,7 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
 /**
  * Concrete implementation of SigmaProtocol input, used by the SigmaElGamalEncryptedValue verifier and simulator.<p>
  * There are two versions of SigmaElGamalEncryptedValue protocol, depending upon if the prover knows 
- * the secret key or it knows the randomness used to generate the ciphertext.
+ * the secret key or it knows the randomness used to generate the ciphertext.<p>
  * This common input contains an ElGamal public Key, the encrypted value x, the ciphertext and 
  * a boolean indicates is the prover knows the secret key or the random value.
  * 
@@ -50,6 +50,14 @@ public class SigmaElGamalEncryptedValueCommonInput implements SigmaCommonInput{
 	private ElGamalPublicKey publicKey;
 	private ElGamalOnGroupElementCiphertext cipher;
 	
+	/**
+	 * Sets the given ciphertext, public key and encrypted value.<p>
+	 * There is also an argument represents if the encryption was done by private key knowledge or by a randomness knowledge.
+	 * @param isRandomness represents if the encryption was done by private key knowledge or by a randomness knowledge.
+	 * @param cipher ciphertext outputed by the encryption scheme on the given x
+	 * @param publicKey used to encrypt.
+	 * @param x encrypted value
+	 */
 	public SigmaElGamalEncryptedValueCommonInput(boolean isRandomness, ElGamalOnGroupElementCiphertext cipher, ElGamalPublicKey publicKey, GroupElement x){
 		this.isRandomness = isRandomness;
 		this.cipher = cipher;
@@ -57,18 +65,34 @@ public class SigmaElGamalEncryptedValueCommonInput implements SigmaCommonInput{
 		this.x = x;
 	}
 	
+	/**
+	 * Returns a boolean represents if the encryption was done by private key knowledge or by a randomness knowledge.
+	 * @return a boolean represents if the encryption was done by private key knowledge or by a randomness knowledge.
+	 */
 	public boolean isRandomness() {
 		return isRandomness;
 	}
 	
+	/**
+	 * Returns the encrypted value.
+	 * @return the encrypted value.
+	 */
 	public GroupElement getX() {
 		return x;
 	}
 
+	/**
+	 * Returns the publicKey used to encrypt.
+	 * @return the publicKey used to encrypt.
+	 */
 	public ElGamalPublicKey getPublicKey() {
 		return publicKey;
 	}
 
+	/**
+	 * Returns the ciphertext.
+	 * @return the ciphertext.
+	 */
 	public ElGamalOnGroupElementCiphertext getCipher() {
 		return cipher;
 	}

@@ -29,8 +29,8 @@ import java.io.Serializable;
 import edu.biu.scapi.interactiveMidProtocols.zeroKnowledge.ZKCommonInput;
 
 /**
- * Marker interface for common input of Sigma Protocols.
- * Each Sigma Protocol has a common input for the prover and the verifier, such input  shuold implement this interface. 
+ * Marker interface for common input of Sigma Protocols.<p>
+ * Each Sigma Protocol has a common input for the prover and the verifier, such input should implement this interface. 
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *

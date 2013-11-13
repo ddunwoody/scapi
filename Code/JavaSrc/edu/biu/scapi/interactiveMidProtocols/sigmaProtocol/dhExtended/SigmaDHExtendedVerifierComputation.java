@@ -109,7 +109,7 @@ public class SigmaDHExtendedVerifierComputation implements SigmaVerifierComputat
 	}
 	
 	/**
-	 * Computes the following line from the protocol:
+	 * Samples the chaalenge for this protocol.<p>
 	 * 	"SAMPLE a random challenge e<-{0,1}^t".
 	 */
 	public void sampleChallenge(){
@@ -136,8 +136,9 @@ public class SigmaDHExtendedVerifierComputation implements SigmaVerifierComputat
 	}
 
 	/**
-	 * Computes the following line from the protocol:
-	 * 	"ACC IFF VALID_PARAMS(G,q,g)=TRUE AND all g1,…,gm in G AND for all i=1,…,m it holds that gi^z = ai*hi^e".     
+	 * Computes the protocol's verification.<p>
+	 * Computes the following line from the protocol:<p>
+	 * 	"ACC IFF VALID_PARAMS(G,q,g)=TRUE AND all g1,…,gm in G AND for all i=1,…,m it holds that gi^z = ai*hi^e".   <p>  
 	 * @param input MUST be an instance of SigmaDHExtendedCommonInput.
 	 * @param z second message from prover
 	 * @return true if the proof has been verified; false, otherwise.

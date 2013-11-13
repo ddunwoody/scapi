@@ -27,7 +27,7 @@ package edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility;
 import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
 
 /**
- * Concrete implementation of SigmaProtocol message. 
+ * Concrete implementation of SigmaProtocol message. <p>
  * This message contains one GroupElement sendable data and used when the prover sends a message to the verifier.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)

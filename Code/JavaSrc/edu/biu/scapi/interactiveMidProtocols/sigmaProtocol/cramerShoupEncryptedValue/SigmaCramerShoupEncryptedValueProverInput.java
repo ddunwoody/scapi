@@ -35,7 +35,7 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
  * Concrete implementation of SigmaProtocol input, used by the SigmaCramerShoupEncryptedValueProver.<p>
  * 
  * In SigmaCramerShoupEncryptedValue protocol, the prover gets a GroupElement x, a CramerShoup public key, 
- * the ciphertext of x using the CramerShoup encryption scheme and the randomness value used to encrypt x.
+ * the ciphertext of x using the CramerShoup encryption scheme and the random value used to encrypt x.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
@@ -45,11 +45,22 @@ public class SigmaCramerShoupEncryptedValueProverInput implements SigmaProverInp
 	private SigmaCramerShoupEncryptedValueCommonInput params;
 	private BigInteger r;
 	
+	/**
+	 * Sets the ciphertext, public key, the encrypted element and the random value used to encrypt x.
+	 * @param cipher ciphertext the output of the encryption scheme on the encrypted element.
+	 * @param publicKey used to encrypt.
+	 * @param x encrypted element.
+	 * @param r random value used to encrypt x.
+	 */
 	public SigmaCramerShoupEncryptedValueProverInput(CramerShoupOnGroupElementCiphertext cipher, CramerShoupPublicKey pubKey, GroupElement x, BigInteger r){
 		params = new SigmaCramerShoupEncryptedValueCommonInput(cipher, pubKey, x);
 		this.r = r;
 	}
 	
+	/**
+	 * Returns the random value used to encrypt x.
+	 * @return the random value used to encrypt x.
+	 */
 	public BigInteger getR(){
 		return r;
 	}

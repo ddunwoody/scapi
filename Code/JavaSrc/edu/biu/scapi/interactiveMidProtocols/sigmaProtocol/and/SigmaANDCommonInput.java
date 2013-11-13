@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaCommonInput;
 
 /**
- * Concrete implementation of SigmaProtocol input, used by the SigmaProtocolAND verifier and simulator.
+ * Concrete implementation of SigmaProtocol input, used by the SigmaProtocolAND verifier and simulator.<p>
  * In SigmaProtocolAND, the common input contains an array of inputs to all of its underlying objects.
  *  
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
@@ -40,10 +40,18 @@ public class SigmaANDCommonInput implements SigmaCommonInput{
 	private static final long serialVersionUID = 6100213822914910563L;
 	private ArrayList<SigmaCommonInput> sigmaInputs;
 	
+	/**
+	 * Sets the input array.
+	 * @param input contains inputs for all the underlying sigma protocol.
+	 */
 	public SigmaANDCommonInput(ArrayList<SigmaCommonInput> input){
 		sigmaInputs = input;
 	}
 	
+	/**
+	 * Returns the input array contains inputs for all the underlying sigma protocol.
+	 * @return the input array contains inputs for all the underlying sigma protocol.
+	 */
 	public ArrayList<SigmaCommonInput> getInputs(){
 		return sigmaInputs;
 	}

@@ -31,7 +31,7 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaCommonIn
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**
- * Concrete implementation of SigmaProtocol input, used by the SigmaDlog verifier and simulator.
+ * Concrete implementation of SigmaProtocol input, used by the SigmaDlog verifier and simulator.<p>
  * In SigmaProtocolDlog, the common input contains a GroupElement h.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
@@ -43,10 +43,18 @@ public class SigmaDlogCommonInput implements SigmaCommonInput{
 	private static final long serialVersionUID = -2041812894475536801L;
 	private GroupElement h;
 	
+	/**
+	 * Sets the given h element.
+	 * @param h
+	 */
 	public SigmaDlogCommonInput(GroupElement h){
 		this.h = h;
 	}
 	
+	/**
+	 * Returns h element.
+	 * @return h element.
+	 */
 	public GroupElement getH(){
 		return h;
 	}

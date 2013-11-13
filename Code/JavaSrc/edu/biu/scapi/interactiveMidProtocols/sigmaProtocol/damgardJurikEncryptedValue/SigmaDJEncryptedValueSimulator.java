@@ -39,7 +39,7 @@ import edu.biu.scapi.midLayer.ciphertext.BigIntegerCiphertext;
 import edu.biu.scapi.midLayer.plaintext.BigIntegerPlainText;
 
 /**
- * Concrete implementation of Sigma Simulator.
+ * Concrete implementation of Sigma Simulator.<p>
  * 
  * This implementation simulates the case that party who encrypted a value x proves that it indeed encrypted x.
  * 
@@ -92,10 +92,10 @@ public class SigmaDJEncryptedValueSimulator implements SigmaSimulator{
 	}
 	
 	/**
-	 * Constructor that gets a simulator and sets it.
-	 * In getSimulator function in SigmaDamgardJurikEncryptedValueProver, the prover needs to create an instance of this class.
+	 * Constructor that gets a simulator and sets it.<p>
+	 * In getSimulator function in SigmaDamgardJurikEncryptedValueProver, the prover needs to create an instance of this class.<p>
 	 * The problem is that the prover does not know which t and random to give, since they are values of the underlying 
-	 * SigmaDamgardJurikencryptedZeroProver that the prover holds.
+	 * SigmaDamgardJurikencryptedZeroProver that the prover holds.<p>
 	 * Using this constructor, the (DJEncryptedValue) prover can get the DJEncryptedZero simulator from the underlying (DJEncryptedZero) 
 	 * prover and use it to create this object.
 	 * 
@@ -120,7 +120,7 @@ public class SigmaDJEncryptedValueSimulator implements SigmaSimulator{
 	}
 	
 	/**
-	 * Computes the simulator computation.
+	 * Computes the simulator computation with the given challenge.
 	 * @param input MUST be an instance of SigmaDJEncryptedValueCommonInput.
 	 * @param challenge
 	 * @return the output of the computation - (a, e, z).
@@ -136,7 +136,7 @@ public class SigmaDJEncryptedValueSimulator implements SigmaSimulator{
 	}
 	
 	/**
-	 * Computes the simulator computation.
+	 * Computes the simulator computation with a randomly chosen challenge.
 	 * @param input MUST be an instance of SigmaDJEncryptedValueInput.
 	 * @return the output of the computation - (a, e, z).
 	 * @throws IllegalArgumentException if input is not the expected.

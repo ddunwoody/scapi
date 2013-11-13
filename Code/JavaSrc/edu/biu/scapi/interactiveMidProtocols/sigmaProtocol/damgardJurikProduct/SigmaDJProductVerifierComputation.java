@@ -101,7 +101,7 @@ public class SigmaDJProductVerifierComputation implements SigmaVerifierComputati
 	}
 	
 	/**
-	 * Sets the input for this Sigma protocol
+	 * Sets the input for this Sigma protocol.
 	 * @param input MUST be an instance of SigmaDJProductCommonInput.
 	 * @throws IllegalArgumentException if input is not an instance of SigmaDJProductCommonInput.
 	 */
@@ -119,11 +119,11 @@ public class SigmaDJProductVerifierComputation implements SigmaVerifierComputati
 	}
 	
 	/**
-	 * Checks the validity of the given soundness parameter.
+	 * Checks the validity of the given soundness parameter.<p>
 	 * t must be less than a third of the length of the public key n.
 	 * @return true if the soundness parameter is valid; false, otherwise.
 	 */
-	public boolean checkSoundnessParam(BigInteger modulus){
+	private boolean checkSoundnessParam(BigInteger modulus){
 		//If soundness parameter is not less than a third of the publicKey n, throw IllegalArgumentException.
 		int third = modulus.bitLength() / 3;
 		if (t >= third){
@@ -133,7 +133,7 @@ public class SigmaDJProductVerifierComputation implements SigmaVerifierComputati
 	}
 	
 	/**
-	 * Computes the following line from the protocol:
+	 * Samples the challenge of the protocol.<p>
 	 * 	"SAMPLE a random challenge e<-{0,1}^t".
 	 */
 	public void sampleChallenge(){
@@ -160,9 +160,9 @@ public class SigmaDJProductVerifierComputation implements SigmaVerifierComputati
 	}
 
 	/**
-	 * Computes the following line from the protocol:
-	 * 	"ACC IFF c1,c2,c3,a1,a2,z1,z2,z3 are relatively prime to n 
-				AND c1^e*a1 = (1+n)^z1*z2^N mod N’ 
+	 * Computes the verification of the protocol.<p>
+	 * 	"ACC IFF c1,c2,c3,a1,a2,z1,z2,z3 are relatively prime to n <p>
+				AND c1^e*a1 = (1+n)^z1*z2^N mod N’ <p>
 				AND (c2^z1)/(a2*c3^e) = z3^N mod N’".
 	 * @param z second message from prover
 	 * @return true if the proof has been verified; false, otherwise.

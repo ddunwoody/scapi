@@ -35,7 +35,7 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProtocol
 import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaSimulatorOutput;
 
 /**
- * Concrete implementation of Sigma Simulator.
+ * Concrete implementation of Sigma Simulator.<p>
  * This implementation simulates the case that the prover convince a verifier that the AND of any number of statements are true, 
  * where each statement can be proven by an associated Sigma protocol.
  * 
@@ -86,7 +86,7 @@ public class SigmaANDSimulator implements SigmaSimulator{
 	}
 	
 	/**
-	 * Computes the simulator computation.
+	 * Computes the simulator computation with the given challenge.
 	 * @param input MUST be an instance of SigmaANDCommonInput.
 	 * @param challenge
 	 * @return the output of the computation - (a, e, z).
@@ -130,7 +130,7 @@ public class SigmaANDSimulator implements SigmaSimulator{
 	}
 	
 	/**
-	 * Computes the simulator computation.
+	 * Computes the simulator computation with a randomly chosen challenge.
 	 * @param input MUST be an instance of SigmaANDCommonInput.
 	 * @return the output of the computation - (a, e, z).
 	 * @throws IllegalArgumentException if the given input is not an instance of SigmaANDCommonInput.

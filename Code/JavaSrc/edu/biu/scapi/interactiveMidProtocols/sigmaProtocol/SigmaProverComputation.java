@@ -29,7 +29,7 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProverIn
 import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProtocolMsg;
 
 /**
- * This interface manages the mathematical calculations of the prover side in the sigma protocol.
+ * This interface manages the mathematical calculations of the prover side in the sigma protocol.<p>
  * It samples random values and computes the messages.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
@@ -57,7 +57,7 @@ public interface SigmaProverComputation {
 	
 	/**
 	 * Returns the simulator that matches this sigma protocol prover.
-	 * @return
+	 * @return the simulator that matches this sigma protocol prover.
 	 */
 	public SigmaSimulator getSimulator();
 

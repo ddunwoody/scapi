@@ -36,7 +36,7 @@ import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**
- * Concrete implementation of Sigma Simulator.
+ * Concrete implementation of Sigma Simulator.<p>
  * This implementation simulates the case that the prover convince a verifier that it knows the value committed to in the commitment (h,c1, c2).
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
@@ -65,8 +65,8 @@ public class SigmaElGamalCmtKnowledgeSimulator implements SigmaSimulator{
 	}
 	
 	/**
-	 * Constructor that gets a simulator and sets it.
-	 * In getSimulator function in SigmaElGamalPrivateKeyProver, the prover needs to create an instance of this class.
+	 * Constructor that gets a simulator and sets it.<p>
+	 * In getSimulator function in SigmaElGamalPrivateKeyProver, the prover needs to create an instance of this class.<p>
 	 * The problem is that the prover does not know which Dlog, t and random to give, since they are values of the underlying 
 	 * SigmaDlogProver that the prover holds.
 	 * Using this constructor, the (ElGamal) prover can get the dlog simulator from the underlying (Dlog) prover and use it to create this object.

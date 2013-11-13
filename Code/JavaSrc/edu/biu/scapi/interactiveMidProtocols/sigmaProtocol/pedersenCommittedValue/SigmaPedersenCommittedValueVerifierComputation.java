@@ -81,7 +81,7 @@ public class SigmaPedersenCommittedValueVerifierComputation implements SigmaVeri
 	}
 
 	/**
-	 * Sets the input for this Sigma protocol
+	 * Sets the input for this Sigma protocol.
 	 * @param input MUST be an instance of SigmaPedersenCommittedValueCommonInput.
 	 * @throws IllegalArgumentException if input is not an instance of SigmaPedersenCommittedValueCommonInput.
 	 */
@@ -103,7 +103,7 @@ public class SigmaPedersenCommittedValueVerifierComputation implements SigmaVeri
 	}
 	
 	/**
-	 * Samples the challenge e <- {0,1}^t
+	 * Samples the challenge e <- {0,1}^t.
 	 */
 	public void sampleChallenge(){
 		//Delegates to the underlying Sigma Dlog verifier.

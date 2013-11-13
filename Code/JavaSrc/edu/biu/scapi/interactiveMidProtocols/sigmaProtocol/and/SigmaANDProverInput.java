@@ -30,7 +30,7 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaCommonIn
 import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProverInput;
 
 /**
- * Concrete implementation of SigmaProtocol input, used by the SigmaProtocolANDProver.
+ * Concrete implementation of SigmaProtocol input, used by the SigmaProtocolANDProver.<p>
  * In SigmaProtocolANDProver, the prover gets an array of inputs to all of its underlying objects.
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
@@ -39,10 +39,18 @@ public class SigmaANDProverInput implements SigmaProverInput{
 	
 	private ArrayList<SigmaProverInput> sigmaInputs;
 	
+	/**
+	 * Sets the input array.
+	 * @param input contains inputs for all the underlying sigma protocol's provers.
+	 */
 	public SigmaANDProverInput(ArrayList<SigmaProverInput> input){
 		sigmaInputs = input;
 	}
 	
+	/**
+	 * Returns the input array contains inputs for all the underlying sigma protocol's provers.
+	 * @return the input array contains inputs for all the underlying sigma protocol's provers.
+	 */
 	public ArrayList<SigmaProverInput> getInputs(){
 		return sigmaInputs;
 	}

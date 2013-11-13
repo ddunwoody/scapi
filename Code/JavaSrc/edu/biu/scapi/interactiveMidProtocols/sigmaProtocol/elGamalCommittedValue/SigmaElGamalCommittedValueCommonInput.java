@@ -33,7 +33,7 @@ import edu.biu.scapi.midLayer.ciphertext.ElGamalCiphertextSendableData;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**
- * Concrete implementation of SigmaProtocol input, used by the SigmaElGamalCommittedValue verifier and simulator.
+ * Concrete implementation of SigmaProtocol input, used by the SigmaElGamalCommittedValue verifier and simulator.<p>
  * In SigmaElGamalCommittedValue protocol, the common input contains an ElGamal commitment message
  * and the value committed x.
  * 
@@ -47,20 +47,38 @@ public class SigmaElGamalCommittedValueCommonInput implements SigmaCommonInput{
 	private ElGamalCiphertextSendableData commitment;
 	private GroupElement x;
 	
+	/**
+	 * Sets the public key, the commitment value and the committed value.
+	 * @param publicKey used to commit the committed value.
+	 * @param commitment the actual commitment value.
+	 * @param x committed value.
+	 */
 	public SigmaElGamalCommittedValueCommonInput(ElGamalPublicKey publicKey, ElGamalCiphertextSendableData commitment, GroupElement x){
 		this.publicKey = publicKey;
 		this.commitment = commitment;
 		this.x = x;
 	}
 	
+	/**
+	 * Returns the actual commitment value.
+	 * @return the actual commitment value.
+	 */
 	public ElGamalCiphertextSendableData getCommitment(){
 		return commitment;
 	}
 	
+	/**
+	 * Returns the committed value.
+	 * @return the committed value.
+	 */
 	public GroupElement getX(){
 		return x;
 	}
 	
+	/**
+	 * Returns the public key used to commit.
+	 * @return the public key used to commit.
+	 */
 	public ElGamalPublicKey getPublicKey(){
 		return publicKey;
 	}

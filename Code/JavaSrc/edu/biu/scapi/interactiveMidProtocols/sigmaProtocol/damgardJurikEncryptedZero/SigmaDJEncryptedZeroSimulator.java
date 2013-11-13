@@ -37,7 +37,7 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaCommonIn
 import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaSimulatorOutput;
 
 /**
- * Concrete implementation of Sigma Simulator.
+ * Concrete implementation of Sigma Simulator.<P>
  * This implementation simulates the case that the prover convince a verifier that a ciphertext is an encryption of 0 (or an Nth power).
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
@@ -99,7 +99,7 @@ public class SigmaDJEncryptedZeroSimulator implements SigmaSimulator{
 	}
 	
 	/**
-	 * Computes the simulator computation.
+	 * Computes the simulator computation with the given challenge.
 	 * @param input MUST be an instance of SigmaDJEncryptedZeroCommonInput.
 	 * @param challenge
 	 * @return the output of the computation - (a, e, z).
@@ -143,7 +143,7 @@ public class SigmaDJEncryptedZeroSimulator implements SigmaSimulator{
 	}
 	
 	/**
-	 * Computes the simulator computation.
+	 * Computes the simulator computation with a randomly chosen challenge.
 	 * @param input MUST be an instance of SigmaDJEncryptedZeroInput.
 	 * @return the output of the computation - (a, e, z).
 	 * @throws IllegalArgumentException if the given input is not an instance of SigmaDJEncryptedZeroInput.
@@ -163,7 +163,7 @@ public class SigmaDJEncryptedZeroSimulator implements SigmaSimulator{
 	}
 	
 	/**
-	 * Checks the validity of the given soundness parameter.
+	 * Checks the validity of the given soundness parameter.<p>
 	 * t must be less than a third of the length of the public key n.
 	 * @return true if the soundness parameter is valid; false, otherwise.
 	 */

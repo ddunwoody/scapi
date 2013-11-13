@@ -30,7 +30,7 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProverIn
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**
- * Concrete implementation of SigmaProtocol input, used by the SigmaDHProver.
+ * Concrete implementation of SigmaProtocol input, used by the SigmaDHProver.<p>
  * In SigmaProtocolDH, the prover gets three GroupElements - h, u, v and a BigInteger w such that g^w = u and h^w = v.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
@@ -41,6 +41,13 @@ public class SigmaDHProverInput implements SigmaProverInput{
 	private SigmaDHCommonInput params;
 	private BigInteger w;
 	
+	/**
+	 * Sets the prover's input values that satisfy g^w = u and h^w = v.
+	 * @param h
+	 * @param u
+	 * @param v
+	 * @param w
+	 */
 	public SigmaDHProverInput(GroupElement h, GroupElement u, GroupElement v, BigInteger w) {
 		params = new SigmaDHCommonInput(h, u, v);
 		this.w = w;

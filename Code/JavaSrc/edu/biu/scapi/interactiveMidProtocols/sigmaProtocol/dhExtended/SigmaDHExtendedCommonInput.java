@@ -32,7 +32,7 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaCommonIn
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**
- * Concrete implementation of SigmaProtocol input, used by the SigmaDHExtended verifier and simulator.
+ * Concrete implementation of SigmaProtocol input, used by the SigmaDHExtended verifier and simulator.<p>
  * In SigmaProtocolDHExtended, the common input contains an extended DH tuple - (g1,…,gm,h1,…,hm).
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
@@ -44,6 +44,11 @@ public class SigmaDHExtendedCommonInput implements SigmaCommonInput{
 	private ArrayList<GroupElement> gArray;
 	private ArrayList<GroupElement> hArray;
 	
+	/**
+	 * Sets the input arrays.
+	 * @param gArray
+	 * @param hArray
+	 */
 	public SigmaDHExtendedCommonInput(ArrayList<GroupElement> gArray, ArrayList<GroupElement> hArray){
 		this.gArray = gArray;
 		this.hArray = hArray;

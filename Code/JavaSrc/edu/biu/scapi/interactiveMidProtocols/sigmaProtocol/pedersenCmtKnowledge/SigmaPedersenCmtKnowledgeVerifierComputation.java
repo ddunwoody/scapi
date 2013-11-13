@@ -105,7 +105,7 @@ public class SigmaPedersenCmtKnowledgeVerifierComputation implements SigmaVerifi
 	}
 	
 	/**
-	 * Computes the following line from the protocol:
+	 * Samples the challenge for this protocol.<p>
 	 * 	"SAMPLE a random challenge e<-{0,1}^t".
 	 */
 	public void sampleChallenge(){
@@ -132,7 +132,7 @@ public class SigmaPedersenCmtKnowledgeVerifierComputation implements SigmaVerifi
 	}
 
 	/**
-	 * Computes the following line from the protocol:
+	 * Computes the varification of the protocol.<p>
 	 * 	"ACC IFF VALID_PARAMS(G,q,g)=TRUE AND h in G AND h^u*g^v=a*c^e".
 	 * @param input MUST be an instance of SigmaPedersenCTKnowledgeCommonInput.
 	 * @param a first message from prover

@@ -32,7 +32,7 @@ import edu.biu.scapi.midLayer.asymmetricCrypto.keys.DamgardJurikPublicKey;
 import edu.biu.scapi.midLayer.ciphertext.BigIntegerCiphertext;
 
 /**
- * Concrete implementation of SigmaProtocol input, used by the SigmaDamgardJurikProduct verifier and simulator.
+ * Concrete implementation of SigmaProtocol input, used by the SigmaDamgardJurikProduct verifier and simulator.<p>
  * In SigmaProtocolDamgardJurikProduct, the common input contains DamgardJurikPublicKey and three BigIntegerCiphertexts.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
@@ -47,6 +47,13 @@ public class SigmaDJProductCommonInput implements SigmaCommonInput{
 	private BigIntegerCiphertext cipher2;
 	private BigIntegerCiphertext cipher3;
 	
+	/**
+	 * Sets the given public key and three ciphertexts.
+	 * @param publicKey used to encrypt.
+	 * @param c1 first ciphertext
+	 * @param c2 second ciphertext
+	 * @param c3 third ciphertext
+	 */
 	public SigmaDJProductCommonInput(DamgardJurikPublicKey publicKey, BigIntegerCiphertext c1, BigIntegerCiphertext c2, BigIntegerCiphertext c3){
 		this.publicKey = publicKey;
 		cipher1 = c1;
@@ -54,18 +61,34 @@ public class SigmaDJProductCommonInput implements SigmaCommonInput{
 		cipher3 = c3;
 	}
 	
+	/**
+	 * Returns the public key used to encrypt.
+	 * @return the public key used to encrypt.
+	 */
 	public DamgardJurikPublicKey getPublicKey(){
 		return publicKey;
 	}
 	
+	/**
+	 * Returns the first ciphertext.
+	 * @return the first ciphertext.
+	 */
 	public BigIntegerCiphertext getC1(){
 		return cipher1;
 	}
 	
+	/**
+	 * Returns the second ciphertext.
+	 * @return the second ciphertext.
+	 */
 	public BigIntegerCiphertext getC2(){
 		return cipher2;
 	}
 	
+	/**
+	 * Returns the third ciphertext.
+	 * @return the third ciphertext.
+	 */
 	public BigIntegerCiphertext getC3(){
 		return cipher3;
 	}

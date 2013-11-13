@@ -43,7 +43,12 @@ public class SigmaDJEncryptedZeroProverInput implements SigmaProverInput{
 	private SigmaDJEncryptedZeroCommonInput params;
 	private BigInteger r; //randomness used to encrypt.
 	
-	
+	/**
+	 * Sets the given public key, ciphertext and random value used to encrypt.
+	 * @param publicKey used to encrypt.
+	 * @param cipher encryption on the given plaintext.
+	 * @param r random value used to encrypt.
+	 */
 	public SigmaDJEncryptedZeroProverInput(DamgardJurikPublicKey publicKey, BigIntegerCiphertext cipher, BigInteger r){
 		params = new SigmaDJEncryptedZeroCommonInput(publicKey, cipher);
 		this.r = r;
@@ -54,9 +59,9 @@ public class SigmaDJEncryptedZeroProverInput implements SigmaProverInput{
 	 * If the prover knows the secret key, then it can compute (once) the value m=n^(-1) mod phi(n)=n^(-1) mod (p-1)(q-1). 
 	 * Then, it can recover the randomness r from c by computing c^m mod n (this equals r^(n/n) mod n = r). 
 	 * Once given r, the prover can proceed with the protocol.
-	 * @param publicKey
-	 * @param cipher
-	 * @param privateKey
+	 * @param publicKey used to encrypt.
+	 * @param cipher encryption on the given plaintext.
+	 * @param privateKey used for decrypt.
 	 */
 	public SigmaDJEncryptedZeroProverInput(DamgardJurikPublicKey publicKey, BigIntegerCiphertext cipher, DamgardJurikPrivateKey privateKey){
 		params = new SigmaDJEncryptedZeroCommonInput(publicKey, cipher);
@@ -75,6 +80,10 @@ public class SigmaDJEncryptedZeroProverInput implements SigmaProverInput{
 		r = cipher.getCipher().modPow(m, n);
 	}
 	
+	/**
+	 * Returns the random value used to encrypt.
+	 * @return random value used to encrypt.
+	 */
 	public BigInteger getR(){
 		return r;
 	}

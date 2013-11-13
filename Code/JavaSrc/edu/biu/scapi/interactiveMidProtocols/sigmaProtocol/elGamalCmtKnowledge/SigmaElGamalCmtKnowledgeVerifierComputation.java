@@ -95,7 +95,7 @@ public class SigmaElGamalCmtKnowledgeVerifierComputation implements SigmaVerifie
 	}
 	
 	/**
-	 * Samples the challenge e <- {0,1}^t
+	 * Samples the challenge e <- {0,1}^t.
 	 */
 	public void sampleChallenge(){
 		//Delegates to the underlying Sigma Dlog verifier.

@@ -158,8 +158,8 @@ public class SigmaDJProductProverComputation implements SigmaProverComputation, 
 	}
 
 	/**
-	 * Computes the following line from the protocol:
-	 * "SAMPLE random values d <- ZN, rd <- Z*n, rdb <- Z*n
+	 * Computes the first message of the protocol.<p>
+	 * "SAMPLE random values d <- ZN, rd <- Z*n, rdb <- Z*n<p>
 	 *  COMPUTE a1 = (1+n)^d*rd^N mod N’ and a2 = ((1+n)^(d*x2))*(rdb^N) mod N’ and SET a = (a1,a2)". 
 	 * @param input MUST be an instance of SigmaDJProductProverInput.
 	 * @return the computed message
@@ -193,7 +193,7 @@ public class SigmaDJProductProverComputation implements SigmaProverComputation, 
 	}
 
 	/**
-	 * Computes the following line from the protocol:
+	 * Computes the second message of the protocol.<p>
 	 * "COMPUTE z1=e^x1+d mod N, z2 = r1^e*rd mod n, z3=(r2^z1)/(rdb*r3^e) mod n, and SET z=(z1,z2,z3)".
 	 * @param challenge
 	 * @return the computed message.

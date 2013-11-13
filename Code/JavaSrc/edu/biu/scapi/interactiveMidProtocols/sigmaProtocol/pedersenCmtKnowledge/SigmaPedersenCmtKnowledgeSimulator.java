@@ -38,7 +38,7 @@ import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**
- * Concrete implementation of Sigma Simulator.
+ * Concrete implementation of Sigma Simulator.<p>
  * This implementation simulates the case that the prover convince a verifier that that the value committed to in the commitment (h, c) is x.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
@@ -100,7 +100,7 @@ public class SigmaPedersenCmtKnowledgeSimulator implements SigmaSimulator{
 	}
 	
 	/**
-	 * Computes the simulator computation.
+	 * Computes the simulator computation with the given challenge.
 	 * @param input MUST be an instance of SigmaPedersenCTKnowledgeCommonInput.
 	 * @param challenge
 	 * @return the output of the computation - (a, e, z).
@@ -149,7 +149,7 @@ public class SigmaPedersenCmtKnowledgeSimulator implements SigmaSimulator{
 	}
 	
 	/**
-	 * Computes the simulator computation.
+	 * Computes the simulator computation with randomly chosen challenge.
 	 * @param input MUST be an instance of SigmaPedersenCTKnowledgeInput.
 	 * @return the output of the computation - (a, e, z).
 	 * @throws IllegalArgumentException if the given input is not an instance of SigmaPedersenCTKnowledgeInput.

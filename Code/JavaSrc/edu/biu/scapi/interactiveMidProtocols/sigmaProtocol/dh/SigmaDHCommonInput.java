@@ -31,7 +31,7 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaCommonIn
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**
- * Concrete implementation of SigmaProtocol input, used by the SigmaDH verifier and simulator.
+ * Concrete implementation of SigmaProtocol input, used by the SigmaDH verifier and simulator.<p>
  * In SigmaProtocolDH, the common input contains three GroupElements - h, u, v.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
@@ -44,6 +44,12 @@ public class SigmaDHCommonInput implements SigmaCommonInput{
 	private GroupElement u;
 	private GroupElement v;
 	
+	/**
+	 * Sets the common input of this sigma protocol.
+	 * @param h
+	 * @param u
+	 * @param v
+	 */
 	public SigmaDHCommonInput(GroupElement h, GroupElement u, GroupElement v){
 		this.h = h;
 		this.u = u;

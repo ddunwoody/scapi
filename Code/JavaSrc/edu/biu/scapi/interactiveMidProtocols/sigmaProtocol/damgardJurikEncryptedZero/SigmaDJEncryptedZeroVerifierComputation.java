@@ -86,7 +86,7 @@ public class SigmaDJEncryptedZeroVerifierComputation implements SigmaVerifierCom
 	}
 	
 	/**
-	 * Checks the validity of the given soundness parameter.
+	 * Checks the validity of the given soundness parameter. <p>
 	 * t must be less than a third of the length of the public key n.
 	 * @return true if the soundness parameter is valid; false, otherwise.
 	 */
@@ -108,7 +108,7 @@ public class SigmaDJEncryptedZeroVerifierComputation implements SigmaVerifierCom
 	}
 	
 	/**
-	 * Computes the following line from the protocol:
+	 * Samples the challenge of the protocol.<p>
 	 * 	"SAMPLE a random challenge e<-{0,1}^t".
 	 */
 	public void sampleChallenge(){
@@ -135,7 +135,7 @@ public class SigmaDJEncryptedZeroVerifierComputation implements SigmaVerifierCom
 	}
 
 	/**
-	 * Computes the following line from the protocol:
+	 * Computes the verification of the protocol.<p>
 	 * 	"ACC IFF c,a,z are relatively prime to n AND z^N = (a*c^e) mod N’".
 	 * @param input MUST be an instance of SigmaDJEncryptedZeroCommonInput.
 	 * @param z second message from prover

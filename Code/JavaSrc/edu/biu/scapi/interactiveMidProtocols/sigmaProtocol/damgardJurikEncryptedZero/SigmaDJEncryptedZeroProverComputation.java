@@ -107,7 +107,7 @@ public class SigmaDJEncryptedZeroProverComputation implements SigmaProverComputa
 	}
 	
 	/**
-	 * Checks the validity of the given soundness parameter.
+	 * Checks the validity of the given soundness parameter.<p>
 	 * t must be less than a third of the length of the public key n.
 	 * @return true if the soundness parameter is valid; false, otherwise.
 	 */
@@ -123,8 +123,8 @@ public class SigmaDJEncryptedZeroProverComputation implements SigmaProverComputa
 	
 
 	/**
-	 * Computes the following line from the protocol:
-	 * "SAMPLE random value s <- Z*n
+	 * Computes the first message of the protocol.<p>
+	 * "SAMPLE random value s <- Z*n<p>
 	 * COMPUTE a = s^N mod N’". 
 	 * @param input MUST be an instance of SigmaDJEncryptedZeroProverInput.
 	 * @return the computed message
@@ -158,7 +158,7 @@ public class SigmaDJEncryptedZeroProverComputation implements SigmaProverComputa
 	}
 
 	/**
-	 * Computes the following line from the protocol:
+	 * Computes the second message of the protocol.<p>
 	 * "COMPUTE z = s*r^e mod n".
 	 * @param challenge
 	 * @return the computed message.

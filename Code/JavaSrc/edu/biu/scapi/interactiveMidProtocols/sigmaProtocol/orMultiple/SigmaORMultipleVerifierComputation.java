@@ -33,7 +33,7 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaMultiple
 import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProtocolMsg;
 
 /**
- * Concrete implementation of Sigma Protocol verifier computation.
+ * Concrete implementation of Sigma Protocol verifier computation.<p>
  * 
  * This protocol is used for a prover to convince a verifier that at least k out of n statements is true, 
  * where each statement can be proven by an associated Sigma protocol.
@@ -125,7 +125,7 @@ public class SigmaORMultipleVerifierComputation implements SigmaVerifierComputat
 	}
 	
 	/**
-	 * Computes the following line from the protocol:
+	 * Samples the challenge of the protocol.<p>
 	 * 	"SAMPLE a single random challenge  e <- GF[2^t]".
 	 */
 	public void sampleChallenge(){
@@ -184,7 +184,7 @@ public class SigmaORMultipleVerifierComputation implements SigmaVerifierComputat
 	}
 
 	/**
-	 * Computes the following line from the protocol:
+	 * Computes the verification of the protocol.<p>
 	 * 	"ACC IFF Q is of degree n-k AND Q(i)=ei for all i=1,…,n AND Q(0)=e, and the verifier output on (ai,ei,zi) for all i=1,…,n is ACC".
 	 * @param input MUST be an instance of SigmaORMultipleCommonInput.
 	 * @param a first message from prover

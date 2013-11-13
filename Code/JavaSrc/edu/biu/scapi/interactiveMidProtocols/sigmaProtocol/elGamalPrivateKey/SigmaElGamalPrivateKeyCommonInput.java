@@ -31,7 +31,7 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaCommonIn
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ElGamalPublicKey;
 
 /**
- * Concrete implementation of SigmaProtocol input, used by the SigmaElGamalPrivateKey verifier and simulator.
+ * Concrete implementation of SigmaProtocol input, used by the SigmaElGamalPrivateKey verifier and simulator.<P>
  * In SigmaElGamalPrivateKey protocol, the common input contains an ElGamal public key.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
@@ -42,10 +42,18 @@ public class SigmaElGamalPrivateKeyCommonInput implements SigmaCommonInput{
 	private static final long serialVersionUID = -7005455199829785734L;
 	private ElGamalPublicKey publicKey;
 	
+	/**
+	 * Sets the publlic key.
+	 * @param publicKey
+	 */
 	public SigmaElGamalPrivateKeyCommonInput(ElGamalPublicKey publicKey){
 		this.publicKey = publicKey;
 	}
 	
+	/**
+	 * Returns the public key.
+	 * @return the public key.
+	 */
 	public ElGamalPublicKey getPublicKey(){
 		return publicKey;
 	}

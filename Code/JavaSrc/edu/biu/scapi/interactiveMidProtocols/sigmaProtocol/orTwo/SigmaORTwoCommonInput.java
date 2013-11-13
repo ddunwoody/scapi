@@ -27,7 +27,7 @@ package edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.orTwo;
 import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaCommonInput;
 
 /**
- * Concrete implementation of SigmaProtocol input, used by the SigmaProtocolORTwoverifier.
+ * Concrete implementation of SigmaProtocol input, used by the SigmaProtocolORTwoverifier.<p>
  * In SigmaProtocolORTwoverifier, the verifier gets an arrya of SigmaProtocolInput that holds 
  * two instances of inputs to its underlying objects.
  * 
@@ -39,6 +39,10 @@ public class SigmaORTwoCommonInput implements SigmaCommonInput{
 	private static final long serialVersionUID = 1200842938254920765L;
 	private SigmaCommonInput[] inputs;
 	
+	/**
+	 * Sets the input array contains inputs for the underlying sigma protocols.
+	 * @param inputs
+	 */
 	public SigmaORTwoCommonInput(SigmaCommonInput[] inputs){
 		if (inputs.length != 2){
 			throw new IllegalArgumentException("The given inputs array must contains two objects.");
@@ -46,6 +50,10 @@ public class SigmaORTwoCommonInput implements SigmaCommonInput{
 		this.inputs = inputs;
 	}
 	
+	/**
+	 * Returns the input array contains inputs for the underlying sigma protocols.
+	 * @return input array contains inputs for the underlying sigma protocols.
+	 */
 	public SigmaCommonInput[] getInputs(){
 		return inputs;
 	}

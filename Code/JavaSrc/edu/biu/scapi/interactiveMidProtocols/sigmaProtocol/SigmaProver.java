@@ -33,7 +33,7 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProverIn
 import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProtocolMsg;
 
 /**
- * This class manages the communication functionality of all the sigma protocol provers.
+ * This class manages the communication functionality of all the sigma protocol provers.<p>
  * It sends the first message, receives the challenge from the prover and sends the second message.<p>
  * It uses SigmaComputation instance of a concrete sigma protocol to compute the actual messages. 
  * 
@@ -71,13 +71,10 @@ public class SigmaProver implements SigmaProtocolProver{
 	}
 	
 	/**
-	 * Runs the proof of this protocol. 
-	 * This function executes the proof at once by calling the following functions one by one.
-	 * This function can be called when a user does not want to save time by doing operations in parallel.
+	 * Runs the proof of this protocol. <p>
+	 * This function executes the proof at once by calling the following functions one by one.<p>
+	 * This function can be called when a user does not want to save time by doing operations in parallel.<p>
 	 * @param input
-	 * @throws CheatAttemptException if the received challenge's length is not equal to the soundness parameter.
-	 * @throws IOException if failed to send or receive a message.
-	 * @throws ClassNotFoundException 
 	 */
 	public void prove(SigmaProverInput input) throws CheatAttemptException, IOException, ClassNotFoundException{
 		//Step one of the protocol.
@@ -88,12 +85,11 @@ public class SigmaProver implements SigmaProtocolProver{
 	}
 	
 	/**
-	 * Processes the first step of the sigma protocol:
-	 *  "SAMPLE a random values 
-	 * 	 COMPUTE first message
-	 * 	 SEND the computed message to the verifier".
+	 * Processes the first step of the sigma protocol.<p>
+	 *  "SAMPLE a random values <p>
+	 * 	 COMPUTE first message<p>
+	 * 	 SEND the computed message to the verifier".<p>
 	 * It computes the first message and sends it to the verifier.
-	 * @throws IOException if failed to send the message.
 	 */
 	public void processFirstMsg(SigmaProverInput input) throws IOException{
 	
@@ -106,14 +102,11 @@ public class SigmaProver implements SigmaProtocolProver{
 	}
 	
 	/**
-	 * Processes the second step of the sigma protocol:
-	 * 	"RECEIVE challenge from verifier
-	 * 	 COMPUTE second message
-	 * 	 SEND the computed message to the verifier".
+	 * Processes the second step of the sigma protocol.<p>
+	 * 	"RECEIVE challenge from verifier<p>
+	 * 	 COMPUTE second message<p>
+	 * 	 SEND the computed message to the verifier".<p>
 	 * This is a blocking function!
-	 * @throws CheatAttemptException if the received challenge's length is not equal to the soundness parameter.
-	 * @throws IOException if failed to send or receive a message.
-	 * @throws ClassNotFoundException 
 	 */
 	public void processSecondMsg() throws CheatAttemptException, IOException, ClassNotFoundException{
 		

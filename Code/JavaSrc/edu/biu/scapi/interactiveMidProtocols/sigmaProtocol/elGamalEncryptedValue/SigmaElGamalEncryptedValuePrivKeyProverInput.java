@@ -34,8 +34,8 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
  * Concrete implementation of SigmaProtocol input, used by the SigmaElGamalEncryptedValueProver.<p>
  * 
  * There are two versions of SigmaElGamalEncryptedValue protocol, depending upon if the prover knows 
- * the secret key or it knows the randomness used to generate the ciphertext.
- * This input represent the case that the prover knows the private key. 
+ * the secret key or it knows the randomness used to generate the ciphertext.<p>
+ * This input represent the case that the prover knows the private key. <p>
  * Thus, the prover gets a GroupElement x, an ElGamal public and private keys, and
  * the ciphertext of x using the ElGamal encryption scheme.
  * 
@@ -47,11 +47,23 @@ public class SigmaElGamalEncryptedValuePrivKeyProverInput implements SigmaProver
 	private SigmaElGamalEncryptedValueCommonInput params;
 	private ElGamalPrivateKey privateKey;
 	
+	/**
+	 * Sets the given ciphertext, public key, encrypted value and private key.
+	 * @param isRandomness represents if the encryption was done by private key knowledge or by a randomness knowledge.
+	 * @param cipher ciphertext outputed by the encryption scheme on the given x
+	 * @param publicKey used to encrypt.
+	 * @param x encrypted value
+	 * @param privateKey used to decrypt.
+	 */
 	public SigmaElGamalEncryptedValuePrivKeyProverInput(ElGamalOnGroupElementCiphertext cipher, ElGamalPublicKey pubKey, GroupElement x, ElGamalPrivateKey privateKey){
 		params = new SigmaElGamalEncryptedValueCommonInput(false, cipher, pubKey, x);
 		this.privateKey = privateKey;
 	}
 	
+	/**
+	 * Returns the private key used in order to decrypt the ciphertext.
+	 * @return the private key used in order to decrypt the ciphertext.
+	 */
 	public ElGamalPrivateKey getPrivateKey(){
 		return privateKey;
 	}

@@ -33,7 +33,7 @@ import edu.biu.scapi.midLayer.ciphertext.BigIntegerCiphertext;
 import edu.biu.scapi.midLayer.plaintext.BigIntegerPlainText;
 
 /**
- * Concrete implementation of SigmaProtocol input, used by the SigmaDamgardJurikProductProver.
+ * Concrete implementation of SigmaProtocol input, used by the SigmaDamgardJurikProductProver.<p>
  * In SigmaProtocolDamgardJurikProduct, the prover gets DamgardJurikPublicKey, three BigIntegerCiphertexts and three random BigIntegers used to encrypt.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
@@ -48,6 +48,18 @@ public class SigmaDJProductProverInput implements SigmaProverInput{
 	private BigIntegerPlainText x1;
 	private BigIntegerPlainText x2;
 	
+	/**
+	 * Sets the given public key, three ciphertexts, three random values, and two plaintexts.
+	 * @param publicKey used to encrypt.
+	 * @param c1 first ciphertext
+	 * @param c2 second ciphertext
+	 * @param c3 third ciphertext
+	 * @param r1 first random number used to encrypt x1
+	 * @param r2 first random number used to encrypt x2
+	 * @param r3 first random number used to encrypt x3
+	 * @param x1 first plaintext
+	 * @param x2 second plaintext
+	 */
 	public SigmaDJProductProverInput(DamgardJurikPublicKey publicKey, 
 							BigIntegerCiphertext c1, BigIntegerCiphertext c2, BigIntegerCiphertext c3, 
 							BigInteger r1, BigInteger r2, BigInteger r3, BigIntegerPlainText x1, BigIntegerPlainText x2){
@@ -64,13 +76,13 @@ public class SigmaDJProductProverInput implements SigmaProverInput{
 	 * If the prover knows the secret key, then it can compute (once) the value m=n^(-1) mod phi(n)=n^(-1) mod (p-1)(q-1). 
 	 * Then, it can recover the randomness ri from ci by computing ci^m mod n (this equals ri^(n/n) mod n = ri). 
 	 * Once given r, the prover can proceed with the protocol.
-	 * @param publicKey
-	 * @param c1
-	 * @param c2
-	 * @param c3
-	 * @param privateKey
-	 * @param x1
-	 * @param x2
+	 * @param c1 first ciphertext
+	 * @param c2 second ciphertext
+	 * @param c3 third ciphertext
+	 * @param privateKey used to recover r1, r2, r3
+	 * @param x1 first plaintext
+	 * @param x2 second plaintext
+	 * 
 	 */
 	public SigmaDJProductProverInput(DamgardJurikPublicKey publicKey, 
 							BigIntegerCiphertext c1, BigIntegerCiphertext c2, BigIntegerCiphertext c3, 
@@ -95,22 +107,42 @@ public class SigmaDJProductProverInput implements SigmaProverInput{
 		r3 = c3.getCipher().modPow(m, n);
 	}
 	
+	/**
+	 * Returns the random number used to encrypt r1.
+	 * @return the random number used to encrypt r1.
+	 */
 	public BigInteger getR1(){
 		return r1;
 	}
 	
+	/**
+	 * Returns the random number used to encrypt r2.
+	 * @return the random number used to encrypt r2.
+	 */
 	public BigInteger getR2(){
 		return r2;
 	}
 	
+	/**
+	 * Returns the random number used to encrypt r3.
+	 * @return the random number used to encrypt r3.
+	 */
 	public BigInteger getR3(){
 		return r3;
 	}
 	
+	/**
+	 * Returns the first plaintext. 
+	 * @return the first plaintext. 
+	 */
 	public BigIntegerPlainText getX1(){
 		return x1;
 	}
 	
+	/**
+	 * Returns the second plaintext. 
+	 * @return the second plaintext. 
+	 */
 	public BigIntegerPlainText getX2(){
 		return x2;
 	}

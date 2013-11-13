@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaCommonInput;
 
 /**
- * Concrete implementation of SigmaProtocol input, used by the SigmaProtocolORMultiple verifier and simulator.
+ * Concrete implementation of SigmaProtocol input, used by the SigmaProtocolORMultiple verifier and simulator.<p>
  * In SigmaProtocolORMultiple, the common input contains an array of inputs to all of 
  * its underlying objects and k - number of true statements.
  * 
@@ -42,15 +42,28 @@ public class SigmaORMultipleCommonInput implements SigmaCommonInput{
 	private ArrayList<SigmaCommonInput> sigmaInputs;
 	private int k; //number of statements that have a witness.
 	
+	/**
+	 * Sets the input array and the number of statements that have a witness.
+	 * @param input contains inputs for all the underlying sigma protocol.
+	 * @param k number of statements that have a witness.
+	 */
 	public SigmaORMultipleCommonInput(ArrayList<SigmaCommonInput> input, int k){
 		sigmaInputs = input;
 		this.k = k;
 	}
 	
+	/**
+	 * Returns the input array contains inputs for all the underlying sigma protocol.
+	 * @return the input array contains inputs for all the underlying sigma protocol.
+	 */
 	public ArrayList<SigmaCommonInput> getInputs(){
 		return sigmaInputs;
 	}
 	
+	/**
+	 * Returns the number of statements that have a witness.
+	 * @return the number of statements that have a witness.
+	 */
 	public int getK(){
 		return k;
 	}

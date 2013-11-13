@@ -31,7 +31,7 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaCommonIn
 import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProtocolMsg;
 
 /**
- * Concrete implementation of Sigma Protocol verifier computation.
+ * Concrete implementation of Sigma Protocol verifier computation.<p>
  * 
  * This protocol is used for a prover to convince a verifier that at least one of two statements is true, 
  * where each statement can be proven by an associated Sigma protocol.
@@ -83,7 +83,7 @@ public class SigmaORTwoVerifierComputation implements SigmaVerifierComputation{
 	}
 	
 	/**
-	 * Computes the following line from the protocol:
+	 * Samples the challenge of the protocol.<p>
 	 * 	"SAMPLE a random challenge e<-{0,1}^t".
 	 */
 	public void sampleChallenge(){

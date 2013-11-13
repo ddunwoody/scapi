@@ -32,7 +32,7 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaCommonIn
 import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaSimulatorOutput;
 
 /**
- * Concrete implementation of Sigma Simulator.
+ * Concrete implementation of Sigma Simulator.<p>
  * This implementation simulates the case that the prover convince a verifier that at least one of two statements is true, 
  * where each statement can be proven by an associated Sigma protocol.
  * 
@@ -84,7 +84,7 @@ public class SigmaORTwoSimulator implements SigmaSimulator{
 	}
 	
 	/**
-	 * Computes the simulator computation.
+	 * Computes the simulator computation with the given challenge.
 	 * @param input MUST be an instance of SigmaORTwoCommonInput.
 	 * @param challenge
 	 * @return the output of the computation - (a, e, z).
@@ -135,7 +135,7 @@ public class SigmaORTwoSimulator implements SigmaSimulator{
 	}
 	
 	/**
-	 * Computes the simulator computation.
+	 * Computes the simulator computation with a randomly chosen challenge.
 	 * @param input MUST be an instance of SigmaORTwoCommonInput.
 	 * @return the output of the computation - (a, e, z).
 	 * @throws IllegalArgumentException if the given input is not an instance of SigmaORTwoCommonInput.

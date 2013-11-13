@@ -30,11 +30,11 @@ import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProverInput;
 
 /**
- * General interface for Sigma Protocol prover. Every class that implements it is signed as Sigma Protocol prover.
+ * General interface for Sigma Protocol prover. Every class that implements it is signed as Sigma Protocol prover.<p>
  * 
- * Sigma protocols are a basic building block for zero-knowledge, zero-knowledge proofs of knowledge and more. 
+ * Sigma protocols are a basic building block for zero-knowledge, zero-knowledge proofs of knowledge and more. <p>
  * A sigma protocol is a 3-round proof, comprised of a first message from the prover to the verifier, 
- * a random challenge from the verifier and a second message from the prover. 
+ * a random challenge from the verifier and a second message from the prover. <p>
  * See Hazay-Lindell (chapter 6) for more information. 
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
@@ -43,18 +43,18 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProverIn
 public interface SigmaProtocolProver {
 	
 	/**
-	 * Runs the proof of this protocol. 
-	 * This function executes the proof at once by calling the following functions one by one.
-	 * This function can be called when a user does not want to save time by doing operations in parallel.
+	 * Runs the proof of this protocol. <p>
+	 * This function executes the proof at once by calling the following functions one by one. <p>
+	 * This function can be called when a user does not want to save time by doing operations in parallel. <p>
 	 * @param input
 	 * @throws CheatAttemptException if the received challenge's length is not equal to the soundness parameter.
-	 * @throws IOException if failed to send or receive a message.
-	 * @throws ClassNotFoundException
+	 * @throws IOException if there was a problem during the communication phase.
+	 * @throws ClassNotFoundException if there was a problem during the serialization mechanism.
 	 */
 	public void prove(SigmaProverInput input) throws CheatAttemptException, IOException, ClassNotFoundException;
 	
 	/**
-	 * Processes the first step of the sigma protocol.
+	 * Processes the first step of the sigma protocol. <p>
 	 * It computes the first message and sends it to the verifier.
 	 * @param input
 	 * @throws IOException if failed to send the message.
@@ -62,12 +62,12 @@ public interface SigmaProtocolProver {
 	public void processFirstMsg(SigmaProverInput input) throws IOException;
 	
 	/**
-	 * Processes the second step of the sigma protocol.
-	 * It receives the challenge from the verifier, computes the second message and then sends it to the verifier.
+	 * Processes the second step of the sigma protocol. <p>
+	 * It receives the challenge from the verifier, computes the second message and then sends it to the verifier. <p>
 	 * This is a blocking function! 
 	 * @throws CheatAttemptException if the received challenge's length is not equal to the soundness parameter. 
-	 * @throws IOException if failed to send or receive a message.
-	 * @throws ClassNotFoundException 
+	 * @throws IOException if there was a problem during the communication phase.
+	 * @throws ClassNotFoundException if there was a problem during the serialization mechanism.
 	 */
 	public void processSecondMsg() throws CheatAttemptException, IOException, ClassNotFoundException;
 	

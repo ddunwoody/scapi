@@ -30,7 +30,7 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProverIn
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**
- * Concrete implementation of SigmaProtocol input, used by the SigmaPedersenCTKnowledgeProver.
+ * Concrete implementation of SigmaProtocol input, used by the SigmaPedersenCTKnowledgeProver.<p>
  * 
  * In SigmaPedersenCTKnowledge protocol, the prover gets a GroupElement h, commitment message and 
  * values x,r <- Zq such that c = g^r * h^x.
@@ -44,16 +44,31 @@ public class SigmaPedersenCmtKnowledgeProverInput implements SigmaProverInput{
 	private BigInteger x;
 	private BigInteger r;
 	
+	/**
+	 * Sets the given h (public key), commitment value, committed value and the random value used to commit.
+	 * @param h public key used to commit.
+	 * @param commitment the actual commitment value.
+	 * @param x committed value
+	 * @param r random value used to commit
+	 */
 	public SigmaPedersenCmtKnowledgeProverInput(GroupElement h, GroupElement commitment, BigInteger x, BigInteger r){
 		params = new SigmaPedersenCmtKnowledgeCommonInput(h, commitment);
 		this.x = x;
 		this.r = r;
 	}
 	
+	/**
+	 * Returns the committed value.
+	 * @return the committed value.
+	 */
 	public BigInteger getX(){
 		return x;
 	}
 
+	/**
+	 * Returns the random value used to commit.
+	 * @return random value used to commit.
+	 */
 	public BigInteger getR(){
 		return r;
 	}

@@ -28,7 +28,7 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaCommonIn
 import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProverInput;
 
 /**
- * Concrete implementation of SigmaProtocol input, used by the SigmaProtocolORTwoProver.
+ * Concrete implementation of SigmaProtocol input, used by the SigmaProtocolORTwoProver.<p>
  * 
  * In SigmaProtocolORTwo protocol, the prover gets an input for the true statement (with witness), 
  * an input for the false statement (without witness) and a bit b, such that (xb,w) is in R.
@@ -42,20 +42,38 @@ public class SigmaORTwoProverInput implements SigmaProverInput{
 	private SigmaCommonInput simulatorInput;
 	private byte b;
 	
+	/**
+	 * Sets the inputs for the underlying prover and simulator and a bit b, such that (xb,w) is in R.
+	 * @param proverInput 
+	 * @param simulatorInput
+	 * @param b such that (xb,w) is in R.
+	 */
 	public SigmaORTwoProverInput(SigmaProverInput proverInput, SigmaCommonInput simulatorInput, byte b){
 		this.proverInput = proverInput;
 		this.simulatorInput = simulatorInput;
 		this.b = b;
 	}
 	
+	/**
+	 * Returns the bit b such that (xb,w) is in R.
+	 * @return the bit b such that (xb,w) is in R.
+	 */
 	public byte getB(){
 		return b;
 	}
 	
+	/**
+	 * Returns the input for the underlying prover.
+	 * @return the input for the underlying prover.
+	 */
 	public SigmaProverInput getProverInput(){
 		return proverInput;
 	}
 	
+	/**
+	 * Returns the input for the underlying simulator.
+	 * @return the input for the underlying simulator.
+	 */
 	public SigmaCommonInput getSimulatorInput(){
 		return simulatorInput;
 	}

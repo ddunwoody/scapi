@@ -31,7 +31,7 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaCommonIn
 import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProverInput;
 
 /**
- * Concrete implementation of SigmaProtocol input, used by the SigmaProtocolORMultipleProver.
+ * Concrete implementation of SigmaProtocol input, used by the SigmaProtocolORMultipleProver.<p>
  * This input contains inputs for the true statements (including witnesses) and input for the false atatements (without witnesses).
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
@@ -45,17 +45,28 @@ public class SigmaORMultipleProverInput  implements SigmaProverInput{
 	//Hold the common parameters of the statement where the prover does not know the witness.
 	private Hashtable<Integer, SigmaCommonInput> simulatorInputs;
 	
-	
-	
+	/**
+	 * Sets the inputs for the underlying provers and simulators.
+	 * @param proverInputs
+	 * @param simulatorInputs
+	 */
 	public SigmaORMultipleProverInput(Hashtable<Integer, SigmaProverInput> proverInputs, Hashtable<Integer, SigmaCommonInput> simulatorInputs){
 		this.proverInputs = proverInputs;
 		this.simulatorInputs = simulatorInputs;
 	}
 	
+	/**
+	 * Returns an array holds the inputs for the underlying provers.
+	 * @return an array holds the inputs for the underlying provers.
+	 */
 	public Hashtable<Integer, SigmaProverInput> getProversInput(){
 		return proverInputs;
 	}
 	
+	/**
+	 * Returns an array holds the inputs for the underlying simulators.
+	 * @return an array holds the inputs for the underlying simulators.
+	 */
 	public Hashtable<Integer, SigmaCommonInput> getSimulatorsInput(){
 		return simulatorInputs;
 	}

@@ -35,7 +35,7 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProverIn
 import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProtocolMsg;
 
 /**
- * Concrete implementation of Sigma Protocol prover computation.
+ * Concrete implementation of Sigma Protocol prover computation.<p>
  * 
  * This protocol is used for a prover to convince a verifier that the AND of any number of statements are true, 
  * where each statement can be proven by an associated Sigma protocol.
@@ -104,7 +104,7 @@ public class SigmaANDProverComputation implements SigmaProverComputation{
 	}
 
 	/**
-	 * Computes the following line from the protocol:
+	 * Computes the first message the protocol.<p>
 	 * "COMPUTE all first prover messages a1,…,am". 
 	 * @param input MUST be an instance of SigmaANDInput.
 	 * @return SigmaMultipleMsg contains a1, …, am.  
@@ -129,7 +129,7 @@ public class SigmaANDProverComputation implements SigmaProverComputation{
 	}
 
 	/**
-	 * Computes the following line from the protocol:
+	 * Computes the second message of the protocol.<p>
 	 * "COMPUTE all second prover messages z1,…,zm".
 	 * @param challenge
 	 * @return SigmaMultipleMsg contains z1, …, zm.

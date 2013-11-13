@@ -39,7 +39,7 @@ import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**
- * Concrete implementation of Sigma Protocol prover computation.
+ * Concrete implementation of Sigma Protocol prover computation.<p>
  * 
  * This protocol is used for a committer to prove that the value committed to in the commitment (h,c1, c2) is x.
  * 

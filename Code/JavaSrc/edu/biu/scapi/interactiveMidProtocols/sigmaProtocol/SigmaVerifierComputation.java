@@ -28,7 +28,7 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaCommonIn
 import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProtocolMsg;
 
 /**
- * This interface manages the mathematical calculations of the verifier side in the sigma protocol.
+ * This interface manages the mathematical calculations of the verifier side in the sigma protocol.<p>
  * It samples random challenge and verifies the proof.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)

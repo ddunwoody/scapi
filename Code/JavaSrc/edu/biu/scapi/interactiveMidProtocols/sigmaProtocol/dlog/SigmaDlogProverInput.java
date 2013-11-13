@@ -30,7 +30,7 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProverIn
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**
- * Concrete implementation of SigmaProtocol input, used by the SigmaDlogProver.
+ * Concrete implementation of SigmaProtocol input, used by the SigmaDlogProver.<p>
  * In SigmaProtocolDlog, the prover gets a GroupElement h and a BigInteger w such that g^w = h.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
@@ -41,11 +41,20 @@ public class SigmaDlogProverInput implements SigmaProverInput{
 	private SigmaDlogCommonInput params;
 	private BigInteger w;
 	
+	/**
+	 * Sets the given h and w, such that g^w = h.
+	 * @param h
+	 * @param w
+	 */
 	public SigmaDlogProverInput(GroupElement h, BigInteger w) {
 		params = new SigmaDlogCommonInput(h);
 		this.w = w;
 	}
 	
+	/**
+	 * Returns w element, such that g^w = h.
+	 * @return w element, such that g^w = h.
+	 */
 	public BigInteger getW(){
 		return w;
 	}

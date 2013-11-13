@@ -109,8 +109,8 @@ public class SigmaDHProverComputation implements SigmaProverComputation, DlogBas
 	}
 
 	/**
-	 * Computes the following line from the protocol:
-	 * "SAMPLE a random r in Zq
+	 * Computes the first message of the protocol.<p>
+	 * "SAMPLE a random r in Zq<p>
 	 * COMPUTE a = g^r and b = h^r".
 	 * @param input MUST be an instance of SigmaDHProverInput.
 	 * @return the computed message
@@ -134,7 +134,7 @@ public class SigmaDHProverComputation implements SigmaProverComputation, DlogBas
 	}
 
 	/**
-	 * Computes the following line from the protocol:
+	 * Computes the second message of the protocol.<p>
 	 * "COMPUTE z = (r + ew) mod q".
 	 * @param challenge
 	 * @return the computed message.

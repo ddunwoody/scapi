@@ -29,7 +29,7 @@ import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ElGamalPrivateKey;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ElGamalPublicKey;
 
 /**
- * Concrete implementation of SigmaProtocol input, used by the SigmaElGamalPrivateKeyProver.
+ * Concrete implementation of SigmaProtocol input, used by the SigmaElGamalPrivateKeyProver.<P>
  * In SigmaElGamalPrivateKey protocol, the prover gets an ElGamal public and private keys.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
@@ -40,11 +40,20 @@ public class SigmaElGamalPrivateKeyProverInput implements SigmaProverInput{
 	private SigmaElGamalPrivateKeyCommonInput params;
 	private ElGamalPrivateKey privateKey;
 	
+	/**
+	 * Sets the keys.
+	 * @param pubKey
+	 * @param privKey
+	 */
 	public SigmaElGamalPrivateKeyProverInput(ElGamalPublicKey pubKey, ElGamalPrivateKey privKey){
 		params = new SigmaElGamalPrivateKeyCommonInput(pubKey);
 		privateKey = privKey;
 	}
 	
+	/**
+	 * Returns the private key.
+	 * @return the private key.
+	 */
 	public ElGamalPrivateKey getPrivateKey(){
 		return privateKey;
 	}

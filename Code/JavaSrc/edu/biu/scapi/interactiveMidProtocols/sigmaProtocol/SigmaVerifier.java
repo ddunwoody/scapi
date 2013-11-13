@@ -33,7 +33,7 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProtocol
 
 /**
  * This class manages the communication functionality of all the sigma protocol verifiers, 
- * such as send the challenge to the prover and receive the prover messages.
+ * such as send the challenge to the prover and receive the prover messages. <p>
  * It uses SigmaVerifierComputation instance of a concrete sigma protocol to compute the actual calculations. 
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
@@ -68,13 +68,11 @@ public class SigmaVerifier implements SigmaProtocolVerifier{
 	}
 	
 	/**
-	 * Runs the verification of this protocol. 
-	 * This function executes the verification protocol at once by calling the following functions one by one.
-	 * This function can be called when a user does not want to save time by doing operations in parallel.
+	 * Runs the verification of this protocol. <p>
+	 * This function executes the verification protocol at once by calling the following functions one by one.<p>
+	 * This function can be called when a user does not want to save time by doing operations in parallel.<p>
 	 * @param input
 	 * @return true if the proof has been verified; false, otherwise.
-	 * @throws IOException if failed to send or receive a message.
-	 * @throws ClassNotFoundException
 	 */
 	public boolean verify(SigmaCommonInput input) throws ClassNotFoundException, IOException{
 		//Samples the challenge.
@@ -86,7 +84,7 @@ public class SigmaVerifier implements SigmaProtocolVerifier{
 	}
 	
 	/**
-	 * Runs the following line from the protocol:
+	 * Runs the challenge sampling from the protocol.<p>
 	 * "SAMPLE a random challenge e".
 	 */
 	public void sampleChallenge(){
@@ -113,9 +111,10 @@ public class SigmaVerifier implements SigmaProtocolVerifier{
 	}
 	
 	/**
-	 * Runs the following lines from the protocol:
-	 * 	"RECEIVE first message from the prover.
-	 * 	 SEND challenge to prover".
+	 * Receive message from the prover and sends the challenge.<p>
+	 * Runs the following lines from the protocol:<p>
+	 * 	"RECEIVE first message from the prover.<p>
+	 * 	 SEND challenge to prover".<p>
 	 * This is a blocking function!
 	 * @throws IOException if failed to send or receive a message.
 	 * @throws ClassNotFoundException
@@ -139,9 +138,10 @@ public class SigmaVerifier implements SigmaProtocolVerifier{
 	}
 
 	/**
-	 * Runs the following lines from the protocol:
-	 * 	"RECEIVE second message from the prover
-	 * 	 VERIFY proof".	
+	 * Receive message from the prover and verify the proof.<p>
+	 * Runs the following lines from the protocol:<p>
+	 * 	"RECEIVE second message from the prover<p>
+	 * 	 VERIFY proof".	<p>
 	 * This is a blocking function!
 	 * @param input
 	 * @return true if the proof has been verified; false, otherwise.

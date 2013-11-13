@@ -40,7 +40,7 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
 /**
  * Concrete implementation of Sigma Protocol verifier computation. <p>
  * 
- * This implementation is based on Schnorr's sigma protocol for Dlog Group.
+ * This implementation is based on Schnorr's sigma protocol for Dlog Group.<p>
  * This protocol is used for a prover to convince a verifier that it knows the discrete log of the value h in G.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
@@ -107,7 +107,7 @@ public class SigmaDlogVerifierComputation implements SigmaVerifierComputation, D
 	}
 	
 	/**
-	 * Computes the following line from the protocol:
+	 * Samples the challenge to use in the protocol.<p>
 	 * 	"SAMPLE a random challenge e<-{0,1}^t".
 	 */
 	public void sampleChallenge(){
@@ -119,7 +119,7 @@ public class SigmaDlogVerifierComputation implements SigmaVerifierComputation, D
 	
 	/**
 	 * Sets the given challenge.
-	 * @param challenge
+	 * @param challenge to set
 	 */
 	public void setChallenge(byte[] challenge){
 		e = challenge;
@@ -134,8 +134,9 @@ public class SigmaDlogVerifierComputation implements SigmaVerifierComputation, D
 	}
 
 	/**
-	 * Computes the following line from the protocol:
-	 * 	"ACC IFF VALID_PARAMS(G,q,g) = TRUE AND h in G AND g^z = ah^e".
+	 * Verifies the proof.<p>
+	 * Computes the following line from the protocol:<p>
+	 * 	"ACC IFF VALID_PARAMS(G,q,g) = TRUE AND h in G AND g^z = ah^e".<p>
 	 * @param a first message from prover
 	 * @param z second message from prover
 	 * @param input MUST be an instance of SigmaDlogCommonInput.

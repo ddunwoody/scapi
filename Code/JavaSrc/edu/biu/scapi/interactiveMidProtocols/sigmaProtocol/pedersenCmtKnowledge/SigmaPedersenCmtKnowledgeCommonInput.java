@@ -31,7 +31,7 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaCommonIn
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**
- * Concrete implementation of SigmaProtocol input, used by the SigmaPedersenCTKnowledge verifier and simulator.
+ * Concrete implementation of SigmaProtocol input, used by the SigmaPedersenCTKnowledge verifier and simulator.<p>
  * 
  * In SigmaPedersenCTKnowledge protocol, the common input contains a GroupElement h and a commitment message.
  * 
@@ -44,15 +44,28 @@ public class SigmaPedersenCmtKnowledgeCommonInput implements SigmaCommonInput{
 	private GroupElement h;
 	private GroupElement commitment;
 	
+	/**
+	 * Sets the given h (public key) and commitment value.
+	 * @param h public key used to commit.
+	 * @param commitment the actual commitment value.
+	 */
 	public SigmaPedersenCmtKnowledgeCommonInput(GroupElement h, GroupElement commitment){
 		this.h = h;
 		this.commitment = commitment;
 	}
 	
+	/**
+	 * Returns the public key used to commit.
+	 * @return public key used to commit.
+	 */
 	public GroupElement getH(){
 		return h;
 	}
 	
+	/**
+	 * Returns the actual commitment value.
+	 * @return the actual commitment value.
+	 */
 	public GroupElement getCommitment(){
 		return commitment;
 	}

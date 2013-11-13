@@ -34,7 +34,7 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProtocol
 import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaSimulatorOutput;
 
 /**
- * Concrete implementation of Sigma Protocol prover computation.
+ * Concrete implementation of Sigma Protocol prover computation.<p>
  * 
  * This protocol is used for a prover to convince a verifier that at least one of two statements is true, 
  * where each statement can be proven by an associated Sigma protocol.
@@ -94,10 +94,10 @@ public class SigmaORTwoProverComputation implements SigmaProverComputation{
 	}
 
 	/**
-	 * Computes the following lines from the protocol:
-	 * "SAMPLE a random challenge  e1-b <- {0, 1}^t" for the simulator.
-	 *  COMPUTE the first message ab in SigmaB, using (xb,w) as input.
-	 *	RUN the simulator M for SigmaI on input (x1-b, e1-b) to obtain (a1-b, e1-b, z1-b).
+	 * Computes the frist message of the protocol.<p>
+	 * "SAMPLE a random challenge  e1-b <- {0, 1}^t" for the simulator.<p>
+	 *  COMPUTE the first message ab in SigmaB, using (xb,w) as input.<p>
+	 *	RUN the simulator M for SigmaI on input (x1-b, e1-b) to obtain (a1-b, e1-b, z1-b).<p>
 	 *	The message is (a0,a1); e1-b,z1-b are stored for later". 
 	 * @param input MUST be an instance of SigmaORTwoProverInput.
 	 * @return SigmaORFirstMsg contains a0, a1.  
@@ -144,9 +144,9 @@ public class SigmaORTwoProverComputation implements SigmaProverComputation{
 	}
 
 	/**
-	 * Computes the following lines from the protocol:
-	 * "SET eb = e XOR e1-b
-	 *	COMPUTE the response zb to (ab, eb) in SigmaB using input (xb,w)
+	 * Computes the second message of the protocol.<p>
+	 * "SET eb = e XOR e1-b<p>
+	 *	COMPUTE the response zb to (ab, eb) in SigmaB using input (xb,w)<p>
 	 *	The message is e0,z0,e1,z1".
 	 * @param challenge
 	 * @return SigmaORTwoSecondMsg contains e0,z0,e1,z1.

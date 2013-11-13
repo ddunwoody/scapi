@@ -36,7 +36,7 @@ import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**
- * Concrete implementation of Sigma Simulator.
+ * Concrete implementation of Sigma Simulator.<p>
  * This implementation simulates the case that the prover convince a verifier that the value encrypted under ElGamal in the 
  * ciphertext (c1, c2) with public-key h is x.
  * 
@@ -73,11 +73,12 @@ public class SigmaElGamalEncryptedValueSimulator implements SigmaSimulator{
 	}
 	
 	/**
-	 * Constructor that gets a simulator and sets it.
-	 * In getSimulator function in SigmaElGamalEncryptedValueProver, the prover needs to create an instance of this class.
+	 * Constructor that gets a simulator and sets it.<p>
+	 * In getSimulator function in SigmaElGamalEncryptedValueProver, the prover needs to create an instance of this class.<p>
 	 * The problem is that the prover does not know which t and random to give, since they are values of the underlying 
-	 * SigmaDHProver that the prover holds.
-	 * Using this constructor, the (ElGamal) prover can get the DH simulator from the underlying (DH) prover and use it to create this object.
+	 * SigmaDHProver that the prover holds.<p>
+	 * Using this constructor, the (ElGamal) prover can get the DH simulator from the underlying (DH) prover and use it to 
+	 * create this object.
 	 * 
 	 * @param simulator MUST be an instance of SigmaDHSimulator.
 	 * @throws IllegalArgumentException if the given simulator is not an instance of SigmaDHSimulator.
@@ -100,7 +101,7 @@ public class SigmaElGamalEncryptedValueSimulator implements SigmaSimulator{
 	}
 	
 	/**
-	 * Computes the simulator computation.
+	 * Computes the simulator computation with the given challenge.
 	 * @param input MUST be an instance of SigmaElGamalEncryptedValueCommonInput.
 	 * @param challenge
 	 * @return the output of the computation - (a, e, z).
@@ -116,7 +117,7 @@ public class SigmaElGamalEncryptedValueSimulator implements SigmaSimulator{
 	}
 	
 	/**
-	 * Computes the simulator computation.
+	 * Computes the simulator computation with a randomly chosen challenge.
 	 * @param input MUST be an instance of SigmaElGamalEncryptedValueInput.
 	 * @return the output of the computation - (a, e, z).
 	 * @throws IllegalArgumentException if input is not the expected.

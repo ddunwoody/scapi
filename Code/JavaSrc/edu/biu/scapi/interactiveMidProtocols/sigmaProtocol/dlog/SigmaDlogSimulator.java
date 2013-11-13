@@ -39,7 +39,7 @@ import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**
- * Concrete implementation of Sigma Simulator.
+ * Concrete implementation of Sigma Simulator.<p>
  * This implementation simulates the case that the prover convince a verifier that it knows the discrete log of the value h in G.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
@@ -103,7 +103,10 @@ public class SigmaDlogSimulator implements SigmaSimulator{
 	}
 	
 	/**
-	 * Computes the simulator computation.
+	 * Computes the simulator computation, using the given challenge.<p>
+	 * "SAMPLE a random z <- Zq <p>
+	 *	COMPUTE a = g^z*h^(-e)  (where –e here means –e mod q)<p>
+	 *	OUTPUT (a,e,z)".	<p>
 	 * @param input MUST be an instance of SigmaDlogCommonInput.
 	 * @param challenge
 	 * @return the output of the computation - (a, e, z).
@@ -138,10 +141,14 @@ public class SigmaDlogSimulator implements SigmaSimulator{
 	}
 	
 	/**
-	 * Computes the simulator computation.
-	 * @param input MUST be an instance of SigmaDlogInput.
+	 * Computes the simulator computation, using random challenge.<p>
+	 * "SAMPLE a random z <- Zq<p>
+	 *	COMPUTE a = g^z*h^(-e)  (where –e here means –e mod q)<p>
+	 *	OUTPUT (a,e,z)".	<p>
+	 * @param input MUST be an instance of SigmaDlogCommonInput.
 	 * @return the output of the computation - (a, e, z).
-	 * @throws IllegalArgumentException if the given input is not an instance of SigmaDlogInput.
+	 * @throws CheatAttemptException if the received challenge's length is not equal to the soundness parameter.
+	 * @throws IllegalArgumentException if the given input is not an instance of SigmaDlogCommonInput.
 	 */
 	public SigmaSimulatorOutput simulate(SigmaCommonInput input){
 		//Create a new byte array of size t/8, to get the required byte size.

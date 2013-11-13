@@ -39,7 +39,7 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProtocol
 import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaSimulatorOutput;
 
 /**
- * Concrete implementation of Sigma Protocol prover computation.
+ * Concrete implementation of Sigma Protocol prover computation.<p>
  * 
  * This protocol is used for a prover to convince a verifier that at least k out of n statements are true, 
  * where each statement can be proven by an associated Sigma protocol.
@@ -193,10 +193,10 @@ public class SigmaORMultipleProverComputation implements SigmaProverComputation{
 	}
 
 	/**
-	 * Computes the following lines from the protocol:
-	 * "For every j not in I, SAMPLE a random element ej <- GF[2^t]
-	 *  For every j not in I, RUN the simulator on statement xj and challenge ej to get transcript (aj,ej,zj)
-		For every i in I, RUN the prover P on statement xi to get first message ai
+	 * Computes the first message of the protocol.<p>
+	 * "For every j not in I, SAMPLE a random element ej <- GF[2^t]<p>
+	 *  For every j not in I, RUN the simulator on statement xj and challenge ej to get transcript (aj,ej,zj)<p>
+		For every i in I, RUN the prover P on statement xi to get first message ai<p>
 		SET a=(a1,…,an)". 
 	 * @param input MUST be an instance of SigmaORMultipleInput.
 	 * @return SigmaMultipleMsg contains a1, …, am. 
@@ -254,11 +254,11 @@ public class SigmaORMultipleProverComputation implements SigmaProverComputation{
 	}
 
 	/**
-	 * Computes the following line from the protocol:
-	 * "INTERPOLATE the points (0,e) and {(j,ej)} for every j not in I to obtain a degree n-k polynomial Q (s.t. Q(0)=e and Q(j)=ej for every j not in I)
-			For every i in I, SET ei = Q(i)
-			For every i in I, COMPUTE the response zi to (ai, ei) in Sigmai using input (xi,wi)
-			The message is Q,e1,z1,…,en,zn (where by Q we mean its coefficients)".
+	 * Computes the second message of the protocol.<p>
+	 * "INTERPOLATE the points (0,e) and {(j,ej)} for every j not in I to obtain a degree n-k polynomial Q (s.t. Q(0)=e and Q(j)=ej for every j not in I)<p>
+			For every i in I, SET ei = Q(i)<p>
+			For every i in I, COMPUTE the response zi to (ai, ei) in Sigmai using input (xi,wi)<p>
+			The message is Q,e1,z1,…,en,zn (where by Q we mean its coefficients)".<p>
 	 * @param challenge
 	 * @return SigmaMultipleMsg contains z1, …, zm.
 	 * @throws CheatAttemptException if the received challenge's length is not equal to the soundness parameter.

@@ -106,7 +106,7 @@ public class SigmaDHVerifierComputation implements SigmaVerifierComputation, Dlo
 	}
 	
 	/**
-	 * Computes the following line from the protocol:
+	 * Samples the challenge of the protocol.<P>
 	 * 	"SAMPLE a random challenge e<-{0,1}^t".
 	 */
 	public void sampleChallenge(){
@@ -133,8 +133,9 @@ public class SigmaDHVerifierComputation implements SigmaVerifierComputation, Dlo
 	}
 
 	/**
-	 * Computes the following line from the protocol:
-	 * 	"ACC IFF VALID_PARAMS(G,q,g) = TRUE AND h in G AND g^z = au^e  AND h^z = bv^e".     
+	 * Computers the protocol's verification.<p>
+	 * Computes the following line from the protocol:<p>
+	 * 	"ACC IFF VALID_PARAMS(G,q,g) = TRUE AND h in G AND g^z = au^e  AND h^z = bv^e".   <p>  
 	 * @param input MUST be an instance of SigmaDHCommonInput.
 	 * @param z second message from prover
 	 * @return true if the proof has been verified; false, otherwise.

@@ -27,7 +27,7 @@ package edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility;
 import java.io.Serializable;
 
 /**
- * Every Sigma protocol prover/receiver needs to send messages during the protocol execution.
+ * Every Sigma protocol prover/receiver needs to send messages during the protocol execution.<p>
  * This interface is a marker interface for Sigma protocol message, where there is an implementing class
  * for each concrete Sigma message, like GroupElement message or BigInteger message.
  * 

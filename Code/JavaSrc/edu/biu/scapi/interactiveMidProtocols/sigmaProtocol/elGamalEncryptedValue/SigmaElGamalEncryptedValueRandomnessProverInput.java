@@ -35,8 +35,8 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
  * Concrete implementation of SigmaProtocol input, used by the SigmaElGamalEncryptedValueProver.<p>
  * 
  * There are two versions of SigmaElGamalEncryptedValue protocol, depending upon if the prover knows 
- * the secret key or it knows the randomness used to generate the ciphertext.
- * This input represent the case that the prover knows the randomness. 
+ * the secret key or it knows the randomness used to generate the ciphertext.<p>
+ * This input represent the case that the prover knows the randomness. <p>
  * Thus, the prover gets a GroupElement x, an ElGamal public key,
  * the ciphertext of x using the ElGamal encryption scheme and the randomness used to encrypt.
  * 
@@ -48,11 +48,23 @@ public class SigmaElGamalEncryptedValueRandomnessProverInput implements SigmaPro
 	private SigmaElGamalEncryptedValueCommonInput params;
 	private BigInteger r;
 	
+	/**
+	 * Sets the given ciphertext, public key, encrypted value and random value used to encrypt.<p>
+	 * @param isRandomness represents if the encryption was done by private key knowledge or by a randomness knowledge.
+	 * @param cipher ciphertext outputed by the encryption scheme on the given x
+	 * @param publicKey used to encrypt.
+	 * @param x encrypted value
+	 * @param r random value used to encrypt.
+	 */
 	public SigmaElGamalEncryptedValueRandomnessProverInput(ElGamalOnGroupElementCiphertext cipher, ElGamalPublicKey pubKey, GroupElement x, BigInteger r){
 		params = new SigmaElGamalEncryptedValueCommonInput(true, cipher, pubKey, x);
 		this.r = r;
 	}
 	
+	/**
+	 * Returns the random value used to encrypt.
+	 * @return the random value used to encrypt.
+	 */
 	public BigInteger getR(){
 		return r;
 	}

@@ -30,11 +30,11 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaCommonIn
 
 
 /**
- * General interface for Sigma Protocol verifier. Every class that implements it is signed as Sigma Protocol verifier.
+ * General interface for Sigma Protocol verifier. Every class that implements it is signed as Sigma Protocol verifier.<p>
  * 
- * Sigma protocols are a basic building block for zero-knowledge, zero-knowledge proofs of knowledge and more. 
+ * Sigma protocols are a basic building block for zero-knowledge, zero-knowledge proofs of knowledge and more. <p>
  * A sigma protocol is a 3-round proof, comprised of a first message from the prover to the verifier, 
- * a random challenge from the verifier and a second message from the prover. 
+ * a random challenge from the verifier and a second message from the prover. <p>
  * See Hazay-Lindell (chapter 6) for more information. 
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
@@ -43,13 +43,13 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaCommonIn
 public interface SigmaProtocolVerifier {
 	
 	/**
-	 * Runs the verification of this protocol. 
-	 * This function executes the verification protocol at once by calling the following functions one by one.
+	 * Runs the verification of this protocol. <p>
+	 * This function executes the verification protocol at once by calling the following functions one by one.<p>
 	 * This function can be called when a user does not want to save time by doing operations in parallel.
 	 * @param input
 	 * @return true if the proof has been verified; false, otherwise.
-	 * @throws IOException if failed to send or receive a message.
-	 * @throws ClassNotFoundException 
+	 * @throws IOException if there was a problem during the communication phase.
+	 * @throws ClassNotFoundException if there was a problem during the serialization mechanism.
 	 */
 	public boolean verify(SigmaCommonInput input) throws ClassNotFoundException, IOException;
 	
@@ -59,20 +59,20 @@ public interface SigmaProtocolVerifier {
 	public void sampleChallenge();
 	
 	/**
-	 * Waits for the prover's first message and then sends the chosen challenge to the prover.
+	 * Waits for the prover's first message and then sends the chosen challenge to the prover.<p>
 	 * This is a blocking function!
-	 * @throws IOException if failed to send or receive a message.
-	 * @throws ClassNotFoundException 
+	 * @throws IOException if there was a problem during the communication phase.
+	 * @throws ClassNotFoundException if there was a problem during the serialization mechanism.
 	 */
 	public void sendChallenge() throws IOException, ClassNotFoundException;
 	
 	/**
-	 * Waits to the prover's second message and then verifies the proof.	
+	 * Waits to the prover's second message and then verifies the proof.	<p>
 	 * This is a blocking function!
 	 * @param input
 	 * @return true if the proof has been verified; false, otherwise.
-	 * @throws IOException if failed to receive a message.
-	 * @throws ClassNotFoundException 
+	 * @throws IOException if there was a problem during the communication phase.
+	 * @throws ClassNotFoundException if there was a problem during the serialization mechanism.
 	 */
 	public boolean processVerify(SigmaCommonInput input) throws ClassNotFoundException, IOException;
 	

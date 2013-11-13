@@ -32,7 +32,7 @@ import edu.biu.scapi.midLayer.ciphertext.ElGamalCiphertextSendableData;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**
- * Concrete implementation of SigmaProtocol input, used by the SigmaElGamalCommittedValueProver.
+ * Concrete implementation of SigmaProtocol input, used by the SigmaElGamalCommittedValueProver.<p>
  * In SigmaElGamalCommittedValue protocol, the prover gets an ElGamal commitment message, 
  * the value committed x and the value r in Zq such that c1=g^r and c2 =h^r*x.
  * 
@@ -44,11 +44,22 @@ public class SigmaElGamalCommittedValueProverInput implements SigmaProverInput{
 	private SigmaElGamalCommittedValueCommonInput params;
 	private BigInteger r;
 	
+	/**
+	 * Sets the given public key, commitment, committed value and random value used to commit.
+	 * @param publicKey used to commit
+	 * @param commitment actual commitment value outputed from the commitment scheme on the given committed value.
+	 * @param x committed value
+	 * @param r random value used to commit.
+	 */
 	public SigmaElGamalCommittedValueProverInput(ElGamalPublicKey publicKey, ElGamalCiphertextSendableData commitment, GroupElement x, BigInteger r){
 		params = new SigmaElGamalCommittedValueCommonInput(publicKey, commitment, x);
 		this.r = r;
 	}
 	
+	/**
+	 * Returns the random value used to commit.
+	 * @return random value used to commit.
+	 */
 	public BigInteger getR(){
 		return r;
 	}

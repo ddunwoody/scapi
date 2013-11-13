@@ -27,7 +27,7 @@ package edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.damgardJurikProduct;
 import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaSimulatorOutput;
 
 /**
- * Concrete implementation of SigmaSimulatorOutput, used by SigmaDamgardJurikProductSimulator.
+ * Concrete implementation of SigmaSimulatorOutput, used by SigmaDamgardJurikProductSimulator.<p>
  * 
  * It contains the a, e, z types used in the above mentioned concrete simulator.
  * 
@@ -40,20 +40,38 @@ public class SigmaDJProductSimulatorOutput implements SigmaSimulatorOutput{
 	private byte[] e;
 	private SigmaDJProductSecondMsg z;
 	
+	/**
+	 * Sets the given messages and challenge.
+	 * @param a protocol's first message 
+	 * @param e protocol's challenge
+	 * @param z protocol's second message 
+	 */
 	public SigmaDJProductSimulatorOutput(SigmaDJProductFirstMsg a, byte[] e, SigmaDJProductSecondMsg z){
 		this.a = a;
 		this.e = e;
 		this.z = z;
 	}
 
+	/**
+	 * Returns the protocol's first message.
+	 * @return protocol's first message.
+	 */
 	public SigmaDJProductFirstMsg getA() {
 		return a;
 	}
 
+	/**
+	 * Returns the protocol's challenge.
+	 * @return protocol's challenge.
+	 */
 	public byte[] getE() {
 		return e;
 	}
 
+	/**
+	 * Returns the protocol's second message.
+	 * @return protocol's second message.
+	 */
 	public SigmaDJProductSecondMsg getZ() {
 		return z;
 	}

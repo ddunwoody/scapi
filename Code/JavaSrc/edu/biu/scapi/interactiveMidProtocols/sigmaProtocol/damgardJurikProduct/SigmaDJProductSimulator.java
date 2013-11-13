@@ -36,7 +36,7 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaCommonIn
 import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaSimulatorOutput;
 
 /**
- * Concrete implementation of Sigma Simulator.
+ * Concrete implementation of Sigma Simulator.<p>
  * This implementation simulates the case that the prover convince a verifier that 3 ciphertexts c1,c2,c3 
  * are encryptions of values x1,x2,x3 s.t. x1*x2=x3 mod N.
  * 
@@ -101,7 +101,7 @@ public class SigmaDJProductSimulator implements SigmaSimulator{
 	}
 	
 	/**
-	 * Computes the simulator computation.
+	 * Computes the simulator computation with the given challenge.
 	 * @param input MUST be an instance of SigmaDJProductCommonInput.
 	 * @param challenge
 	 * @return the output of the computation - (a, e, z).
@@ -168,7 +168,7 @@ public class SigmaDJProductSimulator implements SigmaSimulator{
 	}
 	
 	/**
-	 * Computes the simulator computation.
+	 * Computes the simulator computation with a randomly chosen challenge.
 	 * @param input MUST be an instance of SigmaDJProductInput.
 	 * @return the output of the computation - (a, e, z).
 	 * @throws IllegalArgumentException if the given input is not an instance of SigmaDJProductInput.

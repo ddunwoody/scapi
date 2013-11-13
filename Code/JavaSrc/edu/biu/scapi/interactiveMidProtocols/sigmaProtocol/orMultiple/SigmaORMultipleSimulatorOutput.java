@@ -42,6 +42,12 @@ public class SigmaORMultipleSimulatorOutput implements SigmaSimulatorOutput{
 	private byte[] e;
 	private SigmaORMultipleSecondMsg z;
 	
+	/**
+	 * Sets the output of the simulator.
+	 * @param a first message
+	 * @param e challenge
+	 * @param z second message.
+	 */
 	public SigmaORMultipleSimulatorOutput(SigmaMultipleMsg a, byte[] e, SigmaORMultipleSecondMsg z){
 		this.a = a;
 		this.e = e;

@@ -122,7 +122,7 @@ public class SigmaCramerShoupEncryptedValueVerifierComputation implements SigmaV
 	}
 	
 	/**
-	 * Samples the challenge e <- {0,1}^t
+	 * Samples the challenge e <- {0,1}^t.
 	 */
 	public void sampleChallenge(){
 		//Delegates to the underlying Sigma DHExtended verifier.

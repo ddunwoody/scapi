@@ -32,7 +32,7 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaCommonIn
 import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**
- * Concrete implementation of SigmaProtocol input, used by the SigmaPedersenCommittedValue verifier and simulator.
+ * Concrete implementation of SigmaProtocol input, used by the SigmaPedersenCommittedValue verifier and simulator.<p>
  * In SigmaPedersenCommittedValue protocol, the common input contains a GroupElement h, a commitment message and the committed value x. 
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
@@ -45,20 +45,38 @@ public class SigmaPedersenCommittedValueCommonInput implements SigmaCommonInput{
 	private GroupElement h;
 	private GroupElement commitment;
 	
+	/**
+	 * Sets the given h (public key), commitment value and the committed value.
+	 * @param h public key used to commit.
+	 * @param commitment the actual commitment value.
+	 * @param x the committed value.
+	 */
 	public SigmaPedersenCommittedValueCommonInput(GroupElement h, GroupElement commitment, BigInteger x){
 		this.h = h;
 		this.commitment = commitment;
 		this.x = x;
 	}
 	
+	/**
+	 * Returns the committed value.
+	 * @return the committed value.
+	 */
 	public BigInteger getX(){
 		return x;
 	}
 	
+	/**
+	 * Returns the public key used to commit.
+	 * @return public key used to commit.
+	 */
 	public GroupElement getH(){
 		return h;
 	}
 	
+	/**
+	 * Returns the actual commitment value.
+	 * @return the actual commitment value.
+	 */
 	public GroupElement getCommitment(){
 		return commitment;
 	}
