@@ -125,7 +125,7 @@ public class CmtPedersenHashReceiver extends CmtPedersenReceiverCore implements 
 		hash.update(x, 0, x.length);
 		hash.hashFinal(hashValArray, 0);
 		
-		CmtCommitValue val = processDecommitment(id, new BigInteger(hashValArray), msg.getR().getR());
+		CmtCommitValue val = processDecommitment(id, new BigInteger(1, hashValArray), msg.getR().getR());
 		//If the inner Pedersen core algorithm returned null it means that it rejected the decommitment, so Pedersen Hash also rejects the answer and returns null
 		if (val == null)
 			return null;

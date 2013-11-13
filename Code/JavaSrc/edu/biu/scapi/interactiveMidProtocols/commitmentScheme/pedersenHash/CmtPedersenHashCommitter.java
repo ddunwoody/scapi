@@ -132,7 +132,7 @@ public class CmtPedersenHashCommitter extends CmtPedersenCommitterCore implement
 		hash.update(x, 0, x.length);
 		hash.hashFinal(hashValArray, 0);
 		//Use Pedersen commitment on the hashed value 
-		super.commit(new CmtBigIntegerCommitValue(new BigInteger(hashValArray)), id);
+		super.commit(new CmtBigIntegerCommitValue(new BigInteger(1, hashValArray)), id);
 	}
 
 	/**
