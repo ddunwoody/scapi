@@ -30,7 +30,7 @@ import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CheatAttemptException;
 
 /**
- * Marker interface. Every class that implements it is signed as Oblivious Transfer receiver.<p>
+ * General interface. Every class that implements it is signed as Oblivious Transfer receiver.<p>
  * 
  * Oblivious Transfer is is a type of protocol in which a sender has n messages, and the receiver has an 
  * index i. The receiver wishes to receive the i-th among the sender's messages, 

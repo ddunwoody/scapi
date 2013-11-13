@@ -31,7 +31,7 @@ import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 
 /**
- * Marker interface. Every class that implements it is signed as Oblivious Transfer sender.<p>
+ * General interface. Every class that implements it is signed as Oblivious Transfer sender.<p>
  * 
  * Oblivious Transfer is the situation where a sender has n messages, and the receiver has an 
  * index i. The receiver wishes to receive the i-th among the sender's messages, 
