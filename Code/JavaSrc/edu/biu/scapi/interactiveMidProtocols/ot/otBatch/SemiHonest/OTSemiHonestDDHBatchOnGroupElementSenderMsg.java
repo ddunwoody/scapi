@@ -22,7 +22,7 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-package edu.biu.scapi.interactiveMidProtocols.otBatch.SemiHonest;
+package edu.biu.scapi.interactiveMidProtocols.ot.otBatch.SemiHonest;
 
 import java.util.ArrayList;
 

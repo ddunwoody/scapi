@@ -22,7 +22,7 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-package edu.biu.scapi.interactiveMidProtocols.otBatch;
+package edu.biu.scapi.interactiveMidProtocols.ot.otBatch;
 
 /**
  * Every Batch OT receiver outputs a result in the end of the protocol execution, but every concrete 

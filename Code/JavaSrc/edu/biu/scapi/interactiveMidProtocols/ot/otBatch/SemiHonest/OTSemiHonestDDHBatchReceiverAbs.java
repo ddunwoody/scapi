@@ -22,7 +22,7 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-package edu.biu.scapi.interactiveMidProtocols.otBatch.SemiHonest;
+package edu.biu.scapi.interactiveMidProtocols.ot.otBatch.SemiHonest;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -38,10 +38,10 @@ import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.generals.ScapiDefaultConfiguration;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTRGroupElementPairMsg;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
-import edu.biu.scapi.interactiveMidProtocols.otBatch.OTBatchRInput;
-import edu.biu.scapi.interactiveMidProtocols.otBatch.OTBatchROutput;
-import edu.biu.scapi.interactiveMidProtocols.otBatch.OTBatchReceiver;
-import edu.biu.scapi.interactiveMidProtocols.otBatch.OTBatchRBasicInput;
+import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.OTBatchRInput;
+import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.OTBatchROutput;
+import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.OTBatchReceiver;
+import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.OTBatchRBasicInput;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.securityLevel.DDH;

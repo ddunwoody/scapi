@@ -22,7 +22,7 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-package edu.biu.scapi.interactiveMidProtocols.otBatch;
+package edu.biu.scapi.interactiveMidProtocols.ot.otBatch;
 
 /**
  * Every Batch OT receiver needs inputs during the protocol execution, but every concrete protocol needs 

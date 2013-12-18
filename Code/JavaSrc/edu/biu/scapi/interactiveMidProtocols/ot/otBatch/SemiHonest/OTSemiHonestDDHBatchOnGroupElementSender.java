@@ -22,7 +22,7 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-package edu.biu.scapi.interactiveMidProtocols.otBatch.SemiHonest;
+package edu.biu.scapi.interactiveMidProtocols.ot.otBatch.SemiHonest;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -30,8 +30,8 @@ import java.util.ArrayList;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
 import edu.biu.scapi.interactiveMidProtocols.ot.semiHonest.OTSemiHonestDDHOnGroupElementSenderMsg;
-import edu.biu.scapi.interactiveMidProtocols.otBatch.OTBatchOnGroupElementSInput;
-import edu.biu.scapi.interactiveMidProtocols.otBatch.OTBatchSInput;
+import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.OTBatchOnGroupElementSInput;
+import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.OTBatchSInput;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.securityLevel.SemiHonest;
