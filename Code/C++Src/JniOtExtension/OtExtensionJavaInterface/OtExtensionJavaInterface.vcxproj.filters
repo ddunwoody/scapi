@@ -27,10 +27,10 @@
     <ClInclude Include="OtExtension.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="OtExtensionSemiHonestReceiver.h">
+    <ClInclude Include="OTSemiHonestExtensionReceiver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="OtExtensionSemiHonestSender.h">
+    <ClInclude Include="OTSemiHonestExtensionSender.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
