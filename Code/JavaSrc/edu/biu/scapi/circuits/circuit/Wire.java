@@ -25,49 +25,38 @@
 package edu.biu.scapi.circuits.circuit;
 
 /**
- * The {@code Wire} class is a software representation of a {@code Wire} in a
- * circuit. As these are {@code Wire}s for Boolean circuit's each {@code Wire}
- * can be set to either 0 or 1.
+ * The {@code Wire} class is a software representation of a {@code Wire} in a circuit. <p>
+ * As these are {@code Wire}s for Boolean circuit's each {@code Wire} can be set to either 0 or 1.
  * 
  * @author Steven Goldfeder
  * 
  */
 public class Wire {
 
-  /**
-   * The value that this wire carries. It can be set to either 0 or 1
-   */
-  private int value;
+	/**
+	 * The value that this wire carries. It can be set to either 0 or 1
+  	 */
+	private byte value;
 
-  /**
-   * creates a {@code Wire} and sets it to the specified value
-   * 
-   * @param value
-   *          the value to set this {@code Wire} to
-   */
-  public Wire(int value) {
-    setValue(value);
-  }
+	/**
+	 * Creates a {@code Wire} and sets it to the specified value
+	 * 
+	 * @param value the value to set this {@code Wire} to. Must be either 0 or 1.
+  	 */
+	public Wire(byte value) {
+		// Ensures that the Wire is only set to a legal value (i.e. 0 or 1)
+		if (value < 0 || value > 1) {
+			  throw new IllegalArgumentException("Wire value can only be 0 or 1");
+		} else {
+			this.value = value;
+		}
+	}
 
-  /**
-   * 
-   * @param value
-   *          the value to set this {@code Wire} to. Must be either 0 or 1.
-   */
-  void setValue(int value) {
-    // ensures that the Wire is only set to a legal value (i.e. 0 or 1)
-    if (value < 0 || value > 1) {
-      throw new IllegalArgumentException("Wire value can only be 0 or 1");
-    } else {
-      this.value = value;
-    }
-  }
-
-  /**
-   * 
-   * @return the value (0 or 1) that this {@code Wire} is set to
-   */
-  public int getValue() {
-    return value;
-  }
+	/**
+	 * 
+	 * @return the value (0 or 1) that this {@code Wire} is set to.
+	 */
+	public byte getValue() {
+		return value;
+	}
 }
