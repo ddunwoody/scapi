@@ -28,8 +28,8 @@ import java.util.BitSet;
 
 /**
  * 
- * A built in XOR Gate for the convenience of circuit designers. This gate is
- * identical to creating a Gate with a 0001 truth table.
+ * A built in XOR Gate for the convenience of circuit designers. <p>
+ * This gate is identical to creating a Gate with a 0110 truth table.
  * 
  * @author Steven Goldfeder
  * 
@@ -37,40 +37,27 @@ import java.util.BitSet;
 
 public class XORGate extends Gate {
 
-	private static final long serialVersionUID = -3654074567718944607L;
+	/**
+	 * Constructs an XOR Gate.
+	 * @param gateNumber the gate's integer label (in a circuit all {@code Gate} will be labeled).
+	 * @param inputWireLabels an array containing the labels of the {@code Gate}'s input {@code Wire}s.
+	 * @param outputWireLabels an array containing the labels of the {@code Gate}'s input {@code Wire}(s). 
+	 * There will generally be a single output {@code Wire}. However in instances in which fan-out of the output {@code Wire} is >1, 
+	 * we left the option for treating this as multiple {@code Wire}s.
+	 */
+	public XORGate(int gateNumber, int[] inputWireLabels, int[] outputWireLabels) {
+		super(gateNumber, createXORTruthTable(), inputWireLabels, outputWireLabels);
+	}
 
-/**
-   * Constructs an XOR Gate
-   * 
-   * @param gateNumber
-   *          the gate's integer label(in a circuit all {@code Gate} will be
-   *          labeled)
-   * @param inputWireLabels
-   *          an array containing the labels of the {@code Gate}'s input
-   *          {@code Wire}s
-   * @param outputWireLabels
-   *          an array containing the labels of the {@code Gate}'s input
-   *          {@code Wire}(s). There will generally be a single output
-   *          {@code Wire}. However in instances in which fan-out of the output
-   *          {@code Wire} is >1, we left the option for treating this as
-   *          multiple {@code Wire}s
-   */
-
-  public XORGate(int gateNumber, int[] inputWireLabels, int[] outputWireLabels) {
-    super(gateNumber, createXORTruthTable(), inputWireLabels, outputWireLabels);
-  }
-
-  /**
-   * 
-   * @return a BitSet representation of an XOR Gate truth table to be passed to
-   *         the super constructor
-   */
-
-  private static BitSet createXORTruthTable() {
-    BitSet truthTable = new BitSet();
-    truthTable.set(1);
-    truthTable.set(2);
-    return truthTable;
-  }
+	/**
+	 *  
+	 * @return a BitSet representation of an XOR Gate truth table to be passed to the super constructor.
+	 */
+	private static BitSet createXORTruthTable() {
+	    BitSet truthTable = new BitSet();
+	    truthTable.set(1);
+	    truthTable.set(2);
+	    return truthTable;
+	}
 
 }

@@ -28,47 +28,37 @@ import java.util.BitSet;
 
 /**
  * 
- * A built in NOT Gate for the convenience of circuit designers. This gate is
- * identical to creating a Gate with a 0001 truth table.
+ * A built in NOT Gate for the convenience of circuit designers. <p>
+ * This gate is identical to creating a Gate with a 1000 truth table.
  * 
  * @author Steven Goldfeder
  * 
  */
 
 public class NOTGate extends Gate {
+	
+	/**
+	 * Constructs a NOT Gate.
+	 * @param gateNumber the gate's integer label (in a circuit all gates will be labeled).
+  	 * @param inputWireLabel an array containing the labels of the gate's input {@code Wire}.
+  	 * Since NOT is a unary operator, there will only be one input {@code Wire}.
+  	 * @param outputWireLabels an array containing the labels of the gate's input {@code Wire}(s). 
+  	 * There will generally be a single output {@code Wire}. 
+  	 * However in instances in which fan-out of the output {@code Wire} is >1, we left the option for treating 
+  	 * this as multiple {@code Wire}s.
+   	 */
+	public NOTGate(int gateNumber, int inputWireLabel, int[] outputWireLabels) {
+		super(gateNumber, createNOTTruthTable(), new int[]{inputWireLabel}, outputWireLabels);
+	}
 
-	private static final long serialVersionUID = 5960890254258310472L;
-
-/**
-   * Constructs a NOT Gate
-   * 
-   * @param gateNumber
-   *          the gate's integer label(in a circuit all gates will be labeled)
-   * @param inputWireLabel
-   *          an array containing the labels of the gate's input {@code Wire}.
-   *          Since NOT is a unary operator, there will only be one input
-   *          {@code Wire.}
-   * @param outputWireLabels
-   *          an array containing the labels of the gate's input {@code Wire}
-   *          (s). There will generally be a single output {@code Wire}. However
-   *          in instances in which fan-out of the output {@code Wire} is >1, we
-   *          left the option for treating this as multiple {@code Wire}s
-   */
-
-  public NOTGate(int gateNumber, int inputWireLabel, int[] outputWireLabels) {
-    super(gateNumber, createNOTTruthTable(), new int[] { inputWireLabel },
-        outputWireLabels);
-  }
-
-  /**
-   * 
-   * @return a BitSet representation of a NOT Gate truth table to be passed to
-   *         the super constructor
-   */
-  private static BitSet createNOTTruthTable() {
-    BitSet truthTable = new BitSet();
-    truthTable.set(0);
-    return truthTable;
-  }
+	/**
+	 * 
+	 * @return a BitSet representation of a NOT Gate truth table to be passed to the super constructor.
+	 */
+	private static BitSet createNOTTruthTable() {
+		BitSet truthTable = new BitSet();
+		truthTable.set(0);
+		return truthTable;
+	}
 
 }
