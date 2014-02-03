@@ -40,7 +40,7 @@ import edu.biu.scapi.tools.Factories.CryptographicHashFactory;
 /**
  * We implement this double encryption scheme using Hashing. <p>
  * In this encryption scheme the garbled values of each wire are appended to each other and the result is hashed. 
- * We XOR the plaintext with the output of the hash function. 
+ * We XOR the plaintext with the output of the hash function. <p>
  * See <i>Garbling Schemes </i> by Mihir Bellare, Viet Tung Hoang, and Phillip Rogaway for a full discussion on the many different types
  * of garbling schemes and how efficient they are.
  * 
@@ -49,7 +49,7 @@ import edu.biu.scapi.tools.Factories.CryptographicHashFactory;
  */
 public class HashingMultiKeyEncryption implements MultiKeyEncryptionScheme {
 
-	/**
+	/*
 	 * Key size in bits. This is the size of the individual keys. 
 	 * One or more individual keys of this size will be combined into a {@code MultiSecretKey}.
 	 */
@@ -104,7 +104,7 @@ public class HashingMultiKeyEncryption implements MultiKeyEncryptionScheme {
 		if (!isKeySet) {
 			throw new KeyNotSetException();
 		}
-		// We append all the keys together and hash the result.
+		// Append all the keys together and hash the result.
 		for (SecretKey k : key.getKeys()) {
 			//Divide by 8 since the key size is specified in bits and we are using a byte array.
 			hash.update(k.getEncoded(), 0, keySize / 8);
@@ -117,7 +117,7 @@ public class HashingMultiKeyEncryption implements MultiKeyEncryptionScheme {
 			throw new PlaintextTooLongException();
 		}
 		if (offset > 0) {
-			//We truncate the output to the size of the plaintext by using only the last n bytes where n is the size of the plaintext.
+			//Truncate the output to the size of the plaintext by using only the last n bytes where n is the size of the plaintext.
 			byte[] temp = new byte[plaintext.length];
 			for (int i = 0; i < temp.length; i++) {
 				temp[i] = output[i + offset];
@@ -186,7 +186,7 @@ public class HashingMultiKeyEncryption implements MultiKeyEncryptionScheme {
 
 	@Override
 	public void setTweak(byte[] tweak) {
-		// this encryption scheme ignores the tweak
+		// This encryption scheme ignores the tweak
 	}
 
 	@Override

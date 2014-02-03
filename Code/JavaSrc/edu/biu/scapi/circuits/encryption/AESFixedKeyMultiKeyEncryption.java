@@ -32,37 +32,34 @@ import javax.crypto.spec.SecretKeySpec;
 
 import edu.biu.scapi.exceptions.KeyNotSetException;
 import edu.biu.scapi.exceptions.TweakNotSetException;
-import edu.biu.scapi.midLayer.ciphertext.ByteArraySymCiphertext;
-import edu.biu.scapi.midLayer.plaintext.ByteArrayPlaintext;
 import edu.biu.scapi.primitives.prf.PseudorandomFunction;
 import edu.biu.scapi.primitives.prf.cryptopp.CryptoPpAES;
 
 /**
  * This encryption scheme uses AES with a fixed key and thus has the benefit of not needing to repeatedly perform the costly setKey 
- * procedure for AES. See <i>Garbling * Schemes </i> by Mihir Bellare, Viet Tung Hoang, and Phillip Rogaway Section 5.6 for a full 
+ * procedure for AES. See <i>Garbling Schemes </i> by Mihir Bellare, Viet Tung Hoang, and Phillip Rogaway Section 5.6 for a full 
  * description of thus encryption scheme. <p>
  * 
  * This encryption scheme works by XORing all of the wire values(i.e. keys) to one another and then XORing this to the tweak. 
- * This value is denoted by K. We then call AES with the fixed key on K. 
- * We then XOR the result of that to K and then to the plaintext to encrypt.
+ * This value is denoted by K. We call AES with the fixed key on K and then XOR the result of that to K and then to the plaintext to encrypt.
  * 
  * @author Steven Goldfeder
  * 
  */
 public class AESFixedKeyMultiKeyEncryption implements MultiKeyEncryptionScheme {
 
-	//The number of bits in the key. It is currently set to 128, and the {@code FIXED_KEY} field is this size
-	static final int KEY_SIZE = 128; // key size in bits
+	//The number of bits in the key. It is currently set to 128, and the {@code FIXED_KEY} field is this size.
+	static final int KEY_SIZE = 128; 
 	
 	//A 128 bit key that we generated once and hardcoded in.
 	static final SecretKey FIXED_KEY = new SecretKeySpec (new byte[]{ -13, 29,-20, 98, -96, -51, -86, -82, 9, 49, -26, 92, -22, 50, -100, 36 }, "");
 	
 	private PseudorandomFunction aes;
 	
-	/**
+	/*
 	 * The key here is not the key to the AES, but rather the key to this encryption scheme. 
-	 * See Mihir Bellare, Viet Tung Hoang, and Phillip Rogaway Section 5.6 or see the {@link #encrypt(ByteArrayPlaintext)},
-	 * {@link #decrypt(ByteArraySymCiphertext)} methods below to see how these keys are used in encrpytion/decryption.
+	 * See Mihir Bellare, Viet Tung Hoang, and Phillip Rogaway Section 5.6 or see the encrypt(plaintext),
+	 * decrypt(ciphertext) methods below to see how these keys are used in encrpytion/decryption.
 	 */
 	private MultiSecretKey key;
 
@@ -76,7 +73,6 @@ public class AESFixedKeyMultiKeyEncryption implements MultiKeyEncryptionScheme {
 	private boolean isTweakSet = false;
 
 	public AESFixedKeyMultiKeyEncryption() {
-		//aes = new BcAES();
 		aes = new CryptoPpAES();
 		try {
 			aes.setKey(FIXED_KEY);
@@ -125,14 +121,13 @@ public class AESFixedKeyMultiKeyEncryption implements MultiKeyEncryptionScheme {
 		byte[] outBytes = new byte[KEY_SIZE / 8];
 		
 		/*
-		 * at this point inBytes contains the wire values XOR's with each other XOR'd with the tweak. 
+		 * At this point inBytes contains the wire values XOR's with each other XOR'd with the tweak. 
 		 * This is referred to as K in section 5.6 of "Garbling Schemes" by Bellare, Hoang and Rogaway.
 		 */
 		aes.computeBlock(inBytes, 0, outBytes, 0);
 		
 		/*
-		 * We now XOR the output of the AES again with inBytes(i.e. K in the above
-		 * cited paper) and then with the plaintext to obtain the ciphertext.
+		 * XOR the output of the AES again with inBytes (i.e. K in the above cited paper) and then with the plaintext to obtain the ciphertext.
 		 */
 		for (int byteNumber = 0; byteNumber < outBytes.length; byteNumber++) {
 			outBytes[byteNumber] ^= inBytes[byteNumber];
@@ -168,8 +163,7 @@ public class AESFixedKeyMultiKeyEncryption implements MultiKeyEncryptionScheme {
 		 */
 		aes.computeBlock(inBytes, 0, outBytes, 0);
 		/*
-		 * We now XOR the output of the AES again with inBytes(i.e. K in the above
-		 * cited paper) and then with the ciphertext to obtain the plaintext.
+		 * XOR the output of the AES again with inBytes (i.e. K in the above cited paper) and then with the ciphertext to obtain the plaintext.
 		 */
 		for (int byteNumber = 0; byteNumber < outBytes.length; byteNumber++) {
 			outBytes[byteNumber] ^= inBytes[byteNumber];
@@ -190,7 +184,7 @@ public class AESFixedKeyMultiKeyEncryption implements MultiKeyEncryptionScheme {
 	}
 	
 	/**
-	 *  Return the block size of aes
+	 *  Returns the block size of aes.
 	 */
 	@Override
 	public int getCipherSize() {

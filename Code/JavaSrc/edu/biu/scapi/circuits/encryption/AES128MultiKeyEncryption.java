@@ -45,7 +45,7 @@ import edu.biu.scapi.primitives.prf.cryptopp.CryptoPpAES;
  * This implementation follows their second suggestion in section .6 (the second paragraph starting with a dash '-' ). <p>
  * 
  * Note that this encryption scheme does not minimize the number of AES set key operations. 
- * See {@link MinimizeAESSetKeyGarbledBooleanCircuit} and {@code MinimizeAESSetKeyGarbledGate} for a circuit and gate that do that as
+ * See {@link MinimizeAESSetKeyGarbledBooleanCircuitUtil} and {@code MinimizeAESSetKeyGarbledGate} for a circuit and gate that do that as
  * well as a discussion of why a separate circuit was necessary to accomplish this. <p>
  * 
  * This encryption scheme encrypts by setting each key from the {@code MultiSecretKey} as the AES key and then calling AES on the tweak.
@@ -57,12 +57,12 @@ import edu.biu.scapi.primitives.prf.cryptopp.CryptoPpAES;
 public class AES128MultiKeyEncryption implements MultiKeyEncryptionScheme {
 
 	/**
-	 * Key size in bits
+	 * Key size in bits.
 	 */
 	static final int KEY_SIZE = 128;
 	
 	/**
-	 * The key to encrypt on. 
+	 * The key to encrypt on. <p>
 	 * In this scheme each of the individual {@code SecretKey}s that make up the {@code MultiSecretKey} will be set as the key to AES.
 	 */
 	private MultiSecretKey key;
@@ -186,7 +186,7 @@ public class AES128MultiKeyEncryption implements MultiKeyEncryptionScheme {
 	}
 
 	/**
-	 * return the block size of aes
+	 * Returns the block size of aes.
 	 */
 	@Override
 	public int getCipherSize() {

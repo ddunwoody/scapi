@@ -41,7 +41,7 @@ import edu.biu.scapi.exceptions.TweakNotSetException;
  * 
  * See <i> Garbling Schemes</i> by Mihir Bellare, Viet Tung Hoang, and Phillip Rogaway. In this paper, the authors present the idea of a
  * Garbling Scheme--i.e. the notion to treat Garbling Schemes as cryptographic primitive. In the paper, they present a number of 
- * different efficient garbling schemes.
+ * different efficient garbling schemes.<p>
  * 
  * We have implemented a number of the ones that they mentioned, and any other garbling schemes can easily be implemented and used 
  * anywhere in our code as long as they implement this interface. 
@@ -93,7 +93,7 @@ public interface MultiKeyEncryptionScheme {
 	/**
 	 * See <i> Garbling Schemes</i> by Mihir Bellare, Viet Tung Hoang, and Phillip Rogaway. <p>
 	 * Some encryption schemes use a tweak and instead of encrypting directly on the entry of the plaintext encrypt on the tweak 
-	 * and then XOR the result with the plaintext. 
+	 * and then XOR the result with the plaintext. <p>
 	 * Some encryption schemes do not make use of a tweak, in which case calls to set the tweak have no effect.
 	 * If you are implementing an encryption scheme that does not use a tweak, just leave the body of this method blank.
 	 * 
@@ -129,8 +129,8 @@ public interface MultiKeyEncryptionScheme {
 	public byte[] decrypt(byte[] ciphertext) throws CiphertextTooLongException, KeyNotSetException, TweakNotSetException, InvalidKeyException, IllegalBlockSizeException;
 
 	/**
-	 * This method checks if the key for this {@code MultiKeyEncryptionScheme} has been set.
-	 * Returning {@code true} if it has been and {@code false} if it has not been. 
+	 * Checks if the key for this {@code MultiKeyEncryptionScheme} has been set.<P>
+	 * Returning {@code true} if it has been and {@code false} if it has not been. <P>
 	 * Before encrypting and decrypting, the key must be set.
 	 * 
 	 * @return {@code true} if the key has been set, {@code false} otherwise.
