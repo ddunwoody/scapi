@@ -44,7 +44,7 @@ public class Gate {
 	private BitSet truthTable;
 
 	/**
-	 * An array containing the integer labels of the input Wire Labels to this gate. 
+	 * An array containing the integer labels of the input Wire Labels to this gate. <P>
 	 * The order of the {@code Wire}s in this array is significant as not all functions are symmetric.
 	 */
 	/*
@@ -82,7 +82,7 @@ public class Gate {
 	    this.truthTable = truthTable;
 	    this.inputWireLabels = inputWireLabels;
 	    this.outputWireLabels = outputWireLabels;
-	}
+	} 
 
 	/**
 	 * Compute the gate operation.<p>
@@ -190,7 +190,7 @@ public class Gate {
 	}
 
 	/**
-	 * AReturns the labels of the {@link Wire}s that are output of this {@code Gate}. <p>
+	 * Returns the labels of the {@link Wire}s that are output of this {@code Gate}. <p>
 	 * In most circuit designs, this will contain a single wire. 
 	 * However, in the case of fan-out > 1, some circuit designers may treat each as separate wires.
 	 * 

@@ -89,6 +89,9 @@ public class BooleanCircuit {
 	 * Next it lists the number of output {@code Wire}s followed by the integer label of each of these {@code Wires}. <p>
 	 * Then for each gate, we have the following: number of inputWires, number of OutputWires inputWireLabels OutputWireLabels and the gate's truth Table (as a 0-1 string).<P>
 	 * example file: 1 2 1 1 1 2 1 2 1 3 2 1 1 2 3 0001<p>
+	 * IMPORTANT NOTE: There is a special case when the user want to use the row reduction technique and to sample the wires' keys out of a given output keys.
+	 * In this case the circuit should have an additional gate in the end that has 01 as the truth table (meaning, it does XOR with zero).
+	 * This way we sample all keys from scratch and the last gate will map the new output keys to the given ones.
 	 * 
 	 * @param f the {@link File} from which the circuit is read.
 	 * @throws FileNotFoundException if f is not found in the specified directory.
@@ -254,7 +257,7 @@ public class BooleanCircuit {
 	}
 
 	/**
-	 * The verify method tests the circuits for equality returning {@code true} if they are and {@code false}if they are not. 
+	 * The verify method tests the circuits for equality returning {@code true} if they are and {@code false}if they are not. <p>
 	 * In order to be considered equal, {@code Gate}s and {@code Wire}s must be labeled identically and {@code Gate}s must contain 
 	 * the same truth table.
 	 * 
