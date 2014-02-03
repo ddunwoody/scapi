@@ -39,7 +39,7 @@ public class Wire {
 	private byte value;
 
 	/**
-	 * Creates a {@code Wire} and sets it to the specified value
+	 * Creates a {@code Wire} and sets it to the specified value.
 	 * 
 	 * @param value the value to set this {@code Wire} to. Must be either 0 or 1.
   	 */
