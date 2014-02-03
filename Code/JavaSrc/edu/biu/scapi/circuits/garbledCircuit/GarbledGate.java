@@ -24,7 +24,6 @@
 */
 package edu.biu.scapi.circuits.garbledCircuit;
 
-import java.io.Serializable;
 import java.security.InvalidKeyException;
 import java.util.Map;
 
@@ -33,71 +32,49 @@ import javax.crypto.SecretKey;
 
 import edu.biu.scapi.circuits.circuit.Gate;
 import edu.biu.scapi.exceptions.CiphertextTooLongException;
-import edu.biu.scapi.exceptions.KeyNotSetException;
-import edu.biu.scapi.exceptions.TweakNotSetException;
 
 /**
- * An interface that {@link StandardGarbledGate}'s and any specialized or
- * optimized garbled gate will implement. This will allow the correct method to
- * be caused in cases in which we are dealing with different types of optimized
- * Gates. For example, say that we are using the Free-XOR technique. In this
- * case, we will have a mixture of {@link StandardGarbledGate}s and
- * {@link FreeXORGate}s. We will use this interface so that we can access both
- * of them without knowing ahead of time which one we will be given.
+ * An interface that {@link StandardGarbledGate}'s and any specialized or optimized garbled gate will implement. <p>
+ * This will allow the correct method to be caused in cases in which we are dealing with different types of optimized Gates. <p>
+ * For example, say that we are using the Free-XOR technique. In this case, we will have a mixture of {@link StandardGarbledGate}s and
+ * {@link FreeXORGate}s. We will use this interface so that we can access both of them without knowing ahead of time which one we will be given.
  * 
  * @author Steven Goldfeder
  * 
  */
-public interface GarbledGate extends Serializable{
-  /**
-   * The compute method computes the output of this gate and sets the output
-   * wire(s) to that value
-   * 
-   * @param computedWires
-   *          A {@link Map} containing the {@link GarbledWires}s that have
-   *          already been computed and had their values set
-   * @throws InvalidKeyException
-   * @throws IllegalBlockSizeException
-   * @throws CiphertextTooLongException
-   * @throws KeyNotSetException
-   * @throws TweakNotSetException
-   */
+public interface GarbledGate {
+  	
+	/**
+	 * Computes the output of this gate and sets the output wire(s) to that value.
+	 * @param computedWires a {@link Map} containing the {@link GarbledWires}s that have already been computed and had their values set.
+	 * @throws InvalidKeyException
+	 * @throws IllegalBlockSizeException
+	 * @throws CiphertextTooLongException
+	 */
+	public void compute(Map<Integer, GarbledWire> computedWires) throws InvalidKeyException, IllegalBlockSizeException, CiphertextTooLongException;
 
-  public void compute(Map<Integer, GarbledWire> computedWires)
-      throws InvalidKeyException, IllegalBlockSizeException,
-      CiphertextTooLongException, KeyNotSetException, TweakNotSetException;
+	/**
+	 * This method tests an ungarbled {@link Gate} for equality to this {@code GarbledGate}. <P>
+	 * Meaning, they have the same truth table and labels.<p>
+	 * It is called verify since in general, when this method is used, the assumption is that they are equal and we are verifying this assumption.
+	 * @param g an ungarbled {@code Gate} to be tested for equality to this {@code GarbledGate}
+	 * @param allWireValues contains both keys of all wires.
+	 * @return {@code true} if the gates are have the same truth table and label, and {@code false} otherwise.
+	 * @throws InvalidKeyException
+	 * @throws IllegalBlockSizeException
+	 * @throws CiphertextTooLongException
+	 */
+	boolean verify(Gate g, Map<Integer, SecretKey[]> allWireValues) throws InvalidKeyException, IllegalBlockSizeException, CiphertextTooLongException;
 
-  /**
-   * This method tests an ungarbled {@link Gate} for equality to this
-   * {@code GarbledGate} returning {@code true} if they are equal and
-   * {@code false} otherwise. It is called verify since in general, when this
-   * method is used, the assumption is that they are equal and we are verifying
-   * this assumption.
-   * 
-   * @param g
-   *          an ungarbled {@code Gate} to be tested for equality to this
-   *          {@code GarbledGate}
-   * @return returns {@code true} if the gates are have the same truth table and
-   *         label, and {@code false} otherwise
-   *          * @throws InvalidKeyException
-   * @throws IllegalBlockSizeException
-   * @throws CiphertextTooLongException
-   * @throws KeyNotSetException
-   * @throws TweakNotSetException
-   */
-  boolean verify(Gate g, Map<Integer, SecretKey[]> allWireValues)
-      throws InvalidKeyException, IllegalBlockSizeException,
-      CiphertextTooLongException, KeyNotSetException, TweakNotSetException;
+	/**
+	 * @return an array containing the integer labels of the gate's input wires.
+	 */
+	public int[] getInputWireLabels();
 
-  /**
-   * @return an array containing the integer labels of the gate's input wires.
-   */
-  public int[] getInputWireLabels();
-
-  /**
-   * @return an array containing the integer labels of the gate's output wires.
-   *         generally this will be a single wire, but if fan-out >1 a circuit
-   *         designer may label it as multiple wires.
-   */
-  public int[] getOutputWireLabels();
+	/**
+	 * @return an array containing the integer labels of the gate's output wires.
+	 * Generally this will be a single wire, but if fan-out >1 a circuit designer may label it as multiple wires.
+	 */
+	public int[] getOutputWireLabels();
+  
 }
