@@ -54,7 +54,7 @@ public class OTSemiHonestExtensionReceiver implements SemiHonest, OTBatchReceive
 
 	//This function initializes the receiver. It creates sockets to communicate with the sender and attaches these sockets to the receiver object.
 	//It outputs the receiver object with communication abilities built in. 
-	private native long initOtReceiver(String ipAddress, int port, int koblitzOrZpSize);
+	private native long initOtReceiver(String ipAddress, int port, int koblitzOrZpSize, int numOfThreads);
 	
 	
 	/**
@@ -78,13 +78,13 @@ public class OTSemiHonestExtensionReceiver implements SemiHonest, OTBatchReceive
 	 * 		  163,233,283 for ECC koblitz and 1024, 2048, 3072 for Zp
 	 * 	      
 	 */
-	public OTSemiHonestExtensionReceiver(Party party, int koblitzOrZpSize ){
+	public OTSemiHonestExtensionReceiver(Party party, int koblitzOrZpSize, int numOfThreads ){
 		
 		
 		//create the receiver by passing the local host address.
 		//receiverPtr = initOtReceiver("127.0.0.1", 7766);
 		
-		receiverPtr = initOtReceiver(party.getIpAddress().getHostAddress(), party.getPort(), koblitzOrZpSize);
+		receiverPtr = initOtReceiver(party.getIpAddress().getHostAddress(), party.getPort(), koblitzOrZpSize, numOfThreads);
 		
 
 	}
@@ -102,7 +102,7 @@ public class OTSemiHonestExtensionReceiver implements SemiHonest, OTBatchReceive
 		//create the receiver by passing the local host address.
 		//receiverPtr = initOtReceiver("127.0.0.1", 7766);
 		
-		receiverPtr = initOtReceiver(party.getIpAddress().getHostAddress(), party.getPort(), 163);
+		receiverPtr = initOtReceiver(party.getIpAddress().getHostAddress(), party.getPort(), 163, 1);
 		
 
 	}
