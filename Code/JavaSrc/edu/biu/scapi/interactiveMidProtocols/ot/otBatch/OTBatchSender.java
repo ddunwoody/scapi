@@ -52,5 +52,5 @@ public interface OTBatchSender {
 	 * @throws IOException if there was a problem during a communication phase.
 	 * @throws ClassNotFoundException if there was a problem during serialization mechanism.
 	 */
-	public void transfer(Channel channel, OTBatchSInput input) throws ClassNotFoundException, IOException, CheatAttemptException, InvalidDlogGroupException;
+	public OTBatchSOutput transfer(Channel channel, OTBatchSInput input) throws ClassNotFoundException, IOException, CheatAttemptException, InvalidDlogGroupException;
 }
