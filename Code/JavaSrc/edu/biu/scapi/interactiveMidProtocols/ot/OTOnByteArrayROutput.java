@@ -24,6 +24,8 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.ot;
 
+import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.OTBatchROutput;
+
 /**
  * Concrete implementation of OT receiver (on byteArray) output.<p>
  * In the byteArray scenario, the receiver outputs xSigma as a byte array.
@@ -31,7 +33,7 @@ package edu.biu.scapi.interactiveMidProtocols.ot;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class OTOnByteArrayROutput implements OTROutput {
+public class OTOnByteArrayROutput implements OTROutput, OTBatchROutput {
 
 	private byte[] xSigma;
 	
