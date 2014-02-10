@@ -39,6 +39,7 @@ import edu.biu.scapi.generals.ScapiDefaultConfiguration;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTRGroupElementPairMsg;
 import edu.biu.scapi.interactiveMidProtocols.ot.OTSMsg;
 import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.OTBatchSInput;
+import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.OTBatchSOutput;
 import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.OTBatchSender;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
@@ -145,8 +146,9 @@ abstract class OTSemiHonestDDHBatchSenderAbs implements OTBatchSender{
 	 *		•	vi1 = xi1 * ki1<p>
 	 *	For every i=1,...,m, SEND (u,vi0,vi1) to R<p>
 	 *	OUTPUT nothing"<p>
+	 * @return 
 	 */
-	public void transfer(Channel channel, OTBatchSInput input) throws ClassNotFoundException, IOException {
+	public OTBatchSOutput transfer(Channel channel, OTBatchSInput input) throws ClassNotFoundException, IOException {
 		//WAIT for message (hi0,hi1) from R
 		OTRGroupElementBatchMsg message = waitForMessageFromReceiver(channel);
 		
@@ -180,6 +182,8 @@ abstract class OTSemiHonestDDHBatchSenderAbs implements OTBatchSender{
 		
 		OTSMsg messageToSend = computeMsg(input, u, k0Array, k1Array);
 		sendTupleToReceiver(channel, messageToSend);
+		
+		return null;//sould not return any data
 	}
 
 	/**
