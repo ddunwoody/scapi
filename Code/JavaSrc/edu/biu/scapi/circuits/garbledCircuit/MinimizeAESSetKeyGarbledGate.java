@@ -56,15 +56,14 @@ class MinimizeAESSetKeyGarbledGate extends StandardGarbledGate {
 	 * @param aes The AES object to use to garbled this gate.
 	 * @param garbledTablesHolder a reference to the garbled tables of the circuit.
 	 * @param allWireValues both keys of all the circuit's wires.
-	 * @param signalBits of all the circuit's wires.
    	 * @throws PlaintextTooLongException 
    	 * @throws IllegalBlockSizeException 
    	 * @throws InvalidKeyException 
    	 */
 	MinimizeAESSetKeyGarbledGate(Gate ungarbledGate, MultiKeyEncryptionScheme mes, PseudorandomFunction aes, GarbledTablesHolder garbledTablesHolder, 
-			Map<Integer, SecretKey[]> allWireValues, Map<Integer, Byte> signalBits) throws InvalidKeyException, IllegalBlockSizeException, PlaintextTooLongException {
+			Map<Integer, SecretKey[]> allWireValues) throws InvalidKeyException, IllegalBlockSizeException, PlaintextTooLongException {
   
-		super(ungarbledGate, mes, garbledTablesHolder, allWireValues, signalBits);
+		super(ungarbledGate, mes, garbledTablesHolder, allWireValues);
 		this.aes = aes;
 	}
   
@@ -82,7 +81,7 @@ class MinimizeAESSetKeyGarbledGate extends StandardGarbledGate {
 	}	
    
 	@Override
-	void createGarbledTable(Gate ungarbledGate, Map<Integer, SecretKey[]> allWireValues, Map<Integer, Byte> signalBits) throws InvalidKeyException, IllegalBlockSizeException {
+	void createGarbledTable(Gate ungarbledGate, Map<Integer, SecretKey[]> allWireValues) throws InvalidKeyException, IllegalBlockSizeException {
 		
 		//The number of rows truth table is 2^(number of inputs).
 		int numberOfInputs = inputWireLabels.length;
@@ -131,7 +130,8 @@ class MinimizeAESSetKeyGarbledGate extends StandardGarbledGate {
 	    		 * The signal bits tell us the position on the garbled truth table for the given row of an ungarbled truth table. 
 	    		 * See Fairplay — A Secure Two-Party Computation System by Dahlia Malkhi, Noam Nisan1, Benny Pinkas, and Yaron Sella for more on signal bits.
 	    		 */
-	    		byte signalBit = signalBits.get(inputWireLabels[i]);
+	    		byte[] k0 = allWireValues.get(inputWireLabels[i])[0].getEncoded();
+		  		byte signalBit =  (byte) (k0[k0.length-1] & 1);
 
 	    		// Update the permuted position. For a better understanding on how this works, see the getIndexToDecrypt method in this class.
 		        permutedPosition += (input ^ signalBit) * (Math.pow(2, reverseIndex));

@@ -53,7 +53,7 @@ import edu.biu.scapi.exceptions.NotAllInputsSetException;
 public interface GarbledBooleanCircuit {
 	
 	/**
-	 * This method generates both keys for each input wire. Then, creates the garbled table according to that values.<p>
+	 * This method generates both keys for each wire. Then, creates the garbled table according to that values.<p>
 	 * @param ungarbledCircuit the circuit that this {@code GarbledBooleanCircuit} is supposed to be a garbling of. 
 	 * @return CircuitCreationValues contains both keys for each input and output wire and the translation table.
 	 */
@@ -66,12 +66,13 @@ public interface GarbledBooleanCircuit {
 	 * In addition, it gets the signal bits corresponding to the partial wire's keys. <p>
 	 * In case the given keys are the keys of the output wires than the given signal bits are actually the translation table.
 	 * @param ungarbledCircuit the circuit that this {@code GarbledBooleanCircuit} is supposed to be a garbling of.
-	 * @param partialWireValues can contain the keys of the input wires of the keys of the output wires.
-	 * @param signalBits the signal bits corresponding to the given wire's keys.
+	 * @param partialWireValues can contain the keys of the input wires or the keys of the output wires.
+	 * Note: The list significant bit of the input and output keys of each wire should be different. 
+	 * Meaning, for each wire, if the last bit of k0 is 0, the last bit of k1 must be 1. 
+	 * Clearly, the content of the last bit of all k0 should be picked at random. Else, the circuit is not secure. 
 	 * @return CircuitCreationValues contains both keys for each input and output wire and the translation table.
 	 */
-	public CircuitCreationValues generateWireKeysAndSetTables(BooleanCircuit ungarbledCircuit, Map<Integer, SecretKey[]> partialWireValues,
-			HashMap<Integer, Byte> signalBits);
+	public CircuitCreationValues generateWireKeysAndSetTables(BooleanCircuit ungarbledCircuit, Map<Integer, SecretKey[]> partialWireValues);
 	
 	/**
 	 * This method sets the input of the circuit. <p>

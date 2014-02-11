@@ -82,13 +82,11 @@ class StandardGarbledGate implements GarbledGate {
 	 * @param mes The encryption scheme used to garbled this gate.
 	 * @param garbledTablesHolder a reference to the garbled tables of the circuit.
 	 * @param allWireValues both keys of all the circuit's wires.
-	 * @param signalBits of all the circuit's wires.
    	 * @throws PlaintextTooLongException 
    	 * @throws IllegalBlockSizeException 
    	 * @throws InvalidKeyException 
    	 */
-	StandardGarbledGate(Gate ungarbledGate, MultiKeyEncryptionScheme mes, GarbledTablesHolder garbledTablesHolder, Map<Integer, SecretKey[]> allWireValues, 
-			Map<Integer, Byte> signalBits) throws InvalidKeyException, IllegalBlockSizeException, PlaintextTooLongException{
+	StandardGarbledGate(Gate ungarbledGate, MultiKeyEncryptionScheme mes, GarbledTablesHolder garbledTablesHolder, Map<Integer, SecretKey[]> allWireValues) throws InvalidKeyException, IllegalBlockSizeException, PlaintextTooLongException{
 
 		//Sets the given parameters.
 		this.mes = mes;
@@ -97,7 +95,7 @@ class StandardGarbledGate implements GarbledGate {
 		gateNumber = ungarbledGate.getGateNumber();
 		this.garbledTablesHolder = garbledTablesHolder;
 		//Call the function that calculate the garbled table using the given keys.
-		createGarbledTable(ungarbledGate, allWireValues, signalBits);
+		createGarbledTable(ungarbledGate, allWireValues);
 	}
   
 	/**
@@ -119,12 +117,11 @@ class StandardGarbledGate implements GarbledGate {
 	 * Creates the garbled table of this gate using the given keys.
 	 * @param ungarbledGate the gate to garbled
 	 * @param allWireValues both keys of all the circuit's wires.
-	 * @param signalBits of all the circuit's wires.
 	 * @throws InvalidKeyException
 	 * @throws IllegalBlockSizeException
 	 * @throws PlaintextTooLongException
 	 */
-	void createGarbledTable(Gate ungarbledGate, Map<Integer, SecretKey[]> allWireValues, Map<Integer, Byte> signalBits) throws  IllegalBlockSizeException, PlaintextTooLongException, InvalidKeyException{
+	void createGarbledTable(Gate ungarbledGate, Map<Integer, SecretKey[]> allWireValues) throws  IllegalBlockSizeException, PlaintextTooLongException, InvalidKeyException{
 	  
 		//The number of rows truth table is 2^(number of inputs).
 		int numberOfInputs = inputWireLabels.length;
@@ -158,10 +155,12 @@ class StandardGarbledGate implements GarbledGate {
         
 		  		byte input = (byte) (((rowOfTruthTable & j) == 0) ? 0 : 1);
 		  		/*
-	    		 * The signal bits tell us the position on the garbled truth table for the given row of an ungarbled truth table. 
+	    		 * The signal bits tell us the position on the garbled truth table for the given row of an ungarbled truth table.
+	    		 * The signal bit of wire i is the last bit of wire i's k0. 
 	    		 * See Fairplay — A Secure Two-Party Computation System by Dahlia Malkhi, Noam Nisan1, Benny Pinkas, and Yaron Sella for more on signal bits.
 	    		 */
-		  		byte signalBit = signalBits.get(inputWireLabels[i]);
+		  		byte[] k0 = allWireValues.get(inputWireLabels[i])[0].getEncoded();
+		  		byte signalBit =  (byte) (k0[k0.length-1] & 1);
 		  		
 		  		// Update the permuted position. For a better understanding on how this works, see the getIndexToDecrypt method in this class.
 			    permutedPosition += (input ^ signalBit) * (Math.pow(2, reverseIndex));
@@ -355,7 +354,7 @@ class StandardGarbledGate implements GarbledGate {
 				keysToDecryptOn[i] = currentWireValue;
 			    
 				// Look up the signal bit on this wire. This is the last bit of its value.
-			    int signalBit = (currentWireValue.getEncoded()[currentWireValue.getEncoded().length - 1] & 1) == 0 ? 0 : 1;
+			    byte signalBit = (byte) ((currentWireValue.getEncoded()[currentWireValue.getEncoded().length - 1] & 1) == 0 ? 0 : 1);
 			    
 			    // Update the permuted position. For a better understanding on how this works, see the getIndexToDecrypt method in this class.
 			    permutedPosition += signalBit * Math.pow(2, reverseIndex);

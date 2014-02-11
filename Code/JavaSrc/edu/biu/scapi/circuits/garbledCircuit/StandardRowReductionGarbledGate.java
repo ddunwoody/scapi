@@ -62,13 +62,12 @@ class StandardRowReductionGarbledGate extends StandardGarbledGate{
 	 * @param kdf to use in the row reduction technique
 	 * @param garbledTablesHolder a reference to the garbled tables of the circuit.
 	 * @param allWireValues both keys of all the circuit's wires.
-	 * @param signalBits of all the circuit's wires.
    	 * @throws PlaintextTooLongException
    	 * @throws IllegalBlockSizeException 
    	 * @throws InvalidKeyException 
    	 */
-	StandardRowReductionGarbledGate(Gate ungarbledGate, MultiKeyEncryptionScheme mes, KeyDerivationFunction kdf, GarbledTablesHolder garbledTablesHolder, Map<Integer, SecretKey[]> allWireValues, Map<Integer, Byte> signalBits) throws InvalidKeyException, IllegalBlockSizeException, PlaintextTooLongException{
-		super(ungarbledGate, mes, garbledTablesHolder, allWireValues, signalBits);
+	StandardRowReductionGarbledGate(Gate ungarbledGate, MultiKeyEncryptionScheme mes, KeyDerivationFunction kdf, GarbledTablesHolder garbledTablesHolder, Map<Integer, SecretKey[]> allWireValues) throws InvalidKeyException, IllegalBlockSizeException, PlaintextTooLongException{
+		super(ungarbledGate, mes, garbledTablesHolder, allWireValues);
 		this.kdf = kdf;
 	}
   
@@ -89,7 +88,7 @@ class StandardRowReductionGarbledGate extends StandardGarbledGate{
 	 * Meaning, the last row is not saved and will be calculated when the compute function will be called by the kdf.
 	 */
 	@Override
-	void createGarbledTable(Gate ungarbledGate, Map<Integer, SecretKey[]> allWireValues, Map<Integer, Byte> signalBits) throws  IllegalBlockSizeException, PlaintextTooLongException, InvalidKeyException{
+	void createGarbledTable(Gate ungarbledGate, Map<Integer, SecretKey[]> allWireValues) throws  IllegalBlockSizeException, PlaintextTooLongException, InvalidKeyException{
 		//The number of rows is 2^numberOfInputs - 1. The last row will be calculated by the row reduction technique.
 		int numberOfInputs = inputWireLabels.length;
 		int numberOfRows = (int) Math.pow(2, numberOfInputs)-1;
@@ -119,7 +118,11 @@ class StandardRowReductionGarbledGate extends StandardGarbledGate{
 			   	 */
         
 		  		int input = (((rowOfTruthTable & j) == 0) ? 0 : 1);
-		  		byte signalBit = signalBits.get(inputWireLabels[i]);
+		  		
+		  		//signal bit is the last bit of k0.
+		  		byte[] k0 = allWireValues.get(inputWireLabels[i])[0].getEncoded();
+		  		byte signalBit =  (byte) (k0[k0.length-1] & 1);
+		  		
 		  		
 		  		// Update the permuted position. For a better understanding on how this works, see the getIndexToDecrypt method in this class.
 		  		permutedPosition += (input ^ signalBit) * (Math.pow(2, reverseIndex));

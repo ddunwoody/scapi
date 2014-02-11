@@ -25,7 +25,6 @@
 package edu.biu.scapi.circuits.garbledCircuit;
 
 import java.security.InvalidKeyException;
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.crypto.SecretKey;
@@ -76,11 +75,13 @@ interface CircuitTypeUtil {
 	 * @param garbledTablesHolder the object that points of the garbledTable.
 	 * @param gates the gates of this circuit.
 	 * @param partialWireValues can contain the keys of the input wires or the keys of the output wires.
-	 * @param signalBits the signal bits corresponding to the given wire's keys.
+	 * Note: The list significant bit of the input and output keys of each wire should be different. 
+	 * Meaning, for each wire, if the last bit of k0 is 0, the last bit of k1 must be 1. 
+	 * Clearly, the content of the last bit of all k0 should be picked at random. Else, the circuit is not secure. 
 	 * @return CircuitCreationValues contains both generated values for each input and output wire and the translation table.
 	 */
 	public CircuitCreationValues generateWireKeysAndSetTables(BooleanCircuit ungarbledCircuit, GarbledTablesHolder garbledTablesHolder, 
-			GarbledGate[] gates, Map<Integer, SecretKey[]> partialWireValues, HashMap<Integer, Byte> signalBits) ;
+			GarbledGate[] gates, Map<Integer, SecretKey[]> partialWireValues) ;
 	
 	/**
 	 * This method generates both keys for each input wire using the given prg and seed. 

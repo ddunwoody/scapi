@@ -95,7 +95,7 @@ class FreeXORRowReductionGarbledBooleanCircuitUtil extends FreeXORGarbledBoolean
 	 */
 	@Override
 	public CircuitCreationValues generateWireKeysAndSetTables(BooleanCircuit ungarbledCircuit, GarbledTablesHolder garbledTablesHolder, 
-			GarbledGate[] gates, Map<Integer, SecretKey[]> partialWireValues, HashMap<Integer, Byte> signalBits) {
+			GarbledGate[] gates, Map<Integer, SecretKey[]> partialWireValues) {
 		if (partialWireValues.containsKey(ungarbledCircuit.getOutputWireLabels()[0]) && !isRowReductionWithFixedOutputKeys){
 			throw new IllegalArgumentException("Cannot accept output wires' keys when Row Reduction with fixed keys is not declared");
 		}
@@ -103,30 +103,34 @@ class FreeXORRowReductionGarbledBooleanCircuitUtil extends FreeXORGarbledBoolean
 		Map<Integer, SecretKey[]> allWireValues = new HashMap<Integer, SecretKey[]>();
 		Map<Integer, SecretKey[]> allInputWireValues = null;
 		Map<Integer, SecretKey[]> allOutputWireValues = null;
-		Map<Integer, Byte> allSignalBits = new HashMap<Integer, Byte>();
 		HashMap<Integer, Byte> translationTable = new HashMap<Integer, Byte>();
-		HashMap<Integer, Byte> inputSignalBits = new HashMap<Integer, Byte>();
 		Gate[] ungarbledGates = ungarbledCircuit.getGates();
 		byte[] globalKeyOffset = null;
 		
 		//If there are partial keys, check if they are the input keys or the output keys and set them.
 		if (!partialWireValues.isEmpty()){
+			allWireValues.putAll(partialWireValues);
+			
 			if (partialWireValues.containsKey(ungarbledCircuit.getOutputWireLabels()[0])){
 				allOutputWireValues = partialWireValues;
-				translationTable = signalBits;
+				
+				//Generate the translation table out of the given output keys.
+				for (int n : ungarbledCircuit.getOutputWireLabels()) {
+					//Signal bit is the last bit of k0.
+					byte[] k0 = allWireValues.get(n)[0].getEncoded();
+					translationTable.put(n, (byte) (k0[k0.length-1] & 1));	
+				}
+				
 				//Deduce the global key offset from allOutputWireValues.
 				globalKeyOffset = extractGlobalkey(allOutputWireValues, ungarbledCircuit.getOutputWireLabels()[0]);
 			} else{
 				allInputWireValues = partialWireValues;
-				inputSignalBits = signalBits;
 				try {
 					globalKeyOffset = extractGlobalkey(allInputWireValues, ungarbledCircuit.getInputWireLabels(1).get(0));
 				} catch (NoSuchPartyException e) {
 					//1 should be a valid party number
 				}
 			}
-			allWireValues.putAll(partialWireValues);
-			allSignalBits.putAll(signalBits);
 		} else {
 			/*
 			 * The globalKeyOffset is a randomly chosen bit sequence that is the same size as the key and will be used to create the 
@@ -158,10 +162,9 @@ class FreeXORRowReductionGarbledBooleanCircuitUtil extends FreeXORGarbledBoolean
 				for (int w : inputWireLabels) {
 					//Samples random key. The other key will be calculated via XOR with the globalKeyOffset.
 					SecretKey zeroValue = mes.generateKey();
-					sampleInputKeys(allInputWireValues, inputSignalBits, globalKeyOffset, w, zeroValue);
+					sampleInputKeys(allInputWireValues, globalKeyOffset, w, zeroValue);
 				}
 			}
-			allSignalBits.putAll(inputSignalBits);
 			allWireValues.putAll(allInputWireValues);
 		}
 		
@@ -170,20 +173,23 @@ class FreeXORRowReductionGarbledBooleanCircuitUtil extends FreeXORGarbledBoolean
 		translationTable = new HashMap<Integer, Byte>();
 		
 		//Create the keys of the non-input wires.
-		createNonInputWireValues(ungarbledGates, allWireValues, allSignalBits, globalKeyOffset);
+		createNonInputWireValues(ungarbledGates, allWireValues, globalKeyOffset);
 		
 		//Fill the the output wire values to be used in the following sub circuit
 		for (int n : ungarbledCircuit.getOutputWireLabels()) {
 			
 			//Add both values of output wire labels to the allOutputWireLabels Map that was passed as a parameter.
 			allOutputWireValues.put(n, allWireValues.get(n));
-			translationTable.put(n, allSignalBits.get(n));
+			
+			//Signal bit is the last bit of k0.
+			byte[] k0 = allWireValues.get(n)[0].getEncoded();
+			translationTable.put(n, (byte) (k0[k0.length-1] & 1));	
 		}
 		
 		
 		//now that we have all keys, we can create the garbled tables.
 		try {
-			createGarbledTables(gates, garbledTablesHolder, ungarbledGates, allWireValues, allSignalBits);
+			createGarbledTables(gates, garbledTablesHolder, ungarbledGates, allWireValues);
 		} catch (InvalidKeyException e) {
 			// Should not occur since the keys were generated through the encryption scheme that generates keys that match it.
 		} catch (IllegalBlockSizeException e) {
@@ -192,15 +198,14 @@ class FreeXORRowReductionGarbledBooleanCircuitUtil extends FreeXORGarbledBoolean
 			// Should not occur since the keys were generated through the encryption scheme that generates keys that match it.
 		} 
 		
-		return new CircuitCreationValues(allInputWireValues, inputSignalBits, allOutputWireValues, translationTable);	
+		return new CircuitCreationValues(allInputWireValues, allOutputWireValues, translationTable);	
 	}
 	
 	/**
 	 * Generates keys for standard gate in the row reduction technique.
 	 * @param zeroValueBytes this value is ignored since the row reduction technique calculates both values from the gate's input keys.
 	 */
-	protected void generateStandardValues(Gate ungarbledGate, Map<Integer, SecretKey[]> allWireValues,
-			Map<Integer, Byte> signalBits, byte[] globalKeyOffset, byte[] zeroValueBytes) {
+	protected void generateStandardValues(Gate ungarbledGate, Map<Integer, SecretKey[]> allWireValues, byte[] globalKeyOffset, byte[] zeroValueBytes) {
 		BitSet XORZeroTruthTable = new BitSet();
 		XORZeroTruthTable.set(1);
 		if(!ungarbledGate.getTruthTable().equals(XORZeroTruthTable)){
@@ -222,7 +227,11 @@ class FreeXORRowReductionGarbledBooleanCircuitUtil extends FreeXORGarbledBoolean
 				   	 * binary number 001 and use it to determine the value of the inputs in the third column.
 				   	 */
 			  		int input = (((rowOfTruthTable & j) == 0) ? 0 : 1);
-			  		byte signalBit = signalBits.get(labels[i]);
+			  		
+			  		//signal bit is the last bit of k0.
+			  		byte[] k0 = allWireValues.get(labels[i])[0].getEncoded();
+			  		byte signalBit =  (byte) (k0[k0.length-1] & 1);
+			  		
 			  		permutedPosition += (input ^ signalBit) * (Math.pow(2, reverseIndex));		
 			  	
 			  	}
@@ -255,20 +264,16 @@ class FreeXORRowReductionGarbledBooleanCircuitUtil extends FreeXORGarbledBoolean
 					
 					//Now we have both values, calculate the signal bit.
 					boolean output = ungarbledGate.getTruthTable().get(rowOfTruthTable);
-					byte signalBit = 0;
 					SecretKey zeroKey, oneKey;
 					if (output == false){
 						zeroKey = wireValue;
-						signalBit = (byte) (wireValue.getEncoded()[wireValue.getEncoded().length - 1] & 1);
 						oneKey = new SecretKeySpec(otherBytes, "");
 					} else {
 						oneKey = wireValue;
-						signalBit = (byte) (1 - (wireValue.getEncoded()[wireValue.getEncoded().length - 1] & 1));
 						zeroKey = new SecretKeySpec(otherBytes, "");
 					}
 					
-					//Put k0, k1 and signal bit in the map.
-					signalBits.put(ungarbledGate.getOutputWireLabels()[0], signalBit);
+					//Put k0, k1 in the map.
 					allWireValues.put(ungarbledGate.getOutputWireLabels()[0], new SecretKey[] {zeroKey, oneKey});
 						
 			  	}

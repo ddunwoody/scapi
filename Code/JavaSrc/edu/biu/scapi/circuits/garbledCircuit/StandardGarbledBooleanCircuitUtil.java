@@ -98,36 +98,37 @@ class StandardGarbledBooleanCircuitUtil implements CircuitTypeUtil{
   	public CircuitCreationValues generateWireKeysAndSetTables(BooleanCircuit ungarbledCircuit, GarbledTablesHolder garbledTablesHolder, 
 			GarbledGate[] gates) {
 		Map<Integer, SecretKey[]> emptyWireValues = new HashMap<Integer, SecretKey[]>();
-		HashMap<Integer, Byte> signalBits = new HashMap<Integer, Byte>();
 		
 		//Call the other generateWireKeysAndSetTables function, when the partialWireValues is empty (i.e no partial keys). 
-		return generateWireKeysAndSetTables(ungarbledCircuit, garbledTablesHolder, gates, emptyWireValues, signalBits);
+		return generateWireKeysAndSetTables(ungarbledCircuit, garbledTablesHolder, gates, emptyWireValues);
 	}
 	
 	@Override
 	public CircuitCreationValues generateWireKeysAndSetTables(BooleanCircuit ungarbledCircuit, GarbledTablesHolder garbledTablesHolder, 
-			GarbledGate[] gates, Map<Integer, SecretKey[]> partialWireValues, HashMap<Integer, Byte> signalBits) {
+			GarbledGate[] gates, Map<Integer, SecretKey[]> partialWireValues) {
 		
 		//Prepare the maps that will be used during keys generation.
 		Map<Integer, SecretKey[]> allWireValues = new HashMap<Integer, SecretKey[]>();
 		Map<Integer, SecretKey[]> allInputWireValues = null;
 		Map<Integer, SecretKey[]> allOutputWireValues = null;
-		Map<Integer, Byte> allSignalBits = new HashMap<Integer, Byte>();
 		HashMap<Integer, Byte> translationTable = new HashMap<Integer, Byte>();
-		HashMap<Integer, Byte> inputSignalBits = new HashMap<Integer, Byte>();
 		Gate[] ungarbledGates = ungarbledCircuit.getGates();
 		
 		//If there are partial keys, check if they are the input keys or the output keys and set them.
 		if (!partialWireValues.isEmpty()){
+			allWireValues.putAll(partialWireValues);
+			
 			if (partialWireValues.containsKey(ungarbledCircuit.getOutputWireLabels()[0])){
 				allOutputWireValues = partialWireValues;
-				translationTable = signalBits;
+				//Generate the translation table out of the given output keys.
+				for (int n : ungarbledCircuit.getOutputWireLabels()) {
+					//Signal bit is the last bit of k0.
+					byte[] k0 = allWireValues.get(n)[0].getEncoded();
+					translationTable.put(n, (byte) (k0[k0.length-1] & 1));	
+				}
 			} else{
 				allInputWireValues = partialWireValues;
-				inputSignalBits = signalBits;
 			}
-			allWireValues.putAll(partialWireValues);
-			allSignalBits.putAll(signalBits);
 		} 
 		
 		//In case the keys for the input wires have not been sampled yet, sample them.
@@ -141,27 +142,26 @@ class StandardGarbledBooleanCircuitUtil implements CircuitTypeUtil{
 					// should not occur since the number is a valid party number
 				}
 				for (int w : inputWireLabels) {
-					sampleStandardKeys(allInputWireValues, inputSignalBits, w);
+					sampleStandardKeys(allInputWireValues, w);
 				}
 			}
-			allSignalBits.putAll(inputSignalBits);
 			allWireValues.putAll(allInputWireValues);
 		}
 		
 		//for each gate fill the keys and signal bits for output wires if they are not filled yet.
 		for (int gate = 0; gate < ungarbledGates.length; gate++) {
-			generateOutputKeys(allOutputWireValues, ungarbledGates[gate], allWireValues, allSignalBits);
+			generateOutputKeys(allOutputWireValues, ungarbledGates[gate], allWireValues);
 		}
 		
 		//In case the keys for the output wires have not been sampled yet, fill them.
 		if (allOutputWireValues == null){
 			allOutputWireValues = new HashMap<Integer, SecretKey[]>();
-			fillOutputWiresValues(ungarbledCircuit.getOutputWireLabels(), allOutputWireValues, allWireValues, allSignalBits, translationTable);
+			fillOutputWiresValues(ungarbledCircuit.getOutputWireLabels(), allOutputWireValues, allWireValues, translationTable);
 		}
 		
 		//After we have all keys, create the garbledTables according to them.
 		try {
-			createGarbledTables(gates, garbledTablesHolder, ungarbledGates, allWireValues, allSignalBits);
+			createGarbledTables(gates, garbledTablesHolder, ungarbledGates, allWireValues);
 		} catch (InvalidKeyException e) {
 			//  Should not occur since the keys were generated through the encryption scheme that generates keys that match it.
 		} catch (IllegalBlockSizeException e) {
@@ -170,7 +170,7 @@ class StandardGarbledBooleanCircuitUtil implements CircuitTypeUtil{
 			// Should not occur since the keys were generated through the encryption scheme that generates keys that match it.
 		}
 		
-		return new CircuitCreationValues(allInputWireValues, inputSignalBits, allOutputWireValues, translationTable);
+		return new CircuitCreationValues(allInputWireValues, allOutputWireValues, translationTable);
 	}
 	
 	/**
@@ -178,15 +178,14 @@ class StandardGarbledBooleanCircuitUtil implements CircuitTypeUtil{
 	 * @param allOutputWireValues both keys of all output wires.
 	 * @param ungarbledGate the gate we should sample keys for its output wires.
 	 * @param allWireValues a map to fill with the wires' keys.
-	 * @param signalBits a map  to fill with the wires' signal bits.
 	 */
-	protected void generateOutputKeys(Map<Integer, SecretKey[]> allOutputWireValues, Gate ungarbledGate, Map<Integer, SecretKey[]> allWireValues, Map<Integer, Byte> signalBits) {
+	protected void generateOutputKeys(Map<Integer, SecretKey[]> allOutputWireValues, Gate ungarbledGate, Map<Integer, SecretKey[]> allWireValues) {
 		// In case there are no output keys filled yet, create all output keys.
 		if (allOutputWireValues == null){
 			int len = ungarbledGate.getOutputWireLabels().length;
 			for (int i = 0; i < len; i++) {
 				int wireLabel = ungarbledGate.getOutputWireLabels()[i];
-				sampleStandardKeys(allWireValues, signalBits, wireLabel);
+				sampleStandardKeys(allWireValues, wireLabel);
 			}
 		//In case there are output keys, sample only keys that missing.
 		} else{
@@ -194,7 +193,7 @@ class StandardGarbledBooleanCircuitUtil implements CircuitTypeUtil{
 			for (int i = 0; i < len; i++) {
 				int wireLabel = ungarbledGate.getOutputWireLabels()[i];
 				if (!allOutputWireValues.containsKey(wireLabel)){
-					sampleStandardKeys(allWireValues, signalBits, wireLabel);
+					sampleStandardKeys(allWireValues, wireLabel);
 				}
 			}
 		}
@@ -207,16 +206,15 @@ class StandardGarbledBooleanCircuitUtil implements CircuitTypeUtil{
 	 * @param garbledTablesHolder holds the garbled tables.
 	 * @param ungarbledGates the gates that need to be garbled.
 	 * @param allWireValues a map that contains both keys for each wire.
-	 * @param signalBits  a map that contains the signal bit for each wire.
 	 * @throws InvalidKeyException
 	 * @throws IllegalBlockSizeException
 	 * @throws PlaintextTooLongException
 	 */
-	private void createGarbledTables(GarbledGate[] gates, GarbledTablesHolder garbledTablesHolder, Gate[] ungarbledGates, Map<Integer, SecretKey[]> allWireValues, Map<Integer, Byte> signalBits) throws InvalidKeyException, IllegalBlockSizeException, PlaintextTooLongException {
+	private void createGarbledTables(GarbledGate[] gates, GarbledTablesHolder garbledTablesHolder, Gate[] ungarbledGates, Map<Integer, SecretKey[]> allWireValues) throws InvalidKeyException, IllegalBlockSizeException, PlaintextTooLongException {
 		int length = ungarbledGates.length;
 		//After we have all keys, create the garbledTables according to them.
 		for (int gate = 0; gate < length; gate++) {
-			((StandardGarbledGate) gates[gate]).createGarbledTable(ungarbledGates[gate], allWireValues, signalBits);
+			((StandardGarbledGate) gates[gate]).createGarbledTable(ungarbledGates[gate], allWireValues);
 		}
 	}
 
@@ -225,18 +223,19 @@ class StandardGarbledBooleanCircuitUtil implements CircuitTypeUtil{
 	 * @param outputWireLabels labels of output wires.
 	 * @param allOutputWireValues a map to fill with the output wires' keys.
 	 * @param allWireValues a map to take the output wires' keys from.
-	 * @param signalBits a map to take the output wires' signal bits from.
 	 * @param translationTable a map to fill with the output wires' signal bits.
 	 */
 	private void fillOutputWiresValues(int[] outputWireLabels, Map<Integer, SecretKey[]> allOutputWireValues, Map<Integer, SecretKey[]> allWireValues,
-			Map<Integer, Byte> signalBits, Map<Integer, Byte> translationTable) {
+			Map<Integer, Byte> translationTable) {
 		/*
 		 * Add the output wire labels' signal bits to the translation table. For a full understanding on why we chose to 
 		 * implement the translation table this way, see the documentation to the translationTable field of
 		 * GarbledBooleanCircuitImp.
 		 */
 		for (int n : outputWireLabels) {
-			translationTable.put(n, signalBits.get(n));
+			//Signal bit is the last bit of k0.
+			byte[] k0 = allWireValues.get(n)[0].getEncoded();
+			translationTable.put(n, (byte) (k0[k0.length-1] & 1));	
 			
 			//Add both values of output wire to the allOutputWireValues Map that was passed as a parameter.
 			allOutputWireValues.put(n, allWireValues.get(n));
@@ -246,53 +245,31 @@ class StandardGarbledBooleanCircuitUtil implements CircuitTypeUtil{
 	/**
 	 * Samples both keys of the given wire's label.
 	 * @param allWireValues a map that contains both keys for each wire.
-	 * @param signalBits a map that contains the signal bit for each wire.
 	 * @param wireLabel the label of the wire we want to sample keys for.
 	 */
-	private void sampleStandardKeys(Map<Integer, SecretKey[]> allWireValues, Map<Integer, Byte> signalBits, int wireLabel) {
+	private void sampleStandardKeys(Map<Integer, SecretKey[]> allWireValues, int wireLabel) {
 		
 		//Sample a 0-encoded value and a 1-encoded value for each GarbledWire.
 		SecretKey zeroValue = mes.generateKey();
 		SecretKey oneValue = mes.generateKey();
 		
-		//Sample a 0 or 1 as the signal bit for the current wire.
-		Byte signalBit = (byte) (random.nextBoolean()? 1 : 0); 
-			
-		adjustKeysToSignalBit(allWireValues, signalBits, wireLabel, zeroValue.getEncoded(), oneValue.getEncoded(), signalBit);
+		adjustKeysToSignalBit(allWireValues, wireLabel, zeroValue.getEncoded(), oneValue.getEncoded());
 		
 	}
-	
-	/**
-	 * Adjusts the given zeroValue and oneValue to the given signal bit. Then, saves them in the maps.
-	 * @param allWireValues a map that contains both keys for each wire.
-	 * @param signalBits a map that contains the signal bit for each wire.
-	 * @param wireLabel the label of the wire we want to sample keys for.
-	 * @param zeroValue value of the wire's zero key.
-	 * @param oneValue value of the wire's one key.
-	 * @param signalBit the wire's signal bit.
-	 */
-	private void adjustKeysToSignalBit(Map<Integer, SecretKey[]> allWireValues,	Map<Integer, Byte> signalBits, int wireLabel,
-			byte[] zeroValue, byte[] oneValue, Byte signalBit) {
-		
-		// Put the signal bit of the wire in the signal bit map.
-		signalBits.put(wireLabel, signalBit);
+
+	private void adjustKeysToSignalBit(Map<Integer, SecretKey[]> allWireValues,	int wireLabel, byte[] zeroBytes, byte[] oneBytes) {
 		
 		SecretKey zero = null, one = null;
-		if (signalBit == 0) {
-			// Set 0-value signal bit. This is the last bit of the wire's 0 value(key).
-			zeroValue[zeroValue.length - 1] &= 254;
-			zero = new SecretKeySpec(zeroValue, "");
+		if ((zeroBytes[zeroBytes.length - 1] & 1) == 0) {
 			// Set the 1-value signal bit. This is the last bit of the wire's 1 value(key).
-			oneValue[oneValue.length - 1] |= 1;
-			one = new SecretKeySpec(oneValue, "");
+			oneBytes[oneBytes.length - 1] |= 1;
 		} else{
-			// Set 0-value signal bit. This is the last bit of the wire's 0 value(key).
-			zeroValue[zeroValue.length - 1] |= 1;
-			zero = new SecretKeySpec(zeroValue, "");
 			// Set the 1-value signal bit. This is the last bit of the wire's 1 value(key).
-			oneValue[oneValue.length - 1] &= 254;
-			one = new SecretKeySpec(oneValue, "");
+			oneBytes[oneBytes.length - 1] &= 254;
 		}
+		zero = new SecretKeySpec(zeroBytes, "");
+		one = new SecretKeySpec(oneBytes, "");
+		
 		// Put the 0-value and the 1-value on the allWireValuesMap.
 		SecretKey[] keys = new SecretKey[] {zero, one};
 		allWireValues.put(wireLabel, keys);
@@ -303,11 +280,10 @@ class StandardGarbledBooleanCircuitUtil implements CircuitTypeUtil{
 			GarbledGate[] gates, PseudorandomGenerator prg, byte[] seed, CryptographicHash hash) throws InvalidKeyException {
 		
 		Map<Integer, SecretKey[]> allWireValues = new HashMap<Integer, SecretKey[]>();
-		Map<Integer, Byte> signalBits = new HashMap<Integer, Byte>();
 		Gate[] ungarbledGates = ungarbledCircuit.getGates();
 		
 		//Call the function that sample the keys.
-		CircuitCreationValues values = sampleSeedKeys(prg, seed, ungarbledCircuit, allWireValues, signalBits);
+		CircuitCreationValues values = sampleSeedKeys(prg, seed, ungarbledCircuit, allWireValues);
 				
 		//Now that all wires have garbled values, we create the garbled tables.
 		byte[][] garbledTables = garbledTablesHolder.getGarbledTables();
@@ -316,7 +292,7 @@ class StandardGarbledBooleanCircuitUtil implements CircuitTypeUtil{
 		try {
 			//Create each gate, and update the hash array with the created garbled table.
 			for (int gate = 0; gate < gates.length; gate++) {
-				((StandardGarbledGate) gates[gate]).createGarbledTable(ungarbledGates[gate],	allWireValues, signalBits);
+				((StandardGarbledGate) gates[gate]).createGarbledTable(ungarbledGates[gate], allWireValues);
 				hash.update(garbledTables[gate], 0, garbledTables[gate].length);
 			}
 			hashedCircuit = new byte[hash.getHashedMsgSize()];
@@ -329,8 +305,7 @@ class StandardGarbledBooleanCircuitUtil implements CircuitTypeUtil{
 			// Should not occur since the block size is valid.
 		} 
 				
-		return new CircuitSeedCreationValues(values.getAllInputWireValues(), values.getInputSignalBits(), values.getAllOutputWireValues(), 
-				values.getTranslationTable(), hashedCircuit);
+		return new CircuitSeedCreationValues(values.getAllInputWireValues(), values.getAllOutputWireValues(), values.getTranslationTable(), hashedCircuit);
 	}
 	
 	/**
@@ -339,16 +314,14 @@ class StandardGarbledBooleanCircuitUtil implements CircuitTypeUtil{
 	 * @param seed used to initialize the prg
 	 * @param ungarbledCircuit the circuit that this garbled circuit should be the garbled of.
 	 * @param allWireValues a map that contains both keys for each wire.
-	 * @param signalBits a map that contains the signal bit for each wire.
 	 * @return the values sampled by the function
 	 * @throws InvalidKeyException
 	 */
 	private CircuitCreationValues sampleSeedKeys(PseudorandomGenerator prg, byte[] seed, BooleanCircuit ungarbledCircuit, 
-			Map<Integer, SecretKey[]> allWireValues, Map<Integer, Byte> signalBits) throws InvalidKeyException{
+			Map<Integer, SecretKey[]> allWireValues) throws InvalidKeyException{
 		Map<Integer, SecretKey[]> allInputWireValues = new HashMap<Integer, SecretKey[]>();
 		Map<Integer, SecretKey[]> allOutputWireValues = new HashMap<Integer, SecretKey[]>();
 		HashMap<Integer, Byte> translationTable = new HashMap<Integer, Byte>();
-		HashMap<Integer, Byte> inputSignalBits = new HashMap<Integer, Byte>();
 		
 		//Sets the given seed as the prg key.
 		prg.setKey(new SecretKeySpec(seed, ""));
@@ -362,53 +335,49 @@ class StandardGarbledBooleanCircuitUtil implements CircuitTypeUtil{
 				// should not occur since the number is a valid party number
 			}
 			for (int w : inputWireLabels) {
-				sampleKeysFromSeed(allInputWireValues, inputSignalBits, w, prg);
+				sampleKeysFromSeed(allInputWireValues, w, prg);
 			}
 		}
 		
 		//Set the keys of the input wires. 
 		allWireValues.putAll(allInputWireValues);
-		signalBits.putAll(inputSignalBits);
 		
 		Gate[] ungarbledGates = ungarbledCircuit.getGates();
 		
 		//for each gate fill the keys and signal bits for output wires.
 		for (int gate = 0; gate < ungarbledGates.length; gate++) {
-			generateOutputKeysFromSeed(prg, allWireValues, signalBits, ungarbledGates[gate]);
+			generateOutputKeysFromSeed(prg, allWireValues, ungarbledGates[gate]);
 		}
 		
-		fillOutputWiresValues(ungarbledCircuit.getOutputWireLabels(), allOutputWireValues, allWireValues, signalBits, translationTable);
+		fillOutputWiresValues(ungarbledCircuit.getOutputWireLabels(), allOutputWireValues, allWireValues, translationTable);
 		
-		return new CircuitCreationValues(allInputWireValues, inputSignalBits, allOutputWireValues, translationTable);
+		return new CircuitCreationValues(allInputWireValues, allOutputWireValues, translationTable);
 	}
 
 	/**
 	 * Samples the output keys by the prg and seed.
 	 * @param prg 
 	 * @param allWireValues a map that contains both keys for each wire.
-	 * @param signalBits a map that contains the signal bit for each wire.
 	 * @param ungarbledGate the gate we want to sample keys for its output wires.
 	 */
-	protected void generateOutputKeysFromSeed(PseudorandomGenerator prg,Map<Integer, SecretKey[]> allWireValues,Map<Integer, Byte> signalBits, Gate ungarbledGate) {
+	protected void generateOutputKeysFromSeed(PseudorandomGenerator prg,Map<Integer, SecretKey[]> allWireValues, Gate ungarbledGate) {
 		//Get the labels of the output wires.
 		int[] labels = ungarbledGate.getOutputWireLabels();
 		int len = labels.length;
 		//Sample keys for each label.
 		for (int i = 0; i < len; i++) {
 			int wireLabel = labels[i];
-			sampleKeysFromSeed(allWireValues, signalBits, wireLabel, prg);
+			sampleKeysFromSeed(allWireValues, wireLabel, prg);
 		}
 	}
 	
 	/**
 	 * Samples both keys of the given wire's label using the Prg.
 	 * @param allWireValues a map that contains both keys for each wire.
-	 * @param signalBits a map that contains the signal bit for each wire.
 	 * @param wireLabel the label of the wire we need to sample keys for.
 	 * @param prg 
 	 */
-	private void sampleKeysFromSeed(Map<Integer, SecretKey[]> allWireValues, Map<Integer, Byte> signalBits, int wireLabel,
-			PseudorandomGenerator prg) {
+	private void sampleKeysFromSeed(Map<Integer, SecretKey[]> allWireValues, int wireLabel,	PseudorandomGenerator prg) {
 		
 		//Assign a 0-encoded value and a 1-encoded value for each GarbledWire.
 		int keySize = mes.getCipherSize();
@@ -417,12 +386,7 @@ class StandardGarbledBooleanCircuitUtil implements CircuitTypeUtil{
 		prg.getPRGBytes(zeroKeyBytes, 0, keySize);
 		prg.getPRGBytes(oneKeyBytes, 0, keySize);
 		
-		// Assigns a 0 or 1 as the signal bit for the current wire.
-		byte[] signalByte = new byte[1];
-		prg.getPRGBytes(signalByte, 0, 1);
-		byte signalBit = (byte) (signalByte[0] & 0x01);
-		
-		adjustKeysToSignalBit(allWireValues, signalBits, wireLabel, zeroKeyBytes, oneKeyBytes, signalBit);
+		adjustKeysToSignalBit(allWireValues, wireLabel, zeroKeyBytes, oneKeyBytes);
 		
 	}
 
@@ -430,13 +394,12 @@ class StandardGarbledBooleanCircuitUtil implements CircuitTypeUtil{
 	public byte[] getHashedTables(BooleanCircuit ungarbledCircuit, PseudorandomGenerator prg, byte[] seed, CryptographicHash hash) throws InvalidKeyException {
 		
 		Map<Integer, SecretKey[]> allWireValues = new HashMap<Integer, SecretKey[]>();
-		Map<Integer, Byte> signalBits = new HashMap<Integer, Byte>();
 		
 		//Calculate the garbled tables according to the given seed, then compute the hash function on the calculated tables.
-		sampleSeedKeys(prg, seed, ungarbledCircuit, allWireValues, signalBits);
+		sampleSeedKeys(prg, seed, ungarbledCircuit, allWireValues);
 		
 		try {
-			return computeHashOnTables(hash, allWireValues, signalBits, ungarbledCircuit.getGates());
+			return computeHashOnTables(hash, allWireValues, ungarbledCircuit.getGates());
 		} catch (IllegalBlockSizeException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -452,14 +415,13 @@ class StandardGarbledBooleanCircuitUtil implements CircuitTypeUtil{
 	 * Computes the hash function on the circuit's garbled tables.
 	 * @param hash CryptographicHash function to use
 	 *  @param allWireValues a map that contains both keys for each wire.
-	 * @param signalBits a map that contains the signal bit for each wire.
 	 * @param ungarbledGates the gates of the ungarbled circuit
 	 * @return the result of the hash function on the garbled tables.
 	 * @throws InvalidKeyException
 	 * @throws IllegalBlockSizeException
 	 * @throws PlaintextTooLongException
 	 */
-	private byte[] computeHashOnTables(CryptographicHash hash,Map<Integer, SecretKey[]> allWireValues, Map<Integer, Byte> signalBits, Gate[] ungarbledGates)
+	private byte[] computeHashOnTables(CryptographicHash hash,Map<Integer, SecretKey[]> allWireValues, Gate[] ungarbledGates)
 			throws InvalidKeyException, IllegalBlockSizeException, PlaintextTooLongException {
 		GarbledGate gate;
 		int size =  ungarbledGates.length;
@@ -471,7 +433,7 @@ class StandardGarbledBooleanCircuitUtil implements CircuitTypeUtil{
 		//After updating the hash, drop the garbled table. This way, no memory is saved.
 		for (int i = 0; i < size; i++) {
 			gate = createGate(ungarbledGates[i], temp);
-			((StandardGarbledGate) gate).createGarbledTable(ungarbledGates[i], allWireValues, signalBits);
+			((StandardGarbledGate) gate).createGarbledTable(ungarbledGates[i], allWireValues);
 			hash.update(garbledTablesTemp[i], 0, garbledTablesTemp[i].length);
 			garbledTablesTemp[i] = null;
 		}

@@ -47,14 +47,13 @@ public class CircuitSeedCreationValues extends CircuitCreationValues{
 	/**
 	 * Sets the given arguments.
 	 * @param allInputWireValues both keys for all input wires.
-	 * @param inputSignaBits signal bits of all input wires.
 	 * @param allOutputWireValues both keys for all output wires.
 	 * @param translationTable signal bits of all output wires.
 	 * @param hashedTables the result of the hash function of the garbled tables.
 	 */
-	public CircuitSeedCreationValues(Map<Integer, SecretKey[]> allInputWireValues, HashMap<Integer, Byte> inputSignaBits,
-			Map<Integer, SecretKey[]> allOutputWireValues, HashMap<Integer, Byte> translationTable, byte[] hashedTables){
-		super(allInputWireValues, inputSignaBits, allOutputWireValues, translationTable);
+	public CircuitSeedCreationValues(Map<Integer, SecretKey[]> allInputWireValues, Map<Integer, SecretKey[]> allOutputWireValues, 
+			HashMap<Integer, Byte> translationTable, byte[] hashedTables){
+		super(allInputWireValues, allOutputWireValues, translationTable);
 		this.hashedTables = hashedTables;
 	}
 	
