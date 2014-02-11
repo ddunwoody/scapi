@@ -160,9 +160,6 @@ class StandardRowReductionGarbledBooleanCircuitUtil extends StandardGarbledBoole
 			   	 */
 		  		int input = (((rowOfTruthTable & j) == 0) ? 0 : 1);
 		  		
-		  		if (allWireValues.get(labels[i]) == null){
-		  			System.out.println("missing keys for " +labels[i]);
-		  		}
 		  		//signal bit is the last bit of k0.
 		  		byte[] k0 = allWireValues.get(labels[i])[0].getEncoded();
 		  		byte signalBit =  (byte) (k0[k0.length-1] & 1);

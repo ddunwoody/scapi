@@ -446,9 +446,7 @@ class FreeXORGarbledBooleanCircuitUtil implements CircuitTypeUtil {
 		// Get the bytes of first input
 		byte[] zeroValueBytes = allWireValues.get(ungarbledGate.getInputWireLabels()[0])[0].getEncoded();
 		for (int i = 1; i < ungarbledGate.getInputWireLabels().length; i++) {
-			if ( allWireValues.get(ungarbledGate.getInputWireLabels()[i])== null){
-				System.out.println("null at "+ungarbledGate.getGateNumber());
-			}
+			
 			byte[] nextInput = allWireValues.get(ungarbledGate.getInputWireLabels()[i])[0].getEncoded();
 			for (int currentByte = 0; currentByte < zeroValueBytes.length; currentByte++) {
 				zeroValueBytes[currentByte] ^= nextInput[currentByte];
