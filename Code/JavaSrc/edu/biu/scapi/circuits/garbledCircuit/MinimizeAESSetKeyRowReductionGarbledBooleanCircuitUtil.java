@@ -25,16 +25,12 @@
 package edu.biu.scapi.circuits.garbledCircuit;
 
 import java.security.SecureRandom;
-import java.util.BitSet;
 
 import edu.biu.scapi.circuits.circuit.BooleanCircuit;
 import edu.biu.scapi.circuits.circuit.Gate;
 import edu.biu.scapi.circuits.encryption.AES128MultiKeyEncryption;
-import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
-import edu.biu.scapi.primitives.kdf.bc.BcKdfISO18033;
 import edu.biu.scapi.primitives.prf.AES;
-import edu.biu.scapi.primitives.prf.cryptopp.CryptoPpAES;
 
 /**
  * The {MinimizeAESSetKeyRowReductionGarbledBooleanCircuit} class is a utility class that computes the functionalities regarding Garbled Boolean Circuit 
@@ -56,14 +52,7 @@ public class MinimizeAESSetKeyRowReductionGarbledBooleanCircuitUtil extends Stan
 	 * In this case, the circuit representation should be a little different. 
 	 * See {@link BooleanCircuit#BooleanCircuit(File f)} for more information.
 	 */
-	MinimizeAESSetKeyRowReductionGarbledBooleanCircuitUtil(AES aes, KeyDerivationFunction kdf, SecureRandom random, boolean isRowReductionWithFixedOutputKeys) {
-		doConstruct(aes, kdf, random, isRowReductionWithFixedOutputKeys);
-	}
-
-	/**
-	 * Sets the parameters.
-	 */
-	private void doConstruct(AES aes, KeyDerivationFunction kdf, SecureRandom random, boolean isRowReductionWithFixedOutputKeys) {
+	MinimizeAESSetKeyRowReductionGarbledBooleanCircuitUtil(AES aes, KeyDerivationFunction kdf, SecureRandom random, boolean isRowReductionWithFixedOutputKeys, int[] outputWiresLabels) {
 		this.aes = aes;
 		this.random = random;
 		this.kdf = kdf;
@@ -72,19 +61,9 @@ public class MinimizeAESSetKeyRowReductionGarbledBooleanCircuitUtil extends Stan
 	    // also minimize setKey operations and use aes directly.
 	    mes = new AES128MultiKeyEncryption(aes);
 	    this.isRowReductionWithFixedOutputKeys = isRowReductionWithFixedOutputKeys;
+	    this.outputWiresLabels = outputWiresLabels;
 	}
 	
-	/**
-	 * Default constructor. Uses CryptoPpAES, BcKdfISO18033 with SHA-1 and secureRandom objects.
-	 * 
-	 */
-	MinimizeAESSetKeyRowReductionGarbledBooleanCircuitUtil() {
-		try {
-			doConstruct(new CryptoPpAES(), new BcKdfISO18033("SHA-1"), new SecureRandom(), false);
-		} catch (FactoriesException e) {
-			// Should not occur since SHA-1 is a valid digest name.
-		}
-	}
 	
 	/**
 	 * Creates a MinimizeAESSetKeyRowReductionGate.
@@ -93,9 +72,8 @@ public class MinimizeAESSetKeyRowReductionGarbledBooleanCircuitUtil extends Stan
 	 * @return the created gate.
 	 */
 	protected GarbledGate createGate(Gate ungarbledGate, GarbledTablesHolder garbledTablesHolder) {
-		BitSet XORZeroTruthTable = new BitSet();
-		XORZeroTruthTable.set(1);
-		if(ungarbledGate.getTruthTable().equals(XORZeroTruthTable)){
+		if(isRowReductionWithFixedOutputKeys && checkOutputGate(ungarbledGate)){
+			System.out.println("special last gate");
 			return new MinimizeAESSetKeyGarbledGate(ungarbledGate, mes, aes, garbledTablesHolder);
 		} else{
 			return new MinimizeAESSetKeyRowReductionGate(ungarbledGate, mes, aes, kdf, garbledTablesHolder);

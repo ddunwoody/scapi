@@ -27,7 +27,6 @@ package edu.biu.scapi.circuits.garbledCircuit;
 import java.nio.ByteBuffer;
 import java.security.InvalidKeyException;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,6 +52,7 @@ class FreeXORRowReductionGarbledBooleanCircuitUtil extends FreeXORGarbledBoolean
 
 	private KeyDerivationFunction kdf;
 	private boolean isRowReductionWithFixedOutputKeys;
+	private int[] outputWiresLabels;
 	
 	/**
 	 * Sets the given MultiKeyEncryptionScheme and kdf.
@@ -62,30 +62,32 @@ class FreeXORRowReductionGarbledBooleanCircuitUtil extends FreeXORGarbledBoolean
 	 * In this case, the circuit representation should be a little different. 
 	 * See {@link BooleanCircuit#BooleanCircuit(File f)} for more information.
 	 */
-	FreeXORRowReductionGarbledBooleanCircuitUtil(MultiKeyEncryptionScheme mes, KeyDerivationFunction kdf, boolean isRowReductionWithFixedOutputKeys) {
+	FreeXORRowReductionGarbledBooleanCircuitUtil(MultiKeyEncryptionScheme mes, KeyDerivationFunction kdf, boolean isRowReductionWithFixedOutputKeys, int[] outputWiresLabels) {
 		super(mes);
 		this.kdf = kdf;
 		this.isRowReductionWithFixedOutputKeys = isRowReductionWithFixedOutputKeys;
-	}
-	
-	/**
-	 * Default constructor.
-	 */
-	FreeXORRowReductionGarbledBooleanCircuitUtil(){
-		super();
+		this.outputWiresLabels = outputWiresLabels;
 	}
 	
 	@Override
 	protected GarbledGate createStandardGate(Gate ungarbledGate, GarbledTablesHolder garbledTablesHolder) {
-		BitSet XORZeroTruthTable = new BitSet();
-		XORZeroTruthTable.set(1);
-		//In case the truth table is 01 this is the last gate that was added in order to allow sampling keys out of given output keys.
-		//The last gate should not use the row reduction technique.
-		if(ungarbledGate.getTruthTable().equals(XORZeroTruthTable)){
+		
+		//The last gate that was added in order to allow sampling keys out of given output keys should not use the row reduction technique.
+		if(isRowReductionWithFixedOutputKeys && checkOutputGate(ungarbledGate)){
+			System.out.println("special last gate");
 			return new StandardGarbledGate(ungarbledGate, mes, garbledTablesHolder);
 		} else{
 			return new StandardRowReductionGarbledGate(ungarbledGate, mes, kdf, garbledTablesHolder);
 		}
+	}
+	
+	private boolean checkOutputGate(Gate ungarbledGate) {
+		for (int i=0; i<outputWiresLabels.length; i++){
+			if (ungarbledGate.getOutputWireLabels()[0] == outputWiresLabels[i]){
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	/**
@@ -96,8 +98,14 @@ class FreeXORRowReductionGarbledBooleanCircuitUtil extends FreeXORGarbledBoolean
 	@Override
 	public CircuitCreationValues generateWireKeysAndSetTables(BooleanCircuit ungarbledCircuit, GarbledTablesHolder garbledTablesHolder, 
 			GarbledGate[] gates, Map<Integer, SecretKey[]> partialWireValues) {
-		if (partialWireValues.containsKey(ungarbledCircuit.getOutputWireLabels()[0]) && !isRowReductionWithFixedOutputKeys){
-			throw new IllegalArgumentException("Cannot accept output wires' keys when Row Reduction with fixed keys is not declared");
+		if (partialWireValues.containsKey(ungarbledCircuit.getOutputWireLabels()[0])){
+			if (!isRowReductionWithFixedOutputKeys){
+				throw new IllegalArgumentException("Cannot accept output wires' keys when Row Reduction with fixed keys is not declared");
+			}
+		} else{
+			if (isRowReductionWithFixedOutputKeys){
+				throw new IllegalArgumentException("Expected output wires' keys when Row Reduction with fixed keys is declared");
+			}
 		}
 		//Prepare the maps that will be used during keys generation.
 		Map<Integer, SecretKey[]> allWireValues = new HashMap<Integer, SecretKey[]>();
@@ -206,9 +214,8 @@ class FreeXORRowReductionGarbledBooleanCircuitUtil extends FreeXORGarbledBoolean
 	 * @param zeroValueBytes this value is ignored since the row reduction technique calculates both values from the gate's input keys.
 	 */
 	protected void generateStandardValues(Gate ungarbledGate, Map<Integer, SecretKey[]> allWireValues, byte[] globalKeyOffset, byte[] zeroValueBytes) {
-		BitSet XORZeroTruthTable = new BitSet();
-		XORZeroTruthTable.set(1);
-		if(!ungarbledGate.getTruthTable().equals(XORZeroTruthTable)){
+		//The last gate that was added in order to allow sampling keys out of given output keys should not use the row reduction technique.
+		if(!isRowReductionWithFixedOutputKeys || !checkOutputGate(ungarbledGate)){
 			int[] labels = ungarbledGate.getInputWireLabels();
 			int numberOfInputs = labels.length;
 			//number of rows is 2^numberOfInputs - 1. The last row will be calculated by the row reduction technique.
@@ -278,6 +285,8 @@ class FreeXORRowReductionGarbledBooleanCircuitUtil extends FreeXORGarbledBoolean
 						
 			  	}
 			}
+		} else{
+			super.generateStandardValues(ungarbledGate, allWireValues, globalKeyOffset, zeroValueBytes);
 		}
 	}
 	
