@@ -91,7 +91,7 @@ public class StandardCircuitInput implements CircuitInput{
 		if (kdf == null){ //There is no kdf, return the regular Standard circuit utility.
 			return new StandardGarbledBooleanCircuitUtil(mes, random);
 		} else { //There is a kdf, return the Row Reduction Standard circuit utility.
-			return new StandardRowReductionGarbledBooleanCircuitUtil(mes, kdf, random, isRowReductionWithFixedOutputKeys);
+			return new StandardRowReductionGarbledBooleanCircuitUtil(mes, kdf, random, isRowReductionWithFixedOutputKeys, ungarbledCircuit.getOutputWireLabels());
 		}
 	}
 	
@@ -99,6 +99,9 @@ public class StandardCircuitInput implements CircuitInput{
 		return isRowReductionWithFixedOutputKeys;
 	}
 
+	public KeyDerivationFunction getKDF(){
+		return kdf;
+	}
 	
 	
 

@@ -87,12 +87,16 @@ public class FreeXORCircuitInput implements CircuitInput{
 		if (kdf == null){ //There is no kdf, return the regular Free XOR utility.
 			return new FreeXORGarbledBooleanCircuitUtil(mes);
 		} else { //There is a kdf, return the Row Reduction Free XOR utility.
-			return new FreeXORRowReductionGarbledBooleanCircuitUtil(mes, kdf, isRowReductionWithFixedOutputKeys);
+			return new FreeXORRowReductionGarbledBooleanCircuitUtil(mes, kdf, isRowReductionWithFixedOutputKeys, ungarbledCircuit.getOutputWireLabels());
 		}
 	}
 	
 	public boolean isRowReductionWithFixedOutputKeys(){
 		return isRowReductionWithFixedOutputKeys;
+	}
+	
+	public KeyDerivationFunction getKDF(){
+		return kdf;
 	}
 
 }

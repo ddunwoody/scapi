@@ -92,13 +92,17 @@ public class MinimizeAESSetKeyCircuitInput implements CircuitInput{
 		if (kdf == null){ //There is no kdf, return the regular MinimizeAESSetKey utility.
 			return new MinimizeAESSetKeyGarbledBooleanCircuitUtil(aes, random);
 		} else{ //There is a kdf, return the Row Reduction MinimizeAESSetKey utility.
-			return new MinimizeAESSetKeyRowReductionGarbledBooleanCircuitUtil(aes, kdf, random, true);
+			return new MinimizeAESSetKeyRowReductionGarbledBooleanCircuitUtil(aes, kdf, random, isRowReductionWithFixedOutputKeys, ungarbledCircuit.getOutputWireLabels());
 		}
 		
 	}
 	
 	public boolean isRowReductionWithFixedOutputKeys(){
 		return isRowReductionWithFixedOutputKeys;
+	}
+	
+	public KeyDerivationFunction getKDF(){
+		return kdf;
 	}
 		
 }
