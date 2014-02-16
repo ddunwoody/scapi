@@ -10,10 +10,10 @@ extern "C" {
 /*
  * Class:     edu_biu_scapi_interactiveMidProtocols_ot_otBatch_otExtension_OTSemiHonestExtensionReceiver
  * Method:    initOtReceiver
- * Signature: (Ljava/lang/String;II)J
+ * Signature: (Ljava/lang/String;III)J
  */
 JNIEXPORT jlong JNICALL Java_edu_biu_scapi_interactiveMidProtocols_ot_otBatch_otExtension_OTSemiHonestExtensionReceiver_initOtReceiver
-  (JNIEnv *, jobject, jstring, jint, jint);
+  (JNIEnv *, jobject, jstring, jint, jint, jint);
 
 /*
  * Class:     edu_biu_scapi_interactiveMidProtocols_ot_otBatch_otExtension_OTSemiHonestExtensionReceiver

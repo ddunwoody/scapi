@@ -8,7 +8,7 @@
 
 //#define OTTiming
 
-BOOL Init()
+BOOL Init(int numOfThreads)
 {
 	// Random numbers
 	SHA_CTX sha;
@@ -20,7 +20,7 @@ BOOL Init()
 	m_nCounter = 0;
 
 	//Number of threads that will be used in OT extension
-	m_nNumOTThreads = 1;
+	m_nNumOTThreads = numOfThreads;
 
 	m_vSockets.resize(m_nNumOTThreads);
 
@@ -145,7 +145,7 @@ listen_failure:
 
 
 
-OTExtensionSender* InitOTSender(const char* address, int port)
+OTExtensionSender* InitOTSender(const char* address, int port, int numOfThreads)
 {
 	int nSndVals = 2;
 #ifdef OTTiming
@@ -156,7 +156,7 @@ OTExtensionSender* InitOTSender(const char* address, int port)
 	vKeySeeds = (BYTE*) malloc(AES_KEY_BYTES*NUM_EXECS_NAOR_PINKAS);
 	
 	//Initialize values
-	Init();
+	Init(numOfThreads);
 	
 	//Server listen
 	Listen();
@@ -175,7 +175,7 @@ OTExtensionSender* InitOTSender(const char* address, int port)
 	return new OTExtensionSender (nSndVals, m_vSockets.data(), U, vKeySeeds);
 }
 
-OTExtensionReceiver* InitOTReceiver(const char* address, int port)
+OTExtensionReceiver* InitOTReceiver(const char* address, int port, int numOfThreads)
 {
 	int nSndVals = 2;
 	timeval np_begin, np_end;
@@ -184,7 +184,7 @@ OTExtensionReceiver* InitOTReceiver(const char* address, int port)
 	//vKeySeedMtx = (AES_KEY*) malloc(sizeof(AES_KEY)*NUM_EXECS_NAOR_PINKAS * nSndVals);
 	vKeySeedMtx = (BYTE*) malloc(AES_KEY_BYTES*NUM_EXECS_NAOR_PINKAS * nSndVals);
 	//Initialize values
-	Init();
+	Init(numOfThreads);
 	
 	//Client connect
 	Connect();
@@ -306,7 +306,7 @@ BOOL ObliviouslyReceive(OTExtensionReceiver* receiver, CBitVector& choices, CBit
  * returns : A pointer to the receiver object that was created and later be used to run the protcol
  */
 JNIEXPORT jlong JNICALL Java_edu_biu_scapi_interactiveMidProtocols_ot_otBatch_otExtension_OTSemiHonestExtensionReceiver_initOtReceiver
-  (JNIEnv *env, jobject, jstring ipAddress, jint port, jint koblitzOrZpSize){
+  (JNIEnv *env, jobject, jstring ipAddress, jint port, jint koblitzOrZpSize, jint numOfthreads){
 
 
 	  //use ECC koblitz
@@ -325,7 +325,7 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_interactiveMidProtocols_ot_otBatch_ot
 	}
 	  //get the string from java
 	const char* adrr = env->GetStringUTFChars( ipAddress, NULL );
-	return (jlong) InitOTReceiver(adrr, port);
+	return (jlong) InitOTReceiver(adrr, port, numOfthreads);
 
 }
 
@@ -345,15 +345,12 @@ JNIEXPORT void JNICALL Java_edu_biu_scapi_interactiveMidProtocols_ot_otBatch_otE
 	//get the string from java
 	const char* str = env->GetStringUTFChars( version, NULL );
 
-	cout<<"my version is" <<  str;
-
 	//supports all of the SHA hashes. Get the name of the required hash and instanciate that hash.
 	if(strcmp (str,"general") == 0)
 		ver = G_OT;
 	if(strcmp (str,"correlated") == 0){
 		ver = C_OT;
 		m_fMaskFct = new XORMasking(bitLength);
-		cout<<"my version is C_OT";
 	}
 	if(strcmp (str,"random") == 0)
 		ver = R_OT;
@@ -395,7 +392,9 @@ JNIEXPORT void JNICALL Java_edu_biu_scapi_interactiveMidProtocols_ot_otBatch_otE
 	choices.delCBitVector();
 	response.delCBitVector();
 
-	//delete m_fMaskFct;
+	if(ver == C_OT){
+		delete m_fMaskFct;
+	}
 }
 
 
@@ -407,7 +406,7 @@ JNIEXPORT void JNICALL Java_edu_biu_scapi_interactiveMidProtocols_ot_otBatch_otE
  * returns : A pointer to the receiver object that was created and later be used to run the protcol
  */
 JNIEXPORT jlong JNICALL Java_edu_biu_scapi_interactiveMidProtocols_ot_otBatch_otExtension_OTSemiHonestExtensionSender_initOtSender
-  (JNIEnv *env, jobject,jstring ipAddress, jint port, jint koblitzOrZpSize){
+  (JNIEnv *env, jobject,jstring ipAddress, jint port, jint koblitzOrZpSize, jint numOfThreads){
 
 	  //use ECC koblitz
 	if(koblitzOrZpSize==163 || koblitzOrZpSize==233 || koblitzOrZpSize==283){
@@ -425,7 +424,7 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_interactiveMidProtocols_ot_otBatch_ot
 	}
 	  //get the string from java
 	const char* adrr = env->GetStringUTFChars( ipAddress, NULL );
-	return (jlong) InitOTSender(adrr, port);
+	return (jlong) InitOTSender(adrr, port, numOfThreads);
 
 }
 
@@ -503,7 +502,6 @@ JNIEXPORT void JNICALL Java_edu_biu_scapi_interactiveMidProtocols_ot_otBatch_otE
 		//creates delta as an array with "numOTs" entries of "bitlength" bit-values and fills delta with random values
 		//delta.Create(numOfOts, bitLength, m_aSeed, m_nCounter);
 		
-		cout << "I was here... ";
 	}
 
 	//else if(ver==R_OT){} no need to set any values. There is no input for x0 and x1 and no input for delta
@@ -513,8 +511,6 @@ JNIEXPORT void JNICALL Java_edu_biu_scapi_interactiveMidProtocols_ot_otBatch_otE
 	ObliviouslySend((OTExtensionSender*) sender, X1, X2, numOfOts, bitLength, ver, delta);
 
 	if(ver != G_OT){//we need to copy x0 and x1 
-
-		cout << "I was here... not G_OT";
 
 		//get the values from the ot and copy them to x1Arr, x2Arr wich later on will be copied to the java values x1 and x2
 		for(int i = 0; i < numOfOts*bitLength/8; i++)
@@ -527,6 +523,8 @@ JNIEXPORT void JNICALL Java_edu_biu_scapi_interactiveMidProtocols_ot_otBatch_otE
 
 		if(ver==C_OT){
 			env->ReleaseByteArrayElements(deltaFromJava,deltaArr,0);
+
+			delete m_fMaskFct;
 		}
 	}
 
@@ -537,5 +535,7 @@ JNIEXPORT void JNICALL Java_edu_biu_scapi_interactiveMidProtocols_ot_otBatch_otE
 	X1.delCBitVector();
 	X2.delCBitVector();
 	delta.delCBitVector();
+
+
 
 }
