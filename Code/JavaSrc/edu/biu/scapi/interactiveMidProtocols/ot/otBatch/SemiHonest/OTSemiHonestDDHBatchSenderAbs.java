@@ -146,7 +146,7 @@ abstract class OTSemiHonestDDHBatchSenderAbs implements OTBatchSender{
 	 *		•	vi1 = xi1 * ki1<p>
 	 *	For every i=1,...,m, SEND (u,vi0,vi1) to R<p>
 	 *	OUTPUT nothing"<p>
-	 * @return 
+	 * @return null, this protocol has no output.
 	 */
 	public OTBatchSOutput transfer(Channel channel, OTBatchSInput input) throws ClassNotFoundException, IOException {
 		//WAIT for message (hi0,hi1) from R
