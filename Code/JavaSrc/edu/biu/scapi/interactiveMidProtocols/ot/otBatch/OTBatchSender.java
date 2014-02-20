@@ -47,7 +47,8 @@ public interface OTBatchSender {
 	 * This way the parallel executions of the function will not block each other.<p>
 	 * @param channel each call should get a different one.
 	 * @param input The parameters given in the input must match the DlogGroup member of this class, which given in the constructor.
-	 * @throws IOException if failed to send the message.
+	 * @return OTBatchSOutput there are protocols that have an output. Protocols that have no output will return null.
+	 * @throws InvalidDlogGroupException if the given dlog group is not valid.
 	 * @throws CheatAttemptException if there was a cheat attempt during the execution of the protocol.
 	 * @throws IOException if there was a problem during a communication phase.
 	 * @throws ClassNotFoundException if there was a problem during serialization mechanism.

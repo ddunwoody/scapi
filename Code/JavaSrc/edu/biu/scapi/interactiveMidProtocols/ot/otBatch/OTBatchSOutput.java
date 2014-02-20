@@ -25,9 +25,9 @@
 package edu.biu.scapi.interactiveMidProtocols.ot.otBatch;
 
 /**
- * Most OT senders output nothing. However in the batch senario. there may be cases where the protocol wiches to output x0 and x1 instead of inputting it.
- * Every concrete protocol outputs different data. But all must return an implemented class of this interface even if this class is empty.
- * This interface is a marker interface for OT sender output, where there is an implementing class for each OT protocol or using a general concrete empty output
+ * This interface is a marker interface for OT sender output, where there is an implementing class for each OT protocol that has an output.<p>
+ * Most OT senders output nothing. However in the batch scenario there may be cases where the protocol wishes to output x0 and x1 instead of inputting it.
+ * Every concrete protocol outputs different data. But all must return an implemented class of this interface or null.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Meital Levy)
  *
