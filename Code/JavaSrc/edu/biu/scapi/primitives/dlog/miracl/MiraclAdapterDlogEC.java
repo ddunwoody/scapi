@@ -68,13 +68,6 @@ public abstract class MiraclAdapterDlogEC extends DlogGroupEC
 	public MiraclAdapterDlogEC(String fileName, String curveName) throws IOException {
 		super(fileName, curveName);
 		exponentiationsMap = new HashMap <GroupElement, Long>();
-		
-		try {
-			file= new PrintWriter("EcFpPointMiracleResults.csv");
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 
 	protected abstract boolean basicAndInfinityChecksForExpForPrecomputedValues(GroupElement base);
