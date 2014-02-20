@@ -27,29 +27,40 @@ package edu.biu.scapi.interactiveMidProtocols.ot.otBatch.otExtension;
 import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.OTBatchSInput;
 
 /**
- * Concrete implementation of OT sender input.
- * In the correlated ot extension scenario the sender inputs a delta array and gets as an input x0, x1 such that x0 = x1^delta. 
+ * A concrete class for OT extension input for the sender. <p>
+ * In the correlated OT extension scenario the sender inputs a delta array and gets as an input x0, x1 such that x0 = x1^delta. 
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Meital Levy)
  *
  */
 public class OTExtensionCorrelatedSInput implements OTBatchSInput{
 
-	private byte[] delta;//An array that holds all the delta,i of the sender serially. This is a one dimensional array where the values are stored
-						 //one after the other rather than a two dimensional array. The size of each element can be calculated by delta.length/numOfOts
+	private byte[] delta;	// An array that holds all the delta for all the senders, serially. 
+							// This is a one dimensional array where the values are stored one after the other rather than a two dimensional array. 
+							// The size of each element can be calculated by delta.length/numOfOts.
 	
-	private int numOfOts;//number of ot's in the ot extension
+	private int numOfOts;	//number of ot's in the OT extension.
 	
+	/**
+	 * Constructor that sets the delta and the number of OTs.
+	 * @param delta 
+	 * @param numOfOts
+	 */
 	public OTExtensionCorrelatedSInput(byte[] delta, int numOfOts){
 		this.delta = delta;
 		this.numOfOts = numOfOts;
 	}
 	
+	/**
+	 * @return the delta.
+	 */
 	public byte[] getDelta(){
 		return delta;
 	}
 	
-	
+	/**
+	 * @return the number of elements in the OT.
+	 */
 	public int getNumOfOts(){
 		return numOfOts;
 	}

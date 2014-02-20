@@ -28,26 +28,42 @@ import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.OTBatchRInput;
 
 
 /**
- * An abstract OT receiver input.
- * In the ot extension scenario the receiver gets i bits. Each byte holds a bit for each ot in the ot extension protocol.
+ * An abstract OT receiver input.<P>
+ * 
+ * All the concrete classes are the same and differ only in the name.
+ * The reason a class is created for each version is due to the fact that a relative class is created for the sender and we wish to be consistent. 
+ * The name of the class determines the version of the OT extension we wish to run.
+ * 
+ * In all OT extension scenarios the receiver gets i bits. Each byte holds a bit for each OT in the OT extension protocol.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Meital Levy)
  *
  */
 abstract public class OTExtensionRInput implements OTBatchRInput{
-	private byte[] sigmaArr;
-	private int elementSize = 32;//the size of each element in the ot extension. All elements must be of the same size.
+	private byte[] sigmaArr; 		// Each byte holds a sigma bit for each OT in the OT extension protocol.
+	private int elementSize = 32;	// The size of each element in the ot extension. All elements must be of the same size.
 	
-	
+	/**
+	 * Constructor that sets the sigma array and number of OT elements.
+	 * @param sigmaArr array of sigma for each OT.
+	 * @param elementSize the size of each element in the OT extension. 
+	 */
 	public OTExtensionRInput(byte[] sigmaArr, int elementSize){
 		this.sigmaArr = sigmaArr;
 		this.elementSize = elementSize;
 	}
 	
+	/**
+	 * @return byte[] the sigma array.
+	 */
 	public byte[] getSigmaArr(){
 		return sigmaArr;
 	}
 
+	/**
+	 * 
+	 * @return the number of OT elements.
+	 */
 	public int getElementSize() {
 		return elementSize;
 	}

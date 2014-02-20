@@ -27,34 +27,52 @@ package edu.biu.scapi.interactiveMidProtocols.ot.otBatch.otExtension;
 import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.OTBatchSInput;
 
 /**
- * Concrete implementation of OT sender input.
- * In the ot extension scenario the sender gets x0 and x1 for each ot. 
+ * A concrete class for OT extension input for the sender. <p>
+ * In the general OT extension scenario the sender gets x0 and x1 for each OT. 
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Meital Levy)
  *
  */
 public class OTExtensionGeneralSInput implements OTBatchSInput{
 
-	private byte[] x0Arr;//An array that holds all the x0,i inputs of the sender serially. For optimization reasons, all the x0 inputs are held in one dimensional array
-						 //one after the other rather than a two dimensional array. The size of each element can be calculated by x0Arr.length/numOfOts
-	private byte[] x1Arr;
+	private byte[] x0Arr;	// An array that holds all the x0 for all the senders serially. 
+							// For optimization reasons, all the x0 inputs are held in one dimensional array one after the other 
+							// rather than a two dimensional array. 
+							// The size of each element can be calculated by x0Arr.length/numOfOts.
 	
-	private int numOfOts;//number of ot's in the ot extension
+	private byte[] x1Arr;	// An array that holds all the x1 for all the senders serially. 
 	
+	private int numOfOts;	// Number of OTs in the OT extension.
+	
+	/**
+	 * Constructor that sets x0, x1 for each OT element and the number of OTs.
+	 * @param x1Arr holds all the x0 for all the senders serially
+	 * @param x0Arr holds all the x1 for all the senders serially
+	 * @param numOfOts Number of OTs in the OT extension.
+	 */
 	public OTExtensionGeneralSInput(byte[] x0Arr, byte[] x1Arr, int numOfOts){
 		this.x0Arr = x0Arr;
 		this.x1Arr = x1Arr;
 		this.numOfOts = numOfOts;
 	}
 	
+	/**
+	 * @return the array holds all the x0 for all the senders serially.
+	 */
 	public byte[] getX0Arr(){
 		return x0Arr;
 	}
 	
+	/**
+	 * @return the array holds all the x1 for all the senders serially.
+	 */
 	public byte[] getX1Arr(){
 		return x1Arr;
 	}
 	
+	/**
+	 * @return the numner of OT elements.
+	 */
 	public int getNumOfOts(){
 		return numOfOts;
 	}

@@ -27,28 +27,39 @@ package edu.biu.scapi.interactiveMidProtocols.ot.otBatch.otExtension;
 import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.OTBatchSInput;
 
 /**
- * Concrete implementation of OT sender input.
- * In the random ot extension scenario the sender does not send x0 and x1, rather it gets as an output.
+ * A concrete class for OT extension input for the sender. <p>
+ * In the random OT extension scenario the sender does not send x0 and x1, rather it gets them as an output.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Meital Levy)
  *
  */
 public class OTExtensionRandomSInput implements OTBatchSInput{
 
-	private int bitLength;//since there is no input we need to send the size of each ot so that the ot extension can generate x0 and x1 with the right size
+	private int bitLength;// Since there is no input we need to send the size of each OT so that the OT extension can generate x0 and x1 with the right size.
 	
-	private int numOfOts;//number of ot's in the ot extension
+	private int numOfOts; // Number of OTs in the OT extension.
 	
+	/**
+	 * Constructor that sets the number of OTs and the size of each OT.
+	 * @param numOfOts number of OTs in the OT extension.
+	 * @param bitLength size of each OT
+	 */
 	public OTExtensionRandomSInput(int numOfOts, int bitLength){
 
 		this.numOfOts = numOfOts;
 		this.bitLength = bitLength;
 	}
 	
+	/**
+	 * @return the number of OT elements.
+	 */
 	public int getNumOfOts(){
 		return numOfOts;
 	}
 	
+	/**
+	 * @return the size of each OT.
+	 */
 	public int getBitLength(){
 		
 		return bitLength;

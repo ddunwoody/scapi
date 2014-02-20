@@ -24,22 +24,18 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.ot.otBatch.otExtension;
 
-import java.io.IOException;
-
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.comm.Party;
-import edu.biu.scapi.exceptions.CheatAttemptException;
-import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.OTBatchSInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.OTBatchSOutput;
 import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.OTBatchSender;
 import edu.biu.scapi.securityLevel.SemiHonest;
 
 /**
- * Concrete class for Semi-Honest OT extension sender.
+ * Concrete class for Semi-Honest OT extension sender. <P>
  * 
- * This class is a wrapper to the sender side of the ot extension code written in c++. The c++ code is called via a dll that uses jni to pass data between 
- * the java and native code.
+ * This class is a wrapper to the sender side of the OT extension code written in c++. The c++ code is called via a dll that uses jni to pass data between 
+ * the java and native code. <P>
  * 
  * NOTE: Unlike a regular implementation the connection is done via the native code and thus the channel provided in the transfer function is ignored.  
  * 
@@ -48,78 +44,66 @@ import edu.biu.scapi.securityLevel.SemiHonest;
  */
 public class OTSemiHonestExtensionSender  implements SemiHonest, OTBatchSender{
 	
-	private long senderPtr;//pointer that holds the sender pointer in the c++ code.
+	private long senderPtr; //Pointer that holds the sender pointer in the c++ code.
 	
-	//This function initializes the receiver. It creates sockets to communicate with the sender and attaches these sockets to the receiver object.
-	//It outputs the receiver object with communication abilities built in. 
+	// This function initializes the receiver. It creates sockets to communicate with the sender and attaches these sockets to the receiver object.
+	// It outputs the receiver object with communication abilities built in. 
 	private native long initOtSender(String ipAddress, int port, int koblitzOrZpSize, int numOfThreads);
-	
-	//run the OT as the sender. The inputs are x0 and x1 vectors.
 	
 	/**
 	 * The native code that runs the ot extension as the sender.
 	 * @param senderPtr The pointer initialized via the function initOtSender
 	 * @param x0 an array that holds all the x0 values for each of the ot's serially.
 	 * @param x1 an array that holds all the x1 values for each of the ot's serially.
-	 * @param numOfOts The number or ot's that the protocol runs
-	 * @param bitLength The length of each item in the ot. The size of each x0,x1 which must be the same for all x0,x1.
+	 * @param delta 
+	 * @param numOfOts The number or OTs that the protocol runs.
+	 * @param bitLength The length of each item in the OT. The size of each x0, x1 which must be the same for all x0, x1.
+	 * @param version the OT extension version the user want to use.
 	 */
 	private native void runOtAsSender(long senderPtr, byte[] x0, byte[]x1, byte[] delta, int numOfOts, int bitLength, String version);
 	
 	
 	/**
-	 * 
-	 * 
+	 * Constructor that create the native sender with communication abilities. It uses the ip address and port given in the party object.
 	 * @param party An object that holds the ip address and port
 	 * @param koblitzOrZpSize An integer that determines whether the ot extension uses Zp or ECC koblitz. The optional parameters are the following.
 	 * 		  163,233,283 for ECC koblitz and 1024, 2048, 3072 for Zp
-	 * 	      
+	 * @param numOfThreads    
 	 */
 	public OTSemiHonestExtensionSender(Party party, int koblitzOrZpSize, int numOfThreads ){
 		
 		
-		//create the sender by passing the local host address.
+		// Create the sender by passing the local host address.
 		//receiverPtr = initOtSender("127.0.0.1", 7766);
-		
 		senderPtr = initOtSender(party.getIpAddress().getHostAddress(), party.getPort(), koblitzOrZpSize, numOfThreads);
-		
-
 	}
 	
 	
 	/**
-	 * Initializes the receiver by passing the ip address and uses koblitz 163 as default dlog group. 
-	 * 
-	 * @param party An object that holds the ip address and port
-	 * 	      
+	 * Default constructor. Initializes the sender by passing the ip address and uses koblitz 163 as default dlog group. 
+	 * @param party An object that holds the ip address and port.
 	 */
 	public OTSemiHonestExtensionSender(Party party ){
 		
 		
-		//create the sender by passing the local host address.
-		//receiverPtr = initOtSender("127.0.0.1", 7766);
-		
+		// Create the sender by passing the local host address.
 		senderPtr = initOtSender(party.getIpAddress().getHostAddress(), party.getPort(), 163, 1);
-		
-
 	}
 
 	/**
 	 * The overloaded function that runs the protocol.
-	 * @param channel Disregarded. This is ignored since the connection is done in the c++ code
-	 * @param input The input for the sender 
+	 * @param channel Disregarded. This is ignored since the connection is done in the c++ code.
+	 * @param input The input for the sender specifying the version of the OT extension to run. 
+	 * Every call to the transfer function can run a different OT extension version.
 	 */
-	public OTBatchSOutput transfer(Channel channel, OTBatchSInput input) throws IOException,
-			ClassNotFoundException, CheatAttemptException,
-			InvalidDlogGroupException {
+	public OTBatchSOutput transfer(Channel channel, OTBatchSInput input) {
 		
 		int numOfOts;
 
-		//check if the input is valid.
-		//If input is not instance of OTSExtensionInput, throw Exception.
+		// In case the given input is general input.
 		if (input instanceof OTExtensionGeneralSInput){
 			
-			//Retrieve the values from the input object
+			//Retrieve the values from the input object.
 			byte[] x0 = ((OTExtensionGeneralSInput) input).getX0Arr();
 			byte[] x1 = ((OTExtensionGeneralSInput) input).getX1Arr();
 			numOfOts = ((OTExtensionGeneralSInput) input).getNumOfOts();
@@ -127,54 +111,51 @@ public class OTSemiHonestExtensionSender  implements SemiHonest, OTBatchSender{
 			//call the native function
 			runOtAsSender(senderPtr, x0,x1, null, numOfOts, x0.length/numOfOts*8, "general");
 		
-			
+			//This version has no output. Return null.
 			return null;
-		}
-		
-		else if(input instanceof OTExtensionCorrelatedSInput){
+		//In case the given input is correlated input.
+		} else if(input instanceof OTExtensionCorrelatedSInput){
 			 
-			
 			byte[] delta = ((OTExtensionCorrelatedSInput) input).getDelta();
 			
-
-			//prepare empty x0 and x1 for the output
+			// Prepare empty x0 and x1 for the output.
 			byte[] x0 = new byte[delta.length];
 			byte[] x1 = new byte[delta.length];
 			
 			numOfOts = ((OTExtensionCorrelatedSInput) input).getNumOfOts();
 			
-			//call the native function. It will fill x0 and x1
+			// Call the native function. It will fill x0 and x1.
 			runOtAsSender(senderPtr, x0, x1, delta, numOfOts, delta.length/numOfOts*8, "correlated");
 			
+			//Return output contains x0, x1.
 			return new OTExtensionSOutput(x0,x1);
 		
-		}
-		
-		else if(input instanceof OTExtensionRandomSInput){
+		//In case the given input is random input.
+		} else if(input instanceof OTExtensionRandomSInput){
 			 
 			numOfOts = ((OTExtensionRandomSInput) input).getNumOfOts();
-			
 			int bitLength = ((OTExtensionRandomSInput) input).getBitLength();
 			
-			//prepare empty x0 and x1 for the output
+			// Prepare empty x0 and x1 for the output.
 			byte[] x0 = new byte[numOfOts * bitLength/8];
 			byte[] x1 = new byte[numOfOts * bitLength/8];
 			
-			
-			//call the native function. It will fill x0 and x1
+			// Call the native function. It will fill x0 and x1.
 			runOtAsSender(senderPtr, x0, x1, null, numOfOts, bitLength, "random");
 			
+			//Return output contains x0, x1.
 			return new OTExtensionSOutput(x0,x1);
+		
+		//If input is not instance of the above inputs, throw Exception.
+		} else {
+			throw new IllegalArgumentException("input should be an instance of OTExtensionGeneralSInput or OTExtensionCorrelatedSInput or OTExtensionRandomSInput.");
 		}
-		return null;
-		
-		
 		
 	}
 
- static {
+	static {
 		 
-		 //loads the OtExtensionJavaInterface jni dll
+		 // Loads the OtExtensionJavaInterface jni dll.
 		 System.loadLibrary("OtExtensionJavaInterface");
 	 }
 	
