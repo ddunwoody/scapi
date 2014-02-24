@@ -77,7 +77,7 @@ public class Gate {
 	 * There will generally be a single output {@code Wire}. However in instances in which fan-out of the output {@code Wire} is >1, 
 	 * we left the option for treating this as multiple {@code Wire}s.
 	 */
-	Gate(int gateNumber, BitSet truthTable, int[] inputWireLabels, int[] outputWireLabels) {
+	public Gate(int gateNumber, BitSet truthTable, int[] inputWireLabels, int[] outputWireLabels) {
 	    this.gateNumber = gateNumber;
 	    this.truthTable = truthTable;
 	    this.inputWireLabels = inputWireLabels;
