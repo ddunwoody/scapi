@@ -22,7 +22,7 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-package edu.biu.scapi.interactiveMidProtocols.ot.otBatch.SemiHonest;
+package edu.biu.scapi.interactiveMidProtocols.ot.otBatch.semiHonest;
 
 import java.io.IOException;
 import java.io.Serializable;
