@@ -121,17 +121,17 @@ class FreeXORGarbledBooleanCircuitUtil implements CircuitTypeUtil {
 	}
 	
 	@Override
-  	public CircuitCreationValues generateWireKeysAndSetTables(BooleanCircuit ungarbledCircuit, GarbledTablesHolder garbledTablesHolder, 
+  	public CircuitCreationValues garble(BooleanCircuit ungarbledCircuit, GarbledTablesHolder garbledTablesHolder, 
 			GarbledGate[] gates) {
 		//Create maps to send to the functions that sample the keys and create the garbled tables. 
 		Map<Integer, SecretKey[]> emptyWireValues = new HashMap<Integer, SecretKey[]>();
 		
-		//call the other generateWireKeysAndSetTables (that actually perform the keys creation) with empty partial wire values.
-		return generateWireKeysAndSetTables(ungarbledCircuit, garbledTablesHolder, gates, emptyWireValues);
+		//call the other garble (that actually perform the keys creation) with empty partial wire values.
+		return garble(ungarbledCircuit, garbledTablesHolder, gates, emptyWireValues);
 	}	
 	
 	@Override
-	public CircuitCreationValues generateWireKeysAndSetTables(BooleanCircuit ungarbledCircuit, GarbledTablesHolder garbledTablesHolder, 
+	public CircuitCreationValues garble(BooleanCircuit ungarbledCircuit, GarbledTablesHolder garbledTablesHolder, 
 			GarbledGate[] gates, Map<Integer, SecretKey[]> partialWireValues) {
 		
 		Map<Integer, SecretKey[]> allWireValues = new HashMap<Integer, SecretKey[]>();
@@ -581,7 +581,7 @@ class FreeXORGarbledBooleanCircuitUtil implements CircuitTypeUtil {
 	}
 	
 	@Override
-	public CircuitSeedCreationValues generateWireKeysAndSetTables(BooleanCircuit ungarbledCircuit, GarbledTablesHolder garbledTablesHolder, 
+	public CircuitSeedCreationValues garble(BooleanCircuit ungarbledCircuit, GarbledTablesHolder garbledTablesHolder, 
 			GarbledGate[] gates, PseudorandomGenerator prg, byte[] seed, CryptographicHash hash) throws InvalidKeyException {
 		
 		Map<Integer, SecretKey[]> allWireValues = new HashMap<Integer, SecretKey[]>();

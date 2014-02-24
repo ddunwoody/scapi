@@ -64,9 +64,9 @@ public class GarbledBooleanCircuitSeedGenerationImp extends GarbledBooleanCircui
 	}
 	
 	@Override
-	public CircuitSeedCreationValues generateWireKeysAndSetTables(BooleanCircuit ungarbledCircuit, PseudorandomGenerator prg, byte[] seed, CryptographicHash hash) throws InvalidKeyException {
+	public CircuitSeedCreationValues garble(BooleanCircuit ungarbledCircuit, PseudorandomGenerator prg, byte[] seed, CryptographicHash hash) throws InvalidKeyException {
 		//Call the utility class to generate the keys and create the garbled tables.
-		CircuitSeedCreationValues values = util.generateWireKeysAndSetTables(ungarbledCircuit, garbledTablesHolder, gates, prg, seed, hash);
+		CircuitSeedCreationValues values = util.garble(ungarbledCircuit, garbledTablesHolder, gates, prg, seed, hash);
 		translationTable = values.getTranslationTable();
 		return values;
 	}

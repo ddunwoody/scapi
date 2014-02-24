@@ -96,7 +96,7 @@ class FreeXORRowReductionGarbledBooleanCircuitUtil extends FreeXORGarbledBoolean
 	 * @throws IllegalArgumentException if the user gave the output keys while the isRowReductionWithFixedOutputKeys set to false.
 	 */
 	@Override
-	public CircuitCreationValues generateWireKeysAndSetTables(BooleanCircuit ungarbledCircuit, GarbledTablesHolder garbledTablesHolder, 
+	public CircuitCreationValues garble(BooleanCircuit ungarbledCircuit, GarbledTablesHolder garbledTablesHolder, 
 			GarbledGate[] gates, Map<Integer, SecretKey[]> partialWireValues) {
 		if (partialWireValues.containsKey(ungarbledCircuit.getOutputWireLabels()[0])){
 			if (!isRowReductionWithFixedOutputKeys){

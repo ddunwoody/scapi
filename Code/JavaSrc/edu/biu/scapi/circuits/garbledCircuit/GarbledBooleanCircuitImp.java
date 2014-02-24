@@ -149,17 +149,17 @@ public class GarbledBooleanCircuitImp implements GarbledBooleanCircuit {
 	}
 	
 	@Override
-  	public CircuitCreationValues generateWireKeysAndSetTables(BooleanCircuit ungarbledCircuit) {
+  	public CircuitCreationValues garble(BooleanCircuit ungarbledCircuit) {
 		//Call the utility class to generate the keys and create the garbled tables.
-		CircuitCreationValues values = util.generateWireKeysAndSetTables(ungarbledCircuit, garbledTablesHolder, gates);
+		CircuitCreationValues values = util.garble(ungarbledCircuit, garbledTablesHolder, gates);
 		translationTable = values.getTranslationTable();
 		return values;
 	}
 	
 	@Override
-	public CircuitCreationValues generateWireKeysAndSetTables(BooleanCircuit ungarbledCircuit, Map<Integer, SecretKey[]> partialWireValues) {
+	public CircuitCreationValues garble(BooleanCircuit ungarbledCircuit, Map<Integer, SecretKey[]> partialWireValues) {
 		//Call the utility class to generate the keys and create the garbled tables.
-		CircuitCreationValues values = util.generateWireKeysAndSetTables(ungarbledCircuit, garbledTablesHolder, gates, partialWireValues);
+		CircuitCreationValues values = util.garble(ungarbledCircuit, garbledTablesHolder, gates, partialWireValues);
 		translationTable = values.getTranslationTable();
 		return values;
 	}

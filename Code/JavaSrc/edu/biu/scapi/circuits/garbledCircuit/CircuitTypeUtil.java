@@ -61,7 +61,7 @@ interface CircuitTypeUtil {
 	 * @param gates the gates of this circuit. 
 	 * @return CircuitCreationValues contains both keys for each input and output wire, the translation table and the signal bits of the input wires.
 	 */
-	public CircuitCreationValues generateWireKeysAndSetTables(BooleanCircuit ungarbledCircuit, GarbledTablesHolder garbledTablesHolder, 
+	public CircuitCreationValues garble(BooleanCircuit ungarbledCircuit, GarbledTablesHolder garbledTablesHolder, 
 			GarbledGate[] gates);
 	
 	/**
@@ -80,7 +80,7 @@ interface CircuitTypeUtil {
 	 * Clearly, the content of the last bit of all k0 should be picked at random. Else, the circuit is not secure. 
 	 * @return CircuitCreationValues contains both generated values for each input and output wire and the translation table.
 	 */
-	public CircuitCreationValues generateWireKeysAndSetTables(BooleanCircuit ungarbledCircuit, GarbledTablesHolder garbledTablesHolder, 
+	public CircuitCreationValues garble(BooleanCircuit ungarbledCircuit, GarbledTablesHolder garbledTablesHolder, 
 			GarbledGate[] gates, Map<Integer, SecretKey[]> partialWireValues) ;
 	
 	/**
@@ -94,7 +94,7 @@ interface CircuitTypeUtil {
 	 * @return CircuitCreationValues contains both generated values for each input and output wire and the translation table.
 	 * @throws InvalidKeyException in case the seed is invalid key for the given PRG.
 	 */
-	public CircuitSeedCreationValues generateWireKeysAndSetTables(BooleanCircuit ungarbledCircuit, GarbledTablesHolder garbledTablesHolder, 
+	public CircuitSeedCreationValues garble(BooleanCircuit ungarbledCircuit, GarbledTablesHolder garbledTablesHolder, 
 			GarbledGate[] gates, PseudorandomGenerator prg, byte[] seed, CryptographicHash hash) throws InvalidKeyException;
 	
 	/**

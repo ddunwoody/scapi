@@ -105,7 +105,7 @@ class StandardRowReductionGarbledBooleanCircuitUtil extends StandardGarbledBoole
 	 * @throws IllegalArgumentException if the user gave the output keys while the isRowReductionWithFixedOutputKeys set to false.
 	 */
 	@Override
-	public CircuitCreationValues generateWireKeysAndSetTables(BooleanCircuit ungarbledCircuit, GarbledTablesHolder garbledTablesHolder, 
+	public CircuitCreationValues garble(BooleanCircuit ungarbledCircuit, GarbledTablesHolder garbledTablesHolder, 
 			GarbledGate[] gates, Map<Integer, SecretKey[]> partialWireValues) {
 		if (partialWireValues.containsKey(ungarbledCircuit.getOutputWireLabels()[0])){
 			if (!isRowReductionWithFixedOutputKeys){
@@ -116,7 +116,7 @@ class StandardRowReductionGarbledBooleanCircuitUtil extends StandardGarbledBoole
 				throw new IllegalArgumentException("Expected output wires' keys when Row Reduction with fixed keys is declared");
 			}
 		}
-		return super.generateWireKeysAndSetTables(ungarbledCircuit, garbledTablesHolder, gates, partialWireValues);
+		return super.garble(ungarbledCircuit, garbledTablesHolder, gates, partialWireValues);
 	}
 	
 	/**

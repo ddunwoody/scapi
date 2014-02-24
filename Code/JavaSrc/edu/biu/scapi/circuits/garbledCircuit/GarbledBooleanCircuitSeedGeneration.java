@@ -48,7 +48,7 @@ public interface GarbledBooleanCircuitSeedGeneration extends GarbledBooleanCircu
 	 * @return CircuitCreationValues contains both keys for each input and output wire and the translation table.
 	 * @throws InvalidKeyException in case the seed is invalid key for the given PRG.
 	 */
-	public CircuitSeedCreationValues generateWireKeysAndSetTables(BooleanCircuit ungarbledCircuit, PseudorandomGenerator prg, byte[] seed, CryptographicHash hash) throws InvalidKeyException ;
+	public CircuitSeedCreationValues garble(BooleanCircuit ungarbledCircuit, PseudorandomGenerator prg, byte[] seed, CryptographicHash hash) throws InvalidKeyException ;
 		
 	/**
      * The verify method is used in the case of malicious adversaries.<p>

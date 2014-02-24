@@ -40,7 +40,7 @@ import edu.biu.scapi.exceptions.NotAllInputsSetException;
 /**
  * {@code GarbledBooleanCircuit} is a general interface implemented by all garbled circuits--optimized or not. <p>
  * All garbled circuits have four main operations: <p>
- * 1. The construct operation which is provided by the constructors of the implementing classes following by generateWireKeysAndSetTables function. <p>
+ * 1. The construct operation which is provided by the constructors of the implementing classes following by garble function. <p>
  * 2. The {@link #compute()} function computes a result on a garbled circuit that's input has been set. <p>
  * 3. The {@link #verify(BooleanCircuit, Map)} method is used in the case of a malicious adversary to verify that the garbled circuit 
  * created is an honest garbling of the agreed upon non garbled circuit. The constructing party constructs many garbled circuits and
@@ -57,7 +57,7 @@ public interface GarbledBooleanCircuit {
 	 * @param ungarbledCircuit the circuit that this {@code GarbledBooleanCircuit} is supposed to be a garbling of. 
 	 * @return CircuitCreationValues contains both keys for each input and output wire and the translation table.
 	 */
-	public CircuitCreationValues generateWireKeysAndSetTables(BooleanCircuit ungarbledCircuit) ;
+	public CircuitCreationValues garble(BooleanCircuit ungarbledCircuit) ;
 	
 	/**
 	 * This method gets part of the keys and generates the missing keys for each wire. <p>
@@ -72,7 +72,7 @@ public interface GarbledBooleanCircuit {
 	 * Clearly, the content of the last bit of all k0 should be picked at random. Else, the circuit is not secure. 
 	 * @return CircuitCreationValues contains both keys for each input and output wire and the translation table.
 	 */
-	public CircuitCreationValues generateWireKeysAndSetTables(BooleanCircuit ungarbledCircuit, Map<Integer, SecretKey[]> partialWireValues);
+	public CircuitCreationValues garble(BooleanCircuit ungarbledCircuit, Map<Integer, SecretKey[]> partialWireValues);
 	
 	/**
 	 * This method sets the input of the circuit. <p>
