@@ -50,17 +50,18 @@ public class PartyTwo {
 		Date before = new Date();
 		
 		CircuitInput input = null;
-		//try {
-			//input = new StandardCircuitInput(bc, mes, new BcKdfISO18033("SHA-1"), new SecureRandom());
-			//input = new FreeXORCircuitInput(bc, mes, new BcKdfISO18033("SHA-1"));
-		//} catch (FactoriesException e) {
+		try {
+			//input = new StandardCircuitInput(bc, mes, new BcKdfISO18033("SHA-1"), new SecureRandom(), false);
+			//input = new MinimizeAESSetKeyCircuitInput(bc, new CryptoPpAES(), new BcKdfISO18033("SHA-1"), new SecureRandom(), false);
+			input = new FreeXORCircuitInput(bc, mes, new BcKdfISO18033("SHA-1"), false);
+		} catch (FactoriesException e) {
 			// TODO Auto-generated catch block
-		//	e.printStackTrace();
-		//}
+			e.printStackTrace();
+		}
 		//input = new MinimizeAESSetKeyCircuitInput(bc, new CryptoPpAES(), new SecureRandom());
 		//input = new StandardCircuitInput(bc, mes, new SecureRandom());
 		
-		input = new FreeXORCircuitInput(bc, mes);
+		//input = new FreeXORCircuitInput(bc, mes);
 		circuit = new GarbledBooleanCircuitImp(input);
 		
 		Date after = new Date();
