@@ -19,7 +19,7 @@ import edu.biu.scapi.comm.NaiveSuccess;
 import edu.biu.scapi.comm.Party;
 import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.OTBatchReceiver;
-import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.SemiHonest.OTSemiHonestDDHBatchOnByteArrayReceiver;
+import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.semiHonest.OTSemiHonestDDHBatchOnByteArrayReceiver;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.kdf.HKDF;
 import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
