@@ -36,7 +36,7 @@ import edu.biu.scapi.circuits.circuit.Gate;
  * The Free XOR optimization allows XOR Gates to be evaluated for free -- i.e. without encryption, and thus significantly speeds up Garbled Circuit
  * computations on large circuits with many XOR Gates. <p>
  * The technique dictates a careful way to choose the Wire Values. <p>
- * See the {@link FreeXORGarbledBooleanCircuitUtil} class that construct the circuit and choose the values according to this procedure. 
+ * See the {@link FreeXORGarbledBooleanCircuitUtil} class that constructs the circuit and chooses the values according to this procedure. 
  * Once the Wire values have been chosen as such, evaluating XOR gates does not require encryption. 
  * See the {@link #compute(Map)} method in this class where the computation is done.
  * </p>
@@ -170,8 +170,8 @@ class FreeXORGate implements GarbledGate{
 
 	 /**
 	  * Verifies that the gate number and input/output labels are the same as the given ungarbled circuit.
-	  * @param g the ungarbled circuit that should be verified.
-	  * @return true if varified; false, otherwise.
+	  * @param g The ungarbled circuit that should be verified.
+	  * @return true if verified; false, otherwise.
 	  */
 	 protected boolean verifyGateComponents(Gate g) {
 		/*

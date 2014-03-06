@@ -29,9 +29,9 @@ import edu.biu.scapi.circuits.encryption.MultiKeyEncryptionScheme;
 import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
 
 /**
- * This is the input class for Free XOR circuit.<p>
- * Free XOR circuit's inputs are:<p>
- * 1. The boolean circuit needs to be garbled. <p>
+ * This is the input class for a Free XOR circuit.<p>
+ * A Free XOR circuit's inputs are:<p>
+ * 1. The boolean circuit that needs to be garbled. <p>
  * 2. A MultiKeyEncryptionScheme.<p>
  * 3. A KeyDerivationFunction, in case the user wants to use the Row Reduction algorithm.<p>
  * 
@@ -47,8 +47,8 @@ public class FreeXORCircuitInput implements CircuitInput{
 	
 	/**
 	 * This constructor creates an input object for a regular representation of FreeXORGarbledBooleanCircuit.
-	 * @param ungarbledCircuit the boolean circuit needs to be garbled. 
-	 * @param mes a MultiKeyEncryptionScheme to use.
+	 * @param ungarbledCircuit The boolean circuit that needs to be garbled. 
+	 * @param mes A MultiKeyEncryptionScheme to use.
 	 */
 	public FreeXORCircuitInput(BooleanCircuit ungarbledCircuit, MultiKeyEncryptionScheme mes){
 		this.ungarbledCircuit = ungarbledCircuit;
@@ -58,10 +58,10 @@ public class FreeXORCircuitInput implements CircuitInput{
 	
 	/**
 	 * This constructor creates an input object for a row reduction representation of FreeXORGarbledBooleanCircuit.
-	 * @param ungarbledCircuit the boolean circuit needs to be garbled. 
-	 * @param mes a MultiKeyEncryptionScheme to use.
-	 * @param kdf to use in the row reduction algorithm.
-	 * @param isRowReductionWithFixedOutputKeys indicates if the user is going to use sample the wires' keys out of given output keys. 
+	 * @param ungarbledCircuit The boolean circuit needs to be garbled. 
+	 * @param mes A MultiKeyEncryptionScheme to use.
+	 * @param kdf To use in the row reduction algorithm.
+	 * @param isRowReductionWithFixedOutputKeys Indicates if the user is going to sample the wires' keys from given output keys.
 	 * In this case, the circuit representation should be a little different. 
 	 * See {@link BooleanCircuit#BooleanCircuit(File f)} for more information.
 	 */

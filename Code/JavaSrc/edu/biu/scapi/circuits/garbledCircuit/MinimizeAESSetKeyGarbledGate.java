@@ -51,11 +51,11 @@ class MinimizeAESSetKeyGarbledGate extends StandardGarbledGate {
 
 	/**
 	 * Constructs a MinimizeAESSetKeyGarbledGate from an ungarbled gate using the given aes, {@code MultiKeyEncryptionScheme} and keys.
-	 * @param ungarbledGate the gate to garbled.
-	 * @param mes The encryption scheme used to garbled this gate.
-	 * @param aes The AES object to use to garbled this gate.
-	 * @param garbledTablesHolder a reference to the garbled tables of the circuit.
-	 * @param allWireValues both keys of all the circuit's wires.
+	 * @param ungarbledGate The gate to garbled.
+	 * @param mes The encryption scheme used to garble this gate.
+	 * @param aes The AES object to use to garble this gate.
+	 * @param garbledTablesHolder A reference to the garbled tables of the circuit.
+	 * @param allWireValues Both keys of all the circuit's wires.
    	 * @throws PlaintextTooLongException 
    	 * @throws IllegalBlockSizeException 
    	 * @throws InvalidKeyException 
@@ -69,10 +69,10 @@ class MinimizeAESSetKeyGarbledGate extends StandardGarbledGate {
   
 	/**
 	 * Constructs a MinimizeAESSetKeyGarbledGate from an ungarbled gate using the given aes and {@code MultiKeyEncryptionScheme}.
-	 * @param ungarbledGate the gate to garbled.
+	 * @param ungarbledGate The gate to garbled.
 	 * @param mes The encryption scheme used to garbled this gate.
 	 * @param aes The AES object to use to garbled this gate.
-	 * @param garbledTablesHolder a reference to the garbled tables of the circuit.
+	 * @param garbledTablesHolder A reference to the garbled tables of the circuit.
    	 */
 	MinimizeAESSetKeyGarbledGate(Gate ungarbledGate, MultiKeyEncryptionScheme mes, PseudorandomFunction aes, GarbledTablesHolder garbledTablesHolder){
 		

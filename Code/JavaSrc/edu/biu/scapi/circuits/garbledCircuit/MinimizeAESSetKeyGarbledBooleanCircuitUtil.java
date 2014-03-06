@@ -35,15 +35,15 @@ import edu.biu.scapi.primitives.prf.cryptopp.CryptoPpAES;
 /**
  * Our code is designed as such that in its constructor {@link StandardGarbledBooleanCircuitUtil} constructs {@code StandardGarbledGate}s.<p>
  * Each {@code StandardGarbledGate} garbled itself by creating a garbled truth table. The garble truth table is created row by row. 
- * Thus, if we use {@link AES128MultiKeyEncryption} first we will garbled the first row , then the second row etc.. 
+ * Thus, if we use {@link AES128MultiKeyEncryption} first we will garble the first row, then the second row etc.. 
  * Each row will require two AES operations and two setKey operations--i.e. the key will be set to the garbled value for each row. <p>
  * However, AES set key operations are expensive, and different rows of the truth tables use the same keys. <p>
  * Consider a 2 input gate. There are a total of four keys(a 0 and a 1 for each wire). Yet if we use
  * {@code StandardGarbledBooleanCircuitUtil} with {@code AES128MultiKeyEncryption} we will perform a total of 8 setKey operations. 
- * If we garbled the entire truth table together however, we would be able to minimize this to 4 operations. </p>
+ * If we garbled the entire truth table together, however, we would be able to minimize this to 4 operations. </p>
  * <p>
  * In order to minimize the number of row operations, we have to couple the garbled gate and the encryption scheme. They can no longer 
- * be totally separate entities. This presents an issue however, since for reasons of allowing users to easily extend our code and add 
+ * be totally separate entities. This presents an issue, however, since for reasons of allowing users to easily extend our code and add 
  * new encryption schemes, we want the encryption schemes to be totally separate from the {@code GarbledGate}s. 
  * (See <i>Garbling * Schemes </i> by Mihir Bellare, Viet Tung Hoang, and Phillip Rogaway for their discussion on garbling schemes as
  * an entity in their own right). Therefore, we create the specialized {code {@link MinimizeAESSetKeyGarbledBooleanCircuitUtil} and
@@ -64,7 +64,7 @@ class MinimizeAESSetKeyGarbledBooleanCircuitUtil extends StandardGarbledBooleanC
 	/**
 	 * Constructs a garbled circuit utility using {@link AES128MultiKeyEncryption} while minimizing the number of setKey operations performed.
 	 * @param aes to use in the computations.
-	 * @param random source of randomness.
+	 * @param random A source of randomness.
 	 */
 	MinimizeAESSetKeyGarbledBooleanCircuitUtil(AES aes, SecureRandom random) {
 		this.random = random;

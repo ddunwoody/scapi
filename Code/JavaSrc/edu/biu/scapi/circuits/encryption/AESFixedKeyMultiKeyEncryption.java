@@ -38,9 +38,9 @@ import edu.biu.scapi.primitives.prf.cryptopp.CryptoPpAES;
 /**
  * This encryption scheme uses AES with a fixed key and thus has the benefit of not needing to repeatedly perform the costly setKey 
  * procedure for AES. See <i>Garbling Schemes </i> by Mihir Bellare, Viet Tung Hoang, and Phillip Rogaway Section 5.6 for a full 
- * description of thus encryption scheme. <p>
+ * description of this encryption scheme. <p>
  * 
- * This encryption scheme works by XORing all of the wire values(i.e. keys) to one another and then XORing this to the tweak. 
+ * This encryption scheme works by XORing all of the wire values(i.e. keys) to each other and then XORing this to the tweak. 
  * This value is denoted by K. We call AES with the fixed key on K and then XOR the result of that to K and then to the plaintext to encrypt.
  * 
  * @author Steven Goldfeder

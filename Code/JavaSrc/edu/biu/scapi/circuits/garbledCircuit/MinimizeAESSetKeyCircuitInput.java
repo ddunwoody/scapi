@@ -50,8 +50,8 @@ public class MinimizeAESSetKeyCircuitInput implements CircuitInput{
 	
 	/**
 	 * This constructor creates an input object for a regular representation of MinimizeAESSetKeyGarbledBooleanCircuit.
-	 * @param ungarbledCircuit the boolean circuit needs to be garbled. 
-	 * @param aes an AES object to use.
+	 * @param ungarbledCircuit The boolean circuit that needs to be garbled. 
+	 * @param aes An AES object to use.
 	 * @param random
 	 */
 	public MinimizeAESSetKeyCircuitInput(BooleanCircuit ungarbledCircuit, AES aes, SecureRandom random){
@@ -60,11 +60,11 @@ public class MinimizeAESSetKeyCircuitInput implements CircuitInput{
 	
 	/**
 	 * This constructor creates an input object for a row reduction representation of MinimizeAESSetKeyGarbledBooleanCircuit.
-	 * @param ungarbledCircuit the boolean circuit needs to be garbled. 
-	 * @param aes an AES object to use.
+	 * @param ungarbledCircuit The boolean circuit that needs to be garbled. 
+	 * @param aes An AES object to use.
 	 * @param random
-	 * @param kdf to use in the row reduction algorithm.
-	 * @param isRowReductionWithFixedOutputKeys indicates if the user is going to use sample the wires' keys out of given output keys. 
+	 * @param kdf To use in the row reduction algorithm.
+	 * @param isRowReductionWithFixedOutputKeys Indicates if the user is going to sample the wires' keys from given output keys.
 	 * In this case, the circuit representation should be a little different. 
 	 * See {@link BooleanCircuit#BooleanCircuit(File f)} for more information.
 	 */

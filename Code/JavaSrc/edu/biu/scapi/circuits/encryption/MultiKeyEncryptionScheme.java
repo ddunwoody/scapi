@@ -43,7 +43,7 @@ import edu.biu.scapi.exceptions.TweakNotSetException;
  * Garbling Scheme--i.e. the notion to treat Garbling Schemes as cryptographic primitive. In the paper, they present a number of 
  * different efficient garbling schemes.<p>
  * 
- * We have implemented a number of the ones that they mentioned, and any other garbling schemes can easily be implemented and used 
+ * We have implemented a number of the schemes that they mentioned, and any other garbling scheme can easily be implemented and used 
  * anywhere in our code as long as they implement this interface. 
  * 
  * @author Steven Goldfeder
@@ -62,13 +62,13 @@ public interface MultiKeyEncryptionScheme {
 	 * each {@code GarbledWire} and combine them to a {@code MultiSecretKey} (using the {@code generateMultiKey()} method. 
 	 * Then if we want to encrypt the 0-1 entry, we will use the 0-key from the first wire and the 1-key from the second wire. 
 	 * We will combine these 2 keys into a single {@code MultiSecretKey} and use this to encrypt. Note that in this example,
-	 * the 0-key from the first Wire is part of 2 different {@code MultiSecretKey}s. First we combined it with the 0-key of the second
+	 * the 0-key from the first Wire is combined from 2 different {@code MultiSecretKey}s. First we combined it with the 0-key of the second
 	 * wire and then we combined it with the 1-key. <p>
 	 * Thus, it is necessary to have a method to generate individual keys and a separate method to combine different single keys into
 	 * {@code MultiSecretKey}s. 
 	 * 
 	 * @return {@link SecretKey} of the specified size. One or more of these keys will be combined into a 
-	 * 					{@code MultiSecretKey} to encrypt and decrypt on.
+	 * 					{@code MultiSecretKey} to encrypt and decrypt with.
 	 */
 	public SecretKey generateKey();
 
@@ -76,7 +76,7 @@ public interface MultiKeyEncryptionScheme {
 	 * This method is provided with individual {@code SecretKey}s and combines them into a {@code MultiSecretKey} that can be used 
 	 * for encryption and decryption with the {@code MultiKeyEncryptionScheme}.
 	 * 
-	 * @param keys the individual {@link SecretKey}s that make up the {@code MultiSecretKey}. 
+	 * @param keys The individual {@link SecretKey}s that make up the {@code MultiSecretKey}. 
 	 * The {@code SecretKey} objects can be passed in an array or as individual parameters.
 	 * @return a {@code MultiSecretKey} made up of the {@code SecretKey}s that were passed as parameters.
 	 */
@@ -84,15 +84,15 @@ public interface MultiKeyEncryptionScheme {
 
 	/**
 	 * Sets the key to the specified {@code MultiKeyEncryptionScheme}.<p>
-	 * The key that it is currently set to will be used for encryption and decryption until {@code setKey()} is called again.
+	 * The key that it is currently set to, will be used for encryption and decryption until {@code setKey()} is called again.
 	 * 
-	 * @param key the {@code MultiSecretKey} to be used for encryption and decryption.
+	 * @param key The {@code MultiSecretKey} to be used for encryption and decryption.
 	 */
 	public void setKey(MultiSecretKey key);
 
 	/**
 	 * See <i> Garbling Schemes</i> by Mihir Bellare, Viet Tung Hoang, and Phillip Rogaway. <p>
-	 * Some encryption schemes use a tweak and instead of encrypting directly on the entry of the plaintext encrypt on the tweak 
+	 * Some encryption schemes use a tweak and instead of encrypting directly the entry of the plaintext, encrypt the tweak 
 	 * and then XOR the result with the plaintext. <p>
 	 * Some encryption schemes do not make use of a tweak, in which case calls to set the tweak have no effect.
 	 * If you are implementing an encryption scheme that does not use a tweak, just leave the body of this method blank.

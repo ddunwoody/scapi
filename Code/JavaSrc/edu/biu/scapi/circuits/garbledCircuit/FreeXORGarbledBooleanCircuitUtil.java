@@ -46,16 +46,16 @@ import edu.biu.scapi.primitives.prg.PseudorandomGenerator;
 /**
  * The {@code FreeXORGarbledBooleanCircuitUtil} uses the Free XOR technique that is explained in depth in <i>Free XOR Gates and 
  * Applications</i> by Validimir Kolesnikov and Thomas Schneider. <p>
- * This circuit's computes method chooses the wire labels according to the procedure delineated in the above described paper. 
- * It then replaces all XOR gates with {@code FreeXOR gates} and these gates can be computed without encryption due to the way the 
+ * This circuit's computing method chooses the wire labels according to the procedure delineated in the above described paper. 
+ * It then replaces all XOR gates with {@code FreeXOR gates} and these gates can be computed without an encryption due to the way the 
  * wire's values were chosen. See the above paper also for a proof of security of this method. <p>
  * 
- * Note also that the {@link #compute()} method of {@code FreeXORGarbledBooleanCircuitUtil} is no different than the standard
- * {@code StandardGarbledBooleanCircuitUtil}. The reason for this is that we designed the circuit so that the circuit's compute method just
- * calls the gate's compute method. In the compute method, we use the interface {@link GarbledGate} to make our calls and thus the 
- * appropriate compute method for the dynamic type of the specified gate is automatically waht is used. For the same reason, 
+ * Note also that the {@link #compute()} method of {@code FreeXORGarbledBooleanCircuitUtil} is not different than the standard
+ * {@code StandardGarbledBooleanCircuitUtil}. The reason for this is that we designed the circuit so that the circuit's computing method just
+ * calls the gate's computing method. In the computing method, we use the interface {@link GarbledGate} to make our calls and thus the 
+ * appropriate computing method for the dynamic type of the specified gate is automatically what is used. For the same reason, 
  * the {@link #verify(BooleanCircuit, Map)} method of {@code FreeXORGarbledBooleanCircuitUtil} is also identical to
- * {@code StandardGarbledBooleanCircuitutil}'s verify method. </p>
+ * {@code StandardGarbledBooleanCircuitutil}'s verifying method. </p>
  * 
  * @author Steven Goldfeder
  * 
@@ -70,7 +70,7 @@ class FreeXORGarbledBooleanCircuitUtil implements CircuitTypeUtil {
 	
 	/**
 	 * Sets the given MultiKeyEncryptionScheme.
-	 * @param mes the concrete encryption object to use.
+	 * @param mes The concrete encryption object to use.
 	 */
 	FreeXORGarbledBooleanCircuitUtil(MultiKeyEncryptionScheme mes){
 		this.mes = mes;
@@ -112,8 +112,8 @@ class FreeXORGarbledBooleanCircuitUtil implements CircuitTypeUtil {
 	/**
 	 * We extract the creation of the standard garbled gate in order to be able to derive and create different standard gates.<p>
 	 * For example, in order to use the row reduction technique we derive this class and create RowReductionGate.
-	 * @param ungarbledGate the gate we want to garble.
-	 * @param garbledTablesHolder holds the reference to the garbled tables.
+	 * @param ungarbledGate The gate we want to garble.
+	 * @param garbledTablesHolder Holds the reference to the garbled tables.
 	 * @return the created GarbledGate.
 	 */
 	protected GarbledGate createStandardGate(Gate ungarbledGate, GarbledTablesHolder garbledTablesHolder) {
@@ -264,8 +264,8 @@ class FreeXORGarbledBooleanCircuitUtil implements CircuitTypeUtil {
 	
 	/**
 	 * Generates the input wire keys and signal bits.
-	 * @param allWireValues a map that contains both keys for each wire.
-	 * @param globalKeyOffset the FreeXOR circuit's delta,
+	 * @param allWireValues A map that contains both keys for each wire.
+	 * @param globalKeyOffset The FreeXOR circuit's delta.
 	 * @param zeroValue value of the wire's zero key. The other key will be calculated via XOR with the globalKeyOffset.
 	 */
 	protected void sampleInputKeys(Map<Integer, SecretKey[]> allWireValues, byte[] globalKeyOffset, int w, SecretKey zeroValue) {
@@ -311,11 +311,11 @@ class FreeXORGarbledBooleanCircuitUtil implements CircuitTypeUtil {
 	}
 	
 	/**
-	 * Creates garbled tables the gates of this circuit. 
-	 * @param gates the gates of this circuit.
-	 * @param garbledTablesHolder contains the pointer to the garbled tables.
-	 * @param ungarbledGates the gates that should be garbled.
-	 * @param allWireValues a map that contains both keys for each wire.
+	 * Creates garbled tables for the gates of this circuit. 
+	 * @param gates The gates of this circuit.
+	 * @param garbledTablesHolder Contains the pointer to the garbled tables.
+	 * @param ungarbledGates The gates that should be garbled.
+	 * @param allWireValues A map that contains both keys for each wire.
 	 */
 	protected void createGarbledTables(GarbledGate[] gates, GarbledTablesHolder garbledTablesHolder, Gate[] ungarbledGates, Map<Integer, SecretKey[]> allWireValues) throws InvalidKeyException, IllegalBlockSizeException, PlaintextTooLongException {
 			
@@ -335,9 +335,9 @@ class FreeXORGarbledBooleanCircuitUtil implements CircuitTypeUtil {
 	
 	/**
 	 * Creates the keys of the non-input wires.
-	 * @param ungarbledGates the gates that should be garbled.
-	 * @param allWireValues a map that contains both keys for each wire.
-	 * @param globalKeyOffset the FREE XOR delta.
+	 * @param ungarbledGates The gates that should be garbled.
+	 * @param allWireValues A map that contains both keys for each wire.
+	 * @param globalKeyOffset The FREE XOR delta.
 	 */
 	protected void createNonInputWireValues(Gate[] ungarbledGates, Map<Integer, SecretKey[]> allWireValues, byte[] globalKeyOffset){
 		// Get the XOR and XORNOT truth table to be used to test against for equality.
@@ -365,11 +365,11 @@ class FreeXORGarbledBooleanCircuitUtil implements CircuitTypeUtil {
 
 	/**
 	 * Generates keys for standard gate.
-	 * @param ungarbledGate the gate that should be garbled.
-	 * @param allWireValues a map that contains both keys for each wire.
-	 * @param globalKeyOffset the FREE XOR delta.
-	 * @param zeroValueBytes the value of the first key. 
-	 * We get it as a parameter because the generation of the first key can be done by the encryption scheme or by the prg, depends in the caller function.
+	 * @param ungarbledGate The gate that should be garbled.
+	 * @param allWireValues A map that contains both keys for each wire.
+	 * @param globalKeyOffset The FREE XOR delta.
+	 * @param zeroValueBytes The value of the first key. 
+	 * We get it as a parameter because the generation of the first key can be done by the encryption scheme or by the prg, depending in the caller function.
 	 * Thus, the caller function generates the first key and this function does the rest.
 	 */
 	protected void generateStandardValues(Gate ungarbledGate, Map<Integer, SecretKey[]> allWireValues, byte[] globalKeyOffset, byte[] zeroValueBytes) {
@@ -381,10 +381,10 @@ class FreeXORGarbledBooleanCircuitUtil implements CircuitTypeUtil {
 	/**
 	 * Gets k0 and calculate k1 according to it.
 	 * Puts the keys and signal bit in the maps. 
-	 * @param allWireValues a map that contains both keys for each wire.
-	 * @param globalKeyOffset the FREE XOR delta.
-	 * @param zeroValueBytes the value of the first key.
-	 * @param label the label of the wire we generate keys for.
+	 * @param allWireValues A map that contains both keys for each wire.
+	 * @param globalKeyOffset The FREE XOR delta.
+	 * @param zeroValueBytes The value of the first key.
+	 * @param label The label of the wire we generate keys for.
 	 */
 	protected void calcK1AndPutInMaps(Map<Integer, SecretKey[]> allWireValues, byte[] globalKeyOffset, byte[] zeroValueBytes, byte[] oneValueBytes, int label) {
 		SecretKey zeroValue;
@@ -415,9 +415,9 @@ class FreeXORGarbledBooleanCircuitUtil implements CircuitTypeUtil {
 
 	/**
 	 * Generates keys for XORNOT gate.
-	 * @param ungarbledGate the gate that should be garbled.
-	 * @param allWireValues a map that contains both keys for each wire.
-	 * @param globalKeyOffset the FREE XOR delta.
+	 * @param ungarbledGate The gate that should be garbled.
+	 * @param allWireValues A map that contains both keys for each wire.
+	 * @param globalKeyOffset The FREE XOR delta.
 	 */
 	private void generateXORNOTValues(Gate ungarbledGate, Map<Integer, SecretKey[]> allWireValues, byte[] globalKeyOffset) {
 		
@@ -437,9 +437,9 @@ class FreeXORGarbledBooleanCircuitUtil implements CircuitTypeUtil {
 
 	/**
 	 * Generates keys for XOR gate.
-	 * @param ungarbledGate the gate that should be garbled.
-	 * @param allWireValues a map that contains both keys for each wire.
-	 * @param globalKeyOffset the FREE XOR delta.
+	 * @param ungarbledGate The gate that should be garbled.
+	 * @param allWireValues A map that contains both keys for each wire.
+	 * @param globalKeyOffset The FREE XOR delta.
 	 */
 	private void generateXORValues(Gate ungarbledGate, Map<Integer, SecretKey[]> allWireValues, byte[] globalKeyOffset) {
 		//calculate the value of k0, by xoring all k0 of the input wires.
@@ -459,7 +459,7 @@ class FreeXORGarbledBooleanCircuitUtil implements CircuitTypeUtil {
 
 	/**
 	 * Extracts the global key from the given wire's label.
-	 * @param allInputWireValues a map containing all keys.
+	 * @param allInputWireValues A map containing all keys.
 	 * @param label that exist in the map.
 	 */
 	protected byte[] extractGlobalkey(Map<Integer, SecretKey[]> allInputWireValues, int label) {
@@ -480,9 +480,9 @@ class FreeXORGarbledBooleanCircuitUtil implements CircuitTypeUtil {
 	
 	/**
 	 * Creates the keys of the non-output wires.
-	 * @param ungarbledGates the gates that should be garbled.
-	 * @param allWireValues a map that contains both keys for each wire.
-	 * @param globalKeyOffset the FREE XOR delta.
+	 * @param ungarbledGates The gates that should be garbled.
+	 * @param allWireValues A map that contains both keys for each wire.
+	 * @param globalKeyOffset The FREE XOR delta.
 	 */
 	private void createNonOutputWireValues(Gate[] ungarbledGates, Map<Integer, SecretKey[]> allWireValues, byte[] globalKeyOffset) {
 		// Get the XOR and XORNOT truth table to be used to test against for equality.
@@ -510,11 +510,11 @@ class FreeXORGarbledBooleanCircuitUtil implements CircuitTypeUtil {
 	}
 	
 	/**
-	 * Generates k0, k1 of both input wires of a standard gate, in free xor circuit. <p>
-	 * Meaning, k0 and k1 should be xor of each other and a delta.
-	 * @param ungarbledGate the gate that should be garbled
-	 * @param allWireValues a map that contains both keys for each wire.
-	 * @param globalKeyOffset the FREE XOR delta.
+	 * Generates k0, k1 of both input wires of a standard gate, in a free xor circuit. <p>
+	 * Meaning, k0 and k1 should be the xor of each other and a delta.
+	 * @param ungarbledGate The gate that should be garbled
+	 * @param allWireValues A map that contains both keys for each wire.
+	 * @param globalKeyOffset The FREE XOR delta.
 	 */
 	protected void generateBothStandardValues(Gate ungarbledGate, Map<Integer, SecretKey[]> allWireValues, byte[] globalKeyOffset) {
 		
@@ -533,9 +533,9 @@ class FreeXORGarbledBooleanCircuitUtil implements CircuitTypeUtil {
 
 	/**
 	 * Generates k0, k1 of both input wires of a XORNOT gate. <p>
-	 * @param ungarbledGate the gate that should be garbled
-	 * @param allWireValues a map that contains both keys for each wire.
-	 * @param globalKeyOffset the FREE XOR delta.
+	 * @param ungarbledGate The gate that should be garbled
+	 * @param allWireValues A map that contains both keys for each wire.
+	 * @param globalKeyOffset The FREE XOR delta.
 	 */
 	private void generateBothXORNOTValues(Gate ungarbledGate, Map<Integer, SecretKey[]> allWireValues, byte[] globalKeyOffset) {
 		
@@ -557,9 +557,9 @@ class FreeXORGarbledBooleanCircuitUtil implements CircuitTypeUtil {
 
 	/**
 	 * Generates k0, k1 of both input wires of a XOR gate. <p>
-	 * @param ungarbledGate the gate that should be garbled
-	 * @param allWireValues a map that contains both keys for each wire.
-	 * @param globalKeyOffset the FREE XOR delta.
+	 * @param ungarbledGate The gate that should be garbled
+	 * @param allWireValues A map that contains both keys for each wire.
+	 * @param globalKeyOffset The FREE XOR delta.
 	 */
 	private void generateBothXORValues(Gate ungarbledGate, Map<Integer, SecretKey[]> allWireValues, byte[] globalKeyOffset) {
 		
@@ -605,10 +605,10 @@ class FreeXORGarbledBooleanCircuitUtil implements CircuitTypeUtil {
 	
 	/**
 	 * Samples the keys for the garbled wires.
-	 * @param ungarbledCircuit the circuit that should be garbled.
-	 * @param prg to use in order to generate the keys.
-	 * @param seed to initialize the prg.
-	 * @param allWireValues an empty map that will be filled with keys during the function execution.
+	 * @param ungarbledCircuit The circuit that should be garbled.
+	 * @param prg To use in order to generate the keys.
+	 * @param seed To initialize the prg.
+	 * @param allWireValues An empty map that will be filled with keys during the function execution.
 	 * @return the created keys of each input and output wire and the translation table.
 	 * @throws InvalidKeyException
 	 */
@@ -672,11 +672,11 @@ class FreeXORGarbledBooleanCircuitUtil implements CircuitTypeUtil {
 	/**
 	 * Creates the gates and garbled tables of this circuit.
 	 * Compute the hash function on the garbled tables. 
-	 * @param garbledTablesHolder holds the pointer to the garbled tables.
-	 * @param gates garbled gates of this circuit.
-	 * @param ungarbledGates the gates that should be garbled.
-	 * @param allWireValues an empty map that will be filled with keys during the function execution.
-	 * @param hash the CryptographicHash function to use.
+	 * @param garbledTablesHolder Holds the pointer to the garbled tables.
+	 * @param gates Garbled gates of this circuit.
+	 * @param ungarbledGates The gates that should be garbled.
+	 * @param allWireValues An empty map that will be filled with keys during the function execution.
+	 * @param hash The CryptographicHash function to use.
 	 * @return the result of the hash function on the garbled tables.
 	 */
 	private byte[] createGarbledTables(GarbledTablesHolder garbledTablesHolder, GarbledGate[] gates, Gate[] ungarbledGates, 
@@ -708,10 +708,10 @@ class FreeXORGarbledBooleanCircuitUtil implements CircuitTypeUtil {
 	}
 	
 	/**
-	 * Creates the keys of the non-input wires using the given prg ans seed.
-	 * @param ungarbledGates the gates that should be garbled.
-	 * @param allWireValues a map that contains both keys for each wire.
-	 * @param globalKeyOffset the FREE XOR delta.
+	 * Creates the keys of the non-input wires using the given prg and seed.
+	 * @param ungarbledGates The gates that should be garbled.
+	 * @param allWireValues A map that contains both keys for each wire.
+	 * @param globalKeyOffset The FREE XOR delta.
 	 * @param keySize
 	 * @param prg 
 	 */
@@ -761,9 +761,9 @@ class FreeXORGarbledBooleanCircuitUtil implements CircuitTypeUtil {
   	
 	/**
 	 * Computes the hash function on the circuit's garbled tables.
-	 * @param hash CryptographicHash function to use
-	 * @param allWireValues a map that contains both keys for each wire.
-	 * @param ungarbledGates the gates of the ungarbled circuit
+	 * @param hash CryptographicHash function to use.
+	 * @param allWireValues A map that contains both keys for each wire.
+	 * @param ungarbledGates The gates of the ungarbled circuit
 	 * @return the result of the hash function on the garbled tables.
 	 * @throws InvalidKeyException
 	 * @throws IllegalBlockSizeException

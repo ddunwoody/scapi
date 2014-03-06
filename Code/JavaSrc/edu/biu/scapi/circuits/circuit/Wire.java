@@ -26,7 +26,7 @@ package edu.biu.scapi.circuits.circuit;
 
 /**
  * The {@code Wire} class is a software representation of a {@code Wire} in a circuit. <p>
- * As these are {@code Wire}s for Boolean circuit's each {@code Wire} can be set to either 0 or 1.
+ * As these are {@code Wire}s for Boolean circuit's, each {@code Wire} can be set to either 0 or 1.
  * 
  * @author Steven Goldfeder
  * 
@@ -41,7 +41,7 @@ public class Wire {
 	/**
 	 * Creates a {@code Wire} and sets it to the specified value.
 	 * 
-	 * @param value the value to set this {@code Wire} to. Must be either 0 or 1.
+	 * @param value The value to set this {@code Wire} to. Must be either 0 or 1.
   	 */
 	public Wire(byte value) {
 		// Ensures that the Wire is only set to a legal value (i.e. 0 or 1)

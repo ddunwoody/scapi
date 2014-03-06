@@ -46,7 +46,7 @@ public interface GarbledGate {
   	
 	/**
 	 * Computes the output of this gate and sets the output wire(s) to that value.
-	 * @param computedWires a {@link Map} containing the {@link GarbledWires}s that have already been computed and had their values set.
+	 * @param computedWires A {@link Map} containing the {@link GarbledWires}s that have already been computed and had their values set.
 	 * @throws InvalidKeyException
 	 * @throws IllegalBlockSizeException
 	 * @throws CiphertextTooLongException
@@ -55,11 +55,11 @@ public interface GarbledGate {
 
 	/**
 	 * This method tests an ungarbled {@link Gate} for equality to this {@code GarbledGate}. <P>
-	 * Meaning, they have the same truth table and labels.<p>
+	 * That is, they have the same truth table and labels.<p>
 	 * It is called verify since in general, when this method is used, the assumption is that they are equal and we are verifying this assumption.
-	 * @param g an ungarbled {@code Gate} to be tested for equality to this {@code GarbledGate}
+	 * @param g an ungarbled {@code Gate} to be tested for equality to this {@code GarbledGate}.
 	 * @param allWireValues contains both keys of all wires.
-	 * @return {@code true} if the gates are have the same truth table and label, and {@code false} otherwise.
+	 * @return {@code true} if the gates have the same truth table and label, and {@code false} otherwise.
 	 * @throws InvalidKeyException
 	 * @throws IllegalBlockSizeException
 	 * @throws CiphertextTooLongException

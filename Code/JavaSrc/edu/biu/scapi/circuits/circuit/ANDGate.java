@@ -39,10 +39,10 @@ public class ANDGate extends Gate {
 	/**
 	 * Constructs an AND Gate.
 	 * 
-	 * @param gateNumber the gate's integer label(in a circuit all gates will be labeled)
-	 * @param inputWireLabels an array containing the labels of the gate's input {@code Wire}s.
-	 * @param outputWireLabels an array containing the labels of the gate's input {@code Wire}(s). 
-	 * There will generally be a single output {@code Wire}. However in instances in which fan-out of the output {@code Wire} is >1,
+	 * @param gateNumber The gate's integer label(in a circuit all gates will be labeled)
+	 * @param inputWireLabels An array containing the labels of the gate's input {@code Wire}s.
+	 * @param outputWireLabels An array containing the labels of the gate's input {@code Wire}(s). 
+	 * There will generally be a single output {@code Wire}. However in instances in which the fan-out of the output {@code Wire} is >1,
 	 * we left the option for treating this as multiple {@code Wire}s.
 	 */
 	public ANDGate(int gateNumber, int[] inputWireLabels, int[] outputWireLabels) {

@@ -33,8 +33,8 @@ import javax.crypto.SecretKey;
 /**
  * This class is the Key to be used when encrypting with any @link MultiKeyEncryption} scheme. <P>
  * It generalizes the notion of a dual key cipher that is generally associated with Yao's protocol. <p>
- * A dial key cipher uses two keys and is thus only appropriate for encrypting 2-input {@code GarbledGate}s. <p>
- * A MultiKey cipher can be used for any number of inputs. When it is used to encrypt a 2-input {@code GarbledGate}, it is a dial key 
+ * A dual key cipher uses two keys and is thus only appropriate for encrypting 2-input {@code GarbledGate}s. <p>
+ * A MultiKey cipher can be used for any number of inputs. When it is used to encrypt a 2-input {@code GarbledGate}, it is a dual key 
  * cipher {@link MultiKeyEncryptionScheme}. <p>
  * It contains an array of {@link SecretKey}s that the {@link MultiKeyEncryptionScheme} will use to encrypt.
  * 

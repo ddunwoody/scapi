@@ -26,7 +26,7 @@ package edu.biu.scapi.circuits.garbledCircuit;
 
 /**
  * This class holds the garbled tables of the garbled circuit.<p>
- * The garbled circuit will hold an instance of this class and also are the gates. <p>
+ * The garbled circuit will hold an instance of this class and also will the gates. <p>
  * This way, when we want to change the garbled tables, we just have to change the pointer of the tables in this class. 
  * The circuit and the gates will all get the new tables with no time.
  * 
@@ -55,7 +55,7 @@ class GarbledTablesHolder {
 	
 	/**
 	 * Sets the given garbled tables. <P>
-	 * This allow changing the circuit inner content with no time.
+	 * This allows changing the circuit inner content with no time.
 	 * @param garbledTables
 	 */
 	public void setGarbledTables(byte[][] garbledTables){

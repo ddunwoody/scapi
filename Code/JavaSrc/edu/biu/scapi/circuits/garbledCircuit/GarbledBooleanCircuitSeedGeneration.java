@@ -31,7 +31,7 @@ import edu.biu.scapi.primitives.hash.CryptographicHash;
 import edu.biu.scapi.primitives.prg.PseudorandomGenerator;
 
 /**
- * General interface for Garbled Boolean circuit that was generated via pseudo random generator and seed.
+ * A general interface for Garbled Boolean circuit that was generated via a pseudo random generator and a seed.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
@@ -40,19 +40,19 @@ public interface GarbledBooleanCircuitSeedGeneration extends GarbledBooleanCircu
 	
 	/**
 	 * This method generates both keys for each input wire using the given prg and seed. 
-	 * Then, creates the garbled table according to that values.<p>
-	 * @param ungarbledCircuit the circuit that this {@code GarbledBooleanCircuit} is supposed to be a garbling of. 
-	 * @param prg used to generate the garbled values.
-	 * @param seed used to initialize the given prg.
-	 * @param hash CryptographicHash object used to compute the hash function on the circuit's garbled tables.
-	 * @return CircuitCreationValues contains both keys for each input and output wire and the translation table.
-	 * @throws InvalidKeyException in case the seed is invalid key for the given PRG.
+	 * It then creates the garbled table according to those values.<p>
+	 * @param ungarbledCircuit The circuit that this {@code GarbledBooleanCircuit} is supposed to be a garbling of. 
+	 * @param prg Used to generate the garbled values.
+	 * @param seed Used to initialize the given prg.
+	 * @param hash A CryptographicHash object that is used to compute the hash function on the circuit's garbled tables.
+	 * @return CircuitCreationValues Contains both keys for each input and output wire and the translation table.
+	 * @throws InvalidKeyException In case the seed is an invalid key for the given PRG.
 	 */
 	public CircuitSeedCreationValues garble(BooleanCircuit ungarbledCircuit, PseudorandomGenerator prg, byte[] seed, CryptographicHash hash) throws InvalidKeyException ;
 		
 	/**
      * The verify method is used in the case of malicious adversaries.<p>
-     * Alice constructs n circuits and Bob can verify n-1 of them(of his choosing) to confirm that they are indeed garbling of the 
+     * Alice constructs n circuits and Bob can verify n-1 of them (of his choice) to confirm that they are indeed garbling of the 
      * agreed upon non garbled circuit. <p>
      * 
      * This verify method verifies that the given hashedCircuits is indeed the result of the given hash function 
@@ -60,23 +60,23 @@ public interface GarbledBooleanCircuitSeedGeneration extends GarbledBooleanCircu
      * 
      * In order to verify, Alice has to give Bob the prg and the seed used to generate the keys, along with the hash function 
      * and the result of the hash on the garbled tables of p1.<p>
-     * The function calculates the garbled tables on the fly, meaning it calculates the garbled table of each gate, computes the hash on it and drops it.
+     * The function calculates the garbled tables on the fly, meaning that it calculates the garbled table of each gate, computes the hash on it and drops it.
      * 
-     * @param ungarbledCircuit the circuit that this {@code GarbledBooleanCircuit} is supposed to be a garbling of. 
-     * @param prg used to generate both keys for each input wire.
-     * @param seed used to initialize the given prg
-     * @param hash CryptographicHash object used to compute the hash function on the circuit's garbled tables.
+     * @param ungarbledCircuit The circuit that this {@code GarbledBooleanCircuit} is supposed to be a garbling of. 
+     * @param prg Used to generate both keys for each input wire.
+     * @param seed Used to initialize the given prg
+     * @param hash A CryptographicHash object that is used to compute the hash function on the circuit's garbled tables.
      * @param hashedCircuit the result of the hash on the garbled tables of p1.
-     * @return {@code true} if this {@code GarbledBooleanCircuit} is a garbling of the ungarbledCircuit, {@code false} if it is not
-	 * @throws InvalidKeyException in case the seed is invalid key for the given PRG.
+     * @return {@code true} if this {@code GarbledBooleanCircuit} is a garbling of the ungarbledCircuit, {@code false} if it is not.
+	 * @throws InvalidKeyException in case the seed is an invalid key for the given PRG.
      * 
      */
 	public boolean verify(BooleanCircuit ungarbledCircuit, PseudorandomGenerator prg, byte[] seed, CryptographicHash hash, byte[] hashedCircuit) throws InvalidKeyException;
   
 	/**
 	 * Verifies that the given hashedCircuit is indeed the hash of the garbled table of this circuit.
-	 * @param hash used to hash the garbled tables
-	 * @param hashedCircuit should be equal to the hash of this garbledTables.
+	 * @param hash Used to hash the garbled tables.
+	 * @param hashedCircuit Should be equal to the hash of this garbledTables.
 	 * @return true if the given hashedCircuit is indeed the hash of the garbled table of this circuit; false, otherwise.
 	 */
 	public boolean verifyGarbledTables(CryptographicHash hash, byte[] hashedCircuit) ;

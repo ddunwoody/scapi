@@ -70,10 +70,10 @@ public class Gate {
 
 	/**
 	 * Sets the given values.
-	 * @param gateNumber the gate's integer label (in a circuit all gates will be labeled).
-	 * @param truthTable a BitSet representation of the final column of a truth table( i.e. the output of the function being computed).
-	 * @param inputWireLabels an array containing the labels of the gate's input {@code Wire}s.
-	 * @param outputWireLabels an array containing the labels of the gate's input {@code Wire}(s). 
+	 * @param gateNumber The gate's integer label (in a circuit all gates will be labeled).
+	 * @param truthTable A BitSet representation of the final column of a truth table( i.e. the output of the function being computed).
+	 * @param inputWireLabels An array containing the labels of the gate's input {@code Wire}s.
+	 * @param outputWireLabels An array containing the labels of the gate's input {@code Wire}(s). 
 	 * There will generally be a single output {@code Wire}. However in instances in which fan-out of the output {@code Wire} is >1, 
 	 * we left the option for treating this as multiple {@code Wire}s.
 	 */
@@ -86,7 +86,7 @@ public class Gate {
 
 	/**
 	 * Compute the gate operation.<p>
-	 * @param computedWires a {@code Map} that maps an integer wire label to the Wire. 
+	 * @param computedWires A {@code Map} that maps an integer wire label to the Wire. 
 	 * The values of these {@code Wire}s has already been set (it has been <b>computed</b>--hence the name computedWires).
 	 */
 	void compute(Map<Integer, Wire> computedWires) {
@@ -103,7 +103,7 @@ public class Gate {
 	}
 
 	/**
-	 * @param obj a gate that is to be tested for equality to the current {@code Gate}. 
+	 * @param obj A gate that is to be tested for equality to the current {@code Gate}. 
 	 * @return {@code true} if the gates are equivalent and {@code false} otherwise.
 	 */
 	@Override
@@ -160,8 +160,8 @@ public class Gate {
 	 * This is a helper method that calculates the index of the output value on a truth table corresponding to 
 	 * the values of the input {@code Wire}s.
 	 * 
-	 * @param computedWires a {@code Map} that maps an integer wire label to the Wire. 
-	 * The values of these {@code Wire}s has already been set (it has been <b>computed</b>--hence the name computedWires).
+	 * @param computedWires A {@code Map} that maps an integer wire label to the Wire. 
+	 * The values of these {@code Wire}s have already been set (they has been <b>computed</b>--hence the name computedWires).
   	 * @return the index of the Truth table output corresponding to the values of the input {@code Wire}s.
   	 */
 	private int calculateIndexOfTruthTable(Map<Integer, Wire> computedWires) {
@@ -190,11 +190,11 @@ public class Gate {
 	}
 
 	/**
-	 * Returns the labels of the {@link Wire}s that are output of this {@code Gate}. <p>
+	 * Returns the labels of the {@link Wire}s that are the output of this {@code Gate}. <p>
 	 * In most circuit designs, this will contain a single wire. 
 	 * However, in the case of fan-out > 1, some circuit designers may treat each as separate wires.
 	 * 
-	 * @return an integer array containing the labels of the {@link Wire}s that are output to this {@code Gate}.
+	 * @return an integer array containing the labels of the {@link Wire}s that are the output to this {@code Gate}.
 	 */
 	public int[] getOutputWireLabels() {
 		return outputWireLabels;

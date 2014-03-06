@@ -51,12 +51,12 @@ public class MinimizeAESSetKeyRowReductionGate extends StandardRowReductionGarbl
 	
 	/**
 	 * Constructs a MinimizeAESSetKeyRowReductionGate from an ungarbled gate using the given aes, {@code MultiKeyEncryptionScheme} and keys.
-	 * @param ungarbledGate the gate to garbled.
+	 * @param ungarbledGate The gate to garbled.
 	 * @param mes The encryption scheme used to garbled this gate.
 	 * @param aes The AES object to use to garbled this gate.
 	 * @param kdf to use in the row reduction technique
-	 * @param garbledTablesHolder a reference to the garbled tables of the circuit.
-	 * @param allWireValues both keys of all the circuit's wires.
+	 * @param garbledTablesHolder A reference to the garbled tables of the circuit.
+	 * @param allWireValues Both keys of all the circuit's wires.
    	 * @throws PlaintextTooLongException 
    	 * @throws IllegalBlockSizeException 
    	 * @throws InvalidKeyException 
@@ -69,10 +69,10 @@ public class MinimizeAESSetKeyRowReductionGate extends StandardRowReductionGarbl
   
 	/**
 	 * Constructs a MinimizeAESSetKeyRowReductionGate from an ungarbled gate using the given aes and {@code MultiKeyEncryptionScheme}.
-	 * @param ungarbledGate the gate to garbled.
-	 * @param mes The encryption scheme used to garbled this gate.
-	 * @param aes The AES object to use to garbled this gate.
-	 * @param kdf to use in the row reduction technique
+	 * @param ungarbledGate The gate to garble.
+	 * @param mes The encryption scheme used to garble this gate.
+	 * @param aes The AES object used to garble this gate.
+	 * @param kdf to use in the row reduction technique.
 	 * @param garbledTablesHolder a reference to the garbled tables of the circuit.
    	 */
 	MinimizeAESSetKeyRowReductionGate(Gate ungarbledGate, MultiKeyEncryptionScheme mes, PseudorandomFunction aes, KeyDerivationFunction kdf, GarbledTablesHolder garbledTablesHolder){

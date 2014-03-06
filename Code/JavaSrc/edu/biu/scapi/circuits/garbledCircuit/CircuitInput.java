@@ -27,8 +27,8 @@ package edu.biu.scapi.circuits.garbledCircuit;
 import edu.biu.scapi.circuits.circuit.BooleanCircuit;
 
 /**
- * A general interface for circuit's inputs.<p>
- * Each type of circuit (standard, FreeXor, MinimizeAESSetKey, etc) has different inputs and should have an input class.<p>
+ * A general interface for a circuit's inputs.<p>
+ * Each type of a circuit (standard, FreeXor, MinimizeAESSetKey, etc) has different inputs and should have an input class.<p>
  * All input classes should implement this interface.
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
@@ -36,7 +36,7 @@ import edu.biu.scapi.circuits.circuit.BooleanCircuit;
 public interface CircuitInput {
 	
 	/**
-	 * Creates and returns an unique utility class.<p>
+	 * Creates and returns a unique utility class.<p>
 	 * There are some functionalities in the circuit that have different implementations in different kinds of circuit.
 	 * In case of such function, the circuit calls a utility class corresponding to the concrete circuit. 
 	 * The utility class is given to the circuit in the construct time by the input object, using this function.

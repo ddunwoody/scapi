@@ -57,11 +57,11 @@ class StandardRowReductionGarbledGate extends StandardGarbledGate{
 	
 	/**
 	 * Constructs a garbled gate from an ungarbled gate using the given {@code MultiKeyEncryptionScheme} and keys.
-	 * @param ungarbledGate the gate to garbled.
-	 * @param mes The encryption scheme used to garbled this gate.
-	 * @param kdf to use in the row reduction technique
-	 * @param garbledTablesHolder a reference to the garbled tables of the circuit.
-	 * @param allWireValues both keys of all the circuit's wires.
+	 * @param ungarbledGate The gate to garble.
+	 * @param mes The encryption scheme used to garble this gate.
+	 * @param kdf to use in the row reduction technique.
+	 * @param garbledTablesHolder A reference to the garbled tables of the circuit.
+	 * @param allWireValues Both keys of all the circuit's wires.
    	 * @throws PlaintextTooLongException
    	 * @throws IllegalBlockSizeException 
    	 * @throws InvalidKeyException 
@@ -73,10 +73,10 @@ class StandardRowReductionGarbledGate extends StandardGarbledGate{
   
 	/**
 	 * Constructs a garbled gate from an ungarbled gate using the given {@code MultiKeyEncryptionScheme}.
-	 * @param ungarbledGate the gate to garbled
-	 * @param mes The encryption scheme used to garbled this gate
-	 * @param kdf to use in the row reduction technique
-	 * @param garbledTablesHolder a reference to the garbled tables of the circuit.
+	 * @param ungarbledGate The gate to garble.
+	 * @param mes The encryption scheme used to garble this gate.
+	 * @param kdf to use in the row reduction technique.
+	 * @param garbledTablesHolder A reference to the garbled tables of the circuit.
    	 */
 	StandardRowReductionGarbledGate(Gate ungarbledGate, MultiKeyEncryptionScheme mes, KeyDerivationFunction kdf, GarbledTablesHolder garbledTablesHolder){
 		super(ungarbledGate, mes, garbledTablesHolder);
@@ -85,7 +85,7 @@ class StandardRowReductionGarbledGate extends StandardGarbledGate{
   
 	/**
 	 * Creates the garbled table of this gate using the row reduction technique. <p>
-	 * Meaning, the last row is not saved and will be calculated when the compute function will be called by the kdf.
+	 * Meaning that the last row is not saved and will be calculated when the compute function will be called by the kdf.
 	 */
 	@Override
 	void createGarbledTable(Gate ungarbledGate, Map<Integer, SecretKey[]> allWireValues) throws  IllegalBlockSizeException, PlaintextTooLongException, InvalidKeyException{

@@ -78,10 +78,10 @@ class StandardGarbledGate implements GarbledGate {
 
 	/**
 	 * Constructs a garbled gate from an ungarbled gate using the given {@code MultiKeyEncryptionScheme} and keys.
-	 * @param ungarbledGate the gate to garbled.
-	 * @param mes The encryption scheme used to garbled this gate.
-	 * @param garbledTablesHolder a reference to the garbled tables of the circuit.
-	 * @param allWireValues both keys of all the circuit's wires.
+	 * @param ungarbledGate The gate to garble.
+	 * @param mes The encryption scheme used to garble this gate.
+	 * @param garbledTablesHolder A reference to the garbled tables of the circuit.
+	 * @param allWireValues Both keys of all the circuit's wires.
    	 * @throws PlaintextTooLongException 
    	 * @throws IllegalBlockSizeException 
    	 * @throws InvalidKeyException 
@@ -100,9 +100,9 @@ class StandardGarbledGate implements GarbledGate {
   
 	/**
 	 * Constructs a garbled gate from an ungarbled gate using the given {@code MultiKeyEncryptionScheme}.
-	 * @param ungarbledGate the gate to garbled.
-	 * @param mes The encryption scheme used to garbled this gate.
-	 * @param garbledTablesHolder a reference to the garbled tables of the circuit.
+	 * @param ungarbledGate The gate to garble.
+	 * @param mes The encryption scheme used to garble this gate.
+	 * @param garbledTablesHolder A reference to the garbled tables of the circuit.
    	 */
 	StandardGarbledGate(Gate ungarbledGate, MultiKeyEncryptionScheme mes, GarbledTablesHolder garbledTablesHolder){
 		//Sets the given parameters.
@@ -115,8 +115,8 @@ class StandardGarbledGate implements GarbledGate {
   
 	/**
 	 * Creates the garbled table of this gate using the given keys.
-	 * @param ungarbledGate the gate to garbled
-	 * @param allWireValues both keys of all the circuit's wires.
+	 * @param ungarbledGate The gate to garble.
+	 * @param allWireValues Both keys of all the circuit's wires.
 	 * @throws InvalidKeyException
 	 * @throws IllegalBlockSizeException
 	 * @throws PlaintextTooLongException
@@ -216,8 +216,8 @@ class StandardGarbledGate implements GarbledGate {
 
 	/**
 	 * Computes the garbled table of this gate.
-	 * @param computedWires a Map containing the GarbledWiress that have already been computed and had their values set.
-	 * @param garbledTableIndex the index of the row that should be decrypted.
+	 * @param computedWires A Map containing the GarbledWiress that have already been computed and had their values set.
+	 * @param garbledTableIndex The index of the row that should be decrypted.
 	 * @return the output key.
 	 * @throws CiphertextTooLongException
 	 * @throws InvalidKeyException
@@ -258,8 +258,8 @@ class StandardGarbledGate implements GarbledGate {
 	}
 	
 	/**
-	 * A helper method that computed which index to decrypt based on the signal bits of the input wires.
-	 * @param computedWires a {@code Map} containing the input wires and their values. We will use it to obtain the 
+	 * A helper method that computes which index to decrypt based on the signal bits of the input wires.
+	 * @param computedWires A {@code Map} containing the input wires and their values. We will use it to obtain the 
 	 * signal bits of the values of the input wires in order to determine the correct index to decrypt.
 	 * @return the index of the garbled truth table that the input wires' signal bits signal to decrypt.
 	 */
@@ -320,8 +320,8 @@ class StandardGarbledGate implements GarbledGate {
 
 	/**
 	 * Verifies the garbled table of the gate.
-	 * @param g the boolean gate that this gate should be the garbled of.
-	 * @param allWireValues a map contains both keys of all the circuit's wires.
+	 * @param g The boolean gate that this gate should be the garbling of.
+	 * @param allWireValues A map that contains both keys of all the circuit's wires.
 	 * @param numberOfInputs
 	 * @return true if the garbled table is valid; false, otherwise.
 	 * @throws CiphertextTooLongException

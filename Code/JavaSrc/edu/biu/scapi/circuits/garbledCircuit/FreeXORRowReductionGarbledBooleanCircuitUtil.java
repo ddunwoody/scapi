@@ -58,7 +58,7 @@ class FreeXORRowReductionGarbledBooleanCircuitUtil extends FreeXORGarbledBoolean
 	 * Sets the given MultiKeyEncryptionScheme and kdf.
 	 * @param mes
 	 * @param kdf
-	 * @param isRowReductionWithFixedOutputKeys indicates if the user is going to use sample the wires' keys out of given output keys. 
+	 * @param isRowReductionWithFixedOutputKeys Indicates if the user is going to sample the wires' keys from given output keys. 
 	 * In this case, the circuit representation should be a little different. 
 	 * See {@link BooleanCircuit#BooleanCircuit(File f)} for more information.
 	 */
@@ -92,8 +92,8 @@ class FreeXORRowReductionGarbledBooleanCircuitUtil extends FreeXORGarbledBoolean
 	
 	/**
 	 * Generates wires' keys.<P>
-	 * In case of row reduction, the user can give the output keys only if he set the isRowReductionWithFixedOutputKeys to true in the constructor.
-	 * @throws IllegalArgumentException if the user gave the output keys while the isRowReductionWithFixedOutputKeys set to false.
+	 * In case of row reduction, the user can give the output keys only if he sets the isRowReductionWithFixedOutputKeys to true in the constructor.
+	 * @throws IllegalArgumentException if the user gave the output keys while the isRowReductionWithFixedOutputKeys is set to false.
 	 */
 	@Override
 	public CircuitCreationValues garble(BooleanCircuit ungarbledCircuit, GarbledTablesHolder garbledTablesHolder, 
@@ -210,7 +210,7 @@ class FreeXORRowReductionGarbledBooleanCircuitUtil extends FreeXORGarbledBoolean
 	}
 	
 	/**
-	 * Generates keys for standard gate in the row reduction technique.
+	 * Generates keys for a standard gate in the row reduction technique.
 	 * @param zeroValueBytes this value is ignored since the row reduction technique calculates both values from the gate's input keys.
 	 */
 	protected void generateStandardValues(Gate ungarbledGate, Map<Integer, SecretKey[]> allWireValues, byte[] globalKeyOffset, byte[] zeroValueBytes) {

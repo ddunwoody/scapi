@@ -67,12 +67,12 @@ public class BooleanCircuit {
 	private Gate[] gates;
   
 	/**
-	 * An array containing the integer labels if the input {@code Wire}s of this {@code BooleanCircuit}.
+	 * An array containing the integer labels of the input {@code Wire}s of this {@code BooleanCircuit}.
 	 */
 	private int[] outputWireLabels;
   
 	/**
-	 * The number of parties that are interacting(i.e. receiving input and/or output) with this circuit.
+	 * The number of parties that are interacting (i.e. receiving input and/or output) with this circuit.
 	 */
 	private int numberOfParties;  
 	
@@ -85,15 +85,15 @@ public class BooleanCircuit {
 	/**
 	 * Constructs a BooleanCircuit from a File. <p>
 	 * The File first lists the number of {@code Gate}s, then the number of parties. <p>
-	 * Then for each party: party number, number of inputs for that party and following this is a list of integer labels of each of these input {@code Wire}s.<p>
+	 * Then for each party: party number, the number of inputs for that party, and following there is a list of integer labels of each of these input {@code Wire}s.<p>
 	 * Next it lists the number of output {@code Wire}s followed by the integer label of each of these {@code Wires}. <p>
 	 * Then for each gate, we have the following: number of inputWires, number of OutputWires inputWireLabels OutputWireLabels and the gate's truth Table (as a 0-1 string).<P>
 	 * example file: 1 2 1 1 1 2 1 2 1 3 2 1 1 2 3 0001<p>
-	 * IMPORTANT NOTE: There is a special case when the user want to use the row reduction technique and to sample the wires' keys out of a given output keys.
-	 * In this case the circuit should have an additional gate in the end that has 01 as the truth table (meaning, it does XOR with zero).
+	 * IMPORTANT NOTE: There is a special case when the user wants to use the row reduction technique and to sample the wires' keys out of a given output keys.
+	 * In this case the circuit should have an additional gate in the end that has 01 as the truth table (that is, it does XOR with zero).
 	 * This way we sample all keys from scratch and the last gate will map the new output keys to the given ones.
 	 * 
-	 * @param f the {@link File} from which the circuit is read.
+	 * @param f The {@link File} from which the circuit is read.
 	 * @throws FileNotFoundException if f is not found in the specified directory.
 	 * @throws CircuitFileFormatException if there is a problem with the format of the file.
 	 */
@@ -168,11 +168,11 @@ public class BooleanCircuit {
 
 	/**
 	 * Constructs a {code BooleanCircuit} from an array of gates. <p>
-	 * Each gates keeps an array of the labels of its input and output wires. The constructor is provided with a list of which 
+	 * Each gate keeps an array of the labels of its input and output wires. The constructor is provided with a list of which 
 	 * {@link Wire}s are output {@link Wire}s of the {@code BooleanCircuit}.
 	 * 
-	 * @param gates an array of {@link Gate}s to create from which to construct the {@code BooleanCircuit}.
-	 * @param outputWireLabels an array containing the labels of the wires that will be output of the {@code BooleanCircuit}.
+	 * @param gates An array of {@link Gate}s to create from which to construct the {@code BooleanCircuit}.
+	 * @param outputWireLabels An array containing the labels of the wires that will be output of the {@code BooleanCircuit}.
 	 * @param eachPartysInputWires An arrayList containing the integer labels of the input {@code Wire}s of this
 	 * {@code BooleanCircuit} indexed by the party number.
 	 */
@@ -188,7 +188,7 @@ public class BooleanCircuit {
      * It updates that this party's input has been set. 
      * Once the input is set for all parties that have input, the circuit is ready to be computed.
      * 
-     * @param presetInputWires the circuit's input Wires whose values have been previously set.
+     * @param presetInputWires The circuit's input wires whose values have been previously set.
      * @throws NoSuchPartyException if the party number is negative or bigger then the given number of parties.
      */
 	void setInputs(Map<Integer, Wire> presetInputWires,int partyNumber) throws NoSuchPartyException {
@@ -203,7 +203,7 @@ public class BooleanCircuit {
 	 * Sets the input to the circuit by reading it from a file. <p>
 	 * Written in the file is a list that contains the number of input {@link Wire}s followed by rows of {@link Wire} numbers and values.
 	 * 
-	 * @param inputWires the {@link File} containing the representation of the circuit's input.
+	 * @param inputWires The {@link File} containing the representation of the circuit's input.
 	 * @throws FileNotFoundException
 	 * @throws InvalidInputException 
 	 * @throws NoSuchPartyException 
@@ -261,7 +261,7 @@ public class BooleanCircuit {
 	 * In order to be considered equal, {@code Gate}s and {@code Wire}s must be labeled identically and {@code Gate}s must contain 
 	 * the same truth table.
 	 * 
-	 * @param obj a {@code BooleanCircuit} to be tested for equality to this {@code BooleanCircuit}
+	 * @param obj A {@code BooleanCircuit} to be tested for equality to this {@code BooleanCircuit}
   	 * @return {@code true} if the given {@code BooleanCircuit} is equivalent to this {@code Boolean Circuit}, {@code false} otherwise.
   	 */
 	@Override
@@ -299,7 +299,7 @@ public class BooleanCircuit {
 	}
 
 	/**
-	 * @param partyNumber the number of the party whose input wires will be returned.
+	 * @param partyNumber The number of the party whose input wires will be returned.
 	 * @return an ArrayList containing the input {@link Wire} labels of the specified party.
 	 * @throws NoSuchPartyException if the given party number is less than 1 and greater than the given number of parties.
 	 */
@@ -312,7 +312,7 @@ public class BooleanCircuit {
 	}
   
 	/**
-	 * @param partyNumber the number of the party whose number of input wires will be returned.
+	 * @param partyNumber The number of the party whose number of input wires will be returned.
 	 * @return the number of input wires for the specified party.
 	 * @throws NoSuchPartyException if the given party number is less than 1 and greater than the given number of parties.
 	 */

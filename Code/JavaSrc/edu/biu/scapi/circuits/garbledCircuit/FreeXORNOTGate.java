@@ -33,7 +33,7 @@ import javax.crypto.spec.SecretKeySpec;
 import edu.biu.scapi.circuits.circuit.Gate;
 
 /**
- * This class implements XOR followed by NOT gate. <p>
+ * This class implements XOR followed by a NOT gate. <p>
  * We still use the technique of free XOR, the difference is in the garbled values of the wires. 
  * 
  * @author Steven Goldfeder

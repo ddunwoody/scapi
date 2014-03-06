@@ -33,7 +33,7 @@ import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
 /**
  * This is the input class for Standard circuit.<p>
  * Standard circuit's inputs are:
- * 1. The boolean circuit needs to be garbled. 
+ * 1. The boolean circuit that needs to be garbled. 
  * 2. A MultiKeyEncryptionScheme.
  * 3. A SecureRandom object.
  * 4. A KeyDerivationFunction, in case the user wants to use the Row Reduction algorithm.
@@ -51,8 +51,8 @@ public class StandardCircuitInput implements CircuitInput{
 	
 	/**
 	 * This constructor creates an input object for a regular representation of StandardGarbledBooleanCircuit.
-	 * @param ungarbledCircuit the boolean circuit needs to be garbled. 
-	 * @param mes a MultiKeyEncryptionScheme to use.
+	 * @param ungarbledCircuit The boolean circuit that needs to be garbled. 
+	 * @param mes A MultiKeyEncryptionScheme to use.
 	 * @param random
 	 */
 	public StandardCircuitInput(BooleanCircuit ungarbledCircuit, MultiKeyEncryptionScheme mes, SecureRandom random){
@@ -61,10 +61,10 @@ public class StandardCircuitInput implements CircuitInput{
 	
 	/**
 	 * This constructor creates an input object for a row reduction representation of StandardGarbledBooleanCircuit.
-	 * @param ungarbledCircuit the boolean circuit needs to be garbled. 
-	 * @param mes a MultiKeyEncryptionScheme to use.
+	 * @param ungarbledCircuit The boolean circuit that needs to be garbled. 
+	 * @param mes A MultiKeyEncryptionScheme to use.
 	 * @param random
-	 * @param isRowReductionWithFixedOutputKeys indicates if the user is going to use sample the wires' keys out of given output keys. 
+	 * @param isRowReductionWithFixedOutputKeys Indicates if the user is going to sample the wires' keys from given output keys.
 	 * In this case, the circuit representation should be a little different. 
 	 * See {@link BooleanCircuit#BooleanCircuit(File f)} for more information.
 	 */

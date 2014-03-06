@@ -175,9 +175,9 @@ class StandardGarbledBooleanCircuitUtil implements CircuitTypeUtil{
 	
 	/**
 	 * Samples the keys for the output wires of the given gate.
-	 * @param allOutputWireValues both keys of all output wires.
-	 * @param ungarbledGate the gate we should sample keys for its output wires.
-	 * @param allWireValues a map to fill with the wires' keys.
+	 * @param allOutputWireValues Both keys of all output wires.
+	 * @param ungarbledGate The gate we should sample keys for its output wires.
+	 * @param allWireValues A map to fill with the wires' keys.
 	 */
 	protected void generateOutputKeys(Map<Integer, SecretKey[]> allOutputWireValues, Gate ungarbledGate, Map<Integer, SecretKey[]> allWireValues) {
 		// In case there are no output keys filled yet, create all output keys.
@@ -202,10 +202,10 @@ class StandardGarbledBooleanCircuitUtil implements CircuitTypeUtil{
 	
 	/**
 	 * Creates the garbled tables. This is done by the constructor of the gates.
-	 * @param gates array of gates to fill.
+	 * @param gates An array of gates to fill.
 	 * @param garbledTablesHolder holds the garbled tables.
-	 * @param ungarbledGates the gates that need to be garbled.
-	 * @param allWireValues a map that contains both keys for each wire.
+	 * @param ungarbledGates The gates that need to be garbled.
+	 * @param allWireValues A map that contains both keys for each wire.
 	 * @throws InvalidKeyException
 	 * @throws IllegalBlockSizeException
 	 * @throws PlaintextTooLongException
@@ -220,10 +220,10 @@ class StandardGarbledBooleanCircuitUtil implements CircuitTypeUtil{
 
 	/**
 	 * Fills the maps containing the keys for the output wires and the translation table.
-	 * @param outputWireLabels labels of output wires.
-	 * @param allOutputWireValues a map to fill with the output wires' keys.
-	 * @param allWireValues a map to take the output wires' keys from.
-	 * @param translationTable a map to fill with the output wires' signal bits.
+	 * @param outputWireLabels Labels of the output wires.
+	 * @param allOutputWireValues A map to fill with the output wires' keys.
+	 * @param allWireValues A map to take the output wires' keys from.
+	 * @param translationTable A map to fill with the output wires' signal bits.
 	 */
 	private void fillOutputWiresValues(int[] outputWireLabels, Map<Integer, SecretKey[]> allOutputWireValues, Map<Integer, SecretKey[]> allWireValues,
 			Map<Integer, Byte> translationTable) {
@@ -244,8 +244,8 @@ class StandardGarbledBooleanCircuitUtil implements CircuitTypeUtil{
 
 	/**
 	 * Samples both keys of the given wire's label.
-	 * @param allWireValues a map that contains both keys for each wire.
-	 * @param wireLabel the label of the wire we want to sample keys for.
+	 * @param allWireValues A map that contains both keys for each wire.
+	 * @param wireLabel The label of the wire we want to sample keys for.
 	 */
 	private void sampleStandardKeys(Map<Integer, SecretKey[]> allWireValues, int wireLabel) {
 		
@@ -310,9 +310,9 @@ class StandardGarbledBooleanCircuitUtil implements CircuitTypeUtil{
 	
 	/**
 	 * Samples the keys.
-	 * @param prg used to sample values
-	 * @param seed used to initialize the prg
-	 * @param ungarbledCircuit the circuit that this garbled circuit should be the garbled of.
+	 * @param prg Used to sample values.
+	 * @param seed Used to initialize the prg.
+	 * @param ungarbledCircuit The circuit that this garbled circuit should be the garbling of.
 	 * @param allWireValues a map that contains both keys for each wire.
 	 * @return the values sampled by the function
 	 * @throws InvalidKeyException
@@ -357,8 +357,8 @@ class StandardGarbledBooleanCircuitUtil implements CircuitTypeUtil{
 	/**
 	 * Samples the output keys by the prg and seed.
 	 * @param prg 
-	 * @param allWireValues a map that contains both keys for each wire.
-	 * @param ungarbledGate the gate we want to sample keys for its output wires.
+	 * @param allWireValues A map that contains both keys for each wire.
+	 * @param ungarbledGate The gate we want to sample keys for its output wires.
 	 */
 	protected void generateOutputKeysFromSeed(PseudorandomGenerator prg,Map<Integer, SecretKey[]> allWireValues, Gate ungarbledGate) {
 		//Get the labels of the output wires.
@@ -372,9 +372,9 @@ class StandardGarbledBooleanCircuitUtil implements CircuitTypeUtil{
 	}
 	
 	/**
-	 * Samples both keys of the given wire's label using the Prg.
-	 * @param allWireValues a map that contains both keys for each wire.
-	 * @param wireLabel the label of the wire we need to sample keys for.
+	 * Samples both keys of the given wire's label using the PRG.
+	 * @param allWireValues A map that contains both keys for each wire.
+	 * @param wireLabel The label of the wire we need to sample keys for.
 	 * @param prg 
 	 */
 	private void sampleKeysFromSeed(Map<Integer, SecretKey[]> allWireValues, int wireLabel,	PseudorandomGenerator prg) {
@@ -413,9 +413,9 @@ class StandardGarbledBooleanCircuitUtil implements CircuitTypeUtil{
 	
 	/**
 	 * Computes the hash function on the circuit's garbled tables.
-	 * @param hash CryptographicHash function to use
-	 *  @param allWireValues a map that contains both keys for each wire.
-	 * @param ungarbledGates the gates of the ungarbled circuit
+	 * @param hash A CryptographicHash function to use.
+	 *  @param allWireValues A map that contains both keys for each wire.
+	 * @param ungarbledGates The gates of the ungarbled circuit.
 	 * @return the result of the hash function on the garbled tables.
 	 * @throws InvalidKeyException
 	 * @throws IllegalBlockSizeException

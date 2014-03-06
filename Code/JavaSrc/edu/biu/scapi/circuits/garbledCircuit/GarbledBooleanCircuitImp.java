@@ -41,8 +41,8 @@ import edu.biu.scapi.exceptions.NoSuchPartyException;
 import edu.biu.scapi.exceptions.NotAllInputsSetException;
 
 /**
- * Concrete implementation of GarbledBooleanCircuit that common for all types of circuits.<p>
- * It gets an input object in the constructor that defines which specific type of circuit it really is.
+ * A concrete implementation of GarbledBooleanCircuit that is common for all types of circuits.<p>
+ * It gets an input a object in the constructor that defines which specific type of circuit it really is.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
@@ -86,11 +86,11 @@ public class GarbledBooleanCircuitImp implements GarbledBooleanCircuit {
 	protected HashMap<Integer, Byte> translationTable;
 	
 	/**
-	 * Constructor that gets an input object and create the circuit with it contents.<p>
+	 * A constructor that gets an input an object and creates the circuit with its contents.<p>
 	 * The created circuit will be "empty", without garbled tables. <p>
 	 * After this constructor the circuit is not complete, one of the generateKeysAndSetTables functions should be called in order to 
 	 * create the underlying gates.
-	 * @param input specifies which concrete type of circuit to implement.
+	 * @param input Specifies which concrete type of circuit to implement.
 	 */
 	public GarbledBooleanCircuitImp(CircuitInput input){
 		//Create an empty garbled tables.
@@ -100,7 +100,7 @@ public class GarbledBooleanCircuitImp implements GarbledBooleanCircuit {
 	}
 	
 	/**
-	 * Constructor that gets an input object, garbled tables and translation tables and create the circuit with them.<p>
+	 * A constructor that gets an input an object, garbled tables and translation tables and creates the circuit with them.<p>
 	 * After this constructor the circuit is complete and ready to be used.
 	 * @param input input specifies which concrete type of circuit to implement.
 	 * @param garbledTables 
@@ -297,9 +297,9 @@ public class GarbledBooleanCircuitImp implements GarbledBooleanCircuit {
 	
 	/**
 	 * Translates from the resulting garbled wires to wires.
-	 * @param garbledOutput the result of computing the circuit. 
-	 * This is result is given in garbled wires and will be translation according to the translation table.
-	 * @return the translated results as wires of the boolean circuit where the value of the wires are set.
+	 * @param garbledOutput The result of computing the circuit. 
+	 * This result is given in garbled wires and will be translated according to the translation table.
+	 * @return the translated results as wires of the boolean circuit where the values of the wires are set.
 	 */
   	public Map<Integer, Wire> translate(Map<Integer, GarbledWire> garbledOutput){
   		
