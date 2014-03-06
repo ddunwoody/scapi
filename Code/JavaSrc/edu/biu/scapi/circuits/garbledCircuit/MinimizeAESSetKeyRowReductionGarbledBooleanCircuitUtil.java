@@ -39,7 +39,7 @@ import edu.biu.scapi.primitives.prf.AES;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class MinimizeAESSetKeyRowReductionGarbledBooleanCircuitUtil extends StandardRowReductionGarbledBooleanCircuitUtil{
+class MinimizeAESSetKeyRowReductionGarbledBooleanCircuitUtil extends StandardRowReductionGarbledBooleanCircuitUtil{
 	
 	private AES aes;
 	

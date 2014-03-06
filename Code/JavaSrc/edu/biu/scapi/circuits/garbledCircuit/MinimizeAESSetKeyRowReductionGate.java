@@ -45,7 +45,7 @@ import edu.biu.scapi.primitives.prf.PseudorandomFunction;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein) 
  * 
  */
-public class MinimizeAESSetKeyRowReductionGate extends StandardRowReductionGarbledGate {
+class MinimizeAESSetKeyRowReductionGate extends StandardRowReductionGarbledGate {
 
 	private PseudorandomFunction aes;
 	
