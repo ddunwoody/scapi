@@ -46,8 +46,8 @@ public class OTExtensionGeneralSInput implements OTBatchSInput{
 	
 	/**
 	 * Constructor that sets x0, x1 for each OT element and the number of OTs.
-	 * @param x1Arr holds all the x0 for all the senders serially
-	 * @param x0Arr holds all the x1 for all the senders serially
+	 * @param x1Arr holds all the x0 for all the senders serially.
+	 * @param x0Arr holds all the x1 for all the senders serially.
 	 * @param numOfOts Number of OTs in the OT extension.
 	 */
 	public OTExtensionGeneralSInput(byte[] x0Arr, byte[] x1Arr, int numOfOts){
@@ -57,21 +57,21 @@ public class OTExtensionGeneralSInput implements OTBatchSInput{
 	}
 	
 	/**
-	 * @return the array holds all the x0 for all the senders serially.
+	 * @return the array that holds all the x0 for all the senders serially.
 	 */
 	public byte[] getX0Arr(){
 		return x0Arr;
 	}
 	
 	/**
-	 * @return the array holds all the x1 for all the senders serially.
+	 * @return the array that holds all the x1 for all the senders serially.
 	 */
 	public byte[] getX1Arr(){
 		return x1Arr;
 	}
 	
 	/**
-	 * @return the numner of OT elements.
+	 * @return the number of OT elements.
 	 */
 	public int getNumOfOts(){
 		return numOfOts;

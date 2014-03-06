@@ -31,7 +31,7 @@ import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.OTBatchRInput;
  * An abstract OT receiver input.<P>
  * 
  * All the concrete classes are the same and differ only in the name.
- * The reason a class is created for each version is due to the fact that a relative class is created for the sender and we wish to be consistent. 
+ * The reason a class is created for each version is due to the fact that a respective class is created for the sender and we wish to be consistent. 
  * The name of the class determines the version of the OT extension we wish to run.
  * 
  * In all OT extension scenarios the receiver gets i bits. Each byte holds a bit for each OT in the OT extension protocol.
@@ -44,9 +44,9 @@ abstract public class OTExtensionRInput implements OTBatchRInput{
 	private int elementSize = 32;	// The size of each element in the ot extension. All elements must be of the same size.
 	
 	/**
-	 * Constructor that sets the sigma array and number of OT elements.
-	 * @param sigmaArr array of sigma for each OT.
-	 * @param elementSize the size of each element in the OT extension. 
+	 * Constructor that sets the sigma array and the number of OT elements.
+	 * @param sigmaArr An array of sigma for each OT.
+	 * @param elementSize The size of each element in the OT extension. 
 	 */
 	public OTExtensionRInput(byte[] sigmaArr, int elementSize){
 		this.sigmaArr = sigmaArr;

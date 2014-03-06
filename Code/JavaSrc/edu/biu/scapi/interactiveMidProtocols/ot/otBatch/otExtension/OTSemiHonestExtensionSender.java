@@ -32,10 +32,12 @@ import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.OTBatchSender;
 import edu.biu.scapi.securityLevel.SemiHonest;
 
 /**
- * Concrete class for Semi-Honest OT extension sender. <P>
+ * A concrete class for Semi-Honest OT extension sender. <P>
  * 
  * This class is a wrapper to the sender side of the OT extension code written in c++. The c++ code is called via a dll that uses jni to pass data between 
- * the java and native code. <P>
+ * the java and the native code. <P>
+ * 
+ * The base OT is done once in the construction time. After that, the transfer function will be always optimized and fast, no matter how much OT's there are.
  * 
  * NOTE: Unlike a regular implementation the connection is done via the native code and thus the channel provided in the transfer function is ignored.  
  * 
@@ -51,23 +53,24 @@ public class OTSemiHonestExtensionSender  implements SemiHonest, OTBatchSender{
 	private native long initOtSender(String ipAddress, int port, int koblitzOrZpSize, int numOfThreads);
 	
 	/**
-	 * The native code that runs the ot extension as the sender.
-	 * @param senderPtr The pointer initialized via the function initOtSender
-	 * @param x0 an array that holds all the x0 values for each of the ot's serially.
-	 * @param x1 an array that holds all the x1 values for each of the ot's serially.
+	 * The native code that runs the OT extension as the sender.
+	 * @param senderPtr The pointer initialized via the function initOtSender.
+	 * @param x0 An array that holds all the x0 values for each of the OT's serially.
+	 * @param x1 An array that holds all the x1 values for each of the OT's serially.
 	 * @param delta 
-	 * @param numOfOts The number or OTs that the protocol runs.
+	 * @param numOfOts The number of OTs that the protocol runs.
 	 * @param bitLength The length of each item in the OT. The size of each x0, x1 which must be the same for all x0, x1.
-	 * @param version the OT extension version the user want to use.
+	 * @param version the OT extension version the user wants to use.
 	 */
 	private native void runOtAsSender(long senderPtr, byte[] x0, byte[]x1, byte[] delta, int numOfOts, int bitLength, String version);
 	
 	
 	/**
-	 * Constructor that create the native sender with communication abilities. It uses the ip address and port given in the party object.
+	 * A constructor that creates the native sender with communication abilities. It uses the ip address and port given in the party object.<p>
+	 * The construction runs the base OT phase. Further calls to transfer function will be optimized and fast, no matter how much OTs there are.
 	 * @param party An object that holds the ip address and port
-	 * @param koblitzOrZpSize An integer that determines whether the ot extension uses Zp or ECC koblitz. The optional parameters are the following.
-	 * 		  163,233,283 for ECC koblitz and 1024, 2048, 3072 for Zp
+	 * @param koblitzOrZpSize An integer that determines whether the OT extension uses Zp or ECC koblitz. The optional parameters are the following.
+	 * 		  163,233,283 for ECC koblitz and 1024, 2048, 3072 for Zp.
 	 * @param numOfThreads    
 	 */
 	public OTSemiHonestExtensionSender(Party party, int koblitzOrZpSize, int numOfThreads ){
@@ -80,7 +83,8 @@ public class OTSemiHonestExtensionSender  implements SemiHonest, OTBatchSender{
 	
 	
 	/**
-	 * Default constructor. Initializes the sender by passing the ip address and uses koblitz 163 as default dlog group. 
+	 * Default constructor. Initializes the sender by passing the ip address and uses koblitz 163 as a default dlog group.<P>
+	 * The construction runs the base OT phase. Further calls to transfer function will be optimized and fast, no matter how much OTs there are.
 	 * @param party An object that holds the ip address and port.
 	 */
 	public OTSemiHonestExtensionSender(Party party ){
@@ -92,6 +96,7 @@ public class OTSemiHonestExtensionSender  implements SemiHonest, OTBatchSender{
 
 	/**
 	 * The overloaded function that runs the protocol.
+	 * After the base OT was done by the constructor, call to this function will be optimized and fast, no matter how much OTs there are.
 	 * @param channel Disregarded. This is ignored since the connection is done in the c++ code.
 	 * @param input The input for the sender specifying the version of the OT extension to run. 
 	 * Every call to the transfer function can run a different OT extension version.
