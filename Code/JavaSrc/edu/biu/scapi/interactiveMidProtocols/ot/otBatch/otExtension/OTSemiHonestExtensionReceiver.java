@@ -36,8 +36,9 @@ import edu.biu.scapi.securityLevel.SemiHonest;
 /**
  * A concrete class for Semi-Honest OT extension receiver. <P>
  * 
- * This class is a wrapper to the receiver side of the OT extension code written in c++. The c++ code is called via a dll that uses jni to pass data between 
- * the java and the native code.<p>
+ * The Semi-Honest OT extension implemented is a SCAPI wrapper of the native implementation by Michael Zohner from the paper: <p>
+ * "G. Asharov, Y. Lindell, T. Schneier and M. Zohner. More Efficient Oblivious Transfer and Extensions for Faster Secure Computation. ACM CCS 2013." <p>
+ * See http://eprint.iacr.org/2013/552.pdf for more information.
  * 
  * The base OT is done once in the construction time. After that, the transfer function will be always optimized and fast, no matter how much OT's there are.<p>
  * 
