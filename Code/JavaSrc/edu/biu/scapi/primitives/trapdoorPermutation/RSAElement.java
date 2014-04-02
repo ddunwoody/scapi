@@ -26,7 +26,6 @@
 
 package edu.biu.scapi.primitives.trapdoorPermutation;
 
-import java.io.Serializable;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
@@ -37,7 +36,7 @@ import java.security.SecureRandom;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-final class RSAElement implements TPElement{
+public final class RSAElement implements TPElement{
 
 	private BigInteger element; // the element value
 
@@ -45,7 +44,7 @@ final class RSAElement implements TPElement{
 	 * Constructor that chooses a random element according to the given modulus.
 	 * @param modN the modulus
 	 */
-	RSAElement(BigInteger modN) {
+	public RSAElement(BigInteger modN) {
 		/*
 		 * samples a number between 1 to n-1
 		 */
@@ -57,7 +56,7 @@ final class RSAElement implements TPElement{
 			//samples a random BigInteger with modN.bitLength()+1 bits
 			randNumber = new BigInteger(modN.bitLength()+1, generator);
 			//drops the element if it's bigger than mod(N)-2
-		} while(randNumber.compareTo(modN.add(new BigInteger("-2")))>0);
+		} while((randNumber.compareTo(modN.add(new BigInteger("-2")))>0) );//|| (randNumber.));
 		//gets a random BigInteger between 1 to modN-1
 		randNumber = randNumber.add(new BigInteger("1"));
 
@@ -71,7 +70,7 @@ final class RSAElement implements TPElement{
 	 * @param x - the element value
 	 * @throws IllegalArgumentException if the element is not legal according the modulus
 	 */
-	RSAElement(BigInteger modN, BigInteger x, boolean check) throws IllegalArgumentException{
+	public RSAElement(BigInteger modN, BigInteger x, boolean check) throws IllegalArgumentException{
 
 		if (! check){
 			element = x;
