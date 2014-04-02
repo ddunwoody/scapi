@@ -53,6 +53,9 @@ public final class BitPadding implements PaddingScheme {
 	 */
 	@Override
 	public byte[] pad(byte[] padInput, int padSize) {
+		if (padSize <= 0){
+			throw new IllegalArgumentException("padSize must be a positive number");
+		}
 		
 		int inputLen = padInput.length;
 		
