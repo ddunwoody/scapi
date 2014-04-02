@@ -31,7 +31,6 @@ import java.math.BigInteger;
 import edu.biu.scapi.primitives.dlog.ECElement;
 import edu.biu.scapi.primitives.dlog.ECElementSendableData;
 import edu.biu.scapi.primitives.dlog.ECFpPoint;
-import edu.biu.scapi.primitives.dlog.ECFpUtility;
 import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
 
 /**
@@ -62,7 +61,6 @@ public class ECFpPointMiracl implements ECElement, ECFpPoint{
 	private BigInteger y;
 	private long mip;
 	
-	private ECFpUtility util;
 	 
 	/**
 	 * Constructor that accepts x,y values of a point. 
@@ -76,7 +74,6 @@ public class ECFpPointMiracl implements ECElement, ECFpPoint{
 	 */
 	ECFpPointMiracl(BigInteger x, BigInteger y, MiraclDlogECFp curve) throws IllegalArgumentException{
 		mip = curve.getMip();
-		util = new ECFpUtility();
 		
 		//Create a point in the field with the given parameters, done by Miracl's native code.
 		//Miracl always checks validity of (x,y).
@@ -103,7 +100,7 @@ public class ECFpPointMiracl implements ECElement, ECFpPoint{
 		//in case of infinity, there are no coordinates and we set them to null
 		if (checkInfinityFp(ptr)){
 			this.x = null;
-			this.y  =null;
+			this.y = null;
 		}else{
 			this.x = new BigInteger(getXValueFpPoint(mip, point));
 			this.y = new BigInteger(getYValueFpPoint(mip, point));

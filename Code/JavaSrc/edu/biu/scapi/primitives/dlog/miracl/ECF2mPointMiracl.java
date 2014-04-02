@@ -31,7 +31,6 @@ import java.math.BigInteger;
 import edu.biu.scapi.primitives.dlog.ECElement;
 import edu.biu.scapi.primitives.dlog.ECElementSendableData;
 import edu.biu.scapi.primitives.dlog.ECF2mPoint;
-import edu.biu.scapi.primitives.dlog.ECF2mUtility;
 import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
 /**
  * This class is an adapter for F2m points of miracl
@@ -63,8 +62,6 @@ public class ECF2mPointMiracl implements ECElement, ECF2mPoint{
 	private String curveName;
 	private String fileName;
 	
-	private ECF2mUtility util = new ECF2mUtility();
-
 	/**
 	 * Constructor that accepts x,y values of a point. 
 	 * Miracl always checks validity of coordinates before creating the point.
