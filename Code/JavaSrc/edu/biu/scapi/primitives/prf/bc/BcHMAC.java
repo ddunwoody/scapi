@@ -56,7 +56,6 @@ public final class BcHMAC implements Hmac {
 	 * Our class Hmac is an adapter class for the adaptee class HMac of BC.  
 	 */
 	private HMac hMac;							//The underlying wrapped hmac of BC.
-	private SecretKey secretKey;
 	private boolean isKeySet = false;			//until init is called set to false.
 	private SecureRandom random;				//source of randomness used in key generation
 
@@ -65,7 +64,7 @@ public final class BcHMAC implements Hmac {
 	 * @throws FactoriesException if BC has no hash function corresponding to the given hash.
 	 */
 	public BcHMAC() {
-		//creates SHA1 and secure random end than uses the extended constructor
+		//creates SHA1 and secure random and than uses the extended constructor
 		try{
 			construct("SHA-1", new SecureRandom());
 		}
@@ -136,8 +135,6 @@ public final class BcHMAC implements Hmac {
 	 * @param secretKey the secret key 
 	 */
 	public void setKey(SecretKey secretKey) {
-		//assigns the key
-		this.secretKey = secretKey;
 		
 		CipherParameters bcParams; 
 		//gets the relevant BC cipher parameter
