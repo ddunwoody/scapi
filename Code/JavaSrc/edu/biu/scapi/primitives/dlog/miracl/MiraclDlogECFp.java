@@ -39,7 +39,7 @@ import edu.biu.scapi.primitives.dlog.groupParams.GroupParams;
 import edu.biu.scapi.securityLevel.DDH;
 
 /**
-/**This class implements an Elliptic curve Dlog group over Zp utilizing Miracl's implementation.<p>
+ * This class implements an Elliptic curve Dlog group over Zp utilizing Miracl's implementation.<p>
  * It uses JNI technology to call Miracl's native code.
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  */

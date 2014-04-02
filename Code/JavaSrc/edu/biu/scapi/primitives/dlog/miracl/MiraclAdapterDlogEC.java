@@ -70,6 +70,7 @@ public abstract class MiraclAdapterDlogEC extends DlogGroupEC
 	protected abstract boolean basicAndInfinityChecksForExpForPrecomputedValues(GroupElement base);
 	protected abstract long initExponentiateWithPrecomputedValues(GroupElement baseElement, BigInteger exponent, int window, int maxBits);
 	protected abstract GroupElement computeExponentiateWithPrecomputedValues(long ebrickPointer, BigInteger exponent);
+	
 	/*
 	 * 
 	 * @return mip - miracl pointer
