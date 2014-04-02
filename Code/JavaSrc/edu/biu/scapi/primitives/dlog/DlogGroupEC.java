@@ -30,8 +30,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import edu.biu.scapi.exceptions.UnInitializedException;
-
 
 /**
  * This class manages the creation of NIST recommended elliptic curves.
@@ -131,7 +129,7 @@ public abstract class DlogGroupEC extends DlogGroupAbs implements DlogEllipticCu
 	 * Maybe in the future we will add the validity checks.
 	 * @return <code>true</code> is the generator is valid;<p>
 	 * 		   <code>false</code> otherwise.
-	 * @throws UnInitializedException
+	 * 
 	 */
 	public boolean isGenerator(){
 		return true;
