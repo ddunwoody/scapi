@@ -241,24 +241,8 @@ public class OpenSSLDlogECF2m extends OpenSSLAdapterDlogEC implements DlogECF2m,
 	@Override
 	public GroupElement simultaneousMultipleExponentiations(GroupElement[] groupElements, BigInteger[] exponentiations) {
 		
-		int len = groupElements.length;
-
-		//Create arrays to hold the native points and the exponents' bytes.
-		long[] nativePoints = new long[len];
-		byte[][] exponents = new byte[len][];
-		for (int i = 0; i < len; i++) {
-			// if the GroupElements don't match the DlogGroup, throw exception
-			if (!(groupElements[i] instanceof ECF2mPointOpenSSL)) {
-				throw new IllegalArgumentException("groupElement doesn't match the DlogGroup");
-			}
-			nativePoints[i] = ((ECF2mPointOpenSSL) groupElements[i]).getPoint();
-			exponents[i] = exponentiations[i].toByteArray();
-		}
-
-		// Call the native simultaneousMultiply function.
-		long result = simultaneousMultiply(curve, nativePoints, exponents);
-		// build a ECF2mPointOpenSSL element from the result.
-		return new ECF2mPointOpenSSL(curve, result);
+		//Our tests showed that for ECF2m the naive algorithm is faster than the simultaneousMultipleExponentiations algorithm.
+		return computeNaive(groupElements, exponentiations);
 	}
 
 	/**
