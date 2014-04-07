@@ -537,10 +537,10 @@ epoint* computeLL(miracl* mip, epoint** elements, big* exponents, int n, int fie
 		h = ((int) (n / w)) + 1;
 	}
 		
-	printf("n is: %d\n", n);
-	printf("t is: %d\n", t);
-	printf("w is: %d\n", w);
-	printf("h is: %d\n", h);
+	//printf("n is: %d\n", n);
+	//printf("t is: %d\n", t);
+	//printf("w is: %d\n", w);
+	//printf("h is: %d\n", h);
 
 	//creates pre computation table
 	preComp = createLLPreCompTable(mip, elements, w, h, n, field);
