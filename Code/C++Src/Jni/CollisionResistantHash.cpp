@@ -58,6 +58,7 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_hash_cryptopp_CryptoPpHash
 	else if(strcmp (str,"SHA512") == 0)
 		hashPtr = new SHA512;
 
+	env->ReleaseStringUTFChars(hashName, str);
 	//return a pointer to the created hash.
 	return (jlong)hashPtr;
 
@@ -143,4 +144,5 @@ JNIEXPORT jint JNICALL Java_edu_biu_scapi_primitives_hash_cryptopp_CryptoPpHash_
  */
 JNIEXPORT void JNICALL Java_edu_biu_scapi_primitives_hash_cryptopp_CryptoPpHash_deleteHash
 (JNIEnv *, jobject, jlong hashPtr){
+	delete((HashTransformation *) hashPtr);
 }
