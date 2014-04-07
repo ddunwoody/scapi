@@ -94,11 +94,11 @@ JNIEXPORT void JNICALL Java_edu_biu_scapi_primitives_prf_cryptopp_CryptoPpAES_op
 	  byte* outBlock = new byte[blockSize];
 
 	  for (int i=0; i<rounds; i++){
-		  memcpy(inBlock, in+(i*blockSize), blockSize);
+		  //memcpy(inBlock, in+(i*blockSize), blockSize);
 		  if (forEncrypt){
-			  ((AESEncryption*)aes)->ProcessBlock(inBlock, outBlock);
+			  ((AESEncryption*)aes)->ProcessBlock((byte*)(in+(i*blockSize)), outBlock);
 		  } else {
-			  ((AESDecryption*)aes)->ProcessBlock(inBlock, outBlock);
+			  ((AESDecryption*)aes)->ProcessBlock((byte*)(in+(i*blockSize)), outBlock);
 		  }
 		  env->SetByteArrayRegion(outBytes, i*blockSize, blockSize, (jbyte*)outBlock);
 	  }
