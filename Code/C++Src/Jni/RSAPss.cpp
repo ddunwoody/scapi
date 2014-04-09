@@ -213,3 +213,9 @@ JNIEXPORT jboolean JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_digitalS
 	return verifierLocal->VerifyMessage(msgBytes, length, sigBytes, sigLen);
 
 }
+
+JNIEXPORT void JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_digitalSignature_CryptoPPRSAPss_deleteRSA
+  (JNIEnv *, jobject, jlong signer, jlong verifier){
+	  delete (RSASSA_PKCS1v15_SHA_Signer *) signer;
+	  delete (RSASSA_PKCS1v15_SHA_Verifier*) verifier;
+}

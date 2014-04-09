@@ -88,6 +88,14 @@ JNIEXPORT jbyteArray JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_digita
 JNIEXPORT jboolean JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_digitalSignature_CryptoPPRSAPss_doVerify
   (JNIEnv *, jobject, jlong, jbyteArray, jbyteArray, jint);
 
+/*
+ * Class:     edu_biu_scapi_midLayer_asymmetricCrypto_digitalSignature_CryptoPPRSAPss
+ * Method:    deleteRSA
+ * Signature: (JJ)V
+ */
+JNIEXPORT void JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_digitalSignature_CryptoPPRSAPss_deleteRSA
+  (JNIEnv *, jobject, jlong, jlong);
+
 #ifdef __cplusplus
 }
 #endif

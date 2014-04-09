@@ -232,3 +232,9 @@ JNIEXPORT jint JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_encryption_C
 
 	  return ((RSAES_OAEP_SHA_Encryptor * )encryptor)->FixedMaxPlaintextLength();
 }
+
+JNIEXPORT void JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_encryption_CryptoPPRSAOaep_deleteRSA
+  (JNIEnv *, jobject, jlong encryptor, jlong decryptor){
+	  delete (RSAES_OAEP_SHA_Encryptor *) encryptor;
+	  delete (RSAES_OAEP_SHA_Decryptor *) decryptor;
+}

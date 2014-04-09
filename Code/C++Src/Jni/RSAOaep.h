@@ -96,6 +96,14 @@ JNIEXPORT jbyteArray JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_encryp
 JNIEXPORT jint JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_encryption_CryptoPPRSAOaep_getPlaintextLength
   (JNIEnv *, jobject, jlong);
 
+/*
+ * Class:     edu_biu_scapi_midLayer_asymmetricCrypto_encryption_CryptoPPRSAOaep
+ * Method:    deleteRSA
+ * Signature: (JJ)V
+ */
+JNIEXPORT void JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_encryption_CryptoPPRSAOaep_deleteRSA
+  (JNIEnv *, jobject, jlong, jlong);
+
 #ifdef __cplusplus
 }
 #endif
