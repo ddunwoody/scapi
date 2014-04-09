@@ -27,7 +27,6 @@
 package edu.biu.scapi.midLayer.asymmetricCrypto.encryption;
 
 import edu.biu.scapi.securityLevel.Cca2;
-import edu.biu.scapi.securityLevel.NonMalleable;
 
 /**
  * General interface for RSA OAEP encryption scheme. Every concrete implementation of RSA OAEP encryption should implement this interface.
