@@ -25,8 +25,9 @@
 
 #include "StdAfx.h"
 #include <jni.h>
-#include "RSA.h"
+#include "RSAPermutation.h"
 #include <openssl/rsa.h>
+#include <openssl/rand.h>
 #include <iostream>
 #include <openssl/err.h>
 
@@ -147,6 +148,10 @@ JNIEXPORT jbyteArray JNICALL Java_edu_biu_scapi_primitives_trapdoorPermutation_o
 	  //Convert the given data into c++ notation.
 	  jbyte* el  = (jbyte*) env->GetByteArrayElements(element, 0);
 	  ERR_load_crypto_strings();
+
+	  //Seed the random geneartor.
+	  char seed[] = "Seed the PRNG";
+	  RAND_seed(seed, sizeof seed);
 
 	  //Allocate a new byte array to hold the output.
 	  int size = RSA_size((RSA *) rsa);
