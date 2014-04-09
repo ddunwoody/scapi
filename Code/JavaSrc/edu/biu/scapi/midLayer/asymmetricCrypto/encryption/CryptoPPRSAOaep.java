@@ -38,7 +38,6 @@ import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 
-import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertextSendableData;
 import edu.biu.scapi.midLayer.ciphertext.ByteArrayAsymCiphertext;
 import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertext;
 import edu.biu.scapi.midLayer.plaintext.ByteArrayPlaintext;
@@ -70,7 +69,7 @@ public class CryptoPPRSAOaep extends RSAOaepAbs {
 	private native byte[] doDecrypt(long decryptor, byte[] ciphertext);
 	
 	private native int getPlaintextLength(long encryptor); 
-	
+	private native void deleteRSA(long encryptor, long decryptor);	//Delete the native RSA object.
 	
 	/**
 	 * Default constructor. Uses default implementation of SecureRandom as source of randomness.
@@ -233,7 +232,15 @@ public class CryptoPPRSAOaep extends RSAOaepAbs {
 		return new ByteArrayPlaintext(plaintext);
 	}
 	
-		
+	/*
+	 * Delete the related RSA object.
+	 */
+	protected void finalize() throws Throwable {
+
+		// Delete from the dll the dynamic allocation of the RSA object.
+		deleteRSA(encryptor, decryptor);
+
+	}
 	
 	static {
 	       System.loadLibrary("CryptoPPJavaInterface");
