@@ -51,9 +51,6 @@
     <ClInclude Include="Hmac.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RSA.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="RC4.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -67,6 +64,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SymEncryption.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RSAPermutation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RSAOaep.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RSAPss.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -107,9 +113,6 @@
     <ClCompile Include="Hmac.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RSA.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="RC4.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -123,6 +126,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SymEncryption.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RSAPermutation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RSAOaep.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RSAPss.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -153,6 +153,8 @@
     <ClInclude Include="DlogF2m.h" />
     <ClInclude Include="DlogFp.h" />
     <ClInclude Include="DlogZp.h" />
+    <ClInclude Include="RSAOaep.h" />
+    <ClInclude Include="RSAPss.h" />
     <ClInclude Include="SymEncryption.h" />
     <ClInclude Include="ZpElement.h" />
     <ClInclude Include="F2mPoint.h" />
@@ -161,7 +163,7 @@
     <ClInclude Include="Hmac.h" />
     <ClInclude Include="PrpAbs.h" />
     <ClInclude Include="RC4.h" />
-    <ClInclude Include="RSA.h" />
+    <ClInclude Include="RSAPermutation.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="TripleDES.h" />
@@ -193,7 +195,9 @@
     <ClCompile Include="OpenSSLJavaInterface.cpp" />
     <ClCompile Include="PrpAbs.cpp" />
     <ClCompile Include="RC4.cpp" />
-    <ClCompile Include="RSA.cpp" />
+    <ClCompile Include="RSAOaep.cpp" />
+    <ClCompile Include="RSAPermutation.cpp" />
+    <ClCompile Include="RSAPss.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
