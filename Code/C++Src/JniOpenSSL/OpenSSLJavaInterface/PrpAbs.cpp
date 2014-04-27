@@ -104,19 +104,10 @@ JNIEXPORT void JNICALL Java_edu_biu_scapi_primitives_prf_openSSL_OpenSSLPRP_doOp
 	  int size = env->GetArrayLength(inBytes);
 	  //Allocate a new byte array with the block size of the specific prp algorithm.
 	  unsigned char* outBlock = new unsigned char[size];
-	  //int size;
 	  
+	  //Compute the prp on each block and put the result in the output array.
 	  EVP_EncryptUpdate ((EVP_CIPHER_CTX*)prp, outBlock, &size, (unsigned char*)in, size);
 	  env->SetByteArrayRegion(outBytes, 0, size, (jbyte*)outBlock);
-	  //Compute the prp on each block and put the result in the output array.
-	  //for (int i=0; i<rounds; i++){
-		  
-		  //Compute the block.
-		 // EVP_EncryptUpdate ((EVP_CIPHER_CTX*)prp, outBlock, &size, (unsigned char*)in+(i*blockSize), blockSize);
-
-		  //Put the result in the given output array in the right place.
-		 // env->SetByteArrayRegion(outBytes, i*blockSize, blockSize, (jbyte*)outBlock);
-	 // }
 
 	  //Mke sure to release the memory created in c++. The JVM will not release it automatically.
 	  env->ReleaseByteArrayElements(inBytes,in,0);
@@ -143,17 +134,9 @@ JNIEXPORT void JNICALL Java_edu_biu_scapi_primitives_prf_openSSL_OpenSSLPRP_doOp
 	  //int size;
 	  EVP_DecryptUpdate ((EVP_CIPHER_CTX*)prp, outBlock, &size, (unsigned char*)(in), size);
 
-	  env->SetByteArrayRegion(outBytes, 0, size, (jbyte*)outBlock);  
 	  //Invert the prp on each block and put the result in the output array.
-	 /* for (int i=0; i<rounds; i++){
-		 
-		  //Invert the block.
-		  int suc = EVP_DecryptUpdate ((EVP_CIPHER_CTX*)prp, outBlock, &size, (unsigned char*)(in+(i*blockSize)), blockSize);
-		  
-		  //Put the result in the given output array in the right place.
-		  env->SetByteArrayRegion(outBytes, i*blockSize, blockSize, (jbyte*)outBlock);  
-	  }*/
-
+	  env->SetByteArrayRegion(outBytes, 0, size, (jbyte*)outBlock);  
+	 
 	  //Make sure to release the memory created in c++. The JVM will not release it automatically.
 	  env->ReleaseByteArrayElements(inBytes,in,0);
 	  delete (outBlock);
