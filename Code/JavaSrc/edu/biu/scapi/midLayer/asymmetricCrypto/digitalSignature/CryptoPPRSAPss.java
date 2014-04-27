@@ -40,7 +40,6 @@ import java.security.interfaces.RSAPublicKey;
 
 import edu.biu.scapi.midLayer.signature.RSASignature;
 import edu.biu.scapi.midLayer.signature.Signature;
-import edu.biu.scapi.securityLevel.UnlimitedTimes;
 
 /**
  * This class implements the RSA PSS signature scheme, using Crypto++ RSAPss implementation.
@@ -65,6 +64,7 @@ public class CryptoPPRSAPss extends RSAPssAbs {
 	private native byte[] doSign(long signer, byte[] msg, int length);
 	private native boolean doVerify(long verifier, byte[] signature, byte[] msg, int msgLen);
 	
+	private native void deleteRSA(long signer, long verifier);	//Delete the native RSA objects.
 	
 	/**
 	 * Default constructor. uses default implementation of SecureRandom.
