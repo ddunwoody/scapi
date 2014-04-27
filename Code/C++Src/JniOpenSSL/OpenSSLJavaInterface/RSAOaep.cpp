@@ -32,6 +32,10 @@
 
 using namespace std;
 
+/* 
+ * function createEncryption : This function creates a RSA object that computes the RSA encryption scheme.
+ * return					 : a pointer to the created object.
+ */
 JNIEXPORT jlong JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_encryption_OpenSSLRSAOaep_createEncryption
   (JNIEnv *, jobject){
 	  //Create a RSA object.
@@ -40,10 +44,16 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_encryption_
 	  return (long) rsa;
 }
 
-
+/* 
+ * function initRSAEncryptor : This function initializes the RSA object with public key.
+							   In this case, the object can encrypt but cannot decrypt.
+ * param rsa				 : A pointer to the RSA object.
+ * param modulus			 : Modolus (n)
+ * param pubExponent		 : pubic exponent (e)
+ */
 JNIEXPORT void JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_encryption_OpenSSLRSAOaep_initRSAEncryptor
   (JNIEnv *env, jobject, jlong rsa, jbyteArray modulus, jbyteArray pubExponent){
-	  
+	  //Convert the given data into c++ notation.
 	  jbyte* mod  = (jbyte*) env->GetByteArrayElements(modulus, 0);
 	  jbyte* pubExp  = (jbyte*) env->GetByteArrayElements(pubExponent, 0);
 
@@ -56,9 +66,17 @@ JNIEXPORT void JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_encryption_O
 	  env->ReleaseByteArrayElements(pubExponent, pubExp, 0);
 }
 
-
+/* 
+ * function initRSADecryptor : This function initializes the RSA object with public and private keys.
+							   In this case, the object can encrypt and decrypt.
+ * param rsa				 : A pointer to the RSA object.
+ * param modulus			 : Modolus (n)
+ * param pubExponent		 : pubic exponent (e)
+ * param privExponent		 : private exponent (d)
+ */
 JNIEXPORT void JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_encryption_OpenSSLRSAOaep_initRSADecryptor
   (JNIEnv *env, jobject, jlong rsa, jbyteArray modulus, jbyteArray pubExponent, jbyteArray privExponent){
+	  //Convert the given data into c++ notation.
 	  jbyte* mod  = (jbyte*) env->GetByteArrayElements(modulus, 0);
 	  jbyte* pubExp  = (jbyte*) env->GetByteArrayElements(pubExponent, 0);
 	  jbyte* privExp  = (jbyte*) env->GetByteArrayElements(privExponent, 0);
@@ -74,7 +92,19 @@ JNIEXPORT void JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_encryption_O
 	  env->ReleaseByteArrayElements(privExponent, privExp, 0);
 }
 
-
+/*
+ * function initRSACrtDecryptor		: This function initializes the RSA object with public and CRT private keys.
+									  In this case, the object can encrypt and decrypt.
+ * param rsa						: A pointer to the RSA object.
+ * param modulus					: modolus (n)
+ * param pubExponent				: pubic exponent (e)
+ * param privExponent				: private exponent (d)
+ * param prime1						: The prime p, such that p * q = n.
+ * param prime2						: The prime q, such that p * q = n.
+ * param primeExponent1				: dp, suzh that e * dp = 1 mod(p-1)
+ * param primeExponent2				: dq, suzh that e * dq = 1 mod(q-1)
+ * params crt						: q^(-1) mod p.
+ */
 JNIEXPORT void JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_encryption_OpenSSLRSAOaep_initRSACrtDecryptor
   (JNIEnv *env , jobject, jlong rsa, jbyteArray modulus, jbyteArray pubExponent, jbyteArray privExponent, 
   jbyteArray prime1, jbyteArray prime2, jbyteArray primeExponent1, jbyteArray primeExponent2, jbyteArray crt) {
@@ -111,10 +141,15 @@ JNIEXPORT void JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_encryption_O
 
 }
 
-
+/*
+ * function doEncrypt			: Encrypts the given plaintext.
+ * param rsa					: A pointer to the RSA object.
+ * param plaintextBytes			: The plaintext to encrypt.
+ * return jbyteArray			: The encrypted bytes.
+ */
 JNIEXPORT jbyteArray JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_encryption_OpenSSLRSAOaep_doEncrypt
   (JNIEnv * env, jobject, jlong rsa, jbyteArray plaintextBytes){
-	  
+	  //Convert the given data into c++ notation.
 	  jbyte* plaintext  = (jbyte*) env->GetByteArrayElements(plaintextBytes, 0);
 	  
 	  //Seed the random geneartor.
@@ -125,6 +160,7 @@ JNIEXPORT jbyteArray JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_encryp
 	  int size = RSA_size((RSA *) rsa);
 	  unsigned char* ret = new unsigned char[size]; 
 
+	  //Encrypt the plaintext.
 	  RSA_public_encrypt(env->GetArrayLength(plaintextBytes), (unsigned char*) plaintext, (unsigned char*)ret, (RSA *) rsa, RSA_PKCS1_OAEP_PADDING);
 
 	  //Build jbyteArray from the byteArray.
@@ -138,15 +174,22 @@ JNIEXPORT jbyteArray JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_encryp
 	  return result;
 }
 
-
+/*
+ * function doDecrypt			: Decrypts the given ciphertext.
+ * param rsa					: A pointer to the RSA object.
+ * param ciphertext				: The ciphertext to decrypt.
+ * return jbyteArray			: The decrypted bytes.
+ */
 JNIEXPORT jbyteArray JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_encryption_OpenSSLRSAOaep_doDecrypt
   (JNIEnv *env, jobject, jlong rsa, jbyteArray ciphertext){
+	   //Convert the given data into c++ notation.
 	  jbyte* cipher  = (jbyte*) env->GetByteArrayElements(ciphertext, 0);
 
 	  //Allocate a new byte array to hold the output.
 	  int size = RSA_size((RSA *) rsa) - 41;
 	  unsigned char* ret = new unsigned char[size]; 
 
+	  //Decrypt the ciphertext.
 	  RSA_private_decrypt(env->GetArrayLength(ciphertext), (unsigned char*) cipher, (unsigned char*)ret, (RSA *) rsa, RSA_PKCS1_OAEP_PADDING);
 
 	  //Build jbyteArray from the byteArray.
@@ -160,13 +203,20 @@ JNIEXPORT jbyteArray JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_encryp
 	  return result;
 }
 
-
+/*
+ * function getPlaintextLength			: Returns the maximum size that can be encrypted using RSA OAEP encryption scheme.
+ * param rsa							: A pointer to the RSA object.
+ * return jint
+ */
 JNIEXPORT jint JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_encryption_OpenSSLRSAOaep_getPlaintextLength
 	(JNIEnv *, jobject, jlong rsa){
 		return RSA_size((RSA *) rsa) - 42;
 }
 
-
+/*
+ * function deleteRSA			: Deletes the native RSA object.
+ * param rsa					: A pointer to the RSA object.
+ */
 JNIEXPORT void JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_encryption_OpenSSLRSAOaep_deleteRSA
   (JNIEnv *, jobject, jlong rsa){
 	   RSA_free((RSA *)rsa);

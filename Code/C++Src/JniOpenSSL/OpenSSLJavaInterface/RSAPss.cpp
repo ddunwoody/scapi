@@ -32,6 +32,10 @@
 
 using namespace std;
 
+/* 
+ * function createRSASignature		: This function creates a RSA object that computes the RSA PSS scheme.
+ * return							: a pointer to the created object.
+ */
 JNIEXPORT jlong JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_digitalSignature_OpenSSLRSAPss_createRSASignature
   (JNIEnv *, jobject){
 
@@ -41,8 +45,16 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_digitalSign
 	  return (long) rsa;
 }
 
+/* 
+ * function initRSAVerifier : This function initializes the RSA object with public key.
+							   In this case, the object can verify but cannot sign.
+ * param rsa				 : A pointer to the RSA object.
+ * param modulus			 : Modolus (n)
+ * param pubExponent		 : pubic exponent (e)
+ */
 JNIEXPORT void JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_digitalSignature_OpenSSLRSAPss_initRSAVerifier
   (JNIEnv *env, jobject, jlong rsa, jbyteArray modulus, jbyteArray pubExponent){
+	  //Convert the given data into c++ notation.
 	  jbyte* mod  = (jbyte*) env->GetByteArrayElements(modulus, 0);
 	  jbyte* pubExp  = (jbyte*) env->GetByteArrayElements(pubExponent, 0);
 
@@ -55,6 +67,19 @@ JNIEXPORT void JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_digitalSigna
 	  env->ReleaseByteArrayElements(pubExponent, pubExp, 0);
 }
 
+/*
+ * function initRSACrtSigner		: This function initializes the RSA object with public and CRT private keys.
+									  In this case, the object can sign and verify.
+ * param rsa						: A pointer to the RSA object.
+ * param modulus					: modolus (n)
+ * param pubExponent				: pubic exponent (e)
+ * param privExponent				: private exponent (d)
+ * param prime1						: The prime p, such that p * q = n.
+ * param prime2						: The prime q, such that p * q = n.
+ * param primeExponent1				: dp, suzh that e * dp = 1 mod(p-1)
+ * param primeExponent2				: dq, suzh that e * dq = 1 mod(q-1)
+ * params crt						: q^(-1) mod p.
+ */
 JNIEXPORT void JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_digitalSignature_OpenSSLRSAPss_initRSACrtSigner
   (JNIEnv *env , jobject, jlong rsa, jbyteArray modulus, jbyteArray pubExponent, jbyteArray privExponent, 
   jbyteArray prime1, jbyteArray prime2, jbyteArray primeExponent1, jbyteArray primeExponent2, jbyteArray crt) {
@@ -90,9 +115,17 @@ JNIEXPORT void JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_digitalSigna
 	  env->ReleaseByteArrayElements(crt, u, 0);
  }
 
-
+/* 
+ * function initRSASigner	 : This function initializes the RSA object with public and private keys.
+							   In this case, the object can sign and verify.
+ * param rsa				 : A pointer to the RSA object.
+ * param modulus			 : Modolus (n)
+ * param pubExponent		 : pubic exponent (e)
+ * param privExponent		 : private exponent (d)
+ */
 JNIEXPORT void JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_digitalSignature_OpenSSLRSAPss_initRSASigner
   (JNIEnv *env, jobject, jlong rsa, jbyteArray modulus, jbyteArray pubExponent, jbyteArray privExponent){
+	  //Convert the given data into c++ notation.
 	  jbyte* mod  = (jbyte*) env->GetByteArrayElements(modulus, 0);
 	  jbyte* pubExp  = (jbyte*) env->GetByteArrayElements(pubExponent, 0);
 	  jbyte* privExp  = (jbyte*) env->GetByteArrayElements(privExponent, 0);
@@ -108,17 +141,26 @@ JNIEXPORT void JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_digitalSigna
 	  env->ReleaseByteArrayElements(privExponent, privExp, 0);
 }
 
-
+/*
+ * function doSign				: Signs the given message.
+ * param rsa					: A pointer to the RSA object.
+ * param msg					: The message to sign.
+ * param offset					: The offset within the message to take the bytes from.
+ * param len					: The length of the message to sign.
+ * return jbyteArray			: The signature bytes.
+ */
 JNIEXPORT jbyteArray JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_digitalSignature_OpenSSLRSAPss_doSign
   (JNIEnv *env, jobject, jlong rsa, jbyteArray msg, jint offset, jint len){
+	  //Convert the given data into c++ notation.
 	  jbyte* message  = (jbyte*) env->GetByteArrayElements(msg, 0);
 
 	  //Allocate a new byte array to hold the output.
 	  int size = RSA_size((RSA *) rsa);
 	  unsigned char* sig = new unsigned char[size]; 
 
+	  //Sign the message.
 	  RSA_private_encrypt(len, (unsigned char*)message+offset, sig, (RSA*) rsa, RSA_PKCS1_PADDING);
-
+	  
 	  //Build jbyteArray from the byteArray.
 	  jbyteArray result = env ->NewByteArray(size);
 	  env->SetByteArrayRegion(result, 0, size, (jbyte*)sig);
@@ -130,8 +172,18 @@ JNIEXPORT jbyteArray JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_digita
 	  return result;
 }
 
+/*
+ * function doVerify			: Verify the given signature with the given message.
+ * param rsa					: A pointer to the RSA object.
+ * param signature				: The signature to verify.
+ * param msg					: The message to sign.
+ * param offset					: The offset within the message to take the bytes from.
+ * param len					: The length of the message to sign.
+ * return jboolean				: True, if the given signature is valid. False, otherwise.
+ */
 JNIEXPORT jboolean JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_digitalSignature_OpenSSLRSAPss_doVerify
   (JNIEnv *env, jobject, jlong rsa, jbyteArray signature, jbyteArray msg, jint offset, jint length){
+	  //Convert the given data into c++ notation.
 	  jbyte* message  = (jbyte*) env->GetByteArrayElements(msg, 0);
 	  jbyte* sig  = (jbyte*) env->GetByteArrayElements(signature, 0);
 
@@ -139,12 +191,16 @@ JNIEXPORT jboolean JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_digitalS
 	  int size = RSA_size((RSA *) rsa)-12;
 	  unsigned char* recovered = new unsigned char[size]; 
 
+	  //recover the message from the signature.
 	  int recoveredLength = RSA_public_decrypt(env->GetArrayLength(signature), (unsigned char*)sig, recovered, (RSA*) rsa, RSA_PKCS1_PADDING);
 
+	  //Check that the recovered message's length is equal to the given message's length.
 	  bool verified = true;
 	  if (recoveredLength != length){
 		  verified = false;
 	  }
+
+	  //Check that the recovered message is equal to the given message.
 	  for (int i=0; i<length; i++){
 		  if (recovered[i]  != message[offset+i]){
 			  verified = false;
@@ -159,6 +215,10 @@ JNIEXPORT jboolean JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_digitalS
 	  return verified;
 }
 
+/*
+ * function deleteRSA			: Deletes the native RSA object.
+ * param rsa					: A pointer to the RSA object.
+ */
 JNIEXPORT void JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_digitalSignature_OpenSSLRSAPss_deleteRSA
   (JNIEnv *, jobject, jlong rsa){
 	  RSA_free((RSA *)rsa);
