@@ -33,6 +33,7 @@ import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
 import edu.biu.scapi.primitives.dlog.ZpElement;
 import edu.biu.scapi.primitives.dlog.ZpElementSendableData;
 import edu.biu.scapi.primitives.dlog.groupParams.ZpGroupParams;
+import edu.biu.scapi.securityLevel.DDH;
 import edu.biu.scapi.tools.math.MathAlgorithms;
 
 /**
@@ -41,7 +42,7 @@ import edu.biu.scapi.tools.math.MathAlgorithms;
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  */
-public class OpenSSLDlogZpSafePrime extends DlogGroupAbs implements DlogZpSafePrime{
+public class OpenSSLDlogZpSafePrime extends DlogGroupAbs implements DlogZpSafePrime, DDH{
 
 	private long dlog; // Pointer to the native group object.
 
@@ -266,6 +267,11 @@ public class OpenSSLDlogZpSafePrime extends DlogGroupAbs implements DlogZpSafePr
 		
 		return exponentiateElement;
 			
+	}
+	
+	public GroupElement exponentiateWithPreComputedValues(GroupElement groupElement, BigInteger exponent) {
+		return exponentiate(groupElement, exponent);
+	
 	}
 
 	@Override
