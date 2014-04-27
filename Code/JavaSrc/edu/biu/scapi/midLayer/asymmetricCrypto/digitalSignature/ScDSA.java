@@ -55,7 +55,6 @@ import edu.biu.scapi.primitives.dlog.cryptopp.CryptoPpDlogZpSafePrime;
 import edu.biu.scapi.primitives.dlog.miracl.MiraclDlogECFp;
 import edu.biu.scapi.primitives.hash.CryptographicHash;
 import edu.biu.scapi.primitives.hash.cryptopp.CryptoPpSHA1;
-import edu.biu.scapi.securityLevel.UnlimitedTimes;
 import edu.biu.scapi.tools.Factories.CryptographicHashFactory;
 import edu.biu.scapi.tools.Factories.DlogGroupFactory;
 
