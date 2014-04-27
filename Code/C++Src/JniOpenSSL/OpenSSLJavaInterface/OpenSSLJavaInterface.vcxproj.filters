@@ -75,6 +75,9 @@
     <ClInclude Include="RSAPss.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -135,6 +138,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="RSAPss.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DSA.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

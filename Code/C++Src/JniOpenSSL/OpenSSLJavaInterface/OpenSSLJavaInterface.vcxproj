@@ -153,6 +153,7 @@
     <ClInclude Include="DlogF2m.h" />
     <ClInclude Include="DlogFp.h" />
     <ClInclude Include="DlogZp.h" />
+    <ClInclude Include="DSA.h" />
     <ClInclude Include="RSAOaep.h" />
     <ClInclude Include="RSAPss.h" />
     <ClInclude Include="SymEncryption.h" />
@@ -188,6 +189,7 @@
     <ClCompile Include="DlogF2m.cpp" />
     <ClCompile Include="DlogFp.cpp" />
     <ClCompile Include="DlogZp.cpp" />
+    <ClCompile Include="DSA.cpp" />
     <ClCompile Include="F2mPoint.cpp" />
     <ClCompile Include="FpPoint.cpp" />
     <ClCompile Include="Hash.cpp" />
