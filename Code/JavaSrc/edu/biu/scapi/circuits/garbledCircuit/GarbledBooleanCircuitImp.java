@@ -104,12 +104,12 @@ public class GarbledBooleanCircuitImp implements GarbledBooleanCircuit {
 	 * After this constructor the circuit is complete and ready to be used.
 	 * @param input input specifies which concrete type of circuit to implement.
 	 * @param garbledTables 
-	 * @param translationTable
+	 * @param outputWireValues
 	 */
-	public GarbledBooleanCircuitImp(CircuitInput input, byte[][] garbledTables, HashMap<Integer, Byte> translationTable){
+	public GarbledBooleanCircuitImp(CircuitInput input, byte[][] garbledTables, HashMap<Integer, Byte> outputWireValues){
 		//Sets the given garbled tables.
 		this.garbledTablesHolder = new GarbledTablesHolder(garbledTables);
-		this.translationTable = translationTable;
+		this.translationTable = outputWireValues;
 		
 		doConstruct(input);
 	}
@@ -152,7 +152,7 @@ public class GarbledBooleanCircuitImp implements GarbledBooleanCircuit {
   	public CircuitCreationValues garble(BooleanCircuit ungarbledCircuit) {
 		//Call the utility class to generate the keys and create the garbled tables.
 		CircuitCreationValues values = util.garble(ungarbledCircuit, garbledTablesHolder, gates);
-		translationTable = values.getTranslationTable();
+		translationTable = values.getOutputWireValues();
 		return values;
 	}
 	
@@ -160,7 +160,7 @@ public class GarbledBooleanCircuitImp implements GarbledBooleanCircuit {
 	public CircuitCreationValues garble(BooleanCircuit ungarbledCircuit, Map<Integer, SecretKey[]> partialWireValues) {
 		//Call the utility class to generate the keys and create the garbled tables.
 		CircuitCreationValues values = util.garble(ungarbledCircuit, garbledTablesHolder, gates, partialWireValues);
-		translationTable = values.getTranslationTable();
+		translationTable = values.getOutputWireValues();
 		return values;
 	}
 	
@@ -312,13 +312,11 @@ public class GarbledBooleanCircuitImp implements GarbledBooleanCircuit {
 	      
 	    	//Calculate the resulting value.
 	    	byte value = (byte) (signalBit ^ permutationBitOnWire);
-	    	System.out.print(value);
 	    	
 	    	//Hold the result as a wire.
 	    	Wire translated = new Wire(value);
 	    	translatedOutput.put(w, translated);
 	    }
-	    System.out.println();
 	    return translatedOutput;
 
 	}
@@ -351,15 +349,15 @@ public class GarbledBooleanCircuitImp implements GarbledBooleanCircuit {
 	}
 	
 	@Override
-	public HashMap<Integer, Byte> getTranslationTable() {
+	public HashMap<Integer, Byte> getOutputWireValues() {
 		
 		return translationTable;
 	}
 
 	@Override
-	public void setTranslationTable(HashMap<Integer, Byte> translationTable) {
+	public void setOutputWireValues(HashMap<Integer, Byte> outputWireValues) {
 		
-		this.translationTable = translationTable;
+		this.translationTable = outputWireValues;
 		
 	}
 

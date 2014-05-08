@@ -57,17 +57,17 @@ public class GarbledBooleanCircuitSeedGenerationImp extends GarbledBooleanCircui
 	 * After this constructor the circuit is complete and ready to be used.
 	 * @param input input specifies which concrete type of circuit to implement.
 	 * @param garbledTables 
-	 * @param translationTable
+	 * @param outputWireValues
 	 */
-	public GarbledBooleanCircuitSeedGenerationImp(CircuitInput input, byte[][] garbledTables, HashMap<Integer, Byte> translationTable){
-		super(input, garbledTables, translationTable);
+	public GarbledBooleanCircuitSeedGenerationImp(CircuitInput input, byte[][] garbledTables, HashMap<Integer, Byte> outputWireValues){
+		super(input, garbledTables, outputWireValues);
 	}
 	
 	@Override
 	public CircuitSeedCreationValues garble(BooleanCircuit ungarbledCircuit, PseudorandomGenerator prg, byte[] seed, CryptographicHash hash) throws InvalidKeyException {
 		//Call the utility class to generate the keys and create the garbled tables.
 		CircuitSeedCreationValues values = util.garble(ungarbledCircuit, garbledTablesHolder, gates, prg, seed, hash);
-		translationTable = values.getTranslationTable();
+		translationTable = values.getOutputWireValues();
 		return values;
 	}
 	
