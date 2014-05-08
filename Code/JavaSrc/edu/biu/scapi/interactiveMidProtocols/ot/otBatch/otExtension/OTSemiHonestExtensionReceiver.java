@@ -42,6 +42,14 @@ import edu.biu.scapi.securityLevel.SemiHonest;
  * 
  * The base OT is done once in the construction time. After that, the transfer function will be always optimized and fast, no matter how much OT's there are.<p>
  * 
+ * There are three versions of OT extension: General, Correlated and Random. The difference between them is the way of getting the inputs: <p>
+ * In general OT extension both x0 and x1 are given by the user.<p>
+ * In Correlated OT extension the user gives a delta array and x0, x1 arrays are chosen such that x0 = delta^x1.<p>
+ * In random OT extension both x0 and x1 are chosen randomly.<p>
+ * To allow the user decide which OT extension's version he wants, each option has a corresponding input class. <p>
+ * The particular OT extension version is executed according to the given input instance; 
+ * For example, if the user gave as input an instance of OTExtensionRandomRInput than the random OT Extension will be execute.<p>
+ * 
  * NOTE: Unlike a regular implementation, the connection is done via the native code and thus the channel provided in the transfer function is ignored.  
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Meital Levy)
@@ -55,22 +63,23 @@ public class OTSemiHonestExtensionReceiver implements SemiHonest, OTBatchReceive
 	// This function initializes the receiver. It creates sockets to communicate with the sender and attaches these sockets to the receiver object.
 	// It outputs the receiver object with communication abilities built in. 
 	private native long initOtReceiver(String ipAddress, int port, int koblitzOrZpSize, int numOfThreads);
-	
-	
-	/**
+	/*
 	 * The native code that runs the OT extension as the receiver.
 	 * @param receiverPtr The pointer initialized via the function initOtReceiver
 	 * @param sigma An array holding the input of the receiver, that is, the 0 and 1 choices for each OT.
 	 * @param numOfOts The number or OTs that the protocol runs.
 	 * @param bitLength The length of each item in the OT. The size of each x0, x1 which must be the same for all x0, x1.
-	 * @param output the output of all the OTs. This is provided as a one dimensional array that gets all the data serially one after the other. The 
+	 * @param output The output of all the OTs. This is provided as a one dimensional array that gets all the data serially one after the other. The 
 	 * 				 array is given empty and the native code fills it with the result of the multiple OT results.
+	 * @param version The particular OT type to run.
 	 */
 	private native void runOtAsReceiver(long receiverPtr, byte[] sigma, int numOfOts, int bitLength, byte[] output, String version);
-	
+	//Deletes the native object.
+	private native void deleteReceiver(long receiverPtr);
 	
 	/**
-	 * A constructor that creates the native receiver with communication abilities. It uses the ip address and port given in the party object.<p>
+	 * A constructor that creates the native receiver with communication abilities. <p>
+	 * It uses the ip address and port given in the party object.<p>
 	 * The construction runs the base OT phase. Further calls to transfer function will be optimized and fast, no matter how much OTs there are.
 	 * @param party An object that holds the ip address and port.
 	 * @param koblitzOrZpSize An integer that determines whether the OT extension uses Zp or ECC koblitz. The optional parameters are the following.
@@ -89,7 +98,6 @@ public class OTSemiHonestExtensionReceiver implements SemiHonest, OTBatchReceive
 	 * Default constructor. Initializes the receiver by passing the ip address and uses koblitz 163 as a default dlog group. <P>
 	 * The construction runs the base OT phase. Further calls to transfer function will be optimized and fast, no matter how much OTs there are.
 	 * @param party An object that holds the ip address and port.
-	 * 	      
 	 */
 	public OTSemiHonestExtensionReceiver(Party party ){
 		
@@ -107,10 +115,10 @@ public class OTSemiHonestExtensionReceiver implements SemiHonest, OTBatchReceive
 	 */
 	public OTBatchROutput transfer(Channel channel, OTBatchRInput input) {
 		
-		//we set the version to be the general case, if a different call was made we will change it later to the relevant version.
+		//We set the version to be the general case, if a different call was made we will change it later to the relevant version.
 		String version = "general";
 		
-		//check if the input is valid. If input is not instance of OTRExtensionInput, throw Exception.
+		//Check if the input is valid. If input is not instance of OTRExtensionInput, throw Exception.
 		if (!(input instanceof OTExtensionRInput)){
 			throw new IllegalArgumentException("input should be an instance of OTRExtensionInput.");
 		}
@@ -131,15 +139,23 @@ public class OTSemiHonestExtensionReceiver implements SemiHonest, OTBatchReceive
 		
 		byte[] outputBytes = new byte[numOfOts*elementSize/8];
 		
-		//Run teh protocol using the native code in the dll.
+		//Run the protocol using the native code in the dll.
 		runOtAsReceiver(receiverPtr, sigmaArr, numOfOts, elementSize, outputBytes, version);
 		
 		return new OTOnByteArrayROutput(outputBytes);
 	}
 	
-	static {
-		 
-		 //loads the OT extension jni dll.
+	
+	/**
+	 * Deletes the native OT object.
+	 */
+	public void finalize() throws Throwable {
+		//Delete from the dll the dynamic allocation of the receiver.
+		deleteReceiver(receiverPtr);
+	}
+	
+	static { 
+		 //Loads the OT extension jni dll.
 		 System.loadLibrary("OtExtensionJavaInterface");
 	 }
 	
