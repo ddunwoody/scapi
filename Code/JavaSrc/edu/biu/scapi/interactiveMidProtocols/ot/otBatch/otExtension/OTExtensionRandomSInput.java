@@ -42,7 +42,7 @@ public class OTExtensionRandomSInput implements OTBatchSInput{
 	/**
 	 * Constructor that sets the number of OTs and the size of each OT.
 	 * @param numOfOts number of OTs in the OT extension.
-	 * @param bitLength size of each OT
+	 * @param bitLength The size of each element in the OT extension, in bits. 
 	 */
 	public OTExtensionRandomSInput(int numOfOts, int bitLength){
 

@@ -16,7 +16,7 @@ public class OTExtensionRandomRInput extends OTExtensionRInput {
 	/**
 	 * Constructor that sets the sigma array and the number of OT elements.
 	 * @param sigmaArr An array of sigma for each OT.
-	 * @param elementSize The size of each element in the OT extension. 
+	 * @param elementSize The size of each element in the OT extension, in bits. 
 	 */
 	public OTExtensionRandomRInput(byte[] sigmaArr, int elementSize) {
 		super(sigmaArr, elementSize);

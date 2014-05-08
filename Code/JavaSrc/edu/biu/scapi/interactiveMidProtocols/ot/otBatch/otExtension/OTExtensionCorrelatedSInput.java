@@ -44,7 +44,7 @@ public class OTExtensionCorrelatedSInput implements OTBatchSInput{
 	/**
 	 * Constructor that sets the delta and the number of OTs.
 	 * @param delta 
-	 * @param numOfOts
+	 * @param numOfOts The number of OT's in the OT extension.
 	 */
 	public OTExtensionCorrelatedSInput(byte[] delta, int numOfOts){
 		this.delta = delta;

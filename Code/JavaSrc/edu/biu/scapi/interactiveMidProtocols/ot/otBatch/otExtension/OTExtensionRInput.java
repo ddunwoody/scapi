@@ -41,12 +41,12 @@ import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.OTBatchRInput;
  */
 abstract public class OTExtensionRInput implements OTBatchRInput{
 	private byte[] sigmaArr; 		// Each byte holds a sigma bit for each OT in the OT extension protocol.
-	private int elementSize = 32;	// The size of each element in the ot extension. All elements must be of the same size.
+	private int elementSize;	// The size of each element in the ot extension. All elements must be of the same size.
 	
 	/**
 	 * Constructor that sets the sigma array and the number of OT elements.
 	 * @param sigmaArr An array of sigma for each OT.
-	 * @param elementSize The size of each element in the OT extension. 
+	 * @param elementSize The size of each element in the OT extension, in bits. 
 	 */
 	public OTExtensionRInput(byte[] sigmaArr, int elementSize){
 		this.sigmaArr = sigmaArr;
