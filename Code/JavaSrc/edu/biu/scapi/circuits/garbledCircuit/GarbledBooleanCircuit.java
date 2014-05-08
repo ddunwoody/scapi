@@ -152,20 +152,20 @@ public interface GarbledBooleanCircuit {
 	public void setGarbledTables(byte[][] garbledTables);
 	
 	/**
-     * Returns the translation table of the circuit. <P>
-     * This is necessary since the constructor of the circuit may want to pass the translation table to an other party. <p>
+     * Returns the output wires' values of the circuit. <P>
+     * This is necessary since the constructor of the circuit may want to pass the output wires' values to another party. <p>
      * Usually, this will be used when the other party (not the constructor of the circuit) creates a circuit, sets the garbled tables 
-     * and needs the translation table as well to complete the construction of the circuit.
-     * @return the translation table of the circuit.  
+     * and needs the output wires' values as well to complete the construction of the circuit.
+     * @return the output wires' values.  
      */
-	public HashMap<Integer, Byte> getTranslationTable();
+	public HashMap<Integer, Byte> getOutputWireValues();
   
 	/**
-	 * Sets the translation table of the circuit. <p>
-	 * This is necessary when the garbled tables where set and we would like to compute the circuit later on. 
-	 * @param translationTable This value should match the garbled tables of the circuit.
+	 * Sets the output wires' values of the circuit. <p>
+	 * This is necessary when the garbled tables have been set and we would like to compute the circuit later on. 
+	 * @param outputWireValues This value should match the garbled tables of the circuit.
 	 */
-	public void setTranslationTable(HashMap<Integer, Byte> translationTable);
+	public void setOutputWireValues(HashMap<Integer, Byte> outputWireValues);
 	
 	/**
 	 * @param partyNumber The number of the party which we need his input labels.
