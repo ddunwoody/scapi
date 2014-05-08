@@ -23,6 +23,15 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_interactiveMidProtocols_ot_otBatch_ot
 JNIEXPORT void JNICALL Java_edu_biu_scapi_interactiveMidProtocols_ot_otBatch_otExtension_OTSemiHonestExtensionReceiver_runOtAsReceiver
   (JNIEnv *, jobject, jlong, jbyteArray, jint, jint, jbyteArray, jstring);
 
+/*
+ * Class:     edu_biu_scapi_interactiveMidProtocols_ot_otBatch_otExtension_OTSemiHonestExtensionReceiver
+ * Method:    deleteReceiver
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_edu_biu_scapi_interactiveMidProtocols_ot_otBatch_otExtension_OTSemiHonestExtensionReceiver_deleteReceiver
+  (JNIEnv *, jobject, jlong);
+
+
 #ifdef __cplusplus
 }
 #endif
