@@ -48,13 +48,13 @@ public class CircuitCreationValues {
 	 * Sets the given arguments.
 	 * @param allInputWireValues Both keys for all input wires.
 	 * @param allOutputWireValues Both keys for all output wires.
-	 * @param translationTable Signal bits of all output wires.
+	 * @param outputWireValues Signal bits of all output wires.
 	 */
 	public CircuitCreationValues(Map<Integer, SecretKey[]> allInputWireValues, Map<Integer, SecretKey[]> allOutputWireValues, 
-			HashMap<Integer, Byte> translationTable) {
+			HashMap<Integer, Byte> outputWireValues) {
 		this.allInputWireValues = allInputWireValues;
 		this.allOutputWireValues = allOutputWireValues;
-		this.translationTable = translationTable;
+		this.translationTable = outputWireValues;
 	}
 
 	public Map<Integer, SecretKey[]> getAllInputWireValues() {
@@ -65,7 +65,7 @@ public class CircuitCreationValues {
 		return allOutputWireValues;
 	}
 
-	public HashMap<Integer, Byte> getTranslationTable() {
+	public HashMap<Integer, Byte> getOutputWireValues() {
 		return translationTable;
 	}
 }
