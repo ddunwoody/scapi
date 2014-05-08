@@ -600,7 +600,7 @@ class FreeXORGarbledBooleanCircuitUtil implements CircuitTypeUtil {
 			// Should not occur since the block size is valid
 		} 
 				
-		return new CircuitSeedCreationValues(values.getAllInputWireValues(), values.getAllOutputWireValues(), values.getTranslationTable(), hashedTables);
+		return new CircuitSeedCreationValues(values.getAllInputWireValues(), values.getAllOutputWireValues(), values.getOutputWireValues(), hashedTables);
 	}
 	
 	/**
