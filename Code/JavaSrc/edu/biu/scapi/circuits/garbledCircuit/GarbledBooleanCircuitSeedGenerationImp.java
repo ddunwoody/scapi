@@ -53,7 +53,7 @@ public class GarbledBooleanCircuitSeedGenerationImp extends GarbledBooleanCircui
 	}
 	
 	/**
-	 * Constructor that gets an input object, garbled tables and translation tables and creates the circuit with them.<p>
+	 * Constructor that gets an input object, garbled tables and output wire's values and creates the circuit with them.<p>
 	 * After this constructor the circuit is complete and ready to be used.
 	 * @param input input specifies which concrete type of circuit to implement.
 	 * @param garbledTables 

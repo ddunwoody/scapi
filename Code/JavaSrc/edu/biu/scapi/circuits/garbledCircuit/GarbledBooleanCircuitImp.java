@@ -59,7 +59,7 @@ public class GarbledBooleanCircuitImp implements GarbledBooleanCircuit {
   	/*
   	 * Holds the garbled tables of this garbled circuit. This is stored in the garbled circuit and also in the gates. 
   	 * We keep the garbled tables that way because when sending the circuit to a different party it is sufficient to send only 
-  	 * the garbled tables and translation table, if needed. 
+  	 * the garbled tables and output wire's values, if needed. 
   	 * The party who receives the tables only needs to change the pointer in the holder class to the received tables.
   	 * 
   	 * We store the garbled tables in a two dimensional array, the first dimension for each gate and the other dimension for the encryptions.
@@ -100,7 +100,7 @@ public class GarbledBooleanCircuitImp implements GarbledBooleanCircuit {
 	}
 	
 	/**
-	 * A constructor that gets an input an object, garbled tables and translation tables and creates the circuit with them.<p>
+	 * A constructor that gets an input an object, garbled tables and output wire's values and creates the circuit with them.<p>
 	 * After this constructor the circuit is complete and ready to be used.
 	 * @param input input specifies which concrete type of circuit to implement.
 	 * @param garbledTables 
@@ -254,7 +254,7 @@ public class GarbledBooleanCircuitImp implements GarbledBooleanCircuit {
   		 * Thus, we test for consistent and we assume that the encoded value corresponding to 0 is a 0, and that the value that 
   		 * corresponds to 1 is a 1. Based on this assumption, we map the output wire to the 0-encoded value and 1-encoded value. 
   		 * Thus if our assumption is wrong, the next gate may not verify correctly. We continue this process until we reach the circuit
-  		 * output wires. At this point we confirm(or reject) all assumption by checking the translation table and seeing if the wire 
+  		 * output wires. At this point we confirm (or reject) all assumption by checking the output wire's values and seeing if the wire 
   		 * we expected to encode to a 0 was actually a 0 and the 1 was a 1. Once we have done this, we have verified the circuits are 
   		 * identical and have not relied on any unproven assumptions.
   		 */
@@ -298,7 +298,7 @@ public class GarbledBooleanCircuitImp implements GarbledBooleanCircuit {
 	/**
 	 * Translates from the resulting garbled wires to wires.
 	 * @param garbledOutput The result of computing the circuit. 
-	 * This result is given in garbled wires and will be translated according to the translation table.
+	 * This result is given in garbled wires and will be translated according to the output wire's values.
 	 * @return the translated results as wires of the boolean circuit where the values of the wires are set.
 	 */
   	public Map<Integer, Wire> translate(Map<Integer, GarbledWire> garbledOutput){

@@ -45,7 +45,7 @@ public interface GarbledBooleanCircuitSeedGeneration extends GarbledBooleanCircu
 	 * @param prg Used to generate the garbled values.
 	 * @param seed Used to initialize the given prg.
 	 * @param hash A CryptographicHash object that is used to compute the hash function on the circuit's garbled tables.
-	 * @return CircuitCreationValues Contains both keys for each input and output wire and the translation table.
+	 * @return CircuitCreationValues Contains both keys for each input and output wire and the output wire's values.
 	 * @throws InvalidKeyException In case the seed is an invalid key for the given PRG.
 	 */
 	public CircuitSeedCreationValues garble(BooleanCircuit ungarbledCircuit, PseudorandomGenerator prg, byte[] seed, CryptographicHash hash) throws InvalidKeyException ;
