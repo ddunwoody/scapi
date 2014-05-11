@@ -76,14 +76,14 @@ public class GarbledBooleanCircuitImp implements GarbledBooleanCircuit {
   	private Map<Integer, GarbledWire> computedWires = new HashMap<Integer,GarbledWire>();
 
   	/*
-	 * The translation table stores the signal bit for the output wires. Thus, it just tells you whether the wire coming out is a 
+	 * The outputWireValues stores the signal bit for the output wires. Thus, it just tells you whether the wire coming out is a 
 	 * 0 or 1 but nothing about the plaintext of the wires is revealed. This is good since it is possible that a circuit output 
-	 * wire is also an input wire to a different gate, and thus if the translation table contained the plaintext of both possible
+	 * wire is also an input wire to a different gate, and thus if the outputWireValues contained the plaintext of both possible
 	 * values of the output Wire, the constructing party could change the value of the wire when it is input into a gate, and 
 	 * privacy and/or correctness will not be preserved. Therefore, we only reveal the signal bit, and the other
-	 * possible value for the wire is not stored on the translation table.
+	 * possible value for the wire is not stored on the outputWireValues.
 	 */
-	protected HashMap<Integer, Byte> translationTable;
+	protected HashMap<Integer, Byte> outputWireValues;
 	
 	/**
 	 * A constructor that gets an input an object and creates the circuit with its contents.<p>
@@ -109,7 +109,7 @@ public class GarbledBooleanCircuitImp implements GarbledBooleanCircuit {
 	public GarbledBooleanCircuitImp(CircuitInput input, byte[][] garbledTables, HashMap<Integer, Byte> outputWireValues){
 		//Sets the given garbled tables.
 		this.garbledTablesHolder = new GarbledTablesHolder(garbledTables);
-		this.translationTable = outputWireValues;
+		this.outputWireValues = outputWireValues;
 		
 		doConstruct(input);
 	}
@@ -152,7 +152,7 @@ public class GarbledBooleanCircuitImp implements GarbledBooleanCircuit {
   	public CircuitCreationValues garble(BooleanCircuit ungarbledCircuit) {
 		//Call the utility class to generate the keys and create the garbled tables.
 		CircuitCreationValues values = util.garble(ungarbledCircuit, garbledTablesHolder, gates);
-		translationTable = values.getOutputWireValues();
+		outputWireValues = values.getOutputWireValues();
 		return values;
 	}
 	
@@ -160,7 +160,7 @@ public class GarbledBooleanCircuitImp implements GarbledBooleanCircuit {
 	public CircuitCreationValues garble(BooleanCircuit ungarbledCircuit, Map<Integer, SecretKey[]> partialWireValues) {
 		//Call the utility class to generate the keys and create the garbled tables.
 		CircuitCreationValues values = util.garble(ungarbledCircuit, garbledTablesHolder, gates, partialWireValues);
-		translationTable = values.getOutputWireValues();
+		outputWireValues = values.getOutputWireValues();
 		return values;
 	}
 	
@@ -282,7 +282,7 @@ public class GarbledBooleanCircuitImp implements GarbledBooleanCircuit {
   			SecretKey zeroValue = allWireValues.get(w)[0];
   			SecretKey oneValue = allWireValues.get(w)[1];
 
-  			byte signalBit = translationTable.get(w);
+  			byte signalBit = outputWireValues.get(w);
   			byte permutationBitOnZeroWire = (byte) ((zeroValue.getEncoded()[zeroValue.getEncoded().length - 1] & 1) == 0 ? 0 : 1);
   			byte permutationBitOnOneWire = (byte) ((oneValue.getEncoded()[oneValue.getEncoded().length - 1] & 1) == 0 ? 0 : 1);
   			byte translatedZeroValue = (byte) (signalBit ^ permutationBitOnZeroWire);
@@ -307,7 +307,7 @@ public class GarbledBooleanCircuitImp implements GarbledBooleanCircuit {
 	    
 	    //Go through the output wires.
 	    for (int w : outputWireLabels) {
-	    	byte signalBit = translationTable.get(w);
+	    	byte signalBit = outputWireValues.get(w);
 	    	byte permutationBitOnWire = garbledOutput.get(w).getSignalBit();
 	      
 	    	//Calculate the resulting value.
@@ -351,13 +351,13 @@ public class GarbledBooleanCircuitImp implements GarbledBooleanCircuit {
 	@Override
 	public HashMap<Integer, Byte> getOutputWireValues() {
 		
-		return translationTable;
+		return outputWireValues;
 	}
 
 	@Override
 	public void setOutputWireValues(HashMap<Integer, Byte> outputWireValues) {
 		
-		this.translationTable = outputWireValues;
+		this.outputWireValues = outputWireValues;
 		
 	}
 

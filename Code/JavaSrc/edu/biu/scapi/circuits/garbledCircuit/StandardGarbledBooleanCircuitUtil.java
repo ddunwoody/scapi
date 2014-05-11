@@ -229,7 +229,7 @@ class StandardGarbledBooleanCircuitUtil implements CircuitTypeUtil{
 			Map<Integer, Byte> outputWireValues) {
 		/*
 		 * Add the output wire labels' signal bits to the translation table. For a full understanding on why we chose to 
-		 * implement the translation table this way, see the documentation to the translationTable field of
+		 * implement the translation table this way, see the documentation to the outputWireValues field of
 		 * GarbledBooleanCircuitImp.
 		 */
 		for (int n : outputWireLabels) {

@@ -67,7 +67,7 @@ public class GarbledBooleanCircuitSeedGenerationImp extends GarbledBooleanCircui
 	public CircuitSeedCreationValues garble(BooleanCircuit ungarbledCircuit, PseudorandomGenerator prg, byte[] seed, CryptographicHash hash) throws InvalidKeyException {
 		//Call the utility class to generate the keys and create the garbled tables.
 		CircuitSeedCreationValues values = util.garble(ungarbledCircuit, garbledTablesHolder, gates, prg, seed, hash);
-		translationTable = values.getOutputWireValues();
+		outputWireValues = values.getOutputWireValues();
 		return values;
 	}
 	
