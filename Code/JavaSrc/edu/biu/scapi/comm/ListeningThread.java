@@ -60,10 +60,10 @@ class ListeningThread extends Thread{
 	/**
 	 * 
 	 * @param securingThreadsMap
-	 * @param port
+	 * @param party.getPort()
 	 * @param numOfIncomingConnections
 	 */
-	public ListeningThread( Map<InetAddress ,Vector<SecuringConnectionThread>> securingThreadsMap, int port, int numOfIncomingConnections) {
+	public ListeningThread( Map<InetAddress ,Vector<SecuringConnectionThread>> securingThreadsMap, Party party, int numOfIncomingConnections) {
 
 		connectingThreadsMap = securingThreadsMap;
 		this.numOfIncomingConnections = numOfIncomingConnections;
@@ -71,7 +71,7 @@ class ListeningThread extends Thread{
 		//prepare the listener.
 		try {
 			listener = ServerSocketChannel.open();
-			listener.socket().bind (new InetSocketAddress (InetAddress.getLocalHost(), port));
+			listener.socket().bind (new InetSocketAddress (party.getIpAddress(), party.getPort()));
 			listener.configureBlocking (false);
 		} catch (IOException e) {
 			
@@ -81,6 +81,7 @@ class ListeningThread extends Thread{
 		
 		
 	}
+	
 	
 	/**
 	 * 
