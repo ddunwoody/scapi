@@ -281,7 +281,7 @@ public class CommunicationSetup implements TimeoutObserver{
 		
 		if(listeningThreadMap.size()>0){//there are down connections need to listen to connections using the listeningThread
 			//send information to the listening thread
-			listeningThread = new ListeningThread(listeningThreadMap, firstParty.getPort(), numOfIncomingConnections);
+			listeningThread = new ListeningThread(listeningThreadMap, firstParty, numOfIncomingConnections);
 			listeningThread.start();
 		}
 		
