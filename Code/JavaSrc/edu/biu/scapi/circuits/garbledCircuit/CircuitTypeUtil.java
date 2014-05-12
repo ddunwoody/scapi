@@ -59,7 +59,7 @@ interface CircuitTypeUtil {
 	 * @param ungarbledCircuit The circuit that this {@code GarbledBooleanCircuit} is supposed to be a garbling of.
 	 * @param garbledTablesHolder The object that points to the garbledTable.
 	 * @param gates The gates of this circuit. 
-	 * @return CircuitCreationValues contains both keys for each input and output wire, output wire's values and the signal bits of the input wires.
+	 * @return CircuitCreationValues contains both keys for each input and output wire, the translation table and the signal bits of the input wires.
 	 */
 	public CircuitCreationValues garble(BooleanCircuit ungarbledCircuit, GarbledTablesHolder garbledTablesHolder, 
 			GarbledGate[] gates);
@@ -69,7 +69,7 @@ interface CircuitTypeUtil {
 	 * It then creates the garbled table according to these values.<p>
 	 * This method can receive the keys of the input wires or the keys of the output wires.<p>
 	 * In addition, it gets the signal bits corresponding to the partial wire's keys. 
-	 * In case the given keys are the keys of the output wires, then the given signal bits are actually outputWireValues.
+	 * In case the given keys are the keys of the output wires, then the given signal bits are actually the translation table.
 	 * 
 	 * @param ungarbledCircuit The circuit that this {@code GarbledBooleanCircuit} is supposed to be a garbling of.
 	 * @param garbledTablesHolder The object that points to the garbledTable.
@@ -78,7 +78,7 @@ interface CircuitTypeUtil {
 	 * Note: The least significant bit of the input and the output keys of each wire should be different. 
 	 * That is, for each wire, if the last bit of k0 is 0, the last bit of k1 must be 1. 
 	 * Clearly, the content of the last bit of all k0 should be picked at random. Else, the circuit is not secure. 
-	 * @return CircuitCreationValues contains both generated values for each input and output wire and output wire's values.
+	 * @return CircuitCreationValues contains both generated values for each input and output wire and the translation table.
 	 */
 	public CircuitCreationValues garble(BooleanCircuit ungarbledCircuit, GarbledTablesHolder garbledTablesHolder, 
 			GarbledGate[] gates, Map<Integer, SecretKey[]> partialWireValues) ;
@@ -91,7 +91,7 @@ interface CircuitTypeUtil {
 	 * @param prg Used to generate the garbled values.
 	 * @param seed Used to initialize the given prg.
 	 * @param hash CryptographicHash object that is used to compute the hash function on the circuit's garbled tables.
-	 * @return CircuitCreationValues contains both generated values for each input and output wire and output wire's values.
+	 * @return CircuitCreationValues contains both generated values for each input and output wire and the translation table.
 	 * @throws InvalidKeyException in case the seed is an invalid key for the given PRG.
 	 */
 	public CircuitSeedCreationValues garble(BooleanCircuit ungarbledCircuit, GarbledTablesHolder garbledTablesHolder, 

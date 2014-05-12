@@ -59,7 +59,7 @@ public class GarbledBooleanCircuitImp implements GarbledBooleanCircuit {
   	/*
   	 * Holds the garbled tables of this garbled circuit. This is stored in the garbled circuit and also in the gates. 
   	 * We keep the garbled tables that way because when sending the circuit to a different party it is sufficient to send only 
-  	 * the garbled tables and output wire's values, if needed. 
+  	 * the garbled tables and translation table, if needed. 
   	 * The party who receives the tables only needs to change the pointer in the holder class to the received tables.
   	 * 
   	 * We store the garbled tables in a two dimensional array, the first dimension for each gate and the other dimension for the encryptions.
@@ -76,14 +76,14 @@ public class GarbledBooleanCircuitImp implements GarbledBooleanCircuit {
   	private Map<Integer, GarbledWire> computedWires = new HashMap<Integer,GarbledWire>();
 
   	/*
-	 * The outputWireValues stores the signal bit for the output wires. Thus, it just tells you whether the wire coming out is a 
+	 * The translation table stores the signal bit for the output wires. Thus, it just tells you whether the wire coming out is a 
 	 * 0 or 1 but nothing about the plaintext of the wires is revealed. This is good since it is possible that a circuit output 
-	 * wire is also an input wire to a different gate, and thus if the outputWireValues contained the plaintext of both possible
+	 * wire is also an input wire to a different gate, and thus if the translation table contained the plaintext of both possible
 	 * values of the output Wire, the constructing party could change the value of the wire when it is input into a gate, and 
 	 * privacy and/or correctness will not be preserved. Therefore, we only reveal the signal bit, and the other
-	 * possible value for the wire is not stored on the outputWireValues.
+	 * possible value for the wire is not stored on the translation table.
 	 */
-	protected HashMap<Integer, Byte> outputWireValues;
+	protected HashMap<Integer, Byte> translationTable;
 	
 	/**
 	 * A constructor that gets an input an object and creates the circuit with its contents.<p>
@@ -100,16 +100,16 @@ public class GarbledBooleanCircuitImp implements GarbledBooleanCircuit {
 	}
 	
 	/**
-	 * A constructor that gets an input an object, garbled tables and output wire's values and creates the circuit with them.<p>
+	 * A constructor that gets an input an object, garbled tables and translation tables and creates the circuit with them.<p>
 	 * After this constructor the circuit is complete and ready to be used.
 	 * @param input input specifies which concrete type of circuit to implement.
 	 * @param garbledTables 
-	 * @param outputWireValues
+	 * @param translationTable
 	 */
-	public GarbledBooleanCircuitImp(CircuitInput input, byte[][] garbledTables, HashMap<Integer, Byte> outputWireValues){
+	public GarbledBooleanCircuitImp(CircuitInput input, byte[][] garbledTables, HashMap<Integer, Byte> translationTable){
 		//Sets the given garbled tables.
 		this.garbledTablesHolder = new GarbledTablesHolder(garbledTables);
-		this.outputWireValues = outputWireValues;
+		this.translationTable = translationTable;
 		
 		doConstruct(input);
 	}
@@ -152,7 +152,7 @@ public class GarbledBooleanCircuitImp implements GarbledBooleanCircuit {
   	public CircuitCreationValues garble(BooleanCircuit ungarbledCircuit) {
 		//Call the utility class to generate the keys and create the garbled tables.
 		CircuitCreationValues values = util.garble(ungarbledCircuit, garbledTablesHolder, gates);
-		outputWireValues = values.getOutputWireValues();
+		translationTable = values.getTranslationTable();
 		return values;
 	}
 	
@@ -160,7 +160,7 @@ public class GarbledBooleanCircuitImp implements GarbledBooleanCircuit {
 	public CircuitCreationValues garble(BooleanCircuit ungarbledCircuit, Map<Integer, SecretKey[]> partialWireValues) {
 		//Call the utility class to generate the keys and create the garbled tables.
 		CircuitCreationValues values = util.garble(ungarbledCircuit, garbledTablesHolder, gates, partialWireValues);
-		outputWireValues = values.getOutputWireValues();
+		translationTable = values.getTranslationTable();
 		return values;
 	}
 	
@@ -254,7 +254,7 @@ public class GarbledBooleanCircuitImp implements GarbledBooleanCircuit {
   		 * Thus, we test for consistent and we assume that the encoded value corresponding to 0 is a 0, and that the value that 
   		 * corresponds to 1 is a 1. Based on this assumption, we map the output wire to the 0-encoded value and 1-encoded value. 
   		 * Thus if our assumption is wrong, the next gate may not verify correctly. We continue this process until we reach the circuit
-  		 * output wires. At this point we confirm (or reject) all assumption by checking the output wire's values and seeing if the wire 
+  		 * output wires. At this point we confirm(or reject) all assumption by checking the translation table and seeing if the wire 
   		 * we expected to encode to a 0 was actually a 0 and the 1 was a 1. Once we have done this, we have verified the circuits are 
   		 * identical and have not relied on any unproven assumptions.
   		 */
@@ -282,7 +282,7 @@ public class GarbledBooleanCircuitImp implements GarbledBooleanCircuit {
   			SecretKey zeroValue = allWireValues.get(w)[0];
   			SecretKey oneValue = allWireValues.get(w)[1];
 
-  			byte signalBit = outputWireValues.get(w);
+  			byte signalBit = translationTable.get(w);
   			byte permutationBitOnZeroWire = (byte) ((zeroValue.getEncoded()[zeroValue.getEncoded().length - 1] & 1) == 0 ? 0 : 1);
   			byte permutationBitOnOneWire = (byte) ((oneValue.getEncoded()[oneValue.getEncoded().length - 1] & 1) == 0 ? 0 : 1);
   			byte translatedZeroValue = (byte) (signalBit ^ permutationBitOnZeroWire);
@@ -298,7 +298,7 @@ public class GarbledBooleanCircuitImp implements GarbledBooleanCircuit {
 	/**
 	 * Translates from the resulting garbled wires to wires.
 	 * @param garbledOutput The result of computing the circuit. 
-	 * This result is given in garbled wires and will be translated according to the output wire's values.
+	 * This result is given in garbled wires and will be translated according to the translation table.
 	 * @return the translated results as wires of the boolean circuit where the values of the wires are set.
 	 */
   	public Map<Integer, Wire> translate(Map<Integer, GarbledWire> garbledOutput){
@@ -307,16 +307,18 @@ public class GarbledBooleanCircuitImp implements GarbledBooleanCircuit {
 	    
 	    //Go through the output wires.
 	    for (int w : outputWireLabels) {
-	    	byte signalBit = outputWireValues.get(w);
+	    	byte signalBit = translationTable.get(w);
 	    	byte permutationBitOnWire = garbledOutput.get(w).getSignalBit();
 	      
 	    	//Calculate the resulting value.
 	    	byte value = (byte) (signalBit ^ permutationBitOnWire);
+	    	System.out.print(value);
 	    	
 	    	//Hold the result as a wire.
 	    	Wire translated = new Wire(value);
 	    	translatedOutput.put(w, translated);
 	    }
+	    System.out.println();
 	    return translatedOutput;
 
 	}
@@ -349,15 +351,15 @@ public class GarbledBooleanCircuitImp implements GarbledBooleanCircuit {
 	}
 	
 	@Override
-	public HashMap<Integer, Byte> getOutputWireValues() {
+	public HashMap<Integer, Byte> getTranslationTable() {
 		
-		return outputWireValues;
+		return translationTable;
 	}
 
 	@Override
-	public void setOutputWireValues(HashMap<Integer, Byte> outputWireValues) {
+	public void setTranslationTable(HashMap<Integer, Byte> translationTable) {
 		
-		this.outputWireValues = outputWireValues;
+		this.translationTable = translationTable;
 		
 	}
 

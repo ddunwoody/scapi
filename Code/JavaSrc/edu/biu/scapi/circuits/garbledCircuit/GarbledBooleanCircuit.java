@@ -55,7 +55,7 @@ public interface GarbledBooleanCircuit {
 	/**
 	 * This method generates both keys for each wire. Then, creates the garbled table according to those values.<p>
 	 * @param ungarbledCircuit The circuit that this {@code GarbledBooleanCircuit} is supposed to be a garbling of. 
-	 * @return CircuitCreationValues contains both keys for each input and output wire and output wire's values.
+	 * @return CircuitCreationValues contains both keys for each input and output wire and the translation table.
 	 */
 	public CircuitCreationValues garble(BooleanCircuit ungarbledCircuit) ;
 	
@@ -64,13 +64,13 @@ public interface GarbledBooleanCircuit {
 	 * Then, creates the garbled table according to those values.<p>
 	 * This method can receive the garbled values of the input wires or the garbled values of the output wires.<p>
 	 * In addition, it gets the signal bits corresponding to the partial wire's keys. <p>
-	 * In case the given keys are the keys of the output wires, then the given signal bits are actually outputWireValues.
+	 * In case the given keys are the keys of the output wires, then the given signal bits are actually the translation table.
 	 * @param ungarbledCircuit The circuit that this {@code GarbledBooleanCircuit} is supposed to be a garbling of.
 	 * @param partialWireValues Can contain the keys of the input wires or the keys of the output wires.
 	 * Note: The least significant bit of the input and output keys of each wire should be different. 
 	 * Meaning, for each wire, if the last bit of k0 is 0, the last bit of k1 must be 1. 
 	 * Clearly, the content of the last bit of all k0 should be picked at random. Else, the circuit is not secure. 
-	 * @return CircuitCreationValues contains both keys for each input and output wire and output wire's values.
+	 * @return CircuitCreationValues contains both keys for each input and output wire and the translation table.
 	 */
 	public CircuitCreationValues garble(BooleanCircuit ungarbledCircuit, Map<Integer, SecretKey[]> partialWireValues);
 	
@@ -130,8 +130,8 @@ public interface GarbledBooleanCircuit {
 	 * The garbled tables are stored in the circuit for all the gates. This method returns the garbled tables. <p>
 	 * This function is useful if we would like to pass many garbled circuits built on the same boolean circuit. <p>
 	 * This is a compact way to define a circuit, that is, two garbled circuit with the same multi encryption scheme and the same
-	 * basic boolean circuit only differ in the garbled tables and the output wire's values. <p>
-	 * Thus we can hold one garbled circuit for all the circuits and only replace the garbled tables (and the outputWireValues if 
+	 * basic boolean circuit only differ in the garbled tables and the translation table. <p>
+	 * Thus we can hold one garbled circuit for all the circuits and only replace the garbled tables (and the translation tables if 
 	 * necessary). The advantage is that the size of the tables only is much smaller that all the information stored in the circuit 
 	 * (gates and other member variables). The size becomes important when sending large circuits.
 	 * 
@@ -143,8 +143,8 @@ public interface GarbledBooleanCircuit {
 	 * Sets the garbled tables of this circuit.<p>
 	 * This function is useful if we would like to pass many garbled circuits built on the same boolean circuit. <p>
 	 * This is a compact way to define a circuit, that is, two garbled circuit with the same multi encryption scheme and the same
-	 * basic boolean circuit only differ in the garbled tables and the output wire's values. <p>
-	 * Thus we can hold one garbled circuit for all the circuits and only replace the garbled tables (and the outputWireValues if necessary).
+	 * basic boolean circuit only differ in the garbled tables and the translation table. <p>
+	 * Thus we can hold one garbled circuit for all the circuits and only replace the garbled tables (and the translation tables if necessary).
 	 * The advantage is that the size of the tables only is much smaller that all the information stored in the circuit (gates and other 
 	 * member variables). The size becomes important when sending large circuits.<p>
 	 * The receiver of the circuits will set the garbled tables for the relevant circuit.
@@ -152,20 +152,20 @@ public interface GarbledBooleanCircuit {
 	public void setGarbledTables(byte[][] garbledTables);
 	
 	/**
-     * Returns the output wires' values of the circuit. <P>
-     * This is necessary since the constructor of the circuit may want to pass the output wires' values to another party. <p>
+     * Returns the translation table of the circuit. <P>
+     * This is necessary since the constructor of the circuit may want to pass the translation table to an other party. <p>
      * Usually, this will be used when the other party (not the constructor of the circuit) creates a circuit, sets the garbled tables 
-     * and needs the output wires' values as well to complete the construction of the circuit.
-     * @return the output wires' values.  
+     * and needs the translation table as well to complete the construction of the circuit.
+     * @return the translation table of the circuit.  
      */
-	public HashMap<Integer, Byte> getOutputWireValues();
+	public HashMap<Integer, Byte> getTranslationTable();
   
 	/**
-	 * Sets the output wires' values of the circuit. <p>
-	 * This is necessary when the garbled tables have been set and we would like to compute the circuit later on. 
-	 * @param outputWireValues This value should match the garbled tables of the circuit.
+	 * Sets the translation table of the circuit. <p>
+	 * This is necessary when the garbled tables where set and we would like to compute the circuit later on. 
+	 * @param translationTable This value should match the garbled tables of the circuit.
 	 */
-	public void setOutputWireValues(HashMap<Integer, Byte> outputWireValues);
+	public void setTranslationTable(HashMap<Integer, Byte> translationTable);
 	
 	/**
 	 * @param partyNumber The number of the party which we need his input labels.

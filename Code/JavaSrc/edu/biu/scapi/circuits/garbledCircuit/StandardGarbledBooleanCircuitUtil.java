@@ -120,7 +120,7 @@ class StandardGarbledBooleanCircuitUtil implements CircuitTypeUtil{
 			
 			if (partialWireValues.containsKey(ungarbledCircuit.getOutputWireLabels()[0])){
 				allOutputWireValues = partialWireValues;
-				//Generate the output wire's values out of the given output keys.
+				//Generate the translation table out of the given output keys.
 				for (int n : ungarbledCircuit.getOutputWireLabels()) {
 					//Signal bit is the last bit of k0.
 					byte[] k0 = allWireValues.get(n)[0].getEncoded();
@@ -219,23 +219,23 @@ class StandardGarbledBooleanCircuitUtil implements CircuitTypeUtil{
 	}
 
 	/**
-	 * Fills the maps containing the keys for the output wires and the output wire's values.
+	 * Fills the maps containing the keys for the output wires and the translation table.
 	 * @param outputWireLabels Labels of the output wires.
 	 * @param allOutputWireValues A map to fill with the output wires' keys.
 	 * @param allWireValues A map to take the output wires' keys from.
-	 * @param outputWireValues A map to fill with the output wires' signal bits.
+	 * @param translationTable A map to fill with the output wires' signal bits.
 	 */
 	private void fillOutputWiresValues(int[] outputWireLabels, Map<Integer, SecretKey[]> allOutputWireValues, Map<Integer, SecretKey[]> allWireValues,
-			Map<Integer, Byte> outputWireValues) {
+			Map<Integer, Byte> translationTable) {
 		/*
-		 * Add the output wire labels' signal bits to the outputWireValues. For a full understanding on why we chose to 
-		 * implement the outputWireValues this way, see the documentation to the outputWireValues field of
+		 * Add the output wire labels' signal bits to the translation table. For a full understanding on why we chose to 
+		 * implement the translation table this way, see the documentation to the translationTable field of
 		 * GarbledBooleanCircuitImp.
 		 */
 		for (int n : outputWireLabels) {
 			//Signal bit is the last bit of k0.
 			byte[] k0 = allWireValues.get(n)[0].getEncoded();
-			outputWireValues.put(n, (byte) (k0[k0.length-1] & 1));	
+			translationTable.put(n, (byte) (k0[k0.length-1] & 1));	
 			
 			//Add both values of output wire to the allOutputWireValues Map that was passed as a parameter.
 			allOutputWireValues.put(n, allWireValues.get(n));
@@ -305,7 +305,7 @@ class StandardGarbledBooleanCircuitUtil implements CircuitTypeUtil{
 			// Should not occur since the block size is valid.
 		} 
 				
-		return new CircuitSeedCreationValues(values.getAllInputWireValues(), values.getAllOutputWireValues(), values.getOutputWireValues(), hashedCircuit);
+		return new CircuitSeedCreationValues(values.getAllInputWireValues(), values.getAllOutputWireValues(), values.getTranslationTable(), hashedCircuit);
 	}
 	
 	/**

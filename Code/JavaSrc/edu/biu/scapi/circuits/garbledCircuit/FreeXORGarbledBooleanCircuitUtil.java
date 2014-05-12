@@ -148,7 +148,7 @@ class FreeXORGarbledBooleanCircuitUtil implements CircuitTypeUtil {
 			allOutputWireValues = partialWireValues;
 			
 			allWireValues.putAll(partialWireValues);
-			//Generate the output wire's values out of the given output keys.
+			//Generate the translation table out of the given output keys.
 			for (int n : ungarbledCircuit.getOutputWireLabels()) {
 				//Signal bit is the last bit of k0.
 				byte[] k0 = allWireValues.get(n)[0].getEncoded();
@@ -600,7 +600,7 @@ class FreeXORGarbledBooleanCircuitUtil implements CircuitTypeUtil {
 			// Should not occur since the block size is valid
 		} 
 				
-		return new CircuitSeedCreationValues(values.getAllInputWireValues(), values.getAllOutputWireValues(), values.getOutputWireValues(), hashedTables);
+		return new CircuitSeedCreationValues(values.getAllInputWireValues(), values.getAllOutputWireValues(), values.getTranslationTable(), hashedTables);
 	}
 	
 	/**
@@ -609,7 +609,7 @@ class FreeXORGarbledBooleanCircuitUtil implements CircuitTypeUtil {
 	 * @param prg To use in order to generate the keys.
 	 * @param seed To initialize the prg.
 	 * @param allWireValues An empty map that will be filled with keys during the function execution.
-	 * @return the created keys of each input and output wire and output wire's values.
+	 * @return the created keys of each input and output wire and the translation table.
 	 * @throws InvalidKeyException
 	 */
 	private CircuitCreationValues sampleSeedKeys(BooleanCircuit ungarbledCircuit, PseudorandomGenerator prg, byte[] seed, Map<Integer, SecretKey[]> allWireValues) throws InvalidKeyException {

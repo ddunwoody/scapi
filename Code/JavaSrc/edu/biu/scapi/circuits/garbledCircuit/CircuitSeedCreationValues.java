@@ -33,7 +33,7 @@ import javax.crypto.SecretKey;
  * A class that holds the values used to create the circuit using a pseudo random generator and a seed. <p>
  * These values are:<p>
  * 1. Both keys of the input and the output wires.<p>
- * 2. The output wire's values.<p>
+ * 2. The translation table of the circuit.<p>
  * 3. The signal bits of the input wires. They are returned in order to enable generating keys out of the input wires' keys.<p>
  * 4. The result of applying a hash function on the circuit's garbled tables.<p>
  * 
@@ -48,12 +48,12 @@ public class CircuitSeedCreationValues extends CircuitCreationValues{
 	 * Sets the given arguments.
 	 * @param allInputWireValues Both keys for all input wires.
 	 * @param allOutputWireValues Both keys for all output wires.
-	 * @param outputWireValues Signal bits of all output wires.
+	 * @param translationTable Signal bits of all output wires.
 	 * @param hashedTables The result of the hash function of the garbled tables.
 	 */
 	public CircuitSeedCreationValues(Map<Integer, SecretKey[]> allInputWireValues, Map<Integer, SecretKey[]> allOutputWireValues, 
-			HashMap<Integer, Byte> outputWireValues, byte[] hashedTables){
-		super(allInputWireValues, allOutputWireValues, outputWireValues);
+			HashMap<Integer, Byte> translationTable, byte[] hashedTables){
+		super(allInputWireValues, allOutputWireValues, translationTable);
 		this.hashedTables = hashedTables;
 	}
 	

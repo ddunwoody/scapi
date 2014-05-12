@@ -122,7 +122,7 @@ class FreeXORRowReductionGarbledBooleanCircuitUtil extends FreeXORGarbledBoolean
 			if (partialWireValues.containsKey(ungarbledCircuit.getOutputWireLabels()[0])){
 				allOutputWireValues = partialWireValues;
 				
-				//Generate the output wire's values out of the given output keys.
+				//Generate the translation table out of the given output keys.
 				for (int n : ungarbledCircuit.getOutputWireLabels()) {
 					//Signal bit is the last bit of k0.
 					byte[] k0 = allWireValues.get(n)[0].getEncoded();

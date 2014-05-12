@@ -33,7 +33,7 @@ import javax.crypto.SecretKey;
  * A class that hold the values used to create the circuit. <p>
  * These values are:<P>
  * 1. Both keys of the input and the output wires.<p>
- * 2. The output wire's values.<p>
+ * 2. The translation table of the circuit.<p>
  * 3. The signal bits of the input wires. They are returned in order to enable generating keys out of the input wires' keys.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
@@ -48,13 +48,13 @@ public class CircuitCreationValues {
 	 * Sets the given arguments.
 	 * @param allInputWireValues Both keys for all input wires.
 	 * @param allOutputWireValues Both keys for all output wires.
-	 * @param outputWireValues Signal bits of all output wires.
+	 * @param translationTable Signal bits of all output wires.
 	 */
 	public CircuitCreationValues(Map<Integer, SecretKey[]> allInputWireValues, Map<Integer, SecretKey[]> allOutputWireValues, 
-			HashMap<Integer, Byte> outputWireValues) {
+			HashMap<Integer, Byte> translationTable) {
 		this.allInputWireValues = allInputWireValues;
 		this.allOutputWireValues = allOutputWireValues;
-		this.translationTable = outputWireValues;
+		this.translationTable = translationTable;
 	}
 
 	public Map<Integer, SecretKey[]> getAllInputWireValues() {
@@ -65,7 +65,7 @@ public class CircuitCreationValues {
 		return allOutputWireValues;
 	}
 
-	public HashMap<Integer, Byte> getOutputWireValues() {
+	public HashMap<Integer, Byte> getTranslationTable() {
 		return translationTable;
 	}
 }
