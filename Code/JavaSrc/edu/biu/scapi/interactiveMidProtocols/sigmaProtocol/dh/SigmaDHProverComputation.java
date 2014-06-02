@@ -44,6 +44,8 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
  * This protocol is used for a prover to convince a verifier that the input tuple (g,h,u,v) 
  * is a Diffie-Hellman tuple.
  * 
+ * For more information see Protocol 6.2.4, page 152 of Hazay-Lindell.
+ * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
