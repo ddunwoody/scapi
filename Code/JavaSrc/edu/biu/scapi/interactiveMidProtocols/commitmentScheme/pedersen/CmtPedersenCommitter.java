@@ -45,7 +45,7 @@ import edu.biu.scapi.securityLevel.PerfectlyHidingCmt;
 /**
  * Concrete implementation of committer that executes the Pedersen commitment scheme in the committer's point of view.
  * 
- * For more information see Protocol 6.5.3, page 164 of Hazay-Lindell.
+ * For more information see Protocol 6.5.3, page 164 of <i>Efficient Secure Two-Party Protocols</i> by Hazay-Lindell.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *

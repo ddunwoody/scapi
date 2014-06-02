@@ -55,6 +55,8 @@ import edu.biu.scapi.securityLevel.PerfectlyHidingCmt;
  * 
  * This is a perfectly-hiding commitment that can be used to commit to a value of any length. 
  * 
+ * For more information see Protocol 6.5.3, page 164 of <i>Efficient Secure Two-Party Protocols</i> by Hazay-Lindell.
+ * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
