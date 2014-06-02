@@ -36,6 +36,8 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProtocol
  * This protocol is used for a prover to convince a verifier that at least one of two statements is true, 
  * where each statement can be proven by an associated Sigma protocol.
  * 
+ * For more information see Protocol 6.4.1, page 159 of Hazay-Lindell.
+ * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
