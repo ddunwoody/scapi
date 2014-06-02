@@ -37,7 +37,9 @@ import edu.biu.scapi.securityLevel.StandAlone;
 
 /**
  * This class plays as party two of coin tossing Blum protocol, which tosses a single bit. <p>
- * This protocol is fully secure under the stand-alone simulation-based definitions.
+ * This protocol is fully secure under the stand-alone simulation-based definitions.<p>
+ * 
+ * For more information see M. Blum. Coin Flipping by Phone. IEEE COMPCOM, 1982.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *

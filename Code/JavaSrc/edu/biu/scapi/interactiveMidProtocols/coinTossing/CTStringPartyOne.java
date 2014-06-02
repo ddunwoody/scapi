@@ -44,7 +44,10 @@ import edu.biu.scapi.tools.Factories.KdfFactory;
 
 /**
  * Concrete implementation of a protocol for tossing a string from party one's point of view.<p>
- * This protocol is fully secure under the stand-alone simulation-based definitions.
+ * This protocol is fully secure under the stand-alone simulation-based definitions.<P>
+ * 
+ * This protocol is based on: Y. Lindell. Parallel Coin-Tossing and Constant-Round Secure Two-Party Computation. CRYPTO 2001.
+ * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
