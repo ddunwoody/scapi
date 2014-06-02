@@ -44,10 +44,11 @@ import edu.biu.scapi.securityLevel.UC;
 
 /**
  * Concrete class for OT receiver based on the DDH assumption that achieves UC security in
- * the common reference string model. <p>
- * This is implementation in BYTE ARRAY mode.<p>
- * This class derived from OTUCDDHReceiverAbs and implements the functionality 
- * related to the byte array inputs.
+ * the common reference string model. 
+ * This implementation is based on the protocol of Peikert, Vaikuntanathan and Waters (CRYPTO 2008) for achieving UC-secure OT.<p>
+ * 
+ * This is implementation in BYTE ARRAY mode, derived from OTUCDDHReceiverAbs and implements the functionality 
+ * related to the byte array inputs. <P>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
