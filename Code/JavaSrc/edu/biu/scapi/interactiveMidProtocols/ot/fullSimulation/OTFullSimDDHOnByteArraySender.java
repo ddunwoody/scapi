@@ -48,8 +48,11 @@ import edu.biu.scapi.tools.Factories.KdfFactory;
 /**
  * Concrete implementation of the sender side in oblivious transfer based on the DDH assumption that achieves full simulation.<p>
  * This implementation can also be used as batch OT that achieves full simulation.<p>
- *  In batch oblivious transfer, the parties run an initialization phase and then can carry out concrete OTs later 
- *  whenever they have new inputs and wish to carry out an OT. <p>
+ * In batch oblivious transfer, the parties run an initialization phase and then can carry out concrete OTs later 
+ * whenever they have new inputs and wish to carry out an OT. <p>
+ * 
+ * For more information see Protocol 7.5.1 page 201 of <i>Efficient Secure Two-Party Protocols</i> by Hazay-Lindell; 
+ * this is the protocol of [PVW] adapted to the stand-alone setting <P>
  * 
  * This class derived from OTFullSimDDHSenderAbs and implements the functionality 
  * related to the byte array inputs.
