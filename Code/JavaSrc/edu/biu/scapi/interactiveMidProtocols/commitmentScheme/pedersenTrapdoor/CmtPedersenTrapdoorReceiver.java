@@ -51,6 +51,8 @@ import edu.biu.scapi.securityLevel.PerfectlyHidingCmt;
  * This trapdoor is output by the receiver and can be used by a higher-level application 
  * (e.g., by the ZK transformation of a sigma protocol to a zero-knowledge proof of knowledge).
  * 
+ * For more information see Protocol 6.5.3, page 164 of <i>Efficient Secure Two-Party Protocols</i> by Hazay-Lindell.
+ * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
