@@ -44,7 +44,9 @@ import edu.biu.scapi.tools.Factories.KdfFactory;
 /**
  * Concrete class for OT Privacy assuming DDH receiver ON BYTE ARRAY.<p>
  * This class derived from OTPrivacyOnlyDDHReceiverAbs and implements the functionality 
- * related to the byte array inputs.
+ * related to the byte array inputs. <p>
+ * 
+ * For more information see Protocol 7.2.1 page 179 of <i>Efficient Secure Two-Party Protocols</i> by Hazay-Lindell.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *

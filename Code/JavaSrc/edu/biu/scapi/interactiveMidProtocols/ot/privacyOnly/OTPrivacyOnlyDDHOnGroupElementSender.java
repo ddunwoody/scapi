@@ -39,7 +39,9 @@ import edu.biu.scapi.securityLevel.PrivacyOnly;
 /**
  * Concrete class for OT Privacy assuming DDH sender ON GroupElement.<p>
  * This class derived from OTPrivacyOnlyDDHSenderAbs and implements the functionality 
- * related to the GroupElement inputs.
+ * related to the GroupElement inputs. <p>
+ * 
+ * For more information see Protocol 7.2.1 page 179 of <i>Efficient Secure Two-Party Protocols</i> by Hazay-Lindell.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *

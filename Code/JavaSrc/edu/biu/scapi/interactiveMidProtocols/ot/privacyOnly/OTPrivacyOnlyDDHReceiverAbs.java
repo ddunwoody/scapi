@@ -52,7 +52,9 @@ import edu.biu.scapi.tools.Factories.DlogGroupFactory;
  * Abstract class for OT Privacy assuming DDH receiver.
  * Privacy OT have two modes: one is on ByteArray and the second is on GroupElement.
  * The different is in the input and output types and the way to process them. 
- * In spite that, there is a common behavior for both modes which this class is implementing.
+ * In spite that, there is a common behavior for both modes which this class is implementing. <p>
+ * 
+ * For more information see Protocol 7.2.1 page 179 of <i>Efficient Secure Two-Party Protocols</i> by Hazay-Lindell.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
