@@ -50,7 +50,6 @@ import edu.biu.scapi.tools.Factories.DlogGroupFactory;
  * The difference is in the input and output types and the way to process them. 
  * In spite that, there is a common behavior for both modes which this class implements.
  * 
- * For more information see Protocol 6.1.1, page 148 of Hazay-Lindell.
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */

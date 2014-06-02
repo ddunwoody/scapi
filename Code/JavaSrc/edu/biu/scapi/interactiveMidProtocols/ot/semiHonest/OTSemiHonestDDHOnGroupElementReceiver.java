@@ -40,8 +40,6 @@ import edu.biu.scapi.securityLevel.SemiHonest;
  * This class derived from OTSemiHonestDDHReceiverAbs and implements the functionality 
  * related to the GroupElement inputs.
  * 
- * For more information see Protocol 6.1.1, page 148 of Hazay-Lindell.
- * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
