@@ -42,6 +42,9 @@ import edu.biu.scapi.primitives.randomOracle.RandomOracle;
  * This is a transformation that takes any Sigma protocol and a random oracle 
  * (instantiated with any hash function) H and yields a zero-knowledge proof of knowledge.
  * 
+ * This protocol is explained in depth in <i>How to Prove Yourself: Practical Solutions to Identification and Signature Problems</i> 
+ * by A. Fiat and A. Shamir in CRYPTO 1986, pages 186-194.
+ * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */

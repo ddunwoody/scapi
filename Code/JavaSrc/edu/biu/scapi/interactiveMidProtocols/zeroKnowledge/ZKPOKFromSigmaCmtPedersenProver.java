@@ -42,6 +42,8 @@ import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtRCommitPhaseOut
  * This is a transformation that takes any Sigma protocol and any perfectly hiding trapdoor (equivocal) 
  * commitment scheme and yields a zero-knowledge proof of knowledge.
  * 
+ * For more information see Protocol 6.5.4, page 165 of Hazay-Lindell.
+ * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
