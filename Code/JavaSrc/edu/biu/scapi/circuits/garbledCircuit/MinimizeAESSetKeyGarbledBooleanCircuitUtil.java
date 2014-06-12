@@ -70,8 +70,8 @@ class MinimizeAESSetKeyGarbledBooleanCircuitUtil extends StandardGarbledBooleanC
 		this.random = random;
 		this.aes = aes;
 		 
-		// This will be passed to the gates and used for decryption and (for now) verifying. Eventually, verifying will also minimize setKey operations 
-		// and use aes directly.
+		// This will be passed to the gates and used for decryption and (for now) verifying. 
+		// Eventually, verifying will also minimize setKey operations and use aes directly.
 	    mes = new AES128MultiKeyEncryption(aes);
 	}
 	
@@ -88,7 +88,7 @@ class MinimizeAESSetKeyGarbledBooleanCircuitUtil extends StandardGarbledBooleanC
 	 * @param garbledTablesHolder to fill with the garbled table.
 	 * @return the created gate.
 	 */
-	protected GarbledGate createGate(Gate ungarbledGate, GarbledTablesHolder garbledTablesHolder) {
+	protected GarbledGate createGate(Gate ungarbledGate, BasicGarbledTablesHolder garbledTablesHolder) {
 		return new MinimizeAESSetKeyGarbledGate(ungarbledGate, mes, aes, garbledTablesHolder);
 		
 	}
