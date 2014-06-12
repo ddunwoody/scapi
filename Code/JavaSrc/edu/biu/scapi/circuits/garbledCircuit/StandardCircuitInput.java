@@ -47,7 +47,6 @@ public class StandardCircuitInput implements CircuitInput{
 	private MultiKeyEncryptionScheme mes;
 	private SecureRandom random;
 	private KeyDerivationFunction kdf;
-	private boolean isRowReductionWithFixedOutputKeys;
 	
 	/**
 	 * This constructor creates an input object for a regular representation of StandardGarbledBooleanCircuit.
@@ -56,24 +55,21 @@ public class StandardCircuitInput implements CircuitInput{
 	 * @param random
 	 */
 	public StandardCircuitInput(BooleanCircuit ungarbledCircuit, MultiKeyEncryptionScheme mes, SecureRandom random){
-		this(ungarbledCircuit, mes, null, random, false);
+		this(ungarbledCircuit, mes, null, random);
 	}
 	
 	/**
 	 * This constructor creates an input object for a row reduction representation of StandardGarbledBooleanCircuit.
 	 * @param ungarbledCircuit The boolean circuit that needs to be garbled. 
 	 * @param mes A MultiKeyEncryptionScheme to use.
+	 * @param kdf To use in the row reduction algorithm.
 	 * @param random
-	 * @param isRowReductionWithFixedOutputKeys Indicates if the user is going to sample the wires' keys from given output keys.
-	 * In this case, the circuit representation should be a little different. 
-	 * See {@link BooleanCircuit#BooleanCircuit(File f)} for more information.
 	 */
-	public StandardCircuitInput(BooleanCircuit ungarbledCircuit, MultiKeyEncryptionScheme mes, KeyDerivationFunction kdf, SecureRandom random, boolean isRowReductionWithFixedOutputKeys){
+	public StandardCircuitInput(BooleanCircuit ungarbledCircuit, MultiKeyEncryptionScheme mes, KeyDerivationFunction kdf, SecureRandom random){
 		this.ungarbledCircuit = ungarbledCircuit;
 		this.mes = mes;
 		this.random = random;
 		this.kdf = kdf;
-		this.isRowReductionWithFixedOutputKeys = isRowReductionWithFixedOutputKeys;
 	}
 
 	@Override
@@ -82,22 +78,21 @@ public class StandardCircuitInput implements CircuitInput{
 		return ungarbledCircuit;
 	}
 	
-	/**
-	 * If the constructor with the KDF object was called, the returned utility class uses the rowReduction technology.
-	 * If not, the returned utility class uses the regular garbled table.
-	 */
 	@Override
 	public CircuitTypeUtil createCircuitUtil() {
+		/*
+		 * If the constructor with the KDF object was called, the returned utility class uses the rowReduction technology.
+		 * If not, the returned utility class uses the regular garbled table.
+		 */
+		
 		if (kdf == null){ //There is no kdf, return the regular Standard circuit utility.
 			return new StandardGarbledBooleanCircuitUtil(mes, random);
 		} else { //There is a kdf, return the Row Reduction Standard circuit utility.
-			return new StandardRowReductionGarbledBooleanCircuitUtil(mes, kdf, random, isRowReductionWithFixedOutputKeys, ungarbledCircuit.getOutputWireLabels());
+			return new StandardRowReductionGarbledBooleanCircuitUtil(mes, kdf, random);
 		}
 	}
 	
-	public boolean isRowReductionWithFixedOutputKeys(){
-		return isRowReductionWithFixedOutputKeys;
-	}
+	
 
 	public KeyDerivationFunction getKDF(){
 		return kdf;

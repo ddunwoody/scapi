@@ -43,7 +43,6 @@ public class FreeXORCircuitInput implements CircuitInput{
 	private BooleanCircuit ungarbledCircuit;
 	private MultiKeyEncryptionScheme mes;
 	private KeyDerivationFunction kdf;
-	private boolean isRowReductionWithFixedOutputKeys;
 	
 	/**
 	 * This constructor creates an input object for a regular representation of FreeXORGarbledBooleanCircuit.
@@ -65,11 +64,10 @@ public class FreeXORCircuitInput implements CircuitInput{
 	 * In this case, the circuit representation should be a little different. 
 	 * See {@link BooleanCircuit#BooleanCircuit(File f)} for more information.
 	 */
-	public FreeXORCircuitInput(BooleanCircuit ungarbledCircuit, MultiKeyEncryptionScheme mes, KeyDerivationFunction kdf, boolean isRowReductionWithFixedOutputKeys){
+	public FreeXORCircuitInput(BooleanCircuit ungarbledCircuit, MultiKeyEncryptionScheme mes, KeyDerivationFunction kdf){
 		this.ungarbledCircuit = ungarbledCircuit;
 		this.mes = mes;
 		this.kdf = kdf;
-		this.isRowReductionWithFixedOutputKeys = isRowReductionWithFixedOutputKeys;
 	}
 
 	@Override
@@ -87,12 +85,8 @@ public class FreeXORCircuitInput implements CircuitInput{
 		if (kdf == null){ //There is no kdf, return the regular Free XOR utility.
 			return new FreeXORGarbledBooleanCircuitUtil(mes);
 		} else { //There is a kdf, return the Row Reduction Free XOR utility.
-			return new FreeXORRowReductionGarbledBooleanCircuitUtil(mes, kdf, isRowReductionWithFixedOutputKeys, ungarbledCircuit.getOutputWireLabels());
+			return new FreeXORRowReductionGarbledBooleanCircuitUtil(mes, kdf);
 		}
-	}
-	
-	public boolean isRowReductionWithFixedOutputKeys(){
-		return isRowReductionWithFixedOutputKeys;
 	}
 	
 	public KeyDerivationFunction getKDF(){
