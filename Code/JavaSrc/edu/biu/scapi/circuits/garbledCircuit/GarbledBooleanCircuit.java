@@ -25,7 +25,7 @@
 package edu.biu.scapi.circuits.garbledCircuit;
 
 import java.io.File;
-import java.util.HashMap;
+import java.security.InvalidKeyException;
 import java.util.List;
 import java.util.Map;
 
@@ -33,12 +33,12 @@ import javax.crypto.SecretKey;
 
 import edu.biu.scapi.circuits.circuit.BooleanCircuit;
 import edu.biu.scapi.circuits.circuit.Wire;
-import edu.biu.scapi.exceptions.InvalidInputException;
+import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.exceptions.NoSuchPartyException;
 import edu.biu.scapi.exceptions.NotAllInputsSetException;
 
 /**
- * {@code GarbledBooleanCircuit} is a general interface implemented by all garbled circuits--optimized or not. <p>
+ * {@code GarbledBooleanCircuit} is a general interface for all basic garbled circuits. It is implemented by all garbled circuits--optimized or not. <p>
  * All garbled circuits have four main operations: <p>
  * 1. The construct operation which is provided by the constructors of the implementing classes following by garble function. <p>
  * 2. The {@link #compute()} function computes a result on a garbled circuit whose input has been set. <p>
@@ -54,53 +54,41 @@ public interface GarbledBooleanCircuit {
 	
 	/**
 	 * This method generates both keys for each wire. Then, creates the garbled table according to those values.<p>
-	 * @param ungarbledCircuit The circuit that this {@code GarbledBooleanCircuit} is supposed to be a garbling of. 
 	 * @return CircuitCreationValues contains both keys for each input and output wire and the translation table.
 	 */
-	public CircuitCreationValues garble(BooleanCircuit ungarbledCircuit) ;
+	public CircuitCreationValues garble();
 	
 	/**
-	 * This method gets part of the keys and generates the missing keys for each wire. <p>
-	 * Then, creates the garbled table according to those values.<p>
-	 * This method can receive the garbled values of the input wires or the garbled values of the output wires.<p>
-	 * In addition, it gets the signal bits corresponding to the partial wire's keys. <p>
-	 * In case the given keys are the keys of the output wires, then the given signal bits are actually the translation table.
-	 * @param ungarbledCircuit The circuit that this {@code GarbledBooleanCircuit} is supposed to be a garbling of.
-	 * @param partialWireValues Can contain the keys of the input wires or the keys of the output wires.
-	 * Note: The least significant bit of the input and output keys of each wire should be different. 
-	 * Meaning, for each wire, if the last bit of k0 is 0, the last bit of k1 must be 1. 
-	 * Clearly, the content of the last bit of all k0 should be picked at random. Else, the circuit is not secure. 
-	 * @return CircuitCreationValues contains both keys for each input and output wire and the translation table.
+	 * This method generates both keys for each input wire using the seed. 
+	 * It then creates the garbled table according to those values.<p>
+	 * @param seed Used to initialize the gprg.
+	 * @return CircuitCreationValues Contains both keys for each input and output wire and the translation table.
+	 * @throws InvalidKeyException In case the seed is an invalid key for the given PRG.
 	 */
-	public CircuitCreationValues garble(BooleanCircuit ungarbledCircuit, Map<Integer, SecretKey[]> partialWireValues);
-	
+	public CircuitCreationValues garble(byte[] seed) throws InvalidKeyException;
+		
 	/**
 	 * This method sets the input of the circuit. <p>
-	 * It takes as a parameter a {@code Map} that maps the input Wire labels to a garbled wire containing the appropriate garbled values. <p>
+	 * It takes as a parameter a {@code Map} that maps the input wire indices to a garbled wire containing the appropriate garbled values. <p>
 	 * See {@link #setGarbledInputFromUngarbledInput(File, Map)} for an alternate way of setting the input.
 	 * @param presetInputWires A {@code Map} containing the input wires that have been preset with their values.
-	 * @param partyNumber The number of the party which the inputs belong to.
-	 * @throws NoSuchPartyException 
   	 */
-	public void setInputs(Map<Integer, GarbledWire> presetInputWires, int partyNumber) throws NoSuchPartyException;
+	public void setInputs(Map<Integer, GarbledWire> presetInputWires) ;
 
 	/**
-	 * This method takes a map containing the {@code GarbledWire} label and <b> non garbled</b> value. <p>
+	 * This method takes a map containing the {@code GarbledWire} indices and <b> non garbled</b> value. <p>
 	 * This method then performs the lookup on the accompanying allInputWireValues {@code Map} and sets the inputs 
 	 * to the corresponding garbled outputs.
-	 * @param ungarbledInput A map containing the {@code GarbledWire} label and <b> non garbled</b> value for that label. 
+	 * @param ungarbledInput A map containing the {@code GarbledWire} indices and <b> non garbled</b> value for that index. 
 	 * @param allInputWireValues The map containing both garbled values for each input wire.
-	 * @param partyNumber The number of the party which the inputs belong to.
-	 * @throws NoSuchPartyException 
 	 */
-	public void setGarbledInputFromUngarbledInput(Map<Integer, Byte> ungarbledInput, Map<Integer, SecretKey[]> allInputWireValues, int partyNumber) throws NoSuchPartyException;
+	public void setGarbledInputFromUngarbledInput(Map<Integer, Byte> ungarbledInput, Map<Integer, SecretKey[]> allInputWireValues) ;
  
 	/**
 	 * This method computes the circuit if the input has been set. <p>
 	 * It returns a {@code Map} containing the garbled output. This output can be translated via the {@link #translate(Map)} method.
-	 * @return returns a {@code Map} that maps the label of the output wire to the garbled value of the wire.
+	 * @return returns a {@code Map} that maps the index of the output wire to the garbled value of the wire.
 	 * @throws NotAllInputsSetException if not all the input has been set.
-	 *        
 	 */
 	public Map<Integer, GarbledWire> compute() throws NotAllInputsSetException;
 
@@ -108,24 +96,45 @@ public interface GarbledBooleanCircuit {
      * The verify method is used in the case of malicious adversaries.<p>
      * Alice constructs n circuits and Bob can verify n-1 of them (of his choice) to confirm that they are indeed garbling of the 
      * agreed upon non garbled circuit. In order to verify, Alice has to give Bob both keys for each of the input wires.
-     * @param ungarbledCircuit The circuit that this {@code GarbledBooleanCircuit} is supposed to be a garbling of. 
-     * This is the circuit that Alice and Bob agreed upon in Yao's protocol. We are verifying that this {@code GarbledBooleanCircuit} 
-     * is indeed a garbling of the agreed upon ungarbled circuit.
      * @param allInputWireValues A {@Map} containing both keys for each input wire.
-     * For each input wire label, the map contains an array of two values. The value in the 0 position is the 0 encoding, and the
+     * For each input wire , the map contains an array of two values. The value in the 0 position is the 0 encoding, and the
      * value in the 1 position is the 1 encoding.
-     * @return {@code true} if this {@code GarbledBooleanCircuit} is a garbling of the ungarbledCircuit, {@code false} if it is not.
-     * @throws InvalidInputException in case there is a problem with the given keys.
+     * @return {@code true} if this {@code GarbledBooleanCircuit} is a garbling the given keys, {@code false} if it is not.
      */
-	public boolean verify(BooleanCircuit ungarbledCircuit, Map<Integer, SecretKey[]> allInputWireValues) throws InvalidInputException;
+	public boolean verify(Map<Integer, SecretKey[]> allInputWireValues) ;
 
 	/**
+     * This function behaves exactly as the verify(Map<Integer, SecretKey[]> allInputWireValues) method except the last part.
+     * The verify function verifies that the translation table matches the resulted output garbled values, while this function does not check it 
+     * but return the resulted output garbled values. 
+     * @param allInputWireValues A {@Map} containing both keys for each input wire.
+     * For each input wire index, the map contains an array of two values. The value in the 0 position is the 0 encoding, and the
+     * value in the 1 position is the 1 encoding.
+     * @param allOutputWireValues A {@Map} containing both keys for each output wire. 
+     * When calling the function this map should be empty and will be filled during the process of the function.
+     * @return {@code true} if this {@code GarbledBooleanCircuit} is a garbling the given keys, {@code false} if it is not.
+     */
+	public boolean internalVerify(Map<Integer, SecretKey[]> allInputWireValues, Map<Integer, SecretKey[]> allOutputWireValues);
+	
+	/**
 	 * Translates the garbled output obtained from the {@link #compute()} function into a meaningful(i.e. 0-1) output.<p>
-	 * @param garbledOutput A {@code Map) that contains the garbled output. This map maps the output wire labels to {@code GarbledWire}s
-	 * @return a {@code Map} that maps the output wire labels to ungarbled {@code Wire}s that are set to either 0 or 1.
+	 * @param garbledOutput A {@code Map) that contains the garbled output. This map maps the output wire indices to {@code GarbledWire}s
+	 * @return a {@code Map} that maps the output wire  to ungarbled {@code Wire}s that are set to either 0 or 1.
 	 */
 	public Map<Integer, Wire> translate(Map<Integer, GarbledWire> garbledOutput);
+	
+	/**
+	 * Verifies that the given garbledOutput is valid values according to the given all OutputWireValues. <p>
+	 * Meaning, for each output wire, checks that the garbled wire is one of the two possibilities.
+	 * Then, translates the garbled output obtained from the {@link #compute()} function into a meaningful(i.e. 0-1) output.<p>
+	 * @param garbledOutput A {@code Map) that contains the garbled output. This map maps the output wire s to {@code GarbledWire}s
+	 * @param allOutputWireValues both values for each output wire.
+	 * @return a {@code Map} that maps the output wire indices to ungarbled {@code Wire}s that are set to either 0 or 1.
+	 * @throws CheatAttemptException if there is a garbledOutput values that is not one of the two possibilities.
+	 */
+	public Map<Integer, Wire> verifiedTranslate(Map<Integer, GarbledWire> garbledOutput, Map<Integer, SecretKey[]> allOutputWireValues) throws CheatAttemptException;
 
+	
 	/**
 	 * The garbled tables are stored in the circuit for all the gates. This method returns the garbled tables. <p>
 	 * This function is useful if we would like to pass many garbled circuits built on the same boolean circuit. <p>
@@ -136,8 +145,7 @@ public interface GarbledBooleanCircuit {
 	 * (gates and other member variables). The size becomes important when sending large circuits.
 	 * 
 	 */
-	public byte[][] getGarbledTables();
-	
+	public GarbledTablesHolder getGarbledTables();
 	
 	/**
 	 * Sets the garbled tables of this circuit.<p>
@@ -149,7 +157,7 @@ public interface GarbledBooleanCircuit {
 	 * member variables). The size becomes important when sending large circuits.<p>
 	 * The receiver of the circuits will set the garbled tables for the relevant circuit.
 	 */
-	public void setGarbledTables(byte[][] garbledTables);
+	public void setGarbledTables(GarbledTablesHolder garbledTables);
 	
 	/**
      * Returns the translation table of the circuit. <P>
@@ -158,26 +166,44 @@ public interface GarbledBooleanCircuit {
      * and needs the translation table as well to complete the construction of the circuit.
      * @return the translation table of the circuit.  
      */
-	public HashMap<Integer, Byte> getTranslationTable();
+	public Map<Integer, Byte> getTranslationTable();
   
 	/**
 	 * Sets the translation table of the circuit. <p>
 	 * This is necessary when the garbled tables where set and we would like to compute the circuit later on. 
 	 * @param translationTable This value should match the garbled tables of the circuit.
 	 */
-	public void setTranslationTable(HashMap<Integer, Byte> translationTable);
+	public void setTranslationTable(Map<Integer, Byte> translationTable);
 	
 	/**
-	 * @param partyNumber The number of the party which we need his input labels.
-	 * @return a List containing the integer labels of the input wires of the given party number.
-	 * @throws NoSuchPartyException 
+	 * Returns the input wires' indices of the given party.
+	 * @param partyNumber The number of the party which we need his input wire indices.
+	 * @return a List containing the indices of the input wires of the given party number.
+	 * @throws NoSuchPartyException In case the given party number is not valid.
 	 */
-	public List<Integer> getInputWireLabels(int partyNumber) throws NoSuchPartyException;
+	public List<Integer> getInputWireIndices(int partyNumber) throws NoSuchPartyException;
+	
+	/**
+	 * @return an array containing the indices of the circuit's output wires.
+	 */
+	public int[] getOutputWireIndices();
 
 	/**
+	 * Returns the number of input wires of the given party.
 	 * @param partyNumber the number of the party which we need his number of inputs.
 	 * @return the number of inputs of this circuit.
-	 * @throws NoSuchPartyException 
+	 * @throws NoSuchPartyException In case the given party number is not valid.
 	 */
-	public int getNumberOfInputs(int partyNumber) throws NoSuchPartyException ;  
+	public int getNumberOfInputs(int partyNumber) throws NoSuchPartyException; 
+	
+	/**
+	 * Returns the number of parties using this circuit.
+	 * 
+	 */
+	public int getNumberOfParties();
+	
+	/**
+	 * Return the number of gates in this circuit.
+	 */
+	public int getNumberOfGates();
 }
