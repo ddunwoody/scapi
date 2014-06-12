@@ -25,18 +25,37 @@
 package edu.biu.scapi.circuits.garbledCircuit;
 
 /**
- * This is a general interface for garbled tables holder. <P>
- * There are multiple ways to hold a garbled tables, each one of them will have a concrete class that implement this interface.
+ * This class holds the garbled tables of the garbled circuit.<p>
+ * The garbled circuit will hold an instance of this class and also will the gates. <p>
+ * This way, when we want to change the garbled tables, we just have to change the pointer of the tables in this class. 
+ * The circuit and the gates will all get the new tables with no time.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public interface GarbledTablesHolder {
+class BasicGarbledTablesHolder implements GarbledTablesHolder{
 
+	private byte[][] garbledTables;
+	
 	/**
-	 * There are cases when we do not know which concrete holder we use and we need a general function that returns the garbled tables.
-	 * Thus we add this function that returns the tables in the most basic format - that all classes should have the ability to translate to - byte[][].
-	 * @return the garbled tables in a byte[][] format.
+	 * Sets the given garbled tables.
+	 * @param garbledTables
 	 */
-	public byte[][] toDoubleByteArray();
+	BasicGarbledTablesHolder(byte[][] garbledTables){
+		this.garbledTables = garbledTables;
+	}
+
+	@Override
+	public byte[][] toDoubleByteArray(){
+		return garbledTables;
+	}
+	
+	/**
+	 * Sets the given garbled tables. <P>
+	 * This allows changing the circuit inner content with no time.
+	 * @param garbledTables of the circuit.
+	 */
+	public void setGarbledTables(byte[][] garbledTables){
+		this.garbledTables = garbledTables;
+	}
 }
