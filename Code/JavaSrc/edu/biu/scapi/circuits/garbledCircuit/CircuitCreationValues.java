@@ -34,7 +34,6 @@ import javax.crypto.SecretKey;
  * These values are:<P>
  * 1. Both keys of the input and the output wires.<p>
  * 2. The translation table of the circuit.<p>
- * 3. The signal bits of the input wires. They are returned in order to enable generating keys out of the input wires' keys.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
