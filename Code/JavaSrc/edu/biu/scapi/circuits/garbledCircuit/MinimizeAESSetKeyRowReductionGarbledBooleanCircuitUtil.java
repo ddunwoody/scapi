@@ -26,7 +26,6 @@ package edu.biu.scapi.circuits.garbledCircuit;
 
 import java.security.SecureRandom;
 
-import edu.biu.scapi.circuits.circuit.BooleanCircuit;
 import edu.biu.scapi.circuits.circuit.Gate;
 import edu.biu.scapi.circuits.encryption.AES128MultiKeyEncryption;
 import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
@@ -48,11 +47,8 @@ class MinimizeAESSetKeyRowReductionGarbledBooleanCircuitUtil extends StandardRow
 	 * @param AES to use in the computations
 	 * @param kdf to use in the row reduction technique.
 	 * @param random A source of randomness.
-	 * @param isRowReductionWithFixedOutputKeys Indicates if the user is going to sample the wires' keys from given output keys.
-	 * In this case, the circuit representation should be a little different. 
-	 * See {@link BooleanCircuit#BooleanCircuit(File f)} for more information.
 	 */
-	MinimizeAESSetKeyRowReductionGarbledBooleanCircuitUtil(AES aes, KeyDerivationFunction kdf, SecureRandom random, boolean isRowReductionWithFixedOutputKeys, int[] outputWiresLabels) {
+	MinimizeAESSetKeyRowReductionGarbledBooleanCircuitUtil(AES aes, KeyDerivationFunction kdf, SecureRandom random, int[] outputWiresIndices) {
 		this.aes = aes;
 		this.random = random;
 		this.kdf = kdf;
@@ -60,8 +56,6 @@ class MinimizeAESSetKeyRowReductionGarbledBooleanCircuitUtil extends StandardRow
 		// This will be passed to the gates and used for decryption and (for now) verifying. Eventually, verifying will
 	    // also minimize setKey operations and use aes directly.
 	    mes = new AES128MultiKeyEncryption(aes);
-	    this.isRowReductionWithFixedOutputKeys = isRowReductionWithFixedOutputKeys;
-	    this.outputWiresLabels = outputWiresLabels;
 	}
 	
 	
@@ -71,13 +65,8 @@ class MinimizeAESSetKeyRowReductionGarbledBooleanCircuitUtil extends StandardRow
 	 * @param garbledTablesHolder
 	 * @return the created gate.
 	 */
-	protected GarbledGate createGate(Gate ungarbledGate, GarbledTablesHolder garbledTablesHolder) {
-		if(isRowReductionWithFixedOutputKeys && checkOutputGate(ungarbledGate)){
-			System.out.println("special last gate");
-			return new MinimizeAESSetKeyGarbledGate(ungarbledGate, mes, aes, garbledTablesHolder);
-		} else{
-			return new MinimizeAESSetKeyRowReductionGate(ungarbledGate, mes, aes, kdf, garbledTablesHolder);
-		}
+	protected GarbledGate createGate(Gate ungarbledGate, BasicGarbledTablesHolder garbledTablesHolder) {
+		return new MinimizeAESSetKeyRowReductionGate(ungarbledGate, mes, aes, kdf, garbledTablesHolder);
 		
 	}
 	
