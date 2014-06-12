@@ -57,7 +57,7 @@ class FreeXORNOTGate extends FreeXORGate{
 	@Override
 	public boolean verify(Gate g, Map<Integer, SecretKey[]> allWireValues) {
     
-		//Verify that the gate number and input/output labels are the same as the given ungarbled circuit.
+		//Verify that the gate number and input/output indices are the same as the given ungarbled circuit.
 		if (verifyGateComponents(g) == false){
 			return false;
 		}
@@ -83,10 +83,10 @@ class FreeXORNOTGate extends FreeXORGate{
 	
 	    // First get the 1 output value by using the 0-0 values as inputs and XORing them to get the 0-encoded output. 
 	    // The zero value of the 0th GarbledWire in the input array is called zeroZero.
-	    byte[] zeroZero = allWireValues.get(inputWireLabels[0])[0].getEncoded();
+	    byte[] zeroZero = allWireValues.get(inputWireIndices[0])[0].getEncoded();
 	 
 	    // The zero value of the 1th GarbledWire in the input array is called oneZero.
-	    byte[] oneZero = allWireValues.get(inputWireLabels[1])[0].getEncoded();
+	    byte[] oneZero = allWireValues.get(inputWireIndices[1])[0].getEncoded();
 	    
 	    // XOR the values to obtain the result.
 	    byte[] outputOne = new byte[zeroZero.length];
@@ -96,8 +96,8 @@ class FreeXORNOTGate extends FreeXORGate{
 	    
 	    
 	    //Next, get the 1 output value by using the 0-1 values as inputs.
-	    //The one value of the input GarbledWire with index 1 in the inputwireLabels array is called oneOne.
-	    byte[] oneOne = allWireValues.get(inputWireLabels[1])[1].getEncoded();
+	    //The one value of the input GarbledWire with index 1 in the inputwireIndices array is called oneOne.
+	    byte[] oneOne = allWireValues.get(inputWireIndices[1])[1].getEncoded();
 
 	    //XOR the 0-1 input values to get the output 0-encoded value.
 	    byte[] outputZero = new byte[zeroZero.length];
@@ -106,7 +106,7 @@ class FreeXORNOTGate extends FreeXORGate{
 	    }
 	    
 	    // Put the result in the output wires.
-	    for (int w : outputWireLabels) {
+	    for (int w : outputWireIndices) {
 	      allWireValues.put(w, new SecretKey[] { new SecretKeySpec(outputZero, ""),
 	          new SecretKeySpec(outputOne, "") });
 	    }

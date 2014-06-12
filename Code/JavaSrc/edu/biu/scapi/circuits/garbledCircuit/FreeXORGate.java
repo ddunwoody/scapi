@@ -52,7 +52,7 @@ import edu.biu.scapi.circuits.circuit.Gate;
  */
 class FreeXORGate implements GarbledGate{
 
-	/* An array containing the integer labels of the input Wire Labels to this gate. 
+	/* An array containing the indices of the input Wires of this gate. 
 	 * The order of the {@code GarbledWire}s in this array is significant as not all functions are symmetric.
 	 * For example consider the function ~y v x and the following truth table: 
 	 *  x y  ~y v x 
@@ -61,14 +61,14 @@ class FreeXORGate implements GarbledGate{
 	 *  1 0    1
 	 *  1 1    1
 	 */
-	 protected int[] inputWireLabels;
+	 protected int[] inputWireIndices;
 	  
-	 //An array containing the integer labels of the output {@code GarbledWire}(s).
-	 protected int[] outputWireLabels;
+	 //An array containing the indices of the output {@code GarbledWire}(s).
+	 protected int[] outputWireIndices;
 	  
 	 /*
-	  * The integer label of this {@code FreeXORGarbledGate}. 
-	  * This label is used to order {@code FreeXORGarbledGate}s in a {@link FreeXORGarbledBooleanCircuitUtil}.
+	  * The number of this {@code FreeXORGarbledGate}. 
+	  * This number is used to order {@code FreeXORGarbledGate}s in a {@link FreeXORGarbledBooleanCircuitUtil}.
 	  */
 	 private int gateNumber;
 
@@ -80,8 +80,8 @@ class FreeXORGate implements GarbledGate{
 	  * @param ungarbledGate The ungarbled Gate that needs to be Garbled. 
 	  */
 	 FreeXORGate(Gate ungarbledGate) {
-		  inputWireLabels = ungarbledGate.getInputWireLabels();
-		  outputWireLabels = ungarbledGate.getOutputWireLabels();
+		  inputWireIndices = ungarbledGate.getInputWireIndices();
+		  outputWireIndices = ungarbledGate.getOutputWireIndices();
 		  gateNumber = ungarbledGate.getGateNumber();
 	 }
 
@@ -93,8 +93,8 @@ class FreeXORGate implements GarbledGate{
 		  * This is made possible by carefully choosing the garbled values for the {@code Garbled Wires} in the constructor of the
 		  * {@code FreeXORGarbledBooleanCircuitUtil} class. See there for details.
 		  */
-		 byte[] outputValue = computedWires.get(inputWireLabels[0]).getValueAndSignalBit().getEncoded();
-	     byte[] nextInput = computedWires.get(inputWireLabels[1]).getValueAndSignalBit().getEncoded();
+		 byte[] outputValue = computedWires.get(inputWireIndices[0]).getValueAndSignalBit().getEncoded();
+	     byte[] nextInput = computedWires.get(inputWireIndices[1]).getValueAndSignalBit().getEncoded();
 	
 	     // XORing the two input values.
 	     for (int currentByte = 0; currentByte < outputValue.length; currentByte++) {
@@ -104,7 +104,7 @@ class FreeXORGate implements GarbledGate{
 	     SecretKey outputWireValue = new SecretKeySpec(outputValue, "");
 	    
 	     // Create the output GarbledWire(s) and set them with the value we just computed
-	     for (int w : outputWireLabels) {
+	     for (int w : outputWireIndices) {
 	    	 computedWires.put(w, new GarbledWire(outputWireValue));
 	     }
 	     
@@ -112,7 +112,8 @@ class FreeXORGate implements GarbledGate{
 
 	 @Override
 	 public boolean verify(Gate g, Map<Integer, SecretKey[]> allWireValues) {
-		//Verify that the gate number and input/output labels are the same as the given ungarbled circuit.
+		 
+		//Verify that the gate number and input/output indices are the same as the given ungarbled circuit.
 		if (verifyGateComponents(g) == false){
 			return false;
 		}
@@ -138,10 +139,10 @@ class FreeXORGate implements GarbledGate{
 	
 	    // First get the 0 output value by using the 0-0 values as inputs and XORing them to get the 0-encoded output. 
 	    // The zero value of the 0th GarbledWire in the input array is called zeroZero.
-	    byte[] zeroZero = allWireValues.get(inputWireLabels[0])[0].getEncoded();
+	    byte[] zeroZero = allWireValues.get(inputWireIndices[0])[0].getEncoded();
 	    
 	    // The zero value of the 1th GarbledWire in the input array is called oneZero.
-	    byte[] oneZero = allWireValues.get(inputWireLabels[1])[0].getEncoded();
+	    byte[] oneZero = allWireValues.get(inputWireIndices[1])[0].getEncoded();
 	    
 	    // XOR the values to obtain the result.
 	    byte[] outputZero = new byte[zeroZero.length];
@@ -151,8 +152,8 @@ class FreeXORGate implements GarbledGate{
 	    
 	    
 	    //Next, get the 1 output value by using the 0-1 values as inputs.
-	    //The one value of the input GarbledWire with index 1 in the inputwireLabels array is called oneOne.
-	    byte[] oneOne = allWireValues.get(inputWireLabels[1])[1].getEncoded();
+	    //The one value of the input GarbledWire with index 1 in the inputwireIndices array is called oneOne.
+	    byte[] oneOne = allWireValues.get(inputWireIndices[1])[1].getEncoded();
 	    
 	    //XOR the 0-1 input values to get the output 1-encoded value.
 	    byte[] outputOne = new byte[zeroZero.length];
@@ -161,43 +162,45 @@ class FreeXORGate implements GarbledGate{
 	    }
 	    
 	    // Put the result in the output wires.
-	    for (int w : outputWireLabels) {
+	    for (int w : outputWireIndices) {
 	      allWireValues.put(w, new SecretKey[] { new SecretKeySpec(outputZero, ""),
 	          new SecretKeySpec(outputOne, "") });
 	    }
+	    
+	    
 	    return true;
 	 }
 
 	 /**
-	  * Verifies that the gate number and input/output labels are the same as the given ungarbled circuit.
+	  * Verifies that the gate number and input/output indices are the same as the given ungarbled circuit.
 	  * @param g The ungarbled circuit that should be verified.
 	  * @return true if verified; false, otherwise.
 	  */
 	 protected boolean verifyGateComponents(Gate g) {
 		/*
-		 *  Step 1: Test to see that these gate's are labeled with the same integer label. if they're not, then for our purposes they are not
-		 *  identical. The reason that we treat this as unequal is since in a larger circuit corresponding gates must be identically labeled in 
+		 *  Step 1: Test to see that these gate's are numbered with the same number. if they're not, then for our purposes they are not
+		 *  identical. The reason that we treat this as unequal is since in a larger circuit corresponding gates must be identically numbered in 
 		 *  order for the circuits to be the same.
 		 */
 		if (gateNumber != g.getGateNumber()) {
 			 return false;
 		 }
 
-		// Step 2: Check to ensure that the inputWirelabels and ouputWireLabels are the same.
-	    int[] ungarbledInputWireLabels = g.getInputWireLabels();
-	    int[] ungarbledOutputWireLabels = g.getOutputWireLabels();
-	    int numberOfInputs = inputWireLabels.length;
-	    int numberOfOutputs = outputWireLabels.length;
-	    if (numberOfInputs != ungarbledInputWireLabels.length || numberOfOutputs != ungarbledOutputWireLabels.length) {
+		// Step 2: Check to ensure that the inputWireIndices and ouputWireIndices are the same.
+	    int[] ungarbledInputWireIndices = g.getInputWireIndices();
+	    int[] ungarbledOutputWireIndices = g.getOutputWireIndices();
+	    int numberOfInputs = inputWireIndices.length;
+	    int numberOfOutputs = outputWireIndices.length;
+	    if (numberOfInputs != ungarbledInputWireIndices.length || numberOfOutputs != ungarbledOutputWireIndices.length) {
 	    	return false;
 	    }
 	    for (int i = 0; i < numberOfInputs; i++) {
-	    	if (inputWireLabels[i] != ungarbledInputWireLabels[i]) {
+	    	if (inputWireIndices[i] != ungarbledInputWireIndices[i]) {
 	    		return false;
 	    	}
 	    }
 	    for (int i = 0; i < numberOfOutputs; i++) {
-	    	if (outputWireLabels[i] != ungarbledOutputWireLabels[i]) {
+	    	if (outputWireIndices[i] != ungarbledOutputWireIndices[i]) {
 	    		return false;
 	    	}
 	    }
@@ -205,13 +208,13 @@ class FreeXORGate implements GarbledGate{
 	}
   
 	 @Override
-	 public int[] getInputWireLabels() {
-		 return inputWireLabels;
+	 public int[] getInputWireIndices() {
+		 return inputWireIndices;
 	 }
 	
 	 @Override
-	 public int[] getOutputWireLabels() {
-		 return outputWireLabels;
+	 public int[] getOutputWireIndices() {
+		 return outputWireIndices;
 	 }
  
 }
