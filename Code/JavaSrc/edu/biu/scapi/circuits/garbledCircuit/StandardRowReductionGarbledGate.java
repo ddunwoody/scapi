@@ -54,22 +54,6 @@ import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
 class StandardRowReductionGarbledGate extends StandardGarbledGate{
 
 	private KeyDerivationFunction kdf;
-	
-	/**
-	 * Constructs a garbled gate from an ungarbled gate using the given {@code MultiKeyEncryptionScheme} and keys.
-	 * @param ungarbledGate The gate to garble.
-	 * @param mes The encryption scheme used to garble this gate.
-	 * @param kdf to use in the row reduction technique.
-	 * @param garbledTablesHolder A reference to the garbled tables of the circuit.
-	 * @param allWireValues Both keys of all the circuit's wires.
-   	 * @throws PlaintextTooLongException
-   	 * @throws IllegalBlockSizeException 
-   	 * @throws InvalidKeyException 
-   	 */
-	StandardRowReductionGarbledGate(Gate ungarbledGate, MultiKeyEncryptionScheme mes, KeyDerivationFunction kdf, GarbledTablesHolder garbledTablesHolder, Map<Integer, SecretKey[]> allWireValues) throws InvalidKeyException, IllegalBlockSizeException, PlaintextTooLongException{
-		super(ungarbledGate, mes, garbledTablesHolder, allWireValues);
-		this.kdf = kdf;
-	}
   
 	/**
 	 * Constructs a garbled gate from an ungarbled gate using the given {@code MultiKeyEncryptionScheme}.
@@ -78,7 +62,7 @@ class StandardRowReductionGarbledGate extends StandardGarbledGate{
 	 * @param kdf to use in the row reduction technique.
 	 * @param garbledTablesHolder A reference to the garbled tables of the circuit.
    	 */
-	StandardRowReductionGarbledGate(Gate ungarbledGate, MultiKeyEncryptionScheme mes, KeyDerivationFunction kdf, GarbledTablesHolder garbledTablesHolder){
+	StandardRowReductionGarbledGate(Gate ungarbledGate, MultiKeyEncryptionScheme mes, KeyDerivationFunction kdf, BasicGarbledTablesHolder garbledTablesHolder){
 		super(ungarbledGate, mes, garbledTablesHolder);
 		this.kdf = kdf;;
 	}
@@ -90,12 +74,12 @@ class StandardRowReductionGarbledGate extends StandardGarbledGate{
 	@Override
 	void createGarbledTable(Gate ungarbledGate, Map<Integer, SecretKey[]> allWireValues) throws  IllegalBlockSizeException, PlaintextTooLongException, InvalidKeyException{
 		//The number of rows is 2^numberOfInputs - 1. The last row will be calculated by the row reduction technique.
-		int numberOfInputs = inputWireLabels.length;
+		int numberOfInputs = inputWireIndices.length;
 		int numberOfRows = (int) Math.pow(2, numberOfInputs)-1;
 		
 		//Allocate memory to the garbled table.
 		byte[] garbledTable = new byte[numberOfRows * mes.getCipherSize()];
-		garbledTablesHolder.getGarbledTables()[gateNumber] = garbledTable;
+		garbledTablesHolder.toDoubleByteArray()[gateNumber] = garbledTable;
 		
 		//Calculate the garbled table row by row.
 		for (int rowOfTruthTable = 0; rowOfTruthTable <= numberOfRows; rowOfTruthTable++) {
@@ -120,7 +104,7 @@ class StandardRowReductionGarbledGate extends StandardGarbledGate{
 		  		int input = (((rowOfTruthTable & j) == 0) ? 0 : 1);
 		  		
 		  		//signal bit is the last bit of k0.
-		  		byte[] k0 = allWireValues.get(inputWireLabels[i])[0].getEncoded();
+		  		byte[] k0 = allWireValues.get(inputWireIndices[i])[0].getEncoded();
 		  		byte signalBit =  (byte) (k0[k0.length-1] & 1);
 		  		
 		  		
@@ -128,7 +112,7 @@ class StandardRowReductionGarbledGate extends StandardGarbledGate{
 		  		permutedPosition += (input ^ signalBit) * (Math.pow(2, reverseIndex));
 		  		
 		  		// Add the current Wire value to the list of keys to encrypt on. These keys will then be used to construct a multikey.
-		  		keysToEncryptOn[i] = allWireValues.get(inputWireLabels[i])[input];
+		  		keysToEncryptOn[i] = allWireValues.get(inputWireIndices[i])[input];
 		  		
 		  		/*
 		  		 * We add the signalBit that is placed on the end of the wire's value which is given by input XOR signalBit (i.e. the random bit for the
@@ -151,7 +135,7 @@ class StandardRowReductionGarbledGate extends StandardGarbledGate{
 	      
 			  	// Encrypt the output key and put the ciphertext in the garbled table.
 			  	try {
-					System.arraycopy(mes.encrypt(allWireValues.get(outputWireLabels[0])[value].getEncoded()) , 0, garbledTable, permutedPosition*mes.getCipherSize(), mes.getCipherSize());
+					System.arraycopy(mes.encrypt(allWireValues.get(outputWireIndices[0])[value].getEncoded()) , 0, garbledTable, permutedPosition*mes.getCipherSize(), mes.getCipherSize());
 				} catch (KeyNotSetException e) {
 					// Should not occur since the encryption has a key.
 				} catch (TweakNotSetException e) {
@@ -166,18 +150,18 @@ class StandardRowReductionGarbledGate extends StandardGarbledGate{
 		//Calculate the row in the garbled table we need to decrypt.
 		int garbledTableIndex = getIndexToDecrypt(computedWires);
 		SecretKey wireValue = null;
-		int numberOfInputs = inputWireLabels.length;
+		int numberOfInputs = inputWireIndices.length;
 		
 		//In case of the last row, calculate the output key by the KDF.
 		if (garbledTableIndex == 3){
 			
 			ByteBuffer kdfBytes = ByteBuffer.allocate(mes.getCipherSize()*numberOfInputs +16);
 			for (int i = 0; i < numberOfInputs; i++) {
-				kdfBytes.put(computedWires.get(inputWireLabels[i]).getValueAndSignalBit().getEncoded());
+				kdfBytes.put(computedWires.get(inputWireIndices[i]).getValueAndSignalBit().getEncoded());
 			}
 			kdfBytes.putInt(gateNumber);
 			for (int i = 0; i < numberOfInputs; i++) {
-				kdfBytes.putInt(computedWires.get(inputWireLabels[i]).getSignalBit());
+				kdfBytes.putInt(computedWires.get(inputWireIndices[i]).getSignalBit());
 			}
 			wireValue = kdf.deriveKey(kdfBytes.array(), 0, mes.getCipherSize()*numberOfInputs +16, mes.getCipherSize());
 			
@@ -187,17 +171,17 @@ class StandardRowReductionGarbledGate extends StandardGarbledGate{
 			// Then, reset the tweak and the key to the MultiKeyEncryptionScheme and call its decrypt function.
 			wireValue = computeGarbledTable(computedWires, garbledTableIndex);
 		}
-		int numberOfOutputs = outputWireLabels.length;
+		int numberOfOutputs = outputWireIndices.length;
 		for (int i = 0; i < numberOfOutputs; i++) {
 		
-			computedWires.put(outputWireLabels[i], new GarbledWire(wireValue));
+			computedWires.put(outputWireIndices[i], new GarbledWire(wireValue));
 		}
 	}
 
 	@Override
 	protected boolean verifyGarbledTable(Gate g, Map<Integer, SecretKey[]> allWireValues)
 			throws CiphertextTooLongException, InvalidKeyException,	IllegalBlockSizeException {
-		int numberOfInputs = inputWireLabels.length;
+		int numberOfInputs = inputWireIndices.length;
 		
 		BitSet ungarbledTruthTable = g.getTruthTable();
 		
@@ -216,7 +200,7 @@ class StandardRowReductionGarbledGate extends StandardGarbledGate{
 			// This for loop goes through from left to right the input of the given row of the truth table.
 			for (int i = 0, j = (int) Math.pow(2, numberOfInputs - 1), reverseIndex = numberOfInputs - 1; i < numberOfInputs; i++, j /= 2, reverseIndex--) {
 				int input = ((rowOfTruthTable & j) == 0) ? 0 : 1;
-				SecretKey currentWireValue = allWireValues.get(inputWireLabels[i])[input];
+				SecretKey currentWireValue = allWireValues.get(inputWireIndices[i])[input];
 		    
 			    // Add the current Wire value to the list of keys to decrypt on. These keys will then be used to construct a multikey.
 				keysToDecryptOn[i] = currentWireValue;
@@ -237,7 +221,7 @@ class StandardRowReductionGarbledGate extends StandardGarbledGate{
 				 mes.setTweak(tweak.array());
 			  
 				 try {
-					 pt = mes.decrypt(Arrays.copyOfRange(garbledTablesHolder.getGarbledTables()[gateNumber], permutedPosition * mes.getCipherSize(), (permutedPosition + 1) *mes.getCipherSize()));
+					 pt = mes.decrypt(Arrays.copyOfRange(garbledTablesHolder.toDoubleByteArray()[gateNumber], permutedPosition * mes.getCipherSize(), (permutedPosition + 1) *mes.getCipherSize()));
 				 } catch (KeyNotSetException e) {
 					 // Should not occur since the key has been set.
 				 } catch (TweakNotSetException e) {
@@ -252,8 +236,8 @@ class StandardRowReductionGarbledGate extends StandardGarbledGate{
 		  		int wire1Key = ((rowOfTruthTable & 1) == 0) ? 0 : 1;
 		  		
 		  		//Get the input keys.
-		  		SecretKey input0 = allWireValues.get(inputWireLabels[0])[wire0Key];
-		  		SecretKey input1 = allWireValues.get(inputWireLabels[1])[wire1Key];
+		  		SecretKey input0 = allWireValues.get(inputWireIndices[0])[wire0Key];
+		  		SecretKey input1 = allWireValues.get(inputWireIndices[1])[wire1Key];
 		  		
 		  		//Calculate the kdf result.
 		  		ByteBuffer kdfBytes = ByteBuffer.allocate(mes.getCipherSize()*numberOfInputs +16);
@@ -297,7 +281,7 @@ class StandardRowReductionGarbledGate extends StandardGarbledGate{
 			}
 		}
 		//Add the output wire to the allWireValues Map.
-		for (int w : outputWireLabels) {
+		for (int w : outputWireIndices) {
 			allWireValues.put(w, new SecretKey[] {outputZeroValue, outputOneValue });
 		}
 		return true;

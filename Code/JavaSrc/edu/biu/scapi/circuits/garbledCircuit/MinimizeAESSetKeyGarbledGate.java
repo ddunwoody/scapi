@@ -33,7 +33,6 @@ import javax.crypto.SecretKey;
 
 import edu.biu.scapi.circuits.circuit.Gate;
 import edu.biu.scapi.circuits.encryption.MultiKeyEncryptionScheme;
-import edu.biu.scapi.exceptions.PlaintextTooLongException;
 import edu.biu.scapi.primitives.prf.PseudorandomFunction;
 
 /**
@@ -48,24 +47,6 @@ import edu.biu.scapi.primitives.prf.PseudorandomFunction;
 class MinimizeAESSetKeyGarbledGate extends StandardGarbledGate {
 
 	private PseudorandomFunction aes;
-
-	/**
-	 * Constructs a MinimizeAESSetKeyGarbledGate from an ungarbled gate using the given aes, {@code MultiKeyEncryptionScheme} and keys.
-	 * @param ungarbledGate The gate to garbled.
-	 * @param mes The encryption scheme used to garble this gate.
-	 * @param aes The AES object to use to garble this gate.
-	 * @param garbledTablesHolder A reference to the garbled tables of the circuit.
-	 * @param allWireValues Both keys of all the circuit's wires.
-   	 * @throws PlaintextTooLongException 
-   	 * @throws IllegalBlockSizeException 
-   	 * @throws InvalidKeyException 
-   	 */
-	MinimizeAESSetKeyGarbledGate(Gate ungarbledGate, MultiKeyEncryptionScheme mes, PseudorandomFunction aes, GarbledTablesHolder garbledTablesHolder, 
-			Map<Integer, SecretKey[]> allWireValues) throws InvalidKeyException, IllegalBlockSizeException, PlaintextTooLongException {
-  
-		super(ungarbledGate, mes, garbledTablesHolder, allWireValues);
-		this.aes = aes;
-	}
   
 	/**
 	 * Constructs a MinimizeAESSetKeyGarbledGate from an ungarbled gate using the given aes and {@code MultiKeyEncryptionScheme}.
@@ -74,7 +55,7 @@ class MinimizeAESSetKeyGarbledGate extends StandardGarbledGate {
 	 * @param aes The AES object to use to garbled this gate.
 	 * @param garbledTablesHolder A reference to the garbled tables of the circuit.
    	 */
-	MinimizeAESSetKeyGarbledGate(Gate ungarbledGate, MultiKeyEncryptionScheme mes, PseudorandomFunction aes, GarbledTablesHolder garbledTablesHolder){
+	MinimizeAESSetKeyGarbledGate(Gate ungarbledGate, MultiKeyEncryptionScheme mes, PseudorandomFunction aes, BasicGarbledTablesHolder garbledTablesHolder){
 		
 		super(ungarbledGate, mes, garbledTablesHolder);
 		this.aes = aes;
@@ -84,12 +65,12 @@ class MinimizeAESSetKeyGarbledGate extends StandardGarbledGate {
 	void createGarbledTable(Gate ungarbledGate, Map<Integer, SecretKey[]> allWireValues) throws InvalidKeyException, IllegalBlockSizeException {
 		
 		//The number of rows truth table is 2^(number of inputs).
-		int numberOfInputs = inputWireLabels.length;
+		int numberOfInputs = inputWireIndices.length;
 		int numberOfRows = (int) Math.pow(2, numberOfInputs);
 		
 		//Allocate memory to the garbled table.
 		byte[] garbledTable = new byte[numberOfRows * mes.getCipherSize()];
-		garbledTablesHolder.getGarbledTables()[gateNumber] = garbledTable;
+		garbledTablesHolder.toDoubleByteArray()[gateNumber] = garbledTable;
     
 	    /*
 	     * Rather than encrypt right away as we do in StandardGarbledGate, here we create arrays to hold the data. 
@@ -130,7 +111,7 @@ class MinimizeAESSetKeyGarbledGate extends StandardGarbledGate {
 	    		 * The signal bits tell us the position on the garbled truth table for the given row of an ungarbled truth table. 
 	    		 * See Fairplay — A Secure Two-Party Computation System by Dahlia Malkhi, Noam Nisan1, Benny Pinkas, and Yaron Sella for more on signal bits.
 	    		 */
-	    		byte[] k0 = allWireValues.get(inputWireLabels[i])[0].getEncoded();
+	    		byte[] k0 = allWireValues.get(inputWireIndices[i])[0].getEncoded();
 		  		byte signalBit =  (byte) (k0[k0.length-1] & 1);
 
 	    		// Update the permuted position. For a better understanding on how this works, see the getIndexToDecrypt method in this class.
@@ -151,7 +132,7 @@ class MinimizeAESSetKeyGarbledGate extends StandardGarbledGate {
 	    	valuesToEncryptOn[permutedPosition] = temp;
 	    	tweaksToEncrypt[permutedPosition] = tweak.array();
 	    	int value = (ungarbledGate.getTruthTable().get(rowOfTruthTable) == true) ? 1 : 0;
-	    	outputValuesToEncrypt[permutedPosition] = allWireValues.get(outputWireLabels[0])[value].getEncoded();
+	    	outputValuesToEncrypt[permutedPosition] = allWireValues.get(outputWireIndices[0])[value].getEncoded();
 	    }
 	    
 	    /*
@@ -159,7 +140,7 @@ class MinimizeAESSetKeyGarbledGate extends StandardGarbledGate {
 	     * Set AES to each value and then look for all rows that need to be encrypted on this value before we reset the key.
 	     */
 	    for (int i = 0; i < numberOfInputs; i++) {
-	    	aes.setKey(allWireValues.get(inputWireLabels[i])[0]);
+	    	aes.setKey(allWireValues.get(inputWireIndices[i])[0]);
 	    	for (int rowNumber = 0; rowNumber < numberOfRows; rowNumber++) {
 	    		if (valuesToEncryptOn[rowNumber][i] == 0) {
 	    			byte[] tempo = new byte[aes.getBlockSize()];
@@ -171,7 +152,7 @@ class MinimizeAESSetKeyGarbledGate extends StandardGarbledGate {
 
 	    	}
 
-	    	aes.setKey(allWireValues.get(inputWireLabels[i])[1]);
+	    	aes.setKey(allWireValues.get(inputWireIndices[i])[1]);
 	    	for (int rowNumber = 0; rowNumber < numberOfRows; rowNumber++) {
 	    		if (valuesToEncryptOn[rowNumber][i] == 1) {
 	    			byte[] tempo = new byte[aes.getBlockSize()];
@@ -191,7 +172,7 @@ class MinimizeAESSetKeyGarbledGate extends StandardGarbledGate {
 	    
 	    // Finally we assign the encrypted results to the corresponding row of the garbled truth table. 
     	for (int rowNumber = 0; rowNumber < numberOfRows; rowNumber++) {
-    		System.arraycopy(outputValues[rowNumber], 0, garbledTablesHolder.getGarbledTables()[gateNumber], rowNumber * mes.getCipherSize() , mes.getCipherSize());
+    		System.arraycopy(outputValues[rowNumber], 0, garbledTablesHolder.toDoubleByteArray()[gateNumber], rowNumber * mes.getCipherSize() , mes.getCipherSize());
     	}
 	}
 }
