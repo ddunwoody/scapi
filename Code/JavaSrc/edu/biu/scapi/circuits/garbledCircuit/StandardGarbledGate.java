@@ -52,11 +52,11 @@ import edu.biu.scapi.exceptions.TweakNotSetException;
  */
 class StandardGarbledGate implements GarbledGate {
 
-	protected MultiKeyEncryptionScheme mes; 			// The {@code MultiKeyEncryptionScheme} that will be used to garbled and compute this Gate.
+	protected MultiKeyEncryptionScheme mes; 					// The {@code MultiKeyEncryptionScheme} that will be used to garbled and compute this Gate.
 	
-	protected GarbledTablesHolder garbledTablesHolder; 	// Holds the garbled tables.
+	protected BasicGarbledTablesHolder garbledTablesHolder; 	// Holds the garbled tables.
 	
-	/* An array containing the integer labels of the input Wire Labels to this gate. 
+	/* An array containing the indices of the input wires of this gate. 
 	 * The order of the {@code GarbledWire}s in this array is significant as not all functions are symmetric.
 	 * For example consider the function ~y v x and the following truth table: 
 	 *  x y  ~y v x 
@@ -65,50 +65,28 @@ class StandardGarbledGate implements GarbledGate {
 	 *  1 0    1
 	 *  1 1    1
 	 */
-	protected int[] inputWireLabels;
+	protected int[] inputWireIndices;
 	  
-	//An array containing the integer labels of the output {@code GarbledWire}(s).
-	protected int[] outputWireLabels;
+	//An array containing the indices of the output {@code GarbledWire}(s).
+	protected int[] outputWireIndices;
 	  
 	/* 
-	 * The integer label of this {@code StandardGarbledGate}. This label is used to order {@code StandardGarbledGate}s in a 
+	 * The number of this {@code StandardGarbledGate}. This number is used to order {@code StandardGarbledGate}s in a 
 	 * {@link StandardGarbledBooleanCircuitUtil}
 	 */
 	protected int gateNumber;
 
-	/**
-	 * Constructs a garbled gate from an ungarbled gate using the given {@code MultiKeyEncryptionScheme} and keys.
-	 * @param ungarbledGate The gate to garble.
-	 * @param mes The encryption scheme used to garble this gate.
-	 * @param garbledTablesHolder A reference to the garbled tables of the circuit.
-	 * @param allWireValues Both keys of all the circuit's wires.
-   	 * @throws PlaintextTooLongException 
-   	 * @throws IllegalBlockSizeException 
-   	 * @throws InvalidKeyException 
-   	 */
-	StandardGarbledGate(Gate ungarbledGate, MultiKeyEncryptionScheme mes, GarbledTablesHolder garbledTablesHolder, Map<Integer, SecretKey[]> allWireValues) throws InvalidKeyException, IllegalBlockSizeException, PlaintextTooLongException{
-
-		//Sets the given parameters.
-		this.mes = mes;
-		inputWireLabels = ungarbledGate.getInputWireLabels();
-		outputWireLabels = ungarbledGate.getOutputWireLabels();
-		gateNumber = ungarbledGate.getGateNumber();
-		this.garbledTablesHolder = garbledTablesHolder;
-		//Call the function that calculate the garbled table using the given keys.
-		createGarbledTable(ungarbledGate, allWireValues);
-	}
-  
 	/**
 	 * Constructs a garbled gate from an ungarbled gate using the given {@code MultiKeyEncryptionScheme}.
 	 * @param ungarbledGate The gate to garble.
 	 * @param mes The encryption scheme used to garble this gate.
 	 * @param garbledTablesHolder A reference to the garbled tables of the circuit.
    	 */
-	StandardGarbledGate(Gate ungarbledGate, MultiKeyEncryptionScheme mes, GarbledTablesHolder garbledTablesHolder){
+	StandardGarbledGate(Gate ungarbledGate, MultiKeyEncryptionScheme mes, BasicGarbledTablesHolder garbledTablesHolder){
 		//Sets the given parameters.
 	    this.mes = mes;
-	    inputWireLabels = ungarbledGate.getInputWireLabels();
-	    outputWireLabels = ungarbledGate.getOutputWireLabels();
+	    inputWireIndices = ungarbledGate.getInputWireIndices();
+	    outputWireIndices = ungarbledGate.getOutputWireIndices();
 	    gateNumber = ungarbledGate.getGateNumber();
 	    this.garbledTablesHolder = garbledTablesHolder;
 	}
@@ -124,12 +102,12 @@ class StandardGarbledGate implements GarbledGate {
 	void createGarbledTable(Gate ungarbledGate, Map<Integer, SecretKey[]> allWireValues) throws  IllegalBlockSizeException, PlaintextTooLongException, InvalidKeyException{
 	  
 		//The number of rows truth table is 2^(number of inputs).
-		int numberOfInputs = inputWireLabels.length;
+		int numberOfInputs = inputWireIndices.length;
 		int numberOfRows = (int) Math.pow(2, numberOfInputs);
 		
 		//Allocate memory to the garbled table.
 		byte[] garbledTable = new byte[numberOfRows * mes.getCipherSize()];
-		garbledTablesHolder.getGarbledTables()[gateNumber] = garbledTable;
+		garbledTablesHolder.toDoubleByteArray()[gateNumber] = garbledTable;
 		
 		//Calculate the garbled table row by row.
 		for (int rowOfTruthTable = 0; rowOfTruthTable < numberOfRows; rowOfTruthTable++) {
@@ -159,14 +137,14 @@ class StandardGarbledGate implements GarbledGate {
 	    		 * The signal bit of wire i is the last bit of wire i's k0. 
 	    		 * See Fairplay — A Secure Two-Party Computation System by Dahlia Malkhi, Noam Nisan1, Benny Pinkas, and Yaron Sella for more on signal bits.
 	    		 */
-		  		byte[] k0 = allWireValues.get(inputWireLabels[i])[0].getEncoded();
+		  		byte[] k0 = allWireValues.get(inputWireIndices[i])[0].getEncoded();
 		  		byte signalBit =  (byte) (k0[k0.length-1] & 1);
 		  		
 		  		// Update the permuted position. For a better understanding on how this works, see the getIndexToDecrypt method in this class.
 			    permutedPosition += (input ^ signalBit) * (Math.pow(2, reverseIndex));
 		  		
 		  		// Add the current Wire value to the list of keys to encrypt on. These keys will then be used to construct a multikey.
-		  		keysToEncryptOn[i] = allWireValues.get(inputWireLabels[i])[input];
+		  		keysToEncryptOn[i] = allWireValues.get(inputWireIndices[i])[input];
 		  		
 		  		/*
 		  		 * We add the signalBit that is placed on the end of the wire's value which is given by input XOR signalBit (i.e. the random bit for the
@@ -187,7 +165,7 @@ class StandardGarbledGate implements GarbledGate {
       
 		  	// Encrypt the output key and put the ciphertext in the garbled table.
 		  	try {
-				System.arraycopy(mes.encrypt(allWireValues.get(outputWireLabels[0])[value].getEncoded()) , 0, garbledTable, permutedPosition*mes.getCipherSize(), mes.getCipherSize());
+				System.arraycopy(mes.encrypt(allWireValues.get(outputWireIndices[0])[value].getEncoded()) , 0, garbledTable, permutedPosition*mes.getCipherSize(), mes.getCipherSize());
 			} catch (KeyNotSetException e) {
 				// Should not occur since the encryption has a key.
 			} catch (TweakNotSetException e) {
@@ -207,10 +185,10 @@ class StandardGarbledGate implements GarbledGate {
 		SecretKey wireValue = computeGarbledTable(computedWires, garbledTableIndex);
 		
 		// Create the output wire (s) with the decrypted value.
-		int numberOfOutputs = outputWireLabels.length;
+		int numberOfOutputs = outputWireIndices.length;
 		for (int i = 0; i < numberOfOutputs; i++) {
 		
-			computedWires.put(outputWireLabels[i], new GarbledWire(wireValue));
+			computedWires.put(outputWireIndices[i], new GarbledWire(wireValue));
 		}
 	}
 
@@ -226,7 +204,7 @@ class StandardGarbledGate implements GarbledGate {
 	protected SecretKey computeGarbledTable(Map<Integer, GarbledWire> computedWires, int garbledTableIndex) 
 			throws CiphertextTooLongException, InvalidKeyException, IllegalBlockSizeException {
 		
-		int numberOfInputs = inputWireLabels.length;
+		int numberOfInputs = inputWireIndices.length;
 		
 		SecretKey[] keysToDecryptOn = new SecretKey[numberOfInputs];
 		ByteBuffer tweak = ByteBuffer.allocate(16);
@@ -234,7 +212,7 @@ class StandardGarbledGate implements GarbledGate {
 		tweak.putInt(gateNumber);
 		
 		for (int i = 0; i < numberOfInputs; i++) {
-			GarbledWire wire = computedWires.get(inputWireLabels[i]);
+			GarbledWire wire = computedWires.get(inputWireIndices[i]);
 			keysToDecryptOn[i] = wire.getValueAndSignalBit();
 		  
 			// Put the signal bits of the input wire values into the tweak.
@@ -247,7 +225,7 @@ class StandardGarbledGate implements GarbledGate {
 		// Decrypt the output value.
 		SecretKey wireValue = null;
 		try {
-			wireValue = new SecretKeySpec(mes.decrypt(Arrays.copyOfRange(garbledTablesHolder.getGarbledTables()[gateNumber], 
+			wireValue = new SecretKeySpec(mes.decrypt(Arrays.copyOfRange(garbledTablesHolder.toDoubleByteArray()[gateNumber], 
 					garbledTableIndex * mes.getCipherSize(), (garbledTableIndex +1)*mes.getCipherSize())),"");
 		} catch (KeyNotSetException e) {
 			// Should not occur since the key was set.
@@ -265,9 +243,9 @@ class StandardGarbledGate implements GarbledGate {
 	 */
 	protected int getIndexToDecrypt(Map<Integer, GarbledWire> computedWires) {
 		int garbledTableIndex = 0;
-		int numberOfInputs = inputWireLabels.length;
+		int numberOfInputs = inputWireIndices.length;
 		for (int i = numberOfInputs - 1, j = 0; j < numberOfInputs; i--, j++) {
-			garbledTableIndex += computedWires.get(inputWireLabels[i]).getSignalBit() * Math.pow(2, j);
+			garbledTableIndex += computedWires.get(inputWireIndices[i]).getSignalBit() * Math.pow(2, j);
 		}
 		return garbledTableIndex;
 	}
@@ -276,29 +254,29 @@ class StandardGarbledGate implements GarbledGate {
 	public boolean verify(Gate g, Map<Integer, SecretKey[]> allWireValues) throws InvalidKeyException, IllegalBlockSizeException, CiphertextTooLongException {
 	
 		/*
-		 *  Step 1: Test to see that these gate's are labeled with the same integer label. if they're not, then for our purposes they are not
-		 * identical. The reason that we treat this as unequal is since in a larger circuit corresponding gates must be identically labeled in 
+		 *  Step 1: Test to see that these gate's are numbered with the same number. if they're not, then for our purposes they are not
+		 * identical. The reason that we treat this as unequal is since in a larger circuit corresponding gates must be identically numbered in 
 		 * order for the circuits to be the same.
 		 */
 		if (gateNumber != g.getGateNumber()) {
 			return false;
 		}
 		
-		// Step 2: Check to ensure that the inputWirelabels and ouputWireLabels are the same.
-		int[] ungarbledInputWireLabels = g.getInputWireLabels();
-		int[] ungarbledOutputWireLabels = g.getOutputWireLabels();
-		int numberOfInputs = inputWireLabels.length;
-		int numberOfOutputs = outputWireLabels.length;
-		if (numberOfInputs != ungarbledInputWireLabels.length || numberOfOutputs != ungarbledOutputWireLabels.length) {
+		// Step 2: Check to ensure that the inputWireindices and ouputWireIndices are the same.
+		int[] ungarbledInputWireIndices = g.getInputWireIndices();
+		int[] ungarbledOutputWireIndices = g.getOutputWireIndices();
+		int numberOfInputs = inputWireIndices.length;
+		int numberOfOutputs = outputWireIndices.length;
+		if (numberOfInputs != ungarbledInputWireIndices.length || numberOfOutputs != ungarbledOutputWireIndices.length) {
 			return false;
 		}
 		for (int i = 0; i < numberOfInputs; i++) {
-			if (inputWireLabels[i] != ungarbledInputWireLabels[i]) {
+			if (inputWireIndices[i] != ungarbledInputWireIndices[i]) {
 			    return false;
 			}
 		}
 		for (int i = 0; i < numberOfOutputs; i++) {
-			 if (outputWireLabels[i] != ungarbledOutputWireLabels[i]) {
+			 if (outputWireIndices[i] != ungarbledOutputWireIndices[i]) {
 			    return false;
 			 }
 		}
@@ -330,7 +308,8 @@ class StandardGarbledGate implements GarbledGate {
 	 */
 	protected boolean verifyGarbledTable(Gate g, Map<Integer, SecretKey[]> allWireValues)
 			throws CiphertextTooLongException, InvalidKeyException,	IllegalBlockSizeException {
-		int numberOfInputs = inputWireLabels.length;
+		
+		int numberOfInputs = inputWireIndices.length;
 		
 		SecretKey outputZeroValue = null;
 		SecretKey outputOneValue = null;
@@ -348,7 +327,8 @@ class StandardGarbledGate implements GarbledGate {
 			// This for loop goes through from left to right the input of the given row of the truth table.
 			for (int i = 0, j = (int) Math.pow(2, numberOfInputs - 1), reverseIndex = numberOfInputs - 1; i < numberOfInputs; i++, j /= 2, reverseIndex--) {
 				int input = ((rowOfTruthTable & j) == 0) ? 0 : 1;
-				SecretKey currentWireValue = allWireValues.get(inputWireLabels[i])[input];
+				
+				SecretKey currentWireValue = allWireValues.get(inputWireIndices[i])[input];
 		    
 			    // Add the current Wire value to the list of keys to decrypt on. These keys will then be used to construct a multikey.
 				keysToDecryptOn[i] = currentWireValue;
@@ -370,7 +350,8 @@ class StandardGarbledGate implements GarbledGate {
 			// Decrypt the output key.
 			byte[] pt = null;
 			try {
-				pt = mes.decrypt(Arrays.copyOfRange(garbledTablesHolder.getGarbledTables()[gateNumber], permutedPosition * mes.getCipherSize(), (permutedPosition + 1) *mes.getCipherSize()));
+				
+				pt = mes.decrypt(Arrays.copyOfRange(garbledTablesHolder.toDoubleByteArray()[gateNumber], permutedPosition * mes.getCipherSize(), (permutedPosition + 1) *mes.getCipherSize()));
 			} catch (KeyNotSetException e) {
 				// Should not occur since the key has been set.
 			} catch (TweakNotSetException e) {
@@ -408,20 +389,20 @@ class StandardGarbledGate implements GarbledGate {
 			}
 		}
 		// Add the output wire to the allWireValues Map.
-		for (int w : outputWireLabels) {
+		for (int w : outputWireIndices) {
 			allWireValues.put(w, new SecretKey[] {outputZeroValue, outputOneValue });
 		}
 		return true;
 	}
 	
 	@Override
-	public int[] getInputWireLabels() {
-	    return inputWireLabels;
+	public int[] getInputWireIndices() {
+	    return inputWireIndices;
 	}
 
 	@Override
-	public int[] getOutputWireLabels() {
-		return outputWireLabels;
+	public int[] getOutputWireIndices() {
+		return outputWireIndices;
 	}
 	
 	
