@@ -55,11 +55,11 @@ public interface GarbledGate {
 
 	/**
 	 * This method tests an ungarbled {@link Gate} for equality to this {@code GarbledGate}. <P>
-	 * That is, they have the same truth table and labels.<p>
+	 * That is, they have the same truth table and indices.<p>
 	 * It is called verify since in general, when this method is used, the assumption is that they are equal and we are verifying this assumption.
 	 * @param g an ungarbled {@code Gate} to be tested for equality to this {@code GarbledGate}.
 	 * @param allWireValues contains both keys of all wires.
-	 * @return {@code true} if the gates have the same truth table and label, and {@code false} otherwise.
+	 * @return {@code true} if the gates have the same truth table and indeces, and {@code false} otherwise.
 	 * @throws InvalidKeyException
 	 * @throws IllegalBlockSizeException
 	 * @throws CiphertextTooLongException
@@ -67,14 +67,14 @@ public interface GarbledGate {
 	boolean verify(Gate g, Map<Integer, SecretKey[]> allWireValues) throws InvalidKeyException, IllegalBlockSizeException, CiphertextTooLongException;
 
 	/**
-	 * @return an array containing the integer labels of the gate's input wires.
+	 * @return an array containing the indices of the gate's input wires.
 	 */
-	public int[] getInputWireLabels();
+	public int[] getInputWireIndices();
 
 	/**
-	 * @return an array containing the integer labels of the gate's output wires.
-	 * Generally this will be a single wire, but if fan-out >1 a circuit designer may label it as multiple wires.
+	 * @return an array containing the indices of the gate's output wires.
+	 * Generally this will be a single wire, but if fan-out >1 a circuit designer may index it as multiple wires.
 	 */
-	public int[] getOutputWireLabels();
+	public int[] getOutputWireIndices();
   
 }
