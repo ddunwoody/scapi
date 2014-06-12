@@ -40,13 +40,12 @@ import edu.biu.scapi.circuits.encryption.HashingMultiKeyEncryption;
 import edu.biu.scapi.circuits.encryption.MultiKeyEncryptionScheme;
 import edu.biu.scapi.exceptions.NoSuchPartyException;
 import edu.biu.scapi.exceptions.PlaintextTooLongException;
-import edu.biu.scapi.primitives.hash.CryptographicHash;
 import edu.biu.scapi.primitives.prg.PseudorandomGenerator;
 
 /**
  * The {@code FreeXORGarbledBooleanCircuitUtil} uses the Free XOR technique that is explained in depth in <i>Free XOR Gates and 
  * Applications</i> by Validimir Kolesnikov and Thomas Schneider. <p>
- * This circuit's computing method chooses the wire labels according to the procedure delineated in the above described paper. 
+ * This circuit's computing method chooses the wire numbers according to the procedure delineated in the above described paper. 
  * It then replaces all XOR gates with {@code FreeXOR gates} and these gates can be computed without an encryption due to the way the 
  * wire's values were chosen. See the above paper also for a proof of security of this method. <p>
  * 
@@ -85,6 +84,9 @@ class FreeXORGarbledBooleanCircuitUtil implements CircuitTypeUtil {
 	
 	@Override
 	public GarbledGate[] createGates(Gate[] ungarbledGates, GarbledTablesHolder garbledTablesHolder){
+		if (!(garbledTablesHolder instanceof BasicGarbledTablesHolder)){
+			throw new IllegalArgumentException("the given garbledTablesHolder should be an instance of BasicGarbledTablesHolder");
+		}
 		// Get the XOR and XORNOT truth table to be used to test against for equality.
 		BitSet XORTruthTable = getXORTruthTable();
 		BitSet XORNOTTruthTable = getXORNOTTruthTable();
@@ -103,7 +105,7 @@ class FreeXORGarbledBooleanCircuitUtil implements CircuitTypeUtil {
 			}
 			//In case of standard gate, create a StandardGarbledGate.
 			else {
-				gates[gate] = createStandardGate(ungarbledGates[gate], garbledTablesHolder);
+				gates[gate] = createStandardGate(ungarbledGates[gate], (BasicGarbledTablesHolder) garbledTablesHolder);
 			}
 		}
 		return gates;
@@ -116,24 +118,16 @@ class FreeXORGarbledBooleanCircuitUtil implements CircuitTypeUtil {
 	 * @param garbledTablesHolder Holds the reference to the garbled tables.
 	 * @return the created GarbledGate.
 	 */
-	protected GarbledGate createStandardGate(Gate ungarbledGate, GarbledTablesHolder garbledTablesHolder) {
+	protected GarbledGate createStandardGate(Gate ungarbledGate, BasicGarbledTablesHolder garbledTablesHolder) {
 		return new StandardGarbledGate(ungarbledGate, mes, garbledTablesHolder);
 	}
 	
 	@Override
   	public CircuitCreationValues garble(BooleanCircuit ungarbledCircuit, GarbledTablesHolder garbledTablesHolder, 
 			GarbledGate[] gates) {
-		//Create maps to send to the functions that sample the keys and create the garbled tables. 
-		Map<Integer, SecretKey[]> emptyWireValues = new HashMap<Integer, SecretKey[]>();
-		
-		//call the other garble (that actually perform the keys creation) with empty partial wire values.
-		return garble(ungarbledCircuit, garbledTablesHolder, gates, emptyWireValues);
-	}	
-	
-	@Override
-	public CircuitCreationValues garble(BooleanCircuit ungarbledCircuit, GarbledTablesHolder garbledTablesHolder, 
-			GarbledGate[] gates, Map<Integer, SecretKey[]> partialWireValues) {
-		
+		if (!(garbledTablesHolder instanceof BasicGarbledTablesHolder)){
+			throw new IllegalArgumentException("the given garbledTablesHolder should be an instance of BasicGarbledTablesHolder");
+		}
 		Map<Integer, SecretKey[]> allWireValues = new HashMap<Integer, SecretKey[]>();
 		Map<Integer, SecretKey[]> allInputWireValues = null;
 		Map<Integer, SecretKey[]> allOutputWireValues = null;
@@ -141,114 +135,60 @@ class FreeXORGarbledBooleanCircuitUtil implements CircuitTypeUtil {
 		Gate[] ungarbledGates = ungarbledCircuit.getGates();
 		byte[] globalKeyOffset = null;
 		
-		//In case the given partialKeys are the output keys, sample the non output keys.
-		if (partialWireValues.containsKey(ungarbledCircuit.getOutputWireLabels()[0])){
-			
-			//Set the given keys and signal bits.
-			allOutputWireValues = partialWireValues;
-			
-			allWireValues.putAll(partialWireValues);
-			//Generate the translation table out of the given output keys.
-			for (int n : ungarbledCircuit.getOutputWireLabels()) {
-				//Signal bit is the last bit of k0.
-				byte[] k0 = allWireValues.get(n)[0].getEncoded();
-				translationTable.put(n, (byte) (k0[k0.length-1] & 1));	
+		/*
+		 * The globalKeyOffset is a randomly chosen bit sequence that is the same size as the key and will be used to create the 
+		 * garbled wire's values.
+		 * We used generate key since this way globalKeyOfset will always be the size of the key. 
+		 * See Free XOR Gates and Applications by Validimir Kolesnikov and Thomas Schneider.
+		 */
+		globalKeyOffset = mes.generateKey().getEncoded();
+		/*
+		 * Setting the last bit to 1. This follows algorithm 1 step 2 part A of Free XOR Gates and Applications by Validimir 
+		 * Kolesnikov and Thomas Schneider.
+		 * This algorithm calls for XORing the Wire values with R and the signal bit with 1. So, we set the last bit of R to 1 and 
+		 * this will be XOR'd with the last bit of the wire value, which is the signal bit in our implementation.
+		 */
+		globalKeyOffset[globalKeyOffset.length - 1] |= 1;
+				
+		//Sample input keys.
+		allInputWireValues = new HashMap<Integer, SecretKey[]>();
+		for (int i=1; i<=ungarbledCircuit.getNumberOfParties(); i++){
+			ArrayList<Integer> inputWireNumbers = null;
+			try {
+				inputWireNumbers = ungarbledCircuit.getInputWireIndices(i);
+			} catch (NoSuchPartyException e) {
+				// should not occur since the number is a valid party number
 			}
-			
-			
-			//Deduce the global key offset from allOutputWireValues.
-			globalKeyOffset = extractGlobalkey(allOutputWireValues, ungarbledCircuit.getOutputWireLabels()[0]);
-			
-			//Create the keys of the non-output wires.
-			createNonOutputWireValues(ungarbledGates, allWireValues, globalKeyOffset);
-			
-			int label;
-			allInputWireValues = new HashMap<Integer, SecretKey[]>();
-			ArrayList<Integer> inputWires = null;
-			int length = ungarbledCircuit.getNumberOfParties();
-			//Fill the input wire's keys and signal bits.
-			for (int i=1; i<=length; i++){
-				try {
-					inputWires = ungarbledCircuit.getInputWireLabels(i);
-				} catch (NoSuchPartyException e) {
-					// Should not occur since there always at least one party.
-				}
-				for (int j=0; j<inputWires.size(); j++){
-					label = inputWires.get(j);
-					
-					allInputWireValues.put(label, allWireValues.get(label));
-				}
+			for (int w : inputWireNumbers) {
+				//Samples random key. The other key will be calculated via XOR with the globalKeyOffset.
+				SecretKey zeroValue = mes.generateKey();
+				sampleInputKeys(allInputWireValues, globalKeyOffset, w, zeroValue);
 			}
+		}
 			
-		//In case the given partialKeys are not the output keys, they can be the input keys or empty.
-		} else{
-			//In case the partial keys are not empty, they contain the input keys.
-			if (!partialWireValues.isEmpty()){
-				//Set the given keys and signal bits.
-				allInputWireValues = partialWireValues;
-				
-				//Deduce the global key offset from allInputWireValues.
-				try {
-					globalKeyOffset = extractGlobalkey(allInputWireValues, ungarbledCircuit.getInputWireLabels(1).get(0));
-				} catch (NoSuchPartyException e) {
-					// Should not occur since there always at least one party.
-				}
-			//In case the partial keys are empty, sample all keys.
-			} else {
-				/*
-				 * The globalKeyOffset is a randomly chosen bit sequence that is the same size as the key and will be used to create the 
-				 * garbled wire's values.
-				 * We used generate key since this way globalKeyOfset will always be the size of the key. 
-				 * See Free XOR Gates and Applications by Validimir Kolesnikov and Thomas Schneider.
-				 */
-				globalKeyOffset = mes.generateKey().getEncoded();
-				/*
-				 * Setting the last bit to 1. This follows algorithm 1 step 2 part A of Free XOR Gates and Applications by Validimir 
-				 * Kolesnikov and Thomas Schneider.
-				 * This algorithm calls for XORing the Wire values with R and the signal bit with 1. So, we set the last bit of R to 1 and 
-				 * this will be XOR'd with the last bit of the wire value, which is the signal bit in our implementation.
-				 */
-				globalKeyOffset[globalKeyOffset.length - 1] |= 1;
-				
-				//Sample input keys.
-				allInputWireValues = new HashMap<Integer, SecretKey[]>();
-				for (int i=1; i<=ungarbledCircuit.getNumberOfParties(); i++){
-					ArrayList<Integer> inputWireLabels = null;
-					try {
-						inputWireLabels = ungarbledCircuit.getInputWireLabels(i);
-					} catch (NoSuchPartyException e) {
-						// should not occur since the number is a valid party number
-					}
-					for (int w : inputWireLabels) {
-						//Samples random key. The other key will be calculated via XOR with the globalKeyOffset.
-						SecretKey zeroValue = mes.generateKey();
-						sampleInputKeys(allInputWireValues, globalKeyOffset, w, zeroValue);
-					}
-				}
-			}	
-			//Set the given keys and signal bits.
-			allWireValues.putAll(allInputWireValues);
+		//Set the given keys and signal bits.
+		allWireValues.putAll(allInputWireValues);
 			
-			allOutputWireValues = new HashMap<Integer, SecretKey[]>();
-			translationTable = new HashMap<Integer, Byte>();
+		allOutputWireValues = new HashMap<Integer, SecretKey[]>();
+		translationTable = new HashMap<Integer, Byte>();
 			
-			//Create the keys of the non-input wires.
-			createNonInputWireValues(ungarbledGates, allWireValues, globalKeyOffset);
+		//Create the keys of the non-input wires.
+		createNonInputWireValues(ungarbledGates, allWireValues, globalKeyOffset);
 			
-			//Fill the the output wire values to be used in the following sub circuit
-			for (int n : ungarbledCircuit.getOutputWireLabels()) {
+		//Fill the the output wire values to be used in the following sub circuit
+		for (int n : ungarbledCircuit.getOutputWireIndices()) {
 				
-				//Add both values of output wire labels to the allOutputWireLabels Map that was passed as a parameter.
-				allOutputWireValues.put(n, allWireValues.get(n));
-				
-				//Signal bit is the last bit of k0.
-				byte[] k0 = allWireValues.get(n)[0].getEncoded();
-				translationTable.put(n, (byte) (k0[k0.length-1] & 1));			}
+			//Add both values of output wire numbers to the allOutputWireValues Map that was passed as a parameter.
+			allOutputWireValues.put(n, allWireValues.get(n));
+			
+			//Signal bit is the last bit of k0.
+			byte[] k0 = allWireValues.get(n)[0].getEncoded();
+			translationTable.put(n, (byte) (k0[k0.length-1] & 1));			
 		}
 		
 		//now that we have all keys, we can create the garbled tables.
 		try {
-			createGarbledTables(gates, garbledTablesHolder, ungarbledGates, allWireValues);
+			createGarbledTables(gates, (BasicGarbledTablesHolder) garbledTablesHolder, ungarbledGates, allWireValues);
 		} catch (InvalidKeyException e) {
 			// Should not occur since the keys were generated through the encryption scheme that generates keys that match it.
 		} catch (IllegalBlockSizeException e) {
@@ -256,16 +196,14 @@ class FreeXORGarbledBooleanCircuitUtil implements CircuitTypeUtil {
 		} catch (PlaintextTooLongException e) {
 			// Should not occur since the keys were generated through the encryption scheme that generates keys that match it.
 		} 
-		
 		return new CircuitCreationValues(allInputWireValues, allOutputWireValues, translationTable);		
-	}
-	
-	
+	}	
 	
 	/**
 	 * Generates the input wire keys and signal bits.
 	 * @param allWireValues A map that contains both keys for each wire.
 	 * @param globalKeyOffset The FreeXOR circuit's delta.
+	 * @param w The number of the wire to generate keys for.
 	 * @param zeroValue value of the wire's zero key. The other key will be calculated via XOR with the globalKeyOffset.
 	 */
 	protected void sampleInputKeys(Map<Integer, SecretKey[]> allWireValues, byte[] globalKeyOffset, int w, SecretKey zeroValue) {
@@ -317,7 +255,7 @@ class FreeXORGarbledBooleanCircuitUtil implements CircuitTypeUtil {
 	 * @param ungarbledGates The gates that should be garbled.
 	 * @param allWireValues A map that contains both keys for each wire.
 	 */
-	protected void createGarbledTables(GarbledGate[] gates, GarbledTablesHolder garbledTablesHolder, Gate[] ungarbledGates, Map<Integer, SecretKey[]> allWireValues) throws InvalidKeyException, IllegalBlockSizeException, PlaintextTooLongException {
+	protected void createGarbledTables(GarbledGate[] gates, BasicGarbledTablesHolder garbledTablesHolder, Gate[] ungarbledGates, Map<Integer, SecretKey[]> allWireValues) throws InvalidKeyException, IllegalBlockSizeException, PlaintextTooLongException {
 			
 		// Get the XOR and XORNOT truth table to be used to test against for equality.
 		BitSet XORTruthTable = getXORTruthTable();
@@ -375,7 +313,7 @@ class FreeXORGarbledBooleanCircuitUtil implements CircuitTypeUtil {
 	protected void generateStandardValues(Gate ungarbledGate, Map<Integer, SecretKey[]> allWireValues, byte[] globalKeyOffset, byte[] zeroValueBytes) {
 		
 		//Call the function that calculate k1 from k0 and globalKeyOffset.
-		calcK1AndPutInMaps(allWireValues, globalKeyOffset, zeroValueBytes, null, ungarbledGate.getOutputWireLabels()[0]);
+		calcK1AndPutInMaps(allWireValues, globalKeyOffset, zeroValueBytes, null, ungarbledGate.getOutputWireIndices()[0]);
 	}
 
 	/**
@@ -384,9 +322,9 @@ class FreeXORGarbledBooleanCircuitUtil implements CircuitTypeUtil {
 	 * @param allWireValues A map that contains both keys for each wire.
 	 * @param globalKeyOffset The FREE XOR delta.
 	 * @param zeroValueBytes The value of the first key.
-	 * @param label The label of the wire we generate keys for.
+	 * @param index The index of the wire we generate keys for.
 	 */
-	protected void calcK1AndPutInMaps(Map<Integer, SecretKey[]> allWireValues, byte[] globalKeyOffset, byte[] zeroValueBytes, byte[] oneValueBytes, int label) {
+	protected void calcK1AndPutInMaps(Map<Integer, SecretKey[]> allWireValues, byte[] globalKeyOffset, byte[] zeroValueBytes, byte[] oneValueBytes, int index) {
 		SecretKey zeroValue;
 		SecretKey oneValue;
 		
@@ -410,7 +348,7 @@ class FreeXORGarbledBooleanCircuitUtil implements CircuitTypeUtil {
 		oneValue = new SecretKeySpec(oneValueBytes, "");
 
 		//Put the keys in the map.
-		allWireValues.put(label, new SecretKey[] { zeroValue, oneValue });
+		allWireValues.put(index, new SecretKey[] { zeroValue, oneValue });
 	}
 
 	/**
@@ -422,16 +360,16 @@ class FreeXORGarbledBooleanCircuitUtil implements CircuitTypeUtil {
 	private void generateXORNOTValues(Gate ungarbledGate, Map<Integer, SecretKey[]> allWireValues, byte[] globalKeyOffset) {
 		
 		//calculate the value of k1, by xoring all k0 of the input wires.
-		byte[] oneOutputBytes = allWireValues.get(ungarbledGate.getInputWireLabels()[0])[0].getEncoded();// bytes of first input
-		for (int i = 1; i < ungarbledGate.getInputWireLabels().length; i++) {
-			byte[] nextInput = allWireValues.get(ungarbledGate.getInputWireLabels()[i])[0].getEncoded();
+		byte[] oneOutputBytes = allWireValues.get(ungarbledGate.getInputWireIndices()[0])[0].getEncoded();// bytes of first input
+		for (int i = 1; i < ungarbledGate.getInputWireIndices().length; i++) {
+			byte[] nextInput = allWireValues.get(ungarbledGate.getInputWireIndices()[i])[0].getEncoded();
 			for (int currentByte = 0; currentByte < oneOutputBytes.length; currentByte++) {
 				oneOutputBytes[currentByte] ^= (byte) nextInput[currentByte];
 			}
 		}
 		
 		//Call the function that calculate k0 from k1 and globalKeyOffset.
-		calcK1AndPutInMaps(allWireValues, globalKeyOffset, null, oneOutputBytes, ungarbledGate.getOutputWireLabels()[0]);
+		calcK1AndPutInMaps(allWireValues, globalKeyOffset, null, oneOutputBytes, ungarbledGate.getOutputWireIndices()[0]);
 		
 	}
 
@@ -444,29 +382,29 @@ class FreeXORGarbledBooleanCircuitUtil implements CircuitTypeUtil {
 	private void generateXORValues(Gate ungarbledGate, Map<Integer, SecretKey[]> allWireValues, byte[] globalKeyOffset) {
 		//calculate the value of k0, by xoring all k0 of the input wires.
 		// Get the bytes of first input
-		byte[] zeroValueBytes = allWireValues.get(ungarbledGate.getInputWireLabels()[0])[0].getEncoded();
-		for (int i = 1; i < ungarbledGate.getInputWireLabels().length; i++) {
+		byte[] zeroValueBytes = allWireValues.get(ungarbledGate.getInputWireIndices()[0])[0].getEncoded();
+		for (int i = 1; i < ungarbledGate.getInputWireIndices().length; i++) {
 			
-			byte[] nextInput = allWireValues.get(ungarbledGate.getInputWireLabels()[i])[0].getEncoded();
+			byte[] nextInput = allWireValues.get(ungarbledGate.getInputWireIndices()[i])[0].getEncoded();
 			for (int currentByte = 0; currentByte < zeroValueBytes.length; currentByte++) {
 				zeroValueBytes[currentByte] ^= nextInput[currentByte];
 			}
 		}
 		
 		//Call the function that calculate k1 from k0 and globalKeyOffset.
-		calcK1AndPutInMaps(allWireValues, globalKeyOffset, zeroValueBytes, null, ungarbledGate.getOutputWireLabels()[0]);
+		calcK1AndPutInMaps(allWireValues, globalKeyOffset, zeroValueBytes, null, ungarbledGate.getOutputWireIndices()[0]);
 	}
 
 	/**
-	 * Extracts the global key from the given wire's label.
+	 * Extracts the global key from the given wire's index.
 	 * @param allInputWireValues A map containing all keys.
-	 * @param label that exist in the map.
+	 * @param wireIndex that exist in the map.
 	 */
-	protected byte[] extractGlobalkey(Map<Integer, SecretKey[]> allInputWireValues, int label) {
+	protected byte[] extractGlobalkey(Map<Integer, SecretKey[]> allInputWireValues, int wireIndex) {
 		
-		//Get the keys of the given wire's label.
-		SecretKey zeroValue = allInputWireValues.get(label)[0];
-		SecretKey oneValue = allInputWireValues.get(label)[1];
+		//Get the keys of the given wire's index.
+		SecretKey zeroValue = allInputWireValues.get(wireIndex)[0];
+		SecretKey oneValue = allInputWireValues.get(wireIndex)[1];
 		byte[] zeroValueBytes = zeroValue.getEncoded();
 		byte[] oneValueBytes = oneValue.getEncoded();
 		
@@ -478,129 +416,30 @@ class FreeXORGarbledBooleanCircuitUtil implements CircuitTypeUtil {
 		return globalKeyOffset;
 	}
 	
-	/**
-	 * Creates the keys of the non-output wires.
-	 * @param ungarbledGates The gates that should be garbled.
-	 * @param allWireValues A map that contains both keys for each wire.
-	 * @param globalKeyOffset The FREE XOR delta.
-	 */
-	private void createNonOutputWireValues(Gate[] ungarbledGates, Map<Integer, SecretKey[]> allWireValues, byte[] globalKeyOffset) {
-		// Get the XOR and XORNOT truth table to be used to test against for equality.
-		BitSet XORTruthTable = getXORTruthTable();
-		BitSet XORNOTTruthTable = getXORNOTTruthTable();
-						
-		// Create the keys according to the specific gate. 
-		// When we process a gate, we should have its output wires' keys in order to create the input keys.
-		// In order to let that happen, notice that we go through the circuit from the end to the beginning.
-		// Tthe gates are sorted in topological order, and that ensure us that when we get to a specific gate it will have the output keys.
-		for (int gate = ungarbledGates.length-1; gate >= 0; gate--) {
-			//XOR gate.
-			if (ungarbledGates[gate].getTruthTable().equals(XORTruthTable)) {
-				generateBothXORValues(ungarbledGates[gate], allWireValues, globalKeyOffset);
-			
-			//XORNOT gate.
-			} else if (ungarbledGates[gate].getTruthTable().equals(XORNOTTruthTable)) {
-				generateBothXORNOTValues(ungarbledGates[gate], allWireValues, globalKeyOffset);
-			
-			//Standard gate.
-			}else {
-				generateBothStandardValues(ungarbledGates[gate], allWireValues, globalKeyOffset);
-			}
-		}
-	}
-	
-	/**
-	 * Generates k0, k1 of both input wires of a standard gate, in a free xor circuit. <p>
-	 * Meaning, k0 and k1 should be the xor of each other and a delta.
-	 * @param ungarbledGate The gate that should be garbled
-	 * @param allWireValues A map that contains both keys for each wire.
-	 * @param globalKeyOffset The FREE XOR delta.
-	 */
-	protected void generateBothStandardValues(Gate ungarbledGate, Map<Integer, SecretKey[]> allWireValues, byte[] globalKeyOffset) {
-		
-		// Generate values are for the first input wire.
-		// Generate k0 value.
-		byte[] zeroKeyBytes = mes.generateKey().getEncoded();
-		// Call the function that calculate the corresponding k1 and put the values in the map.
-		calcK1AndPutInMaps(allWireValues, globalKeyOffset, zeroKeyBytes, null, ungarbledGate.getInputWireLabels()[0]);
-		
-		// Generate values are for the second input wire.
-		// Generate k0 value.
-		zeroKeyBytes = mes.generateKey().getEncoded();
-		// Call the function that calculate the corresponding k1 and put the values in the map.
-		calcK1AndPutInMaps(allWireValues, globalKeyOffset, zeroKeyBytes, null, ungarbledGate.getInputWireLabels()[1]);
-	}
-
-	/**
-	 * Generates k0, k1 of both input wires of a XORNOT gate. <p>
-	 * @param ungarbledGate The gate that should be garbled
-	 * @param allWireValues A map that contains both keys for each wire.
-	 * @param globalKeyOffset The FREE XOR delta.
-	 */
-	private void generateBothXORNOTValues(Gate ungarbledGate, Map<Integer, SecretKey[]> allWireValues, byte[] globalKeyOffset) {
-		
-		// Create the first input wire's keys
-		byte[] zeroKeyBytes = mes.generateKey().getEncoded();
-		// Calculate the corresponding k1 and put the values in the map.
-		calcK1AndPutInMaps(allWireValues, globalKeyOffset, zeroKeyBytes, null, ungarbledGate.getInputWireLabels()[0]);
-		
-		// Create the second input wire's keys
-		byte[] oneKeyBytes = new byte[zeroKeyBytes.length];
-		//k1 of the second wire is k0 of the first wire xor with k0 of the output wire.
-		byte[] gateOutputKey = allWireValues.get(ungarbledGate.getOutputWireLabels()[0])[0].getEncoded();
-		for (int i = 0; i < zeroKeyBytes.length; i++) {
-			oneKeyBytes[i] = (byte) (zeroKeyBytes[i] ^ gateOutputKey[i]);
-		}
-		// Calculate the corresponding k0 and put the values in the map.
-		calcK1AndPutInMaps(allWireValues, globalKeyOffset, null, oneKeyBytes, ungarbledGate.getInputWireLabels()[1]);
-	}
-
-	/**
-	 * Generates k0, k1 of both input wires of a XOR gate. <p>
-	 * @param ungarbledGate The gate that should be garbled
-	 * @param allWireValues A map that contains both keys for each wire.
-	 * @param globalKeyOffset The FREE XOR delta.
-	 */
-	private void generateBothXORValues(Gate ungarbledGate, Map<Integer, SecretKey[]> allWireValues, byte[] globalKeyOffset) {
-		
-		
-		// Create the first input wire's keys
-		byte[] w0ZeroKeyBytes = mes.generateKey().getEncoded();
-		// Calculate the corresponding k1 and put the values in the map.
-		calcK1AndPutInMaps(allWireValues, globalKeyOffset, w0ZeroKeyBytes, null, ungarbledGate.getInputWireLabels()[0]);
-		
-		// Create the second input wire's keys
-		byte[] w1ZeroKeyBytes = new byte[w0ZeroKeyBytes.length];
-		//k0 of the second wire is k0 of the first wire xor with k0 of the output wire.
-		byte[] gateOutputKey = allWireValues.get(ungarbledGate.getOutputWireLabels()[0])[0].getEncoded();
-		for (int i = 0; i < w0ZeroKeyBytes.length; i++) {
-			w1ZeroKeyBytes[i] = (byte) (w0ZeroKeyBytes[i] ^ gateOutputKey[i]);
-		}
-		// Calculate the corresponding k1 and put the values in the map.
-		calcK1AndPutInMaps(allWireValues, globalKeyOffset, w1ZeroKeyBytes, null, ungarbledGate.getInputWireLabels()[1]);
-	}
-	
 	@Override
-	public CircuitSeedCreationValues garble(BooleanCircuit ungarbledCircuit, GarbledTablesHolder garbledTablesHolder, 
-			GarbledGate[] gates, PseudorandomGenerator prg, byte[] seed, CryptographicHash hash) throws InvalidKeyException {
+	public CircuitCreationValues garble(BooleanCircuit ungarbledCircuit, GarbledTablesHolder garbledTablesHolder, 
+			GarbledGate[] gates, PseudorandomGenerator prg, byte[] seed) throws InvalidKeyException {
+		if (!(garbledTablesHolder instanceof BasicGarbledTablesHolder)){
+			throw new IllegalArgumentException("the given garbledTablesHolder should be an instance of BasicGarbledTablesHolder");
+		}
 		
 		Map<Integer, SecretKey[]> allWireValues = new HashMap<Integer, SecretKey[]>();
+		Map<Integer, SecretKey[]> outputGarbledValues = new HashMap<Integer, SecretKey[]>();
 		Gate[] ungarbledGates = ungarbledCircuit.getGates();
 		
 		//Call the function thast actually performs the keys generation.
-		CircuitCreationValues values = sampleSeedKeys(ungarbledCircuit, prg, seed, allWireValues);
+		CircuitCreationValues values = sampleSeedKeys(ungarbledCircuit, prg, seed, allWireValues, outputGarbledValues);
 		
 		//Now that all wires have garbled values, we create the garbled tables.
-		byte[] hashedTables = null;
 		try {
-			hashedTables = createGarbledTables(garbledTablesHolder, gates, ungarbledGates, allWireValues, hash);
+			createGarbledTables(gates, (BasicGarbledTablesHolder) garbledTablesHolder, ungarbledGates, allWireValues);
 		} catch (PlaintextTooLongException e) {
 			// Should not occur since the plaintext length is valid 
 		} catch (IllegalBlockSizeException e) {
 			// Should not occur since the block size is valid
 		} 
 				
-		return new CircuitSeedCreationValues(values.getAllInputWireValues(), values.getAllOutputWireValues(), values.getTranslationTable(), hashedTables);
+		return values;
 	}
 	
 	/**
@@ -609,12 +448,12 @@ class FreeXORGarbledBooleanCircuitUtil implements CircuitTypeUtil {
 	 * @param prg To use in order to generate the keys.
 	 * @param seed To initialize the prg.
 	 * @param allWireValues An empty map that will be filled with keys during the function execution.
+	 * @param outputGarbledValues 
 	 * @return the created keys of each input and output wire and the translation table.
 	 * @throws InvalidKeyException
 	 */
-	private CircuitCreationValues sampleSeedKeys(BooleanCircuit ungarbledCircuit, PseudorandomGenerator prg, byte[] seed, Map<Integer, SecretKey[]> allWireValues) throws InvalidKeyException {
+	private CircuitCreationValues sampleSeedKeys(BooleanCircuit ungarbledCircuit, PseudorandomGenerator prg, byte[] seed, Map<Integer, SecretKey[]> allWireValues, Map<Integer, SecretKey[]> outputGarbledValues) throws InvalidKeyException {
 		Map<Integer, SecretKey[]> allInputWireValues = new HashMap<Integer, SecretKey[]>();
-		Map<Integer, SecretKey[]> allOutputWireValues = new HashMap<Integer, SecretKey[]>();
 		HashMap<Integer, Byte> translationTable = new HashMap<Integer, Byte>();
 		
 		//Sets the given seed as the prg key.
@@ -635,13 +474,13 @@ class FreeXORGarbledBooleanCircuitUtil implements CircuitTypeUtil {
 		
 		//Set input wire keys and the related signal bits.
 		for (int i=1; i <= ungarbledCircuit.getNumberOfParties(); i++){
-			ArrayList<Integer> inputWireLabels = null;
+			ArrayList<Integer> inputWireIndices = null;
 			try {
-				inputWireLabels = ungarbledCircuit.getInputWireLabels(i);
+				inputWireIndices = ungarbledCircuit.getInputWireIndices(i);
 			} catch (NoSuchPartyException e) {
 				// should not occur since the number is a valid party number
 			}
-			for (int w : inputWireLabels) {
+			for (int w : inputWireIndices) {
 				byte[] zeroValueBytes = new byte[keySize];
 				prg.getPRGBytes(zeroValueBytes, 0, keySize);
 				sampleInputKeys(allInputWireValues, globalKeyOffset, w, new SecretKeySpec(zeroValueBytes, ""));
@@ -656,55 +495,17 @@ class FreeXORGarbledBooleanCircuitUtil implements CircuitTypeUtil {
 		createNonInputWireValuesFromSeed(ungarbledCircuit.getGates(), allWireValues, globalKeyOffset, keySize, prg);
 
 		//Fill the the output wire values to be used in the following sub circuit
-		for (int n : ungarbledCircuit.getOutputWireLabels()) {
+		for (int n : ungarbledCircuit.getOutputWireIndices()) {
 			
-			//Add both values of output wire labels to the allOutputWireLabels Map that was passed as a parameter.
-			allOutputWireValues.put(n, allWireValues.get(n));
+			//Add both values of each output wire to the outputGarbledValues Map that was passed as a parameter.
+			outputGarbledValues.put(n, allWireValues.get(n));
 			
 			//Signal bit is the last bit of k0.
 			byte[] k0 = allWireValues.get(n)[0].getEncoded();
 			translationTable.put(n, (byte) (k0[k0.length-1] & 1));	
 		}
 		
-		return new CircuitCreationValues(allInputWireValues, allOutputWireValues, translationTable);
-	}
-	
-	/**
-	 * Creates the gates and garbled tables of this circuit.
-	 * Compute the hash function on the garbled tables. 
-	 * @param garbledTablesHolder Holds the pointer to the garbled tables.
-	 * @param gates Garbled gates of this circuit.
-	 * @param ungarbledGates The gates that should be garbled.
-	 * @param allWireValues An empty map that will be filled with keys during the function execution.
-	 * @param hash The CryptographicHash function to use.
-	 * @return the result of the hash function on the garbled tables.
-	 */
-	private byte[] createGarbledTables(GarbledTablesHolder garbledTablesHolder, GarbledGate[] gates, Gate[] ungarbledGates, 
-			Map<Integer, SecretKey[]> allWireValues, CryptographicHash hash) 
-			throws InvalidKeyException, IllegalBlockSizeException, PlaintextTooLongException{
-		
-		byte[][] garbledTables = garbledTablesHolder.getGarbledTables();
-		
-		// Get the XOR and XORNOT truth table to be used to test against for equality.
-		BitSet XORTruthTable = getXORTruthTable();
-		BitSet XORNOTTruthTable = getXORNOTTruthTable();
-				
-		//For each gate that is not XOR or XORNOT gates, create the suitable gate object. 
-		for (int gate = 0; gate < ungarbledGates.length; gate++) {
-			//In case of XOR gate, create FreeXORGateSlim.
-			if ((!ungarbledGates[gate].getTruthTable().equals(XORTruthTable)) && !(ungarbledGates[gate].getTruthTable().equals(XORNOTTruthTable))){
-				((StandardGarbledGate) gates[gate]).createGarbledTable(ungarbledGates[gate], allWireValues);
-				//Update the hash with the new garbled table.
-				hash.update(garbledTables[gate], 0, garbledTables[gate].length);
-			}
-		}
-		
-		//Compute the hash function.
-		byte[] hashedTables = new byte[hash.getHashedMsgSize()];
-		hash.hashFinal(hashedTables, 0);
-		
-		return hashedTables;
-		
+		return new CircuitCreationValues(allInputWireValues, outputGarbledValues, translationTable);
 	}
 	
 	/**
@@ -738,64 +539,4 @@ class FreeXORGarbledBooleanCircuitUtil implements CircuitTypeUtil {
 
 		}
 	}
-	
-	@Override
-	public byte[] getHashedTables(BooleanCircuit ungarbledCircuit, PseudorandomGenerator prg, byte[] seed, CryptographicHash hash) throws InvalidKeyException {
-			
-  		Map<Integer, SecretKey[]> allWireValues = new HashMap<Integer, SecretKey[]>();
-		
-		// Calculate the garbled tables according to the given seed, then compute the hash function on the calculated tables.
-  		sampleSeedKeys(ungarbledCircuit, prg, seed, allWireValues);
-  		try {
-			return computeHashOnTables(hash, allWireValues, ungarbledCircuit.getGates());
-		} catch (IllegalBlockSizeException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (PlaintextTooLongException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
-  		
-  	}
-  	
-	/**
-	 * Computes the hash function on the circuit's garbled tables.
-	 * @param hash CryptographicHash function to use.
-	 * @param allWireValues A map that contains both keys for each wire.
-	 * @param ungarbledGates The gates of the ungarbled circuit
-	 * @return the result of the hash function on the garbled tables.
-	 * @throws InvalidKeyException
-	 * @throws IllegalBlockSizeException
-	 * @throws PlaintextTooLongException
-	 */
-  	private byte[] computeHashOnTables(CryptographicHash hash, Map<Integer, SecretKey[]> allWireValues, Gate[] ungarbledGates) throws InvalidKeyException, IllegalBlockSizeException, PlaintextTooLongException {
-		GarbledGate gate;
-		
-		// Get the XOR and XORNOT truth table to be used to test against for equality.
-		BitSet XORTruthTable = getXORTruthTable();
-		BitSet XORNOTTruthTable = getXORNOTTruthTable();
-		int size =  ungarbledGates.length;
-		
-		byte[][] garbledTablesTemp = new byte[size][];
-		GarbledTablesHolder temp = new GarbledTablesHolder(garbledTablesTemp);
-		
-		//For each Standard gate, create the garbled tables and update the hashed array with it.
-		//After updating the hash, drop the garbled table. This way, no memory is saved. 
-		for (int i = 0; i < size; i++) {
-			if (!ungarbledGates[i].getTruthTable().equals(XORTruthTable) && !ungarbledGates[i].getTruthTable().equals(XORNOTTruthTable)) {
-				gate = createStandardGate(ungarbledGates[i], temp);
-				((StandardGarbledGate) gate).createGarbledTable(ungarbledGates[i], allWireValues);
-				hash.update(garbledTablesTemp[i], 0, garbledTablesTemp[i].length);
-				garbledTablesTemp[i] = null;
-			}
-		}
-	
-		//compute the hash function on the garbled tables.
-		byte[] hashedTables = new byte[hash.getHashedMsgSize()];
-		hash.hashFinal(hashedTables, 0);
-		
-		return hashedTables;
-	}	
-
 }
