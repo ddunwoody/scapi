@@ -26,6 +26,7 @@ package edu.biu.scapi.circuits.garbledCircuit;
 
 import java.io.File;
 import java.security.InvalidKeyException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -166,14 +167,14 @@ public interface GarbledBooleanCircuit {
      * and needs the translation table as well to complete the construction of the circuit.
      * @return the translation table of the circuit.  
      */
-	public Map<Integer, Byte> getTranslationTable();
+	public HashMap<Integer, Byte> getTranslationTable();
   
 	/**
 	 * Sets the translation table of the circuit. <p>
 	 * This is necessary when the garbled tables where set and we would like to compute the circuit later on. 
 	 * @param translationTable This value should match the garbled tables of the circuit.
 	 */
-	public void setTranslationTable(Map<Integer, Byte> translationTable);
+	public void setTranslationTable(HashMap<Integer, Byte> translationTable);
 	
 	/**
 	 * Returns the input wires' indices of the given party.
