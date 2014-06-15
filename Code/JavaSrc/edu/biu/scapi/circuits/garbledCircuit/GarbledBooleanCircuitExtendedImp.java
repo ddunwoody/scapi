@@ -792,8 +792,10 @@ public class GarbledBooleanCircuitExtendedImp implements GarbledBooleanCircuitEx
 			throw new IllegalArgumentException("garbledTables should be an instance of ExtendedGarbledTablesHolder");
 		}
 		
-		this.garbledTablesHolder = (ExtendedGarbledTablesHolder) garbledTables;
-		gbc.setGarbledTables(((ExtendedGarbledTablesHolder)garbledTables).getInternalGarbledTables());
+		ExtendedGarbledTablesHolder holder = (ExtendedGarbledTablesHolder) garbledTables;
+		
+		this.garbledTablesHolder.setGarbledTables(holder.getInternalGarbledTables(), holder.getInputGarbledTables(), holder.getOutputGarbledTables());
+		gbc.setGarbledTables(holder.getInternalGarbledTables());
 	}
 
 	@Override
@@ -859,13 +861,13 @@ public class GarbledBooleanCircuitExtendedImp implements GarbledBooleanCircuitEx
 	}
 
 	@Override
-	public Map<Integer, Byte> getTranslationTable() {
+	public HashMap<Integer, Byte> getTranslationTable() {
 		
 		return gbc.getTranslationTable();
 	}
 
 	@Override
-	public void setTranslationTable(Map<Integer, Byte> translationTable) {
+	public void setTranslationTable(HashMap<Integer, Byte> translationTable) {
 		gbc.setTranslationTable(translationTable);
 		
 	}
