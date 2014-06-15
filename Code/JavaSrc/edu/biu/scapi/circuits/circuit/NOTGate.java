@@ -39,16 +39,16 @@ public class NOTGate extends Gate {
 	
 	/**
 	 * Constructs a NOT Gate.
-	 * @param gateNumber The gate's integer label (in a circuit all gates will be labeled).
-  	 * @param inputWireLabel An array containing the labels of the gate's input {@code Wire}.
+	 * @param gateNumber The gate's number (in a circuit all gates will be numbered).
+  	 * @param inputWireIndex An array containing the index of the gate's input {@code Wire}.
   	 * Since NOT is a unary operator, there will only be one input {@code Wire}.
-  	 * @param outputWireLabels An array containing the labels of the gate's input {@code Wire}(s). 
+  	 * @param outputWireIndices An array containing the indices of the gate's input {@code Wire}(s). 
   	 * There will generally be a single output {@code Wire}. 
   	 * However in instances in which the fan-out of the output {@code Wire} is >1, we left the option for treating 
   	 * this as multiple {@code Wire}s.
    	 */
-	public NOTGate(int gateNumber, int inputWireLabel, int[] outputWireLabels) {
-		super(gateNumber, createNOTTruthTable(), new int[]{inputWireLabel}, outputWireLabels);
+	public NOTGate(int gateNumber, int inputWireIndex, int[] outputWireIndices) {
+		super(gateNumber, createNOTTruthTable(), new int[]{inputWireIndex}, outputWireIndices);
 	}
 
 	/**

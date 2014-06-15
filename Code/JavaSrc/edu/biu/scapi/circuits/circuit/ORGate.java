@@ -38,14 +38,14 @@ public class ORGate extends Gate {
 	/**
 	 * Constructs an OR Gate.
 	 * 
-	 * @param gateNumber The gate's integer label (in a circuit all gates will be labeled).
-	 * @param inputWireLabels An array containing the labels of the gate's input {@code Wire}s.
-	 * @param outputWireLabels An array containing the labels of the gate's input {@code Wire}(s). 
+	 * @param gateNumber The gate's number (in a circuit all gates will be numbered).
+	 * @param inputWireIndices An array containing the indices of the gate's input {@code Wire}s.
+	 * @param outputWireIndices An array containing the indices of the gate's input {@code Wire}(s). 
 	 * There will generally be a single output {@code Wire}. However in instances in which the fan-out of the output {@code Wire} is >1, 
 	 * we left the option for treating this as multiple {@code Wire}s.
 	 */
-	public ORGate(int gateNumber, int[] inputWireLabels, int[] outputWireLabels) {
-		super(gateNumber, createORTruthTable(), inputWireLabels, outputWireLabels);
+	public ORGate(int gateNumber, int[] inputWireIndices, int[] outputWireIndices) {
+		super(gateNumber, createORTruthTable(), inputWireIndices, outputWireIndices);
 	}
 
 	/**

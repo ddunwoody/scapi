@@ -55,7 +55,7 @@ public class BooleanCircuit {
 	private boolean[] isInputSet;
 	
 	/**
-	 * A {@code Map} that maps the integer label of a {@code Wire} to the previously set {@code Wire}. 
+	 * A {@code Map} that maps the number of a {@code Wire} to the previously set {@code Wire}. 
 	 * Only {@code Wire}s whose value has been set will be on this map.
 	 * 
 	 */
@@ -67,9 +67,9 @@ public class BooleanCircuit {
 	private Gate[] gates;
   
 	/**
-	 * An array containing the integer labels of the input {@code Wire}s of this {@code BooleanCircuit}.
+	 * An array containing the indices of the output {@code Wire}s of this {@code BooleanCircuit}.
 	 */
-	private int[] outputWireLabels;
+	private int[] outputWireIndices;
   
 	/**
 	 * The number of parties that are interacting (i.e. receiving input and/or output) with this circuit.
@@ -77,7 +77,7 @@ public class BooleanCircuit {
 	private int numberOfParties;  
 	
 	/**
-	 * An arrayList containing the integer labels of the input {@code Wire}s of this {@code BooleanCircuit} indexed by the party number.
+	 * An arrayList containing the indices of the input {@code Wire}s of this {@code BooleanCircuit} indexed by the party number.
 	 */
 	private ArrayList<ArrayList<Integer>> eachPartysInputWires = new ArrayList<ArrayList<Integer>>();
 	
@@ -85,14 +85,11 @@ public class BooleanCircuit {
 	/**
 	 * Constructs a BooleanCircuit from a File. <p>
 	 * The File first lists the number of {@code Gate}s, then the number of parties. <p>
-	 * Then for each party: party number, the number of inputs for that party, and following there is a list of integer labels of each of these input {@code Wire}s.<p>
-	 * Next it lists the number of output {@code Wire}s followed by the integer label of each of these {@code Wires}. <p>
-	 * Then for each gate, we have the following: number of inputWires, number of OutputWires inputWireLabels OutputWireLabels and the gate's truth Table (as a 0-1 string).<P>
+	 * Then for each party: party number, the number of inputs for that party, and following there is a list of indices of each of these input {@code Wire}s.<p>
+	 * Next it lists the number of output {@code Wire}s followed by the index of each of these {@code Wires}. <p>
+	 * Then for each gate, we have the following: number of inputWires, number of OutputWires inputWireIndices OutputWireIndices and the gate's truth Table (as a 0-1 string).<P>
 	 * example file: 1 2 1 1 1 2 1 2 1 3 2 1 1 2 3 0001<p>
-	 * IMPORTANT NOTE: There is a special case when the user wants to use the row reduction technique and to sample the wires' keys out of a given output keys.
-	 * In this case the circuit should have an additional gate in the end that has 01 as the truth table (that is, it does XOR with zero).
-	 * This way we sample all keys from scratch and the last gate will map the new output keys to the given ones.
-	 * 
+	 *
 	 * @param f The {@link File} from which the circuit is read.
 	 * @throws FileNotFoundException if f is not found in the specified directory.
 	 * @throws CircuitFileFormatException if there is a problem with the format of the file.
@@ -105,7 +102,7 @@ public class BooleanCircuit {
 	    //Read the number of parties.
 	    numberOfParties =  Integer.parseInt(s.next());
 	    isInputSet = new boolean[numberOfParties];
-	    //For each party, read the party's number, number of input wires and their labels.
+	    //For each party, read the party's number, number of input wires and their indices.
 	    for (int i = 0; i < numberOfParties; i++) {
 	    	if (Integer.parseInt(s.next()) != i+1) {//add 1 since parties are indexed from 1, not 0
 	    		throw new CircuitFileFormatException();
@@ -120,34 +117,35 @@ public class BooleanCircuit {
 	    	
 	    	ArrayList<Integer> currentPartyInput = new ArrayList<Integer>();
 	    	eachPartysInputWires.add(currentPartyInput);
-	    	//Read the input wires labels.
+	    	//Read the input wires indices.
 	    	for (int j = 0; j < numberOfInputsForCurrentParty; j++) {
 	    		currentPartyInput.add(Integer.parseInt(s.next()));
 	    	}
 	    }
 	    
 	    /*
-	     * The ouputWireLabels are the outputs from this circuit. However, this circuit may actually be a single layer of a 
+	     * The ouputWireIndices are the outputs from this circuit. However, this circuit may actually be a single layer of a 
 	     * larger layered circuit. So this output can be part of the input to another layer of the circuit.
 	     */
 	    int numberOfCircuitOutputs = Integer.parseInt(s.next());
-	    outputWireLabels = new int[numberOfCircuitOutputs];
-	    //Read the output wires labels.
+	    outputWireIndices = new int[numberOfCircuitOutputs];
+	    //Read the output wires indices.
 	    for (int i = 0; i < numberOfCircuitOutputs; i++) {
-	    	outputWireLabels[i] = Integer.parseInt(s.next());
+	    	outputWireIndices[i] = Integer.parseInt(s.next());
 	    }
 	    
-	    //For each gate, read the number of input and output wires, their labels and the truth table.
+	    int numberOfGateInputs, numberOfGateOutputs;
+	    //For each gate, read the number of input and output wires, their indices and the truth table.
 	    for (int i = 0; i < numberOfGates; i++) {
-	    	int numberOfGateInputs = Integer.parseInt(s.next());
-	    	int numberOfGateOutputs = Integer.parseInt(s.next());
-	    	int[] inputWireLabels = new int[numberOfGateInputs];
-	    	int[] outputWireLabels = new int[numberOfGateOutputs];
+	    	numberOfGateInputs = Integer.parseInt(s.next());
+	    	numberOfGateOutputs = Integer.parseInt(s.next());
+	    	int[] inputWireIndices = new int[numberOfGateInputs];
+	    	int[] outputWireIndices = new int[numberOfGateOutputs];
 	    	for (int j = 0; j < numberOfGateInputs; j++) {
-	    		inputWireLabels[j] = Integer.parseInt(s.next());
+	    		inputWireIndices[j] = Integer.parseInt(s.next());
 	    	}
 	    	for (int j = 0; j < numberOfGateOutputs; j++) {
-	    		outputWireLabels[j] = Integer.parseInt(s.next());
+	    		outputWireIndices[j] = Integer.parseInt(s.next());
 	    	}
       
 	    	/*
@@ -162,23 +160,23 @@ public class BooleanCircuit {
 	    		}
 	    	}
 	    	//Construct the gate.
-	    	gates[i] = new Gate(i, truthTable, inputWireLabels, outputWireLabels);
+	    	gates[i] = new Gate(i, truthTable, inputWireIndices, outputWireIndices);
 	    }
 	}
 
 	/**
 	 * Constructs a {code BooleanCircuit} from an array of gates. <p>
-	 * Each gate keeps an array of the labels of its input and output wires. The constructor is provided with a list of which 
+	 * Each gate keeps an array of the indices of its input and output wires. The constructor is provided with a list of which 
 	 * {@link Wire}s are output {@link Wire}s of the {@code BooleanCircuit}.
 	 * 
 	 * @param gates An array of {@link Gate}s to create from which to construct the {@code BooleanCircuit}.
-	 * @param outputWireLabels An array containing the labels of the wires that will be output of the {@code BooleanCircuit}.
-	 * @param eachPartysInputWires An arrayList containing the integer labels of the input {@code Wire}s of this
+	 * @param outputWireIndices An array containing the indices of the wires that will be output of the {@code BooleanCircuit}.
+	 * @param eachPartysInputWires An arrayList containing the indices of the input {@code Wire}s of this
 	 * {@code BooleanCircuit} indexed by the party number.
 	 */
-	public BooleanCircuit(Gate[] gates, int[] outputWireLabels, ArrayList<ArrayList<Integer>> eachPartysInputWires) {
+	public BooleanCircuit(Gate[] gates, int[] outputWireIndices, ArrayList<ArrayList<Integer>> eachPartysInputWires) {
 		this.gates = gates;
-		this.outputWireLabels = outputWireLabels;
+		this.outputWireIndices = outputWireIndices;
 		this.eachPartysInputWires = eachPartysInputWires;
 		numberOfParties = eachPartysInputWires.size();
   	}
@@ -219,15 +217,14 @@ public class BooleanCircuit {
 		}
 		Map<Integer, Wire> presetInputWires = new HashMap<Integer, Wire>();
 		for (int i = 0; i < numberOfInputWires; i++) {
-			int wireLabel = s.nextInt();
-			presetInputWires.put(wireLabel, new Wire(s.nextByte()));
+			presetInputWires.put(s.nextInt(), new Wire(s.nextByte()));
 		}
 		setInputs(presetInputWires,partyNumber);
 	}
 
  	/**
  	 * Computes the circuit if the input has been set.<p>
- 	 * @return a {@link Map} that maps the output {@link Wire} label to the computed {@link Wire}.
+ 	 * @return a {@link Map} that maps the output {@link Wire} index to the computed {@link Wire}.
  	 * @throws NotAllInputsSetException in case there is a party that has no input.
  	 */
 	public Map<Integer, Wire> compute() throws NotAllInputsSetException {
@@ -250,7 +247,7 @@ public class BooleanCircuit {
 		 * We return outputMap.
 		 */
 		Map<Integer, Wire> outputMap = new HashMap<Integer, Wire>();
-		for (int w : outputWireLabels) {
+		for (int w : outputWireIndices) {
 			outputMap.put(w, computedWires.get(w));
 		}
 		return outputMap;
@@ -258,7 +255,7 @@ public class BooleanCircuit {
 
 	/**
 	 * The verify method tests the circuits for equality returning {@code true} if they are and {@code false}if they are not. <p>
-	 * In order to be considered equal, {@code Gate}s and {@code Wire}s must be labeled identically and {@code Gate}s must contain 
+	 * In order to be considered equal, {@code Gate}s and {@code Wire}s must be indexed identically and {@code Gate}s must contain 
 	 * the same truth table.
 	 * 
 	 * @param obj A {@code BooleanCircuit} to be tested for equality to this {@code BooleanCircuit}
@@ -292,18 +289,18 @@ public class BooleanCircuit {
 	}
 
 	/**
-	 * @return an array of the output{@link Wire} labels of this circuit.
+	 * @return an array of the output{@link Wire} indices of this circuit.
   	 */
-	public int[] getOutputWireLabels() {
-		return outputWireLabels;
+	public int[] getOutputWireIndices() {
+		return outputWireIndices;
 	}
 
 	/**
 	 * @param partyNumber The number of the party whose input wires will be returned.
-	 * @return an ArrayList containing the input {@link Wire} labels of the specified party.
+	 * @return an ArrayList containing the input {@link Wire} indices of the specified party.
 	 * @throws NoSuchPartyException if the given party number is less than 1 and greater than the given number of parties.
 	 */
-	public ArrayList<Integer> getInputWireLabels(int partyNumber) throws NoSuchPartyException {
+	public ArrayList<Integer> getInputWireIndices(int partyNumber) throws NoSuchPartyException {
 		if(partyNumber < 1 || partyNumber > numberOfParties){
 			throw new NoSuchPartyException();
 		}
