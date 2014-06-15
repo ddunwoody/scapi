@@ -85,7 +85,7 @@ public class GarbledBooleanCircuitImp implements GarbledBooleanCircuit {
 	 * privacy and/or correctness will not be preserved. Therefore, we only reveal the signal bit, and the other
 	 * possible value for the wire is not stored on the translation table.
 	 */
-	private Map<Integer, Byte> translationTable;
+	private HashMap<Integer, Byte> translationTable;
   	
   	//A map that is used during computation to map a {@code GarbledWire}'s index to the computed and set {@code GarbledWire}.
 	private Map<Integer, GarbledWire> computedWires = new HashMap<Integer,GarbledWire>();
@@ -338,12 +338,12 @@ public class GarbledBooleanCircuitImp implements GarbledBooleanCircuit {
 	      
 	    	//Calculate the resulting value.
 	    	value = (byte) (signalBit ^ permutationBitOnWire);
-	    	//System.out.print(value);
+	    	System.out.print(value);
 	    	//Hold the result as a wire.
 	    	Wire translated = new Wire(value);
 	    	translatedOutput.put(w, translated);
 	    }
-	//System.out.println();
+	System.out.println();
 	    return translatedOutput;
 
 	}
@@ -420,17 +420,17 @@ public class GarbledBooleanCircuitImp implements GarbledBooleanCircuit {
 		if (!(garbledTables instanceof BasicGarbledTablesHolder)){
 			throw new IllegalArgumentException("garbledTables should be an instance of BasicGarbledTablesHolder");
 		}
-		this.garbledTablesHolder = (BasicGarbledTablesHolder) garbledTables;
+		this.garbledTablesHolder.setGarbledTables(garbledTables.toDoubleByteArray());
 	}
 	
 	@Override
-	public Map<Integer, Byte> getTranslationTable(){
+	public HashMap<Integer, Byte> getTranslationTable(){
 	  
 		return translationTable;
 	}
   
 	@Override
-	public void setTranslationTable(Map<Integer, Byte> translationTable){
+	public void setTranslationTable(HashMap<Integer, Byte> translationTable){
 		
 		this.translationTable = translationTable;
 	}
