@@ -29,16 +29,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.SecretKey;
 
 import edu.biu.scapi.circuits.circuit.BooleanCircuit;
 import edu.biu.scapi.circuits.circuit.Wire;
+import edu.biu.scapi.circuits.encryption.AESFixedKeyMultiKeyEncryption;
+import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.exceptions.CiphertextTooLongException;
-import edu.biu.scapi.exceptions.InvalidInputException;
 import edu.biu.scapi.exceptions.NoSuchPartyException;
 import edu.biu.scapi.exceptions.NotAllInputsSetException;
+import edu.biu.scapi.primitives.prg.PseudorandomGenerator;
 
 /**
  * A concrete implementation of GarbledBooleanCircuit that is common for all types of circuits.<p>
@@ -49,13 +52,15 @@ import edu.biu.scapi.exceptions.NotAllInputsSetException;
  */
 public class GarbledBooleanCircuitImp implements GarbledBooleanCircuit {
 
-	protected CircuitTypeUtil util; 	//Executes all functionalities that specific to the circuit type.
-	private int[] outputWireLabels;
-	private boolean[] isInputSet; 		//For each party we save a boolean indicates if the input for that party has been set.
-	private ArrayList<ArrayList<Integer>> eachPartysInputWires; //Input wires' labels of each party.
-  	protected GarbledGate[] gates; // The garbled gates of this garbled circuit.
-  	private int numberOfParties;
+	private BooleanCircuit bc;			// The Boolean circuit that this circuit should be the garbling of.
+	private CircuitTypeUtil util; 		//Executes all functionalities that specific to the circuit type.
+	private PseudorandomGenerator prg;  //used in case of generating the keys using a seed.
 	
+	private int[] outputWireIndices;	
+	private ArrayList<ArrayList<Integer>> eachPartysInputWires; //Input wires' indices of each party.
+	private GarbledGate[] gates; 		// The garbled gates of this garbled circuit.
+	private int numberOfParties;
+  	
   	/*
   	 * Holds the garbled tables of this garbled circuit. This is stored in the garbled circuit and also in the gates. 
   	 * We keep the garbled tables that way because when sending the circuit to a different party it is sufficient to send only 
@@ -70,12 +75,9 @@ public class GarbledBooleanCircuitImp implements GarbledBooleanCircuit {
   	 * If we store the array as one dimensional array we only have 12 bytes overhead for the entire table and thus this is the way we 
   	 * store the garbled tables. 
   	 */
-  	protected GarbledTablesHolder garbledTablesHolder;
-  	
-  	//A map that is used during computation to map a {@code GarbledWire}'s label to the computed and set {@code GarbledWire}.
-  	private Map<Integer, GarbledWire> computedWires = new HashMap<Integer,GarbledWire>();
-
-  	/*
+	private BasicGarbledTablesHolder garbledTablesHolder;
+	
+	/*
 	 * The translation table stores the signal bit for the output wires. Thus, it just tells you whether the wire coming out is a 
 	 * 0 or 1 but nothing about the plaintext of the wires is revealed. This is good since it is possible that a circuit output 
 	 * wire is also an input wire to a different gate, and thus if the translation table contained the plaintext of both possible
@@ -83,124 +85,140 @@ public class GarbledBooleanCircuitImp implements GarbledBooleanCircuit {
 	 * privacy and/or correctness will not be preserved. Therefore, we only reveal the signal bit, and the other
 	 * possible value for the wire is not stored on the translation table.
 	 */
-	protected HashMap<Integer, Byte> translationTable;
+	private Map<Integer, Byte> translationTable;
+  	
+  	//A map that is used during computation to map a {@code GarbledWire}'s index to the computed and set {@code GarbledWire}.
+	private Map<Integer, GarbledWire> computedWires = new HashMap<Integer,GarbledWire>();
+  	
+  	/**
+	 * Default constructor. Sets the given boolean circuit and creates a Free XOR circuit using a AESFixedKeyMultiKeyEncryption.
+	 * 
+	 */
+	public GarbledBooleanCircuitImp(BooleanCircuit bc){
+		this(new FreeXORCircuitInput(bc, new AESFixedKeyMultiKeyEncryption()));
+		
+	}
 	
 	/**
-	 * A constructor that gets an input an object and creates the circuit with its contents.<p>
+	 * A constructor that gets an input object and creates the circuit with its contents.<p>
+	 * This constructor should be used in case the garbling is done using the encryption scheme. 
+	 * In case the user want to garble using a seed, use the constructor that gets a prg.<p>
 	 * The created circuit will be "empty", without garbled tables. <p>
-	 * After this constructor the circuit is not complete, one of the generateKeysAndSetTables functions should be called in order to 
-	 * create the underlying gates.
+	 * After this constructor the circuit is not complete, one of the garble functions should be called in order to 
+	 * fill the garbled tables and translation table.
 	 * @param input Specifies which concrete type of circuit to implement.
 	 */
 	public GarbledBooleanCircuitImp(CircuitInput input){
 		//Create an empty garbled tables.
-		garbledTablesHolder = new GarbledTablesHolder(new byte[input.getUngarbledCircuit().getGates().length][]);
-		
+		garbledTablesHolder = new BasicGarbledTablesHolder(new byte[input.getUngarbledCircuit().getGates().length][]);
+		//Call the function that creates the gates.
 		doConstruct(input);
 	}
 	
 	/**
-	 * A constructor that gets an input an object, garbled tables and translation tables and creates the circuit with them.<p>
-	 * After this constructor the circuit is complete and ready to be used.
-	 * @param input input specifies which concrete type of circuit to implement.
-	 * @param garbledTables 
-	 * @param translationTable
+	 * A constructor that gets a prg and an input object and creates the circuit with their contents.<p>
+	 * This constructor should be used in case the garbling is done using a seed. 
+	 * In case the user want to garble using an encryption scheme, use the constructor that does not get a prg.<p>
+	 * The created circuit will be "empty", without garbled tables. <p>
+	 * After this constructor the circuit is not complete, one of the garble functions should be called in order to 
+	 * create the underlying gates.
+	 * @param input Specifies which concrete type of circuit to implement.
 	 */
-	public GarbledBooleanCircuitImp(CircuitInput input, byte[][] garbledTables, HashMap<Integer, Byte> translationTable){
-		//Sets the given garbled tables.
-		this.garbledTablesHolder = new GarbledTablesHolder(garbledTables);
-		this.translationTable = translationTable;
+	public GarbledBooleanCircuitImp(CircuitInput input, PseudorandomGenerator prg){
+		//Create an empty garbled tables.
+		garbledTablesHolder = new BasicGarbledTablesHolder(new byte[input.getUngarbledCircuit().getGates().length][]);
+		this.prg = prg;
 		
+		//Call the function that creates the gates.
 		doConstruct(input);
 	}
 	
 	/**
 	 * Constructs a circuit from the given input.
-	 * @param input input specifies which concrete type of circuit to implement.
+	 * @param input Specifies which concrete type of circuit to implement.
 	 */
 	private void doConstruct(CircuitInput input) {
 		// The input object defines which concrete circuit to use. Thus, it can create the utility class that matches this type of circuit.
 		util = input.createCircuitUtil();
 		
 		//Extracts parameters from the given boolean circuit.
-		BooleanCircuit ungarbledCircuit = input.getUngarbledCircuit();
-		outputWireLabels = ungarbledCircuit.getOutputWireLabels();
-		numberOfParties = ungarbledCircuit.getNumberOfParties();
-		isInputSet = new boolean[numberOfParties];
+		bc = input.getUngarbledCircuit();
+		outputWireIndices = bc.getOutputWireIndices();
+		numberOfParties = bc.getNumberOfParties();
 		eachPartysInputWires = new ArrayList<ArrayList<Integer>>();
 		
-		//Gets the input labels for each party.
+		//Gets the input indices for each party.
 		for (int i=1; i<=numberOfParties; i++){
-			ArrayList<Integer> partyInputLabels = null;
+			ArrayList<Integer> partyInputIndices = null;
 			try {
-				partyInputLabels = ungarbledCircuit.getInputWireLabels(i);
+				partyInputIndices = bc.getInputWireIndices(i);
 			} catch (NoSuchPartyException e) {
 				// Should not occur since the called party numbers are correct.
 			}
-			eachPartysInputWires.add(partyInputLabels);
-			if(partyInputLabels.size()==0){
-				isInputSet[i-1] = true;
-			}
+			eachPartysInputWires.add(partyInputIndices);
 			
 		}
 		
 		//Create the circuit's gates.
-		gates = util.createGates(ungarbledCircuit.getGates(), garbledTablesHolder);
+		gates = util.createGates(bc.getGates(), garbledTablesHolder);
 	}
 	
 	@Override
-  	public CircuitCreationValues garble(BooleanCircuit ungarbledCircuit) {
+  	public CircuitCreationValues garble() {
 		//Call the utility class to generate the keys and create the garbled tables.
-		CircuitCreationValues values = util.garble(ungarbledCircuit, garbledTablesHolder, gates);
+		CircuitCreationValues values = util.garble(bc, garbledTablesHolder, gates);
 		translationTable = values.getTranslationTable();
 		return values;
 	}
 	
 	@Override
-	public CircuitCreationValues garble(BooleanCircuit ungarbledCircuit, Map<Integer, SecretKey[]> partialWireValues) {
+	public CircuitCreationValues garble(byte[] seed) throws InvalidKeyException {
+		if (prg == null){
+			throw new IllegalStateException("This circuit can not use seed to generate keys since it has no prg. Use the other garble() function");
+		}
 		//Call the utility class to generate the keys and create the garbled tables.
-		CircuitCreationValues values = util.garble(ungarbledCircuit, garbledTablesHolder, gates, partialWireValues);
+		CircuitCreationValues values = util.garble(bc, garbledTablesHolder, gates, prg, seed);
 		translationTable = values.getTranslationTable();
 		return values;
 	}
 	
   	@Override
- 	public void setGarbledInputFromUngarbledInput(Map<Integer, Byte> ungarbledInput, Map<Integer, SecretKey[]> allInputWireValues, int partyNumber) throws NoSuchPartyException {
+ 	public void setGarbledInputFromUngarbledInput(Map<Integer, Byte> ungarbledInput, Map<Integer, SecretKey[]> allInputWireValues) {
   		
   		Map<Integer, GarbledWire> inputs = new HashMap<Integer, GarbledWire>();
+  		Set<Integer> keys = ungarbledInput.keySet();
   		
-  		//Get he labels of the given party.
-  		List<Integer> labels = getInputWireLabels(partyNumber);
-  		int numberOfInputs = labels.size();
-  		
-  		//For each label, fill the map with wire label and garbled input.
-  		for (int i = 0; i < numberOfInputs; i++) {
-  			int label = labels.get(i);
-  			inputs.put(label, new GarbledWire(allInputWireValues.get(label)[ungarbledInput.get(label)]));
+  		//For each wireIndex, fill the map with wire index and garbled input.
+  		for (Integer wireIndex : keys) {
+  			inputs.put(wireIndex, new GarbledWire(allInputWireValues.get(wireIndex)[ungarbledInput.get(wireIndex)]));
   		}
-  		setInputs(inputs, partyNumber);
+  		setInputs(inputs);
   	}
   
   	@Override
-  	public void setInputs(Map<Integer, GarbledWire> presetInputWires, int partyNumber) throws NoSuchPartyException {
-  		
-  		if (partyNumber>numberOfParties){
-  			throw new NoSuchPartyException();
-  		}
+  	public void setInputs(Map<Integer, GarbledWire> presetInputWires) {
   		
   		computedWires.putAll(presetInputWires);
-  	    isInputSet[partyNumber-1] = true;
  	}
  
   	@Override
   	public Map<Integer, GarbledWire> compute() throws NotAllInputsSetException{
-  		int numberOfParties = isInputSet.length;
-  		//check that all the input has been set.
-  		for (int i=0; i<numberOfParties; i++){
-  			if (isInputSet[i] == false) {
-  				throw new NotAllInputsSetException();
-  			}
+  		//Check that all the inputs have been set.
+  		for (int i=1; i <= getNumberOfParties(); i++){
+  			List<Integer> wireNumbers = null;
+			try {
+				wireNumbers = getInputWireIndices(i);
+			} catch (NoSuchPartyException e) {
+				// Should not occur since the parties numbers are between 1 to getNumberOfParties.
+			}
+  			
+	  		for (int wireNumber : wireNumbers){
+	  			if (!computedWires.containsKey(wireNumber)) {
+	  				throw new NotAllInputsSetException();
+	  			}
+	  		}
   		}
+  		
   		/*
   		 * We use the interface GarbledGate and thus this works for all implementing classes. The compute method of the 
   		 * specific garbled gate being used will be called. This allows us to have circuits with different types of gates 
@@ -219,12 +237,12 @@ public class GarbledBooleanCircuitImp implements GarbledBooleanCircuit {
   		}
   		
   		/*
-  		 * Copy only the values that we need to retain--i.e. the values of the output wires to a new map to be returned. 
+  		 * Copy only the values that we need to retain -- i.e. the values of the output wires to a new map to be returned. 
   		 * The computedWire's map contains more values than we need to retain as it has values for all wires, 
   		 * not only circuit output wires.
   		 */
   		Map<Integer, GarbledWire> garbledOutput = new HashMap<Integer, GarbledWire>();
-  		for (int w : outputWireLabels) {
+  		for (int w : outputWireIndices) {
   			garbledOutput.put(w, computedWires.get(w));
   		}
 
@@ -232,17 +250,45 @@ public class GarbledBooleanCircuitImp implements GarbledBooleanCircuit {
   	}	
 
   	@Override
-  	public boolean verify(BooleanCircuit ungarbledCircuit, Map<Integer, SecretKey[]> allInputWireValues) throws InvalidInputException{
+  	public boolean verify(Map<Integer, SecretKey[]> allInputWireValues){
 	  
+  		Map<Integer, SecretKey[]> outputValues = new HashMap<Integer, SecretKey[]>();  
+  		
+  		//Call the internalVerify function that verifies the circuit without the last part of the translation table.
+		boolean verified = internalVerify(allInputWireValues, outputValues);
+		
+		//Check that the output wires translate correctly. 
+	    //outputValues contains both possible values for every output wire in the circuit. 
+		//We check the output wire values and make sure that the 0-wire translates to a 0 and that the 1 wire translates to a 1.
+  		for (int w : outputWireIndices) {
+  			SecretKey zeroValue = outputValues.get(w)[0];
+  			SecretKey oneValue = outputValues.get(w)[1];
+
+  			byte signalBit = translationTable.get(w);
+  			byte permutationBitOnZeroWire = (byte) ((zeroValue.getEncoded()[zeroValue.getEncoded().length - 1] & 1) == 0 ? 0 : 1);
+  			byte permutationBitOnOneWire = (byte) ((oneValue.getEncoded()[oneValue.getEncoded().length - 1] & 1) == 0 ? 0 : 1);
+  			byte translatedZeroValue = (byte) (signalBit ^ permutationBitOnZeroWire);
+  			byte translatedOneValue = (byte) (signalBit ^ permutationBitOnOneWire);
+  			if (translatedZeroValue != 0 || translatedOneValue != 1) {
+  				verified = false;
+  			}
+  		}
+  		return verified;
+	}
+  	
+  	@Override
+  	public boolean internalVerify(Map<Integer, SecretKey[]> allInputWireValues, Map<Integer, SecretKey[]> allOutputWireValues){
+  	
+  		/*
+  		 * We will add values of non-input wires to the map as we compute them (this will take place in the Gate's 
+  		 * verify method that we are about to call). In order to not change the input Map, we first copy its contents to a new Map.
+  		 */
   		Map<Integer, SecretKey[]> allWireValues = new HashMap<Integer, SecretKey[]>();  
-		/*
-	     * We are going to need to add values for non-input wires to the map as we compute them(this will take place in the Gate's 
-	     * verify method that we are about to call). In order to not change the input Map, we first copy its contents to a new Map.
-	     */
 		allWireValues.putAll(allInputWireValues); 
 		
-		// First we check that the number of gates is the same.
-  		if (gates.length != ungarbledCircuit.getGates().length) {
+		
+  		// First we check that the number of gates is the same.
+  		if (gates.length != bc.getGates().length) {
   			return false;
   		}
     
@@ -258,9 +304,9 @@ public class GarbledBooleanCircuitImp implements GarbledBooleanCircuit {
   		 * we expected to encode to a 0 was actually a 0 and the 1 was a 1. Once we have done this, we have verified the circuits are 
   		 * identical and have not relied on any unproven assumptions.
   		 */
-  		for (int i = 0; i < gates.length; i++) {
+		for (int i = 0; i < gates.length; i++) {
   			try {
-				if (gates[i].verify(ungarbledCircuit.getGates()[i], allWireValues) == false) {
+				if (gates[i].verify(bc.getGates()[i], allWireValues) == false) {
 					return false;
 				}
 			} catch (InvalidKeyException e) {
@@ -271,60 +317,84 @@ public class GarbledBooleanCircuitImp implements GarbledBooleanCircuit {
 				// Should not occur since the keys were generated through the encryption scheme that generates keys that match it.
 			}
   		}
-	    
-  		/*
-  		 * Check that the output wires translate correctly. 
-	     * At this point, we have gone through the entire circuit so allWireValues now contains both possible values for every wire
-	     * in the circuit. We check the output wire values and make sure that the 0-wire translates to a 0 and that the 1 wire 
-	     * translates to a 1.
-	     */
-  		for (int w : outputWireLabels) {
-  			SecretKey zeroValue = allWireValues.get(w)[0];
-  			SecretKey oneValue = allWireValues.get(w)[1];
-
-  			byte signalBit = translationTable.get(w);
-  			byte permutationBitOnZeroWire = (byte) ((zeroValue.getEncoded()[zeroValue.getEncoded().length - 1] & 1) == 0 ? 0 : 1);
-  			byte permutationBitOnOneWire = (byte) ((oneValue.getEncoded()[oneValue.getEncoded().length - 1] & 1) == 0 ? 0 : 1);
-  			byte translatedZeroValue = (byte) (signalBit ^ permutationBitOnZeroWire);
-  			byte translatedOneValue = (byte) (signalBit ^ permutationBitOnOneWire);
-  			if (translatedZeroValue != 0 || translatedOneValue != 1) {
-  				return false;
-  			}
+  		
+		//Put the output keys in the given output array.
+  		for (int w : outputWireIndices) {
+  			allOutputWireValues.put(w, allWireValues.get(w));
   		}
   		return true;
-	    
   	}
 	
-	/**
-	 * Translates from the resulting garbled wires to wires.
-	 * @param garbledOutput The result of computing the circuit. 
-	 * This result is given in garbled wires and will be translated according to the translation table.
-	 * @return the translated results as wires of the boolean circuit where the values of the wires are set.
-	 */
+	@Override
   	public Map<Integer, Wire> translate(Map<Integer, GarbledWire> garbledOutput){
   		
 		Map<Integer, Wire> translatedOutput = new HashMap<Integer, Wire>();
-	    
-	    //Go through the output wires.
-	    for (int w : outputWireLabels) {
-	    	byte signalBit = translationTable.get(w);
-	    	byte permutationBitOnWire = garbledOutput.get(w).getSignalBit();
+		byte signalBit, permutationBitOnWire, value;
+		
+	    //Go through the output wires and translate it using the translation table.
+	    for (int w : outputWireIndices) {
+	    	signalBit = translationTable.get(w);
+	    	permutationBitOnWire = garbledOutput.get(w).getSignalBit();
 	      
 	    	//Calculate the resulting value.
-	    	byte value = (byte) (signalBit ^ permutationBitOnWire);
+	    	value = (byte) (signalBit ^ permutationBitOnWire);
 	    	System.out.print(value);
-	    	
 	    	//Hold the result as a wire.
 	    	Wire translated = new Wire(value);
 	    	translatedOutput.put(w, translated);
 	    }
-	    System.out.println();
+	System.out.println();
 	    return translatedOutput;
 
 	}
+  	
+	@Override
+	public Map<Integer, Wire> verifiedTranslate(Map<Integer, GarbledWire> garbledOutput, Map<Integer, SecretKey[]> allOutputWireValues)
+			throws CheatAttemptException {
+		
+		//For each wire check that the given output is one of two given possibilities.
+		for (int index : getOutputWireIndices()){
+			SecretKey[] keys = allOutputWireValues.get(index);
+			SecretKey output = garbledOutput.get(index).getValueAndSignalBit();
+			
+			if (!(equalKey(output, keys[0])) && !(equalKey(output, keys[1]))){
+				throw new CheatAttemptException("The given output value is not one of the two given possible values");
+			}
+		}
+		
+		//After verified, the output can be translated.
+		return translate(garbledOutput);
+		
+	}
+	
+	/**
+	 * Check that the given keys are the same.
+	 * @param output The first key to compare.
+	 * @param key The second key to compare.
+	 * @return true if both keys are the same; False otherwise.
+	 */
+	private boolean equalKey(SecretKey output, SecretKey key){
+		byte[] outputBytes = output.getEncoded();
+		byte[] keyBytes = key.getEncoded();
+		
+		//Compare the keys' lengths.
+		if (outputBytes.length != keyBytes.length){
+			return false;
+		}
+		
+		int length = outputBytes.length;
+		
+		//Compare the keys' contents.	
+		for (int i=0; i<length; i++){
+			if (outputBytes[i] != keyBytes[i]){
+				return false;
+			}
+		}
+		return true;
+	}
 	
 	@Override
-	public List<Integer> getInputWireLabels(int partyNumber) throws NoSuchPartyException {
+	public List<Integer> getInputWireIndices(int partyNumber) throws NoSuchPartyException {
 		if (partyNumber>numberOfParties){
   			throw new NoSuchPartyException();
   		}
@@ -340,27 +410,42 @@ public class GarbledBooleanCircuitImp implements GarbledBooleanCircuit {
 	}
   
 	@Override
-	public byte[][] getGarbledTables(){
+	public GarbledTablesHolder getGarbledTables(){
 	  
-		return garbledTablesHolder.getGarbledTables();
+		return garbledTablesHolder;
 	}
   
 	@Override
-	public void setGarbledTables(byte[][] garbledTables){
-		garbledTablesHolder.setGarbledTables(garbledTables);
+	public void setGarbledTables(GarbledTablesHolder garbledTables){
+		if (!(garbledTables instanceof BasicGarbledTablesHolder)){
+			throw new IllegalArgumentException("garbledTables should be an instance of BasicGarbledTablesHolder");
+		}
+		this.garbledTablesHolder = (BasicGarbledTablesHolder) garbledTables;
 	}
 	
 	@Override
-	public HashMap<Integer, Byte> getTranslationTable() {
-		
+	public Map<Integer, Byte> getTranslationTable(){
+	  
 		return translationTable;
+	}
+  
+	@Override
+	public void setTranslationTable(Map<Integer, Byte> translationTable){
+		
+		this.translationTable = translationTable;
 	}
 
 	@Override
-	public void setTranslationTable(HashMap<Integer, Byte> translationTable) {
-		
-		this.translationTable = translationTable;
-		
+	public int[] getOutputWireIndices() {
+		return outputWireIndices;
 	}
 
+	@Override
+	public int getNumberOfParties() {
+		return numberOfParties;
+	}
+	
+	public int getNumberOfGates(){
+		return gates.length;
+	}
 }
