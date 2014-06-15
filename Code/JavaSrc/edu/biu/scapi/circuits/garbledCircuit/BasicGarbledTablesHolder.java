@@ -35,6 +35,7 @@ package edu.biu.scapi.circuits.garbledCircuit;
  */
 class BasicGarbledTablesHolder implements GarbledTablesHolder{
 
+	private static final long serialVersionUID = -7744399536390133399L;
 	private byte[][] garbledTables;
 	
 	/**

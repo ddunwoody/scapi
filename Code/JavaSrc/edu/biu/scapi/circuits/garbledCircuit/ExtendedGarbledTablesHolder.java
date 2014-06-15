@@ -36,6 +36,8 @@ package edu.biu.scapi.circuits.garbledCircuit;
  */
 public class ExtendedGarbledTablesHolder implements GarbledTablesHolder{
 	
+	private static final long serialVersionUID = -8619840329100680441L;
+	
 	private BasicGarbledTablesHolder inputGarbledTables;	//Garbled tables of input identity gates.
 	private BasicGarbledTablesHolder outputGarbledTables;	//Garbled tables of output identity gates.
 	private GarbledTablesHolder internalGarbledTables;		//Garbled tables of the internal garbled circuit.

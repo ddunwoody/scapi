@@ -24,6 +24,8 @@
 */
 package edu.biu.scapi.circuits.garbledCircuit;
 
+import java.io.Serializable;
+
 /**
  * This is a general interface for garbled tables holder. <P>
  * There are multiple ways to hold a garbled tables, each one of them will have a concrete class that implement this interface.
@@ -31,7 +33,7 @@ package edu.biu.scapi.circuits.garbledCircuit;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public interface GarbledTablesHolder {
+public interface GarbledTablesHolder extends Serializable{
 
 	/**
 	 * There are cases when we do not know which concrete holder we use and we need a general function that returns the garbled tables.
