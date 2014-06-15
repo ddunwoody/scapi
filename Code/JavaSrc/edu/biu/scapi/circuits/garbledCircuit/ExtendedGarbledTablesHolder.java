@@ -111,5 +111,14 @@ public class ExtendedGarbledTablesHolder implements GarbledTablesHolder{
 		
 		return allTables;
 	}
+	
+	public void setGarbledTables(GarbledTablesHolder internalGarbledTables, GarbledTablesHolder inputGarbledTables, GarbledTablesHolder outputGarbledTables){
+		if (!(inputGarbledTables instanceof BasicGarbledTablesHolder) || !(outputGarbledTables instanceof BasicGarbledTablesHolder)){
+			throw new IllegalArgumentException("The given input and output Garbled Tables should be instances of BasicGarbledTablesHolder");
+		}
+		this.internalGarbledTables = internalGarbledTables;
+		this.inputGarbledTables.setGarbledTables(inputGarbledTables.toDoubleByteArray());
+		this.outputGarbledTables.setGarbledTables(outputGarbledTables.toDoubleByteArray());
+	}
 
 }
