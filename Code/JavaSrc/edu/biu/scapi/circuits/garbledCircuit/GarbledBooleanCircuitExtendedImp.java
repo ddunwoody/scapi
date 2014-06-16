@@ -716,7 +716,9 @@ public class GarbledBooleanCircuitExtendedImp implements GarbledBooleanCircuitEx
 		
 		//Update the hash with each gate's garbled table.
 		for (int i=0; i<tables.length; i++){
-			hash.update(tables[i], 0, tables[i].length);
+			if (tables[i] != null){
+				hash.update(tables[i], 0, tables[i].length);
+			}
 		}
 		
 		Byte signalbit;
