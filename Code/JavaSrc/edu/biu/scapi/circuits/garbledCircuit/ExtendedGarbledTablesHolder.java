@@ -69,7 +69,7 @@ public class ExtendedGarbledTablesHolder implements GarbledTablesHolder{
 	@Override
 	public byte[][] toDoubleByteArray() {
 		byte[][] input = inputGarbledTables.toDoubleByteArray();
-		byte[][] inner = inputGarbledTables.toDoubleByteArray();
+		byte[][] inner = internalGarbledTables.toDoubleByteArray();
 		byte[][] output = outputGarbledTables.toDoubleByteArray();
 		
 		//Calculate the number of all gates.
