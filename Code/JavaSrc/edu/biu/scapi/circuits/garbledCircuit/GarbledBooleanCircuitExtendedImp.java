@@ -73,7 +73,7 @@ public class GarbledBooleanCircuitExtendedImp implements GarbledBooleanCircuitEx
 	 */
 	
 	
-	private GarbledBooleanCircuit gbc; 			// The underlying circuit to use.
+	private GarbledBooleanCircuitAbs gbc; 		// The underlying circuit to use.
 	private PseudorandomGenerator prg;			// The prg to use when garbling using a seed.
 	private MultiKeyEncryptionScheme mes;		// The underlying encryption scheme to use when garbling using an encryption.
 	private IdentityGate[] inputIdentityGates;	// The array of input gates in case the user set the input garbled values.
@@ -108,7 +108,7 @@ public class GarbledBooleanCircuitExtendedImp implements GarbledBooleanCircuitEx
   	// Translate function uses the signal bit format in order to translate, but in case the user set the output garbled values,
   	// the values not necessarily are in that format. Because the output from the compute function (that will be sent to the translate function)
   	// will be the values from the user, we save the output from the inner circuit and use them in order to get the signal bit and do the translate.
-  	private Map<Integer, GarbledWire> outputFromInnerCircuit;	
+  	private HashMap<Integer, GarbledWire> outputFromInnerCircuit;	
   	
   	/**
   	 * This constructor should be used in case the garbling is done using a MultiKeyEncryptionScheme.<P>
@@ -117,11 +117,13 @@ public class GarbledBooleanCircuitExtendedImp implements GarbledBooleanCircuitEx
   	 * @param mes The MultiKeyEncryptionScheme to use during garbling.
   	 */
 	public GarbledBooleanCircuitExtendedImp(GarbledBooleanCircuit gbc, MultiKeyEncryptionScheme mes) {
-		
-		this.gbc = gbc;
+		if (!(gbc instanceof GarbledBooleanCircuitAbs)){
+			throw new IllegalArgumentException("the given gbc should be an instance of GarbledBooleanCircuitAbs");
+		}
+		this.gbc = (GarbledBooleanCircuitAbs) gbc;
 		this.mes = mes;
 		
-		//Input and output indices will be needed multiple time, we hold them as class members to avoid the creation of the arrays each time they needed.
+		//Input and output indices will be needed multiple times, we hold them as class members to avoid the creation of the arrays each time they needed.
 		outputIndices = gbc.getOutputWireIndices();
 		inputIndices = new ArrayList<Integer>();
 		for (int i=1; i <= gbc.getNumberOfParties(); i++){
@@ -363,7 +365,7 @@ public class GarbledBooleanCircuitExtendedImp implements GarbledBooleanCircuitEx
  	}
  
   	@Override
-  	public Map<Integer, GarbledWire> compute() throws NotAllInputsSetException{
+  	public HashMap<Integer, GarbledWire> compute() throws NotAllInputsSetException{
   		//check that all the input has been set.
   		for (int i=1; i <= getNumberOfParties(); i++){
   			//Get the wire numbers of the current party.
@@ -426,7 +428,7 @@ public class GarbledBooleanCircuitExtendedImp implements GarbledBooleanCircuitEx
 		
   		//Copy only the values that we need to retain -- i.e. the values of the output wires to a new map to be returned. 
   		//If there are output identity gates, the wire indexes should be adjusted.
-  		Map<Integer, GarbledWire> garbledOutput = new HashMap<Integer, GarbledWire>();
+  		HashMap<Integer, GarbledWire> garbledOutput = new HashMap<Integer, GarbledWire>();
   		if (outputIdentityGates != null){
 	  		for (int w : gbc.getOutputWireIndices()) {
 	  			garbledOutput.put(w, outputFromInnerCircuit.get(-1*(w+1)));
@@ -518,8 +520,8 @@ public class GarbledBooleanCircuitExtendedImp implements GarbledBooleanCircuitEx
   			oneValue = keys.get(w)[1];
 
   			signalBit = translationTable.get(w);
-  			permutationBitOnZeroWire = (byte) ((zeroValue.getEncoded()[zeroValue.getEncoded().length - 1] & 1) == 0 ? 0 : 1);
-  			permutationBitOnOneWire = (byte) ((oneValue.getEncoded()[oneValue.getEncoded().length - 1] & 1) == 0 ? 0 : 1);
+  			permutationBitOnZeroWire = gbc.getKeySignalBit(zeroValue);
+  			permutationBitOnOneWire = gbc.getKeySignalBit(oneValue);;
   			translatedZeroValue = (byte) (signalBit ^ permutationBitOnZeroWire);
   			translatedOneValue = (byte) (signalBit ^ permutationBitOnOneWire);
   			if (translatedZeroValue != 0 || translatedOneValue != 1) {
@@ -809,12 +811,6 @@ public class GarbledBooleanCircuitExtendedImp implements GarbledBooleanCircuitEx
 	public int getNumberOfParties() {
 		
 		return gbc.getNumberOfParties();
-	}
-
-	@Override
-	public int getNumberOfGates() {
-		
-		return gbc.getNumberOfGates() + inputIdentityGates.length + outputIdentityGates.length;
 	}
 
 	@Override
