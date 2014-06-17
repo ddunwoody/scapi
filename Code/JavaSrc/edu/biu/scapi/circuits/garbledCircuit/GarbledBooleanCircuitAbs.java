@@ -36,6 +36,12 @@ import edu.biu.scapi.circuits.circuit.Wire;
 import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.exceptions.NoSuchPartyException;
 
+/**
+ * Abstract class that holds all the common members and functionalities of circuits.
+ * 
+ * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
+ *
+ */
 abstract class GarbledBooleanCircuitAbs implements GarbledBooleanCircuit{
 
 	protected int[] outputWireIndices;	
@@ -91,6 +97,11 @@ abstract class GarbledBooleanCircuitAbs implements GarbledBooleanCircuit{
   		computedWires.putAll(presetInputWires);
  	}
   	
+  	/**
+  	 * Returns the signal bit of the given key.
+  	 * @param key to get the signal bit of.
+  	 * @return the signal bit of the given key.
+  	 */
   	abstract byte getKeySignalBit(SecretKey key);
   	
   	@Override
@@ -109,8 +120,8 @@ abstract class GarbledBooleanCircuitAbs implements GarbledBooleanCircuit{
   			SecretKey oneValue = outputValues.get(w)[1];
 
   			byte signalBit = translationTable.get(w);
-  			byte permutationBitOnZeroWire = getKeySignalBit(zeroValue);//.getEncoded()[zeroValue.getEncoded().length - 1] & 1) == 0 ? 0 : 1);
-  			byte permutationBitOnOneWire = getKeySignalBit(oneValue);//.getEncoded()[oneValue.getEncoded().length - 1] & 1) == 0 ? 0 : 1);
+  			byte permutationBitOnZeroWire = getKeySignalBit(zeroValue);
+  			byte permutationBitOnOneWire = getKeySignalBit(oneValue);
   			byte translatedZeroValue = (byte) (signalBit ^ permutationBitOnZeroWire);
   			byte translatedOneValue = (byte) (signalBit ^ permutationBitOnOneWire);
   			if (translatedZeroValue != 0 || translatedOneValue != 1) {
@@ -133,12 +144,12 @@ abstract class GarbledBooleanCircuitAbs implements GarbledBooleanCircuit{
 	      
 	    	//Calculate the resulting value.
 	    	value = (byte) (signalBit ^ permutationBitOnWire);
-	    	System.out.print(value);
+	    	//System.out.print(value);
 	    	//Hold the result as a wire.
 	    	Wire translated = new Wire(value);
 	    	translatedOutput.put(w, translated);
 	    }
-	System.out.println();
+	//System.out.println();
 	    return translatedOutput;
 
 	}
