@@ -87,11 +87,11 @@ public interface GarbledBooleanCircuit {
  
 	/**
 	 * This method computes the circuit if the input has been set. <p>
-	 * It returns a {@code Map} containing the garbled output. This output can be translated via the {@link #translate(Map)} method.
-	 * @return returns a {@code Map} that maps the index of the output wire to the garbled value of the wire.
+	 * It returns a {@code HashMap} containing the garbled output. This output can be translated via the {@link #translate(Map)} method.
+	 * @return returns a {@code HashMap} that maps the index of the output wire to the garbled value of the wire.
 	 * @throws NotAllInputsSetException if not all the input has been set.
 	 */
-	public Map<Integer, GarbledWire> compute() throws NotAllInputsSetException;
+	public HashMap<Integer, GarbledWire> compute() throws NotAllInputsSetException;
 
 	/**
      * The verify method is used in the case of malicious adversaries.<p>
@@ -202,9 +202,4 @@ public interface GarbledBooleanCircuit {
 	 * 
 	 */
 	public int getNumberOfParties();
-	
-	/**
-	 * Return the number of gates in this circuit.
-	 */
-	public int getNumberOfGates();
 }
