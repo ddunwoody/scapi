@@ -315,6 +315,12 @@ class StandardGarbledGate implements GarbledGate {
 		SecretKey outputOneValue = null;
 		
 		BitSet ungarbledTruthTable = g.getTruthTable();
+		
+		//There are cases when a gate always output the same key, for example gate that has a 00 garbledTable always outputs the 0-key.
+		//In these cases the verifyGarbledTable of the gate will output just the 0-key and the 1-key will remain null.
+		//This can cause a NullPointerException if there is a gate that uses this wire as input wire and want to go over all possibilities for input keys.
+		//To avoid this exception, if we get a null key, we avoid this possibility for input key.
+		boolean keyNotNull = true; 
 		// The outer for loop goes through each row of the truth table
 		for (int rowOfTruthTable = 0; rowOfTruthTable < Math.pow(2, numberOfInputs); rowOfTruthTable++) {
 		
@@ -330,6 +336,11 @@ class StandardGarbledGate implements GarbledGate {
 				
 				SecretKey currentWireValue = allWireValues.get(inputWireIndices[i])[input];
 		    
+				//If the key is null, mark this option as no relevant.
+				if (currentWireValue == null){
+					keyNotNull = false;
+					break;
+				}
 			    // Add the current Wire value to the list of keys to decrypt on. These keys will then be used to construct a multikey.
 				keysToDecryptOn[i] = currentWireValue;
 			    
@@ -341,52 +352,55 @@ class StandardGarbledGate implements GarbledGate {
 			    
 			    // Add the signal bit of this input wire value to the tweak
 			    tweak.putInt(signalBit);
-			 }
-			
-			// Set the key and the tweak of the encryption scheme.
-			mes.setKey(mes.generateMultiKey(keysToDecryptOn));
-			mes.setTweak(tweak.array());
-		  
-			// Decrypt the output key.
-			byte[] pt = null;
-			try {
-				
-				pt = mes.decrypt(Arrays.copyOfRange(garbledTablesHolder.toDoubleByteArray()[gateNumber], permutedPosition * mes.getCipherSize(), (permutedPosition + 1) *mes.getCipherSize()));
-			} catch (KeyNotSetException e) {
-				// Should not occur since the key has been set.
-			} catch (TweakNotSetException e) {
-				// Should not occur since the tweak has been set.
 			}
-			
-			// Check to see that rows of the truth table with the same ungarbled value have the same garbled value as well.
-			if (ungarbledTruthTable.get(rowOfTruthTable) == true) {// i.e this bit is set
+			//If this option is no relevant, do not verify it.
+			if (keyNotNull){
+				// Set the key and the tweak of the encryption scheme.
+				mes.setKey(mes.generateMultiKey(keysToDecryptOn));
+				mes.setTweak(tweak.array());
+			  
+				// Decrypt the output key.
+				byte[] pt = null;
+				try {
+					
+					pt = mes.decrypt(Arrays.copyOfRange(garbledTablesHolder.toDoubleByteArray()[gateNumber], permutedPosition * mes.getCipherSize(), (permutedPosition + 1) *mes.getCipherSize()));
+				} catch (KeyNotSetException e) {
+					// Should not occur since the key has been set.
+				} catch (TweakNotSetException e) {
+					// Should not occur since the tweak has been set.
+				}
 				
-				// This is the first time we face k1, create it.
-				if (outputOneValue == null) {
-					outputOneValue = new SecretKeySpec(pt, "");
-				// K1 has already been created, check that it is equal to the current value.
-				} else{
-					byte[] oneValueBytes = outputOneValue.getEncoded();
-					for (int byteArrayIndex = 0; byteArrayIndex < pt.length; byteArrayIndex++) {
-						if (pt[byteArrayIndex] != oneValueBytes[byteArrayIndex]) {
-							return false;
+				// Check to see that rows of the truth table with the same ungarbled value have the same garbled value as well.
+				if (ungarbledTruthTable.get(rowOfTruthTable) == true) {// i.e this bit is set
+					
+					// This is the first time we face k1, create it.
+					if (outputOneValue == null) {
+						outputOneValue = new SecretKeySpec(pt, "");
+					// K1 has already been created, check that it is equal to the current value.
+					} else{
+						byte[] oneValueBytes = outputOneValue.getEncoded();
+						for (int byteArrayIndex = 0; byteArrayIndex < pt.length; byteArrayIndex++) {
+							if (pt[byteArrayIndex] != oneValueBytes[byteArrayIndex]) {
+								return false;
+							}
 						}
+				 	} 
+				} else { //Bit is not set.
+					// This is the first time we face k0, create it.
+					if (outputZeroValue == null) {
+						outputZeroValue = new SecretKeySpec(pt, "");
+					// K0 has already been created, check that it is equal to the current value.
+					} else {
+						byte[] zeroValueBytes = outputZeroValue.getEncoded();
+						for (int byteArrayIndex = 0; byteArrayIndex < pt.length; byteArrayIndex++) {
+							if (pt[byteArrayIndex] != zeroValueBytes[byteArrayIndex]) {
+								return false;
+							}
+						}	
 					}
-			 	} 
-			} else { //Bit is not set.
-				// This is the first time we face k0, create it.
-				if (outputZeroValue == null) {
-					outputZeroValue = new SecretKeySpec(pt, "");
-				// K0 has already been created, check that it is equal to the current value.
-				} else {
-					byte[] zeroValueBytes = outputZeroValue.getEncoded();
-					for (int byteArrayIndex = 0; byteArrayIndex < pt.length; byteArrayIndex++) {
-						if (pt[byteArrayIndex] != zeroValueBytes[byteArrayIndex]) {
-							return false;
-						}
-					}	
 				}
 			}
+			keyNotNull = true;
 		}
 		// Add the output wire to the allWireValues Map.
 		for (int w : outputWireIndices) {
