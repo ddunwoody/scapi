@@ -81,7 +81,7 @@ public class BooleanCircuit {
 	 */
 	private ArrayList<ArrayList<Integer>> eachPartysInputWires = new ArrayList<ArrayList<Integer>>();
 	
-	// Integer.parseInt(s.next()) is significantly faster than s.nextInt() so I use the former
+	// Integer.parseInt(s.next()) is significantly faster than s.nextInt() so we use the former.
 	/**
 	 * Constructs a BooleanCircuit from a File. <p>
 	 * The File first lists the number of {@code Gate}s, then the number of parties. <p>
@@ -97,18 +97,18 @@ public class BooleanCircuit {
 	public BooleanCircuit(File f) throws FileNotFoundException, CircuitFileFormatException {
 	    Scanner s = new Scanner(f);
 	    //Read the number of gates.
-	    int numberOfGates = Integer.parseInt(s.next());
+	    int numberOfGates = Integer.parseInt(read(s));
 	    gates = new Gate[numberOfGates];
 	    //Read the number of parties.
-	    numberOfParties =  Integer.parseInt(s.next());
+	    numberOfParties =  Integer.parseInt(read(s));
 	    isInputSet = new boolean[numberOfParties];
 	    //For each party, read the party's number, number of input wires and their indices.
 	    for (int i = 0; i < numberOfParties; i++) {
-	    	if (Integer.parseInt(s.next()) != i+1) {//add 1 since parties are indexed from 1, not 0
+	    	if (Integer.parseInt(read(s)) != i+1) {//add 1 since parties are indexed from 1, not 0
 	    		throw new CircuitFileFormatException();
 	    	}
 	    	//Read the number of input wires.
-	    	int numberOfInputsForCurrentParty = Integer.parseInt(s.next());
+	    	int numberOfInputsForCurrentParty = Integer.parseInt(read(s));
 	    	if(numberOfInputsForCurrentParty < 0){
 	    		throw new CircuitFileFormatException();
 	    	}
@@ -119,7 +119,7 @@ public class BooleanCircuit {
 	    	eachPartysInputWires.add(currentPartyInput);
 	    	//Read the input wires indices.
 	    	for (int j = 0; j < numberOfInputsForCurrentParty; j++) {
-	    		currentPartyInput.add(Integer.parseInt(s.next()));
+	    		currentPartyInput.add(Integer.parseInt(read(s)));
 	    	}
 	    }
 	    
@@ -127,25 +127,25 @@ public class BooleanCircuit {
 	     * The ouputWireIndices are the outputs from this circuit. However, this circuit may actually be a single layer of a 
 	     * larger layered circuit. So this output can be part of the input to another layer of the circuit.
 	     */
-	    int numberOfCircuitOutputs = Integer.parseInt(s.next());
+	    int numberOfCircuitOutputs = Integer.parseInt(read(s));
 	    outputWireIndices = new int[numberOfCircuitOutputs];
 	    //Read the output wires indices.
 	    for (int i = 0; i < numberOfCircuitOutputs; i++) {
-	    	outputWireIndices[i] = Integer.parseInt(s.next());
+	    	outputWireIndices[i] = Integer.parseInt(read(s));
 	    }
 	    
 	    int numberOfGateInputs, numberOfGateOutputs;
 	    //For each gate, read the number of input and output wires, their indices and the truth table.
 	    for (int i = 0; i < numberOfGates; i++) {
-	    	numberOfGateInputs = Integer.parseInt(s.next());
-	    	numberOfGateOutputs = Integer.parseInt(s.next());
+	    	numberOfGateInputs = Integer.parseInt(read(s));
+	    	numberOfGateOutputs = Integer.parseInt(read(s));
 	    	int[] inputWireIndices = new int[numberOfGateInputs];
 	    	int[] outputWireIndices = new int[numberOfGateOutputs];
 	    	for (int j = 0; j < numberOfGateInputs; j++) {
-	    		inputWireIndices[j] = Integer.parseInt(s.next());
+	    		inputWireIndices[j] = Integer.parseInt(read(s));
 	    	}
 	    	for (int j = 0; j < numberOfGateOutputs; j++) {
-	    		outputWireIndices[j] = Integer.parseInt(s.next());
+	    		outputWireIndices[j] = Integer.parseInt(read(s));
 	    	}
       
 	    	/*
@@ -153,7 +153,7 @@ public class BooleanCircuit {
 	    	 * that we read from the file.
 	    	 */
 	    	BitSet truthTable = new BitSet();
-	    	String tTable = s.next();
+	    	String tTable = read(s);
 	    	for (int j = 0; j < tTable.length(); j++) {
 	    		if (tTable.charAt(j) == '1') {
 	    			truthTable.set(j);
@@ -164,6 +164,15 @@ public class BooleanCircuit {
 	    }
 	}
 
+	private String read(Scanner s){
+		String token = s.next();
+		while (token.startsWith("#")){
+			s.nextLine();
+			token = s.next();
+		}
+		return token;
+	}
+	
 	/**
 	 * Constructs a {code BooleanCircuit} from an array of gates. <p>
 	 * Each gate keeps an array of the indices of its input and output wires. The constructor is provided with a list of which 
@@ -211,13 +220,13 @@ public class BooleanCircuit {
 			throw new NoSuchPartyException();
 		}
 		Scanner s = new Scanner(inputWires);
-		int numberOfInputWires = s.nextInt();
+		int numberOfInputWires = Integer.parseInt(read(s));
 		if(numberOfInputWires != getNumberOfInputs(partyNumber)){
 			throw new InvalidInputException();
 		}
 		Map<Integer, Wire> presetInputWires = new HashMap<Integer, Wire>();
 		for (int i = 0; i < numberOfInputWires; i++) {
-			presetInputWires.put(s.nextInt(), new Wire(s.nextByte()));
+			presetInputWires.put(Integer.parseInt(read(s)), new Wire(read(s).getBytes()[0]));
 		}
 		setInputs(presetInputWires,partyNumber);
 	}
