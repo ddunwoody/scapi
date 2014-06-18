@@ -138,21 +138,26 @@ class StandardRowReductionGarbledBooleanCircuitUtil extends StandardGarbledBoole
 		  	
 		  	//This is the row that we do not save in the table but calculate the value via KDF.
 		  	if (permutedPosition == numberOfRows){
-		  		//Get the indexes of the input keys.
-		  		int wire0Key = ((rowOfTruthTable & 2) == 0) ? 0 : 1;
-		  		int wire1Key = ((rowOfTruthTable & 1) == 0) ? 0 : 1;
-		  		
-		  		//Get the input keys.
-		  		SecretKey input0 = allWireValues.get(indices[0])[wire0Key];
-		  		SecretKey input1 = allWireValues.get(indices[1])[wire1Key];
-		  		
-		  		//Calculate the output key via KDF.
+		  		//Allocate a byte array to hold the bytes for the KDF.
 		  		ByteBuffer kdfBytes = ByteBuffer.allocate(mes.getCipherSize()*numberOfInputs +16);
-				kdfBytes.put(input0.getEncoded());
-				kdfBytes.put(input1.getEncoded());
+		  		
+		  		//The input for the kdf should be the concatenation of input keys, gate number and input keys' signal bits.
+		  		SecretKey[] keys = new SecretKey[numberOfInputs];
+		  		for (int i=0; i<numberOfInputs; i++){
+		  			//Get the index of the input key.
+		  			int wireKeyIndex = ((rowOfTruthTable & (numberOfInputs - i)) == 0) ? 0 : 1;
+		  			//Put each input key in the kdf array.
+		  			keys[i] = allWireValues.get(indices[i])[wireKeyIndex];
+		  			kdfBytes.put(keys[i].getEncoded());
+		  		}
+		  		//Put gate number in the kdf array.
 				kdfBytes.putInt(ungarbledGate.getGateNumber());
-				kdfBytes.putInt((input0.getEncoded()[input0.getEncoded().length - 1] & 1) == 0 ? 0 : 1);
-				kdfBytes.putInt((input1.getEncoded()[input1.getEncoded().length - 1] & 1) == 0 ? 0 : 1);
+				//Put each signal bit in the kdf array.
+				for (int i=0; i<numberOfInputs; i++){
+					kdfBytes.putInt((keys[i].getEncoded()[keys[i].getEncoded().length - 1] & 1) == 0 ? 0 : 1);
+				}
+				
+				//Compute the KDF.
 				SecretKey wireValue = kdf.deriveKey(kdfBytes.array(), 0, mes.getCipherSize()*numberOfInputs +16, mes.getCipherSize());
 				
 				//Now we have both values, calculate the signal bit.

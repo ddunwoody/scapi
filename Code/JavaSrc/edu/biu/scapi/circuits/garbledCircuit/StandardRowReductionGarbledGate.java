@@ -125,7 +125,7 @@ class StandardRowReductionGarbledGate extends StandardGarbledGate{
 		  	}
 		  	
 		  	//In row reduction technique we compute all rows except the last one. The last row will be calculated by the KDF.
-		  	if (permutedPosition != numberOfRows){
+		  	if (permutedPosition != numberOfRows){ 
 		  		//Set the keys and the tweak of the encryption scheme.
 		  		mes.setKey(mes.generateMultiKey(keysToEncryptOn));
 			  	mes.setTweak(tweak.array());
@@ -153,7 +153,9 @@ class StandardRowReductionGarbledGate extends StandardGarbledGate{
 		int numberOfInputs = inputWireIndices.length;
 		
 		//In case of the last row, calculate the output key by the KDF.
-		if (garbledTableIndex == 3){
+		//The number of rows is 2^numberOfInputs - 1. The last row will be calculated by the row reduction technique.
+		int numberOfRows = (int) Math.pow(2, numberOfInputs)-1;
+		if (garbledTableIndex == numberOfRows){
 			
 			ByteBuffer kdfBytes = ByteBuffer.allocate(mes.getCipherSize()*numberOfInputs +16);
 			for (int i = 0; i < numberOfInputs; i++) {
@@ -216,7 +218,8 @@ class StandardRowReductionGarbledGate extends StandardGarbledGate{
 			}
 			byte[] pt = null;
 			//In case other than the last row, verify the row by the encryption scheme.
-			if (permutedPosition != 3){
+			int numberOfRows = (int) Math.pow(2, numberOfInputs)-1;
+			if (permutedPosition != numberOfRows){
 				 mes.setKey(mes.generateMultiKey(keysToDecryptOn));
 				 mes.setTweak(tweak.array());
 			  
@@ -230,22 +233,26 @@ class StandardRowReductionGarbledGate extends StandardGarbledGate{
 				 
 			//In case of the last row, verify the row by the KDF.
 			} else{
-				
-				// Get the input values.
-				int wire0Key = ((rowOfTruthTable & 2) == 0) ? 0 : 1;
-		  		int wire1Key = ((rowOfTruthTable & 1) == 0) ? 0 : 1;
-		  		
-		  		//Get the input keys.
-		  		SecretKey input0 = allWireValues.get(inputWireIndices[0])[wire0Key];
-		  		SecretKey input1 = allWireValues.get(inputWireIndices[1])[wire1Key];
-		  		
-		  		//Calculate the kdf result.
+				//Allocate a byte array to hold the bytes for the KDF.
 		  		ByteBuffer kdfBytes = ByteBuffer.allocate(mes.getCipherSize()*numberOfInputs +16);
-				kdfBytes.put(input0.getEncoded());
-				kdfBytes.put(input1.getEncoded());
+		  		
+		  		//The input for the kdf should be the concatenation of input keys, gate number and input keys' signal bits.
+		  		SecretKey[] keys = new SecretKey[numberOfInputs];
+		  		for (int i=0; i<numberOfInputs; i++){
+		  			//Get the index of the input key.
+		  			int wireKeyIndex = ((rowOfTruthTable & (numberOfInputs - i)) == 0) ? 0 : 1;
+		  			//Put each input key in the kdf array.
+		  			keys[i] = allWireValues.get(inputWireIndices[i])[wireKeyIndex];
+		  			kdfBytes.put(keys[i].getEncoded());
+		  		}
+		  		//Put gate number in the kdf array.
 				kdfBytes.putInt(gateNumber);
-				kdfBytes.putInt((input0.getEncoded()[input0.getEncoded().length - 1] & 1) == 0 ? 0 : 1);
-				kdfBytes.putInt((input1.getEncoded()[input1.getEncoded().length - 1] & 1) == 0 ? 0 : 1);
+				//Put each signal bit in the kdf array.
+				for (int i=0; i<numberOfInputs; i++){
+					kdfBytes.putInt((keys[i].getEncoded()[keys[i].getEncoded().length - 1] & 1) == 0 ? 0 : 1);
+				}
+				
+				//Compute the KDF.
 				pt = kdf.deriveKey(kdfBytes.array(), 0, mes.getCipherSize()*numberOfInputs +16, mes.getCipherSize()).getEncoded();
 					
 			}
