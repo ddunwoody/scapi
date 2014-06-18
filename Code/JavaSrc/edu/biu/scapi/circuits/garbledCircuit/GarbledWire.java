@@ -24,6 +24,8 @@
 */
 package edu.biu.scapi.circuits.garbledCircuit;
 
+import java.io.Serializable;
+
 import javax.crypto.SecretKey;
 
 import edu.biu.scapi.circuits.circuit.BooleanCircuit;
@@ -38,8 +40,11 @@ import edu.biu.scapi.circuits.circuit.Wire;
  * @author Steven Goldfeder
  * 
  */
-public class GarbledWire  {
+public class GarbledWire implements Serializable{
 
+	
+	private static final long serialVersionUID = 4396938333877434711L;
+	
 	/**
 	 * The garbled value of this {@code GarbledWire}. The least significant bit is the signal bit.
 	 */
