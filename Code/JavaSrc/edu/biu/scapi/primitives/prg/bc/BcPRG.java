@@ -37,7 +37,6 @@ import javax.crypto.spec.SecretKeySpec;
 import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.StreamCipher;
 
-import edu.biu.scapi.exceptions.UnInitializedException;
 import edu.biu.scapi.primitives.prg.PseudorandomGenerator;
 import edu.biu.scapi.tools.Translation.BCParametersTranslator;
 
@@ -51,7 +50,6 @@ import edu.biu.scapi.tools.Translation.BCParametersTranslator;
  */
 public abstract class BcPRG implements PseudorandomGenerator {
 	
-	private SecretKey secretKey = null;	//secret key
 	private SecureRandom random;
 	private boolean isKeySet = false;
 	private StreamCipher bcStreamCipher;	//the underlying stream cipher of bc
@@ -85,8 +83,6 @@ public abstract class BcPRG implements PseudorandomGenerator {
 		//initializes the underlying stream cipher. Note that the first argument is irrelevant and thus does not matter is true or false.
 		bcStreamCipher.init(false, bcParams);
 		
-		//sets the key. Further initialization should be implemented in the derived concrete class.
-		this.secretKey = secretKey;
 		//marks this object as initialized
 		isKeySet = true;
 	}
