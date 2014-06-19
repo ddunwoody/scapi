@@ -132,7 +132,7 @@ class MinimizeAESSetKeyRowReductionGate extends StandardRowReductionGarbledGate 
 	    	
 	    	//In case that is not the last row, save the calculated values to use later, all at once.
 	    	//In case of the last row, do not save the values. They will be calculated by the kdf in he compute function.
-	    	if (permutedPosition != 3){
+	    	if (permutedPosition != numberOfRows){
 		    	valuesToEncryptOn[permutedPosition] = temp;
 		    	tweaksToEncrypt[permutedPosition] = tweak.array();
 		    	int value = (ungarbledGate.getTruthTable().get(rowOfTruthTable) == true) ? 1 : 0;
