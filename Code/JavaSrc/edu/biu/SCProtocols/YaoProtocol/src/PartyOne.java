@@ -1,5 +1,4 @@
 import java.io.IOException;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -14,64 +13,66 @@ import edu.biu.scapi.circuits.garbledCircuit.CircuitInput;
 import edu.biu.scapi.circuits.garbledCircuit.FreeXORCircuitInput;
 import edu.biu.scapi.circuits.garbledCircuit.GarbledBooleanCircuit;
 import edu.biu.scapi.circuits.garbledCircuit.GarbledBooleanCircuitImp;
-import edu.biu.scapi.circuits.garbledCircuit.GarbledBooleanCircuitSeedGenerationImp;
-import edu.biu.scapi.circuits.garbledCircuit.MinimizeAESSetKeyCircuitInput;
-import edu.biu.scapi.circuits.garbledCircuit.StandardCircuitInput;
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CheatAttemptException;
-import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.NoSuchPartyException;
 import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.OTBatchOnByteArraySInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.OTBatchSInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.OTBatchSender;
-import edu.biu.scapi.primitives.kdf.bc.BcKdfISO18033;
-import edu.biu.scapi.primitives.prf.cryptopp.CryptoPpAES;
 
+/**
+ * This is an implementation of party one of Yao protocol.
+ * 
+ * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
+ *
+ */
 public class PartyOne {
 
-	OTBatchSender otSender;
-	BooleanCircuit bc;
-	GarbledBooleanCircuit circuit;
-	Channel channel;
+	OTBatchSender otSender;			//The OT object that used in the protocol.	
+	GarbledBooleanCircuit circuit;	//The garbled circuit used in the protocol.
+	Channel channel;				//The channel between both parties.
 	
+	/**
+	 * Constructor that sets the parameters of the OT protocol and creates the garbled circuit.
+	 * @param channel The channel between both parties.
+	 * @param bc The boolean circuit that should be garbled.
+	 * @param mes The encryption scheme to use in the garbled circuit.
+	 * @param otSender The OT object to use in the protocol.
+	 */
 	public PartyOne(Channel channel, BooleanCircuit bc, MultiKeyEncryptionScheme mes, OTBatchSender otSender){
+		//Set the given parameters.
 		this.channel = channel;
-		this.bc = bc;
 		this.otSender = otSender;
 		
+		//Create the garbled circuit.
 		Date before = new Date();
-		
-		CircuitInput input = null;
-		try {
-			//input = new StandardCircuitInput(bc, mes, new BcKdfISO18033("SHA-1"), new SecureRandom(), false);
-			//input = new MinimizeAESSetKeyCircuitInput(bc, new CryptoPpAES(), new BcKdfISO18033("SHA-1"), new SecureRandom(), false);
-			input = new FreeXORCircuitInput(bc, mes, new BcKdfISO18033("SHA-1"), false);
-		} catch (FactoriesException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		//input = new MinimizeAESSetKeyCircuitInput(bc, new CryptoPpAES(), new SecureRandom());
-		//input = new StandardCircuitInput(bc, mes, new SecureRandom());
-		//input = new FreeXORCircuitInput(bc, mes);
+		CircuitInput input = new FreeXORCircuitInput(bc, mes, false);
 		circuit = new GarbledBooleanCircuitImp(input);
-			
 		Date after = new Date();
 		long time = (after.getTime() - before.getTime());
 		System.out.println("create circuit took " +time + " milis");
 	}
 	
+	/**
+	 * Runs the protocol.
+	 * @param ungarbledInput The input for the circuit, each p1's input wire gets 0 or 1.
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 * @throws CheatAttemptException
+	 * @throws InvalidDlogGroupException
+	 */
 	public void run(ArrayList<Byte> ungarbledInput) throws IOException, ClassNotFoundException, CheatAttemptException, InvalidDlogGroupException{
 		Date startProtocol = new Date();
 		Date start = new Date();
 		//Constructs the garbled circuit.
-		CircuitCreationValues values = circuit.garble(bc);
+		CircuitCreationValues values = circuit.garble();
 		Date end = new Date();
 		long time = (end.getTime() - start.getTime());
 		System.out.println("generate keys and set tables took " +time + " milis");
 		
 		start = new Date();
-		//Send the garbled tables and the translation table to p2.
+		//Send garbled tables and the translation table to p2.
 		channel.send(circuit.getGarbledTables());
 		channel.send(circuit.getTranslationTable());
 		end = new Date();
@@ -79,7 +80,7 @@ public class PartyOne {
 		System.out.println("Send garbled tables and translation tables took " +time + " milis");
 		
 		start = new Date();
-		//Put p1 inputs
+		//Send p1 input keys to p2.
 		sendP1Inputs(ungarbledInput, values.getAllInputWireValues());
 		end = new Date();
 		time = (end.getTime() - start.getTime());
@@ -91,53 +92,71 @@ public class PartyOne {
 		end = new Date();
 		time = (end.getTime() - start.getTime());
 		System.out.println("run OT took " +time + " milis");
-		
 		Date yaoEnd = new Date();
 		long yaoTime = (yaoEnd.getTime() - startProtocol.getTime());
 		System.out.println("run one protocol took " +yaoTime + " milis");
 		
 	}
 
+	/**
+	 * Sends p1 input keys to p2.
+	 * @param ungarbledInput The boolean input of each wire.
+	 * @param allInputWireValues The keys for each wire.
+	 * @throws IOException In case there was a problem to send via the channel.
+	 */
 	private void sendP1Inputs(ArrayList<Byte> ungarbledInput, Map<Integer, SecretKey[]> allInputWireValues) throws IOException {
-		List<Integer> labels = null;
+		//Get the indices of p1 input wires.
+		List<Integer> indices = null;
 		try {
-			labels = circuit.getInputWireLabels(1);
+			indices = circuit.getInputWireIndices(1);
 		} catch (NoSuchPartyException e) {
 			// Should not occur since the party number is valid.
 		}
-  		int numberOfInputs = labels.size();
+  		int numberOfInputs = indices.size();
   		
+  		//Create an array with the keys corresponding the given input.
   		ArrayList<SecretKey> inputs = new ArrayList<SecretKey> ();
-  		
   		for (int i = 0; i < numberOfInputs; i++) {
-  			int label = labels.get(i);
-  			inputs.add(allInputWireValues.get(label)[ungarbledInput.get(i)]);
+  			inputs.add(allInputWireValues.get(indices.get(i))[ungarbledInput.get(i)]);
   		}		
 			
+  		//Send the keys to p2.
 		channel.send(inputs);
-		
 	}
 	
+	/**
+	 * Runs OT protocol in order to send p2 the necessary keys without revealing any other information.
+	 * @param allInputWireValues The keys for each wire.
+	 * @throws ClassNotFoundException
+	 * @throws IOException
+	 * @throws CheatAttemptException
+	 * @throws InvalidDlogGroupException
+	 */
 	private void runOTProtocol(Map<Integer, SecretKey[]> allInputWireValues) throws ClassNotFoundException, IOException, CheatAttemptException, InvalidDlogGroupException {
-		
-		ArrayList<byte[]> x0Arr = new ArrayList<byte[]>();
-		ArrayList<byte[]> x1Arr = new ArrayList<byte[]>();
-		OTBatchSInput input = new OTBatchOnByteArraySInput(x0Arr, x1Arr);
-		
+		//Get the indices of p2 input wires.
+		List<Integer> partyTwoIndices = null;
 		int size = 0;
-		List<Integer> partyTwoLabels = null;
 		try {
 			size = circuit.getNumberOfInputs(2);
-			partyTwoLabels = circuit.getInputWireLabels(2);
+			partyTwoIndices = circuit.getInputWireIndices(2);
 		} catch (NoSuchPartyException e) {
 			// Should not occur since the given party number is valid.
 		}
-		int label;
+		
+		//Create and fill arrays with both keys of each input wire.
+		ArrayList<byte[]> x0Arr = new ArrayList<byte[]>();
+		ArrayList<byte[]> x1Arr = new ArrayList<byte[]>();
+		int index;
 		for (int i=0; i<size; i++){
-			label = partyTwoLabels.get(i);
-			x0Arr.add(allInputWireValues.get(label)[0].getEncoded());
-			x1Arr.add(allInputWireValues.get(label)[1].getEncoded());
+			index = partyTwoIndices.get(i);
+			x0Arr.add(allInputWireValues.get(index)[0].getEncoded());
+			x1Arr.add(allInputWireValues.get(index)[1].getEncoded());
 		}
+		
+		//Create an OT input object with the keys arrays.
+		OTBatchSInput input = new OTBatchOnByteArraySInput(x0Arr, x1Arr);
+		
+		//Run the OT's transfer phase.
 		otSender.transfer(channel, input);
 		
 	}
