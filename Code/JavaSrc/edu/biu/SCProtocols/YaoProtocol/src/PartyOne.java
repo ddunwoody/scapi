@@ -17,9 +17,9 @@ import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.NoSuchPartyException;
-import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.OTBatchOnByteArraySInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.OTBatchSInput;
 import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.OTBatchSender;
+import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.otExtension.OTExtensionGeneralSInput;
 
 /**
  * This is an implementation of party one of Yao protocol.
@@ -144,20 +144,30 @@ public class PartyOne {
 		}
 		
 		//Create and fill arrays with both keys of each input wire.
-		ArrayList<byte[]> x0Arr = new ArrayList<byte[]>();
-		ArrayList<byte[]> x1Arr = new ArrayList<byte[]>();
+		int otWordSize = allInputWireValues.get(partyTwoIndices.get(0))[0].getEncoded().length;
+		
+		byte[] x0Arr = new byte[size * otWordSize];
+		byte[] x1Arr = new byte[size * otWordSize];
+		
 		int index;
 		for (int i=0; i<size; i++){
 			index = partyTwoIndices.get(i);
-			x0Arr.add(allInputWireValues.get(index)[0].getEncoded());
-			x1Arr.add(allInputWireValues.get(index)[1].getEncoded());
+			byte[] x0 = allInputWireValues.get(index)[0].getEncoded();
+			byte[] x1 = allInputWireValues.get(index)[1].getEncoded();
+			
+			
+			for(int j=0; j<otWordSize; j++){
+				
+				x0Arr[i*otWordSize + j] = x0[j];
+				x1Arr[i*otWordSize + j] = x1[j];
+			}
 		}
 		
 		//Create an OT input object with the keys arrays.
-		OTBatchSInput input = new OTBatchOnByteArraySInput(x0Arr, x1Arr);
-		
+		OTBatchSInput input = new OTExtensionGeneralSInput(x0Arr, x1Arr, size);
+	
 		//Run the OT's transfer phase.
-		otSender.transfer(channel, input);
+		otSender.transfer(null, input);
 		
 	}
 

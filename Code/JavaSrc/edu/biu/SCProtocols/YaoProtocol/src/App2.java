@@ -1,8 +1,8 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.security.SecureRandom;
-import java.util.ArrayList;
+import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -17,14 +17,8 @@ import edu.biu.scapi.comm.ConnectivitySuccessVerifier;
 import edu.biu.scapi.comm.LoadParties;
 import edu.biu.scapi.comm.NaiveSuccess;
 import edu.biu.scapi.comm.Party;
-import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.OTBatchReceiver;
-import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.semiHonest.OTSemiHonestDDHBatchOnByteArrayReceiver;
-import edu.biu.scapi.primitives.dlog.DlogGroup;
-import edu.biu.scapi.primitives.kdf.HKDF;
-import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
-import edu.biu.scapi.primitives.prf.bc.BcHMAC;
-import edu.biu.scapi.tools.Factories.DlogGroupFactory;
+import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.otExtension.OTSemiHonestExtensionReceiver;
 
 /**
  * This application runs party two of Yao protocol.
@@ -38,19 +32,13 @@ public class App2 {
 	 * @param args no arguments should be passed
 	 */
 	public static void main(String[] args) {
-		//Create the necessary objects that are used in the protocol.
-		DlogGroup dlog = null;
-		KeyDerivationFunction kdf = null;
-		SecureRandom random = new SecureRandom();
+		Party party = null;
 		try {
-			//use the koblitz curve.
-			dlog = DlogGroupFactory.getInstance().getObject("DlogECF2m(K-233)", "OpenSSL");
-			kdf = new HKDF(new BcHMAC());
-		} catch (FactoriesException e1) {
+			party = new Party(InetAddress.getByName("127.0.0.1"), 7666);
+		} catch (UnknownHostException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-	
 		//Set up the communication with the other side and get the created channel/
 		Channel channel = setCommunication();	
 		
@@ -58,7 +46,9 @@ public class App2 {
 			//Create the Boolean circuit of AES.
 			BooleanCircuit bc = new BooleanCircuit(new File("AES_Final-2.txt"));
 			//Create the OT sender.
-			OTBatchReceiver otReceiver = new OTSemiHonestDDHBatchOnByteArrayReceiver(dlog, kdf, random);
+			//OTBatchReceiver otReceiver = new OTSemiHonestDDHBatchOnByteArrayReceiver(dlog, kdf, random);
+			OTBatchReceiver otReceiver = new OTSemiHonestExtensionReceiver(party,163,1);
+			
 			//Create the encryption scheme.
 			MultiKeyEncryptionScheme mes = new AESFixedKeyMultiKeyEncryption();
 			Date start = new Date();
@@ -67,7 +57,8 @@ public class App2 {
 				
 				Date before = new Date();
 				//Create Party two with the previous created objects.
-				ArrayList<Byte> ungarbledInput = readInputs();
+				//ArrayList<Byte> ungarbledInput = readInputs();
+				byte[] ungarbledInput = readInputsAsArray();
 				Date after = new Date();
 				long time = (after.getTime() - before.getTime());
 				System.out.println("read inputs took " +time + " milis");
@@ -92,8 +83,8 @@ public class App2 {
 	 * Create the inputs of party two from an input file.
 	 * @return an Array contains the inputs for party two.
 	 */
-	private static ArrayList<Byte> readInputs() {
-		File file = new File("AESpartyTwoInputs.txt");
+	private static byte[] readInputsAsArray() {
+		File file = new File("AESPartyTwoInputs.txt");
 		
 		Scanner scanner = null;
 		try {
@@ -102,13 +93,11 @@ public class App2 {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		ArrayList<Byte> inputs = new ArrayList<Byte>();
-		//First, read the number of inputs.
-		int inputsNumber = scanner.nextInt();
-		//Read each input and set it in the inputs array.
+			int inputsNumber = scanner.nextInt();
+		byte[] inputs = new byte[inputsNumber];
+	
 		for (int i=0; i<inputsNumber; i++){
-			inputs.add((byte) scanner.nextInt());
+			inputs[i] =  (byte) scanner.nextInt();
 		}
 		
 		return inputs;

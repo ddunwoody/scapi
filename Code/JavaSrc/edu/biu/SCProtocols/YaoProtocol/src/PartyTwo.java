@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -23,10 +24,11 @@ import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.NoSuchPartyException;
 import edu.biu.scapi.exceptions.NotAllInputsSetException;
-import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.OTBatchOnByteArrayROutput;
-import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.OTBatchRBasicInput;
+import edu.biu.scapi.interactiveMidProtocols.ot.OTOnByteArrayROutput;
 import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.OTBatchRInput;
+import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.OTBatchROutput;
 import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.OTBatchReceiver;
+import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.otExtension.OTExtensionGeneralRInput;
 
 /**
  * This is an implementation of party two of Yao protocol.
@@ -69,7 +71,7 @@ public class PartyTwo {
 	 * @throws CheatAttemptException
 	 * @throws InvalidDlogGroupException
 	 */
-	public void run(ArrayList<Byte> ungarbledInput) throws CheatAttemptException, ClassNotFoundException, IOException, InvalidDlogGroupException {
+	public void run(byte[] ungarbledInput) throws CheatAttemptException, ClassNotFoundException, IOException, InvalidDlogGroupException {
 		Date startProtocol = new Date();
 		Date start = new Date();
 		//Receive garbled tables and translation table from p1.
@@ -87,21 +89,28 @@ public class PartyTwo {
 		
 		start = new Date();
 		//Run OT protocol in order to get the necessary keys without revealing any information.
-		OTBatchOnByteArrayROutput output = runOTProtocol(ungarbledInput);
+		OTBatchROutput output = runOTProtocol(ungarbledInput);
 		end = new Date();
 		time = (end.getTime() - start.getTime());
 		System.out.println("run OT took " +time + " milis");
 		
 		start = new Date();
 		//Compute the circuit.
-		computeCircuit(output);
+		Map<Integer, Wire> circuitOutput = computeCircuit(output);
 		end = new Date();
 		time = (end.getTime() - start.getTime());
-		System.out.println("computethe circuit took " +time + " milis");
+		System.out.println("compute the circuit took " +time + " milis");
 		
 		Date yaoEnd = new Date();
 		long yaoTime = (yaoEnd.getTime() - startProtocol.getTime());
 		System.out.println("run one protocol took " +yaoTime + " milis");
+		
+		int[] indices = circuit.getOutputWireIndices();
+		for (int index : indices){
+			System.out.print(circuitOutput.get(index).getValue());
+		}
+		System.out.println();
+		
 	}
 
 	/**
@@ -117,7 +126,7 @@ public class PartyTwo {
 			throw new CheatAttemptException("the received message should be an instance of GarbledTablesHolder");
 		}
 		GarbledTablesHolder garbledTables = (GarbledTablesHolder) msg;
-
+	
 		//Receive translation table.
 		msg = channel.receive();
 		if (!(msg instanceof HashMap<?, ?>)){
@@ -173,21 +182,23 @@ public class PartyTwo {
 	 * @throws CheatAttemptException
 	 * @throws InvalidDlogGroupException
 	 */
-	private OTBatchOnByteArrayROutput runOTProtocol(ArrayList<Byte> sigmaArr) throws ClassNotFoundException, IOException, CheatAttemptException, InvalidDlogGroupException {
+	private OTBatchROutput runOTProtocol(byte[] sigmaArr) throws ClassNotFoundException, IOException, CheatAttemptException, InvalidDlogGroupException {
 		//Create an OT input object with the given sigmaArr.
-		OTBatchRInput input = new OTBatchRBasicInput(sigmaArr);
-			
+		OTBatchRInput input = new OTExtensionGeneralRInput(sigmaArr, 128);
+		
 		//Run the Ot protocol.
-		return (OTBatchOnByteArrayROutput) otReceiver.transfer(channel, input);
+		return otReceiver.transfer(channel, input);
 	}
 	
 	/**
 	 * Compute the garbled circuit.
 	 * @param otOutput The output from the OT protocol, which are party two inputs.
+	 * @return 
 	 */
-	private void computeCircuit(OTBatchOnByteArrayROutput otOutput) {
+	private Map<Integer, Wire> computeCircuit(OTBatchROutput otOutput) {
 		//Get the output of the protocol.
-		ArrayList<byte[]> keys = otOutput.getXSigmaArr();
+		byte[] keys = ((OTOnByteArrayROutput)otOutput).getXSigma();
+		
 		//Get party two input wires' indices.
 		List<Integer> labels = null;
 		try {
@@ -196,12 +207,14 @@ public class PartyTwo {
 			// Should not occur since the party number is valid.
 		}
   		int numberOfInputs = labels.size();
-  		
+  		byte[] key;
+  		int	keySize = keys.length/numberOfInputs;	
+
   		//Put the inputs in HashMap, while the key for the map is the wire index and the value is the given key.
   		HashMap<Integer, GarbledWire> inputs = new HashMap<Integer, GarbledWire>();
   		for (int i = 0; i < numberOfInputs; i++) {
-  			int label = labels.get(i);
-  			inputs.put(label, new GarbledWire(new SecretKeySpec(keys.get(i), "")));
+			key = Arrays.copyOfRange(keys, i*keySize, (i+1)*keySize);
+  			inputs.put(labels.get(i), new GarbledWire(new SecretKeySpec(key, "")));
   		}
   		
   		//Set the input to the circuit.
@@ -218,6 +231,6 @@ public class PartyTwo {
 		
 		//Translate the result from compute.
   		Map<Integer, Wire> circuitOutput = circuit.translate(garbledOutput);
-  	
+  		return circuitOutput;
 	}
 }
