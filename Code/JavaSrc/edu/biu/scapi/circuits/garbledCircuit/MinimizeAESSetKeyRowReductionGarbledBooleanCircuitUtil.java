@@ -48,7 +48,7 @@ class MinimizeAESSetKeyRowReductionGarbledBooleanCircuitUtil extends StandardRow
 	 * @param kdf to use in the row reduction technique.
 	 * @param random A source of randomness.
 	 */
-	MinimizeAESSetKeyRowReductionGarbledBooleanCircuitUtil(AES aes, KeyDerivationFunction kdf, SecureRandom random, int[] outputWiresIndices) {
+	MinimizeAESSetKeyRowReductionGarbledBooleanCircuitUtil(AES aes, KeyDerivationFunction kdf, SecureRandom random) {
 		this.aes = aes;
 		this.random = random;
 		this.kdf = kdf;
