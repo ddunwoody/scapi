@@ -76,7 +76,12 @@ abstract class GarbledBooleanCircuitAbs implements GarbledBooleanCircuit{
   	
 	
 	//A map that is used during computation to map a {@code GarbledWire}'s index to the computed and set {@code GarbledWire}.
-	protected Map<Integer, GarbledWire> computedWires = new HashMap<Integer,GarbledWire>();
+	protected Map<Integer, GarbledWire> computedWires;
+	
+	public GarbledBooleanCircuitAbs(){
+		computedWires = new HashMap<Integer,GarbledWire>();
+		eachPartysInputWires = new ArrayList<ArrayList<Integer>>();
+	}
 	
 	@Override
  	public void setGarbledInputFromUngarbledInput(Map<Integer, Byte> ungarbledInput, Map<Integer, SecretKey[]> allInputWireValues) {
