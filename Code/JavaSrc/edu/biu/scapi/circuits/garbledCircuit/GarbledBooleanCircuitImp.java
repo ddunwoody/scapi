@@ -58,7 +58,7 @@ public class GarbledBooleanCircuitImp extends GarbledBooleanCircuitAbs implement
 	 * 
 	 */
 	public GarbledBooleanCircuitImp(BooleanCircuit bc){
-		this(new FreeXORCircuitInput(bc, new AESFixedKeyMultiKeyEncryption()));
+		this(new FreeXORCircuitInput(bc, new AESFixedKeyMultiKeyEncryption(), false));
 		
 	}
 	
@@ -108,7 +108,6 @@ public class GarbledBooleanCircuitImp extends GarbledBooleanCircuitAbs implement
 		bc = input.getUngarbledCircuit();
 		outputWireIndices = bc.getOutputWireIndices();
 		numberOfParties = bc.getNumberOfParties();
-		eachPartysInputWires = new ArrayList<ArrayList<Integer>>();
 		
 		//Gets the input indices for each party.
 		for (int i=1; i<=numberOfParties; i++){
