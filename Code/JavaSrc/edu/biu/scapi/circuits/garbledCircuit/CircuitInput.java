@@ -25,6 +25,7 @@
 package edu.biu.scapi.circuits.garbledCircuit;
 
 import edu.biu.scapi.circuits.circuit.BooleanCircuit;
+import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
 
 /**
  * A general interface for a circuit's inputs.<p>
@@ -49,5 +50,16 @@ public interface CircuitInput {
 	 * @return the boolean circuit that was garbled.
 	 */
 	public BooleanCircuit getUngarbledCircuit();
+	
+	/**
+	 * Sets a KDf object that uses in the row reduction technique.
+	 * @param kdf to use in the row reduction technique.
+	 */
+	public void setKDF(KeyDerivationFunction kdf);
+	
+	/**
+	 * Returns the KDF object used in the row reduction technique.
+	 */
+	public KeyDerivationFunction getKDF();
 
 }

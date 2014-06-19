@@ -27,8 +27,11 @@ package edu.biu.scapi.circuits.garbledCircuit;
 import java.security.SecureRandom;
 
 import edu.biu.scapi.circuits.circuit.BooleanCircuit;
+import edu.biu.scapi.exceptions.FactoriesException;
+import edu.biu.scapi.primitives.kdf.HKDF;
 import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
 import edu.biu.scapi.primitives.prf.AES;
+import edu.biu.scapi.primitives.prf.bc.BcHMAC;
 
 /**
  * This is the input class for MinimizeAESSetKey circuit.<p>
@@ -46,29 +49,37 @@ public class MinimizeAESSetKeyCircuitInput implements CircuitInput{
 	private SecureRandom random;
 	private KeyDerivationFunction kdf;
 	private AES aes;
+	private boolean isRowReduction;
 	
 	/**
 	 * This constructor creates an input object for a regular representation of MinimizeAESSetKeyGarbledBooleanCircuit.
 	 * @param ungarbledCircuit The boolean circuit that needs to be garbled. 
 	 * @param aes An AES object to use.
 	 * @param random
+	 * @param isRowReduction Indicates if the circuit should use the row reduction algorithm or not.
 	 */
-	public MinimizeAESSetKeyCircuitInput(BooleanCircuit ungarbledCircuit, AES aes, SecureRandom random){
-		this(ungarbledCircuit, aes, null, random);
-	}
-	
-	/**
-	 * This constructor creates an input object for a row reduction representation of MinimizeAESSetKeyGarbledBooleanCircuit.
-	 * @param ungarbledCircuit The boolean circuit that needs to be garbled. 
-	 * @param aes An AES object to use.
-	 * @param kdf To use in the row reduction algorithm.
-	 * @param random
-	 */
-	public MinimizeAESSetKeyCircuitInput(BooleanCircuit ungarbledCircuit, AES aes, KeyDerivationFunction kdf, SecureRandom random){
+	public MinimizeAESSetKeyCircuitInput(BooleanCircuit ungarbledCircuit, AES aes, SecureRandom random, boolean isRowReduction){
 		this.ungarbledCircuit = ungarbledCircuit;
 		this.random = random;
-		this.kdf = kdf;
 		this.aes = aes;
+		this.isRowReduction = isRowReduction;
+		
+		if (isRowReduction){
+			try {
+				kdf = new HKDF(new BcHMAC("SHA-256"));
+			} catch (FactoriesException e) {
+				// Should not occur since the given parameters are implemented.
+			}
+		}
+		
+	}
+	
+	@Override
+	public void setKDF(KeyDerivationFunction kdf){
+		if(!isRowReduction){
+			throw new IllegalStateException("the setKDF function should be called in case of row reduction only");
+		}
+		this.kdf = kdf;
 	}
 
 	@Override
@@ -85,14 +96,14 @@ public class MinimizeAESSetKeyCircuitInput implements CircuitInput{
 		 * If not, the returned utility class uses the regular garbled table.
 		 */
 		
-		if (kdf == null){ //There is no kdf, return the regular MinimizeAESSetKey utility.
+		if (!isRowReduction){ //There is no kdf, return the regular MinimizeAESSetKey utility.
 			return new MinimizeAESSetKeyGarbledBooleanCircuitUtil(aes, random);
 		} else{ //There is a kdf, return the Row Reduction MinimizeAESSetKey utility.
-			return new MinimizeAESSetKeyRowReductionGarbledBooleanCircuitUtil(aes, kdf, random, ungarbledCircuit.getOutputWireIndices());
+			return new MinimizeAESSetKeyRowReductionGarbledBooleanCircuitUtil(aes, kdf, random);
 		}
-		
 	}
 	
+	@Override
 	public KeyDerivationFunction getKDF(){
 		return kdf;
 	}

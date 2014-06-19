@@ -28,7 +28,10 @@ import java.security.SecureRandom;
 
 import edu.biu.scapi.circuits.circuit.BooleanCircuit;
 import edu.biu.scapi.circuits.encryption.MultiKeyEncryptionScheme;
+import edu.biu.scapi.exceptions.FactoriesException;
+import edu.biu.scapi.primitives.kdf.HKDF;
 import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
+import edu.biu.scapi.primitives.prf.bc.BcHMAC;
 
 /**
  * This is the input class for Standard circuit.<p>
@@ -47,28 +50,34 @@ public class StandardCircuitInput implements CircuitInput{
 	private MultiKeyEncryptionScheme mes;
 	private SecureRandom random;
 	private KeyDerivationFunction kdf;
+	private boolean isRowReduction;
 	
 	/**
 	 * This constructor creates an input object for a regular representation of StandardGarbledBooleanCircuit.
 	 * @param ungarbledCircuit The boolean circuit that needs to be garbled. 
 	 * @param mes A MultiKeyEncryptionScheme to use.
 	 * @param random
+	 * @param isRowReduction Indicates if the circuit should use the row reduction algorithm or not.
 	 */
-	public StandardCircuitInput(BooleanCircuit ungarbledCircuit, MultiKeyEncryptionScheme mes, SecureRandom random){
-		this(ungarbledCircuit, mes, null, random);
-	}
-	
-	/**
-	 * This constructor creates an input object for a row reduction representation of StandardGarbledBooleanCircuit.
-	 * @param ungarbledCircuit The boolean circuit that needs to be garbled. 
-	 * @param mes A MultiKeyEncryptionScheme to use.
-	 * @param kdf To use in the row reduction algorithm.
-	 * @param random
-	 */
-	public StandardCircuitInput(BooleanCircuit ungarbledCircuit, MultiKeyEncryptionScheme mes, KeyDerivationFunction kdf, SecureRandom random){
+	public StandardCircuitInput(BooleanCircuit ungarbledCircuit, MultiKeyEncryptionScheme mes, SecureRandom random, boolean isRowReduction){
 		this.ungarbledCircuit = ungarbledCircuit;
 		this.mes = mes;
 		this.random = random;
+		
+		if (isRowReduction){
+			try {
+				kdf = new HKDF(new BcHMAC("SHA-256"));
+			} catch (FactoriesException e) {
+				// Should not occur since the given parameters are implemented.
+			}
+		}
+	}
+	
+	@Override
+	public void setKDF(KeyDerivationFunction kdf){
+		if(!isRowReduction){
+			throw new IllegalStateException("the setKDF function should be called in case of row reduction only");
+		}
 		this.kdf = kdf;
 	}
 
@@ -85,19 +94,15 @@ public class StandardCircuitInput implements CircuitInput{
 		 * If not, the returned utility class uses the regular garbled table.
 		 */
 		
-		if (kdf == null){ //There is no kdf, return the regular Standard circuit utility.
+		if (!isRowReduction){ //There is no kdf, return the regular Standard circuit utility.
 			return new StandardGarbledBooleanCircuitUtil(mes, random);
 		} else { //There is a kdf, return the Row Reduction Standard circuit utility.
 			return new StandardRowReductionGarbledBooleanCircuitUtil(mes, kdf, random);
 		}
 	}
 	
-	
-
+	@Override
 	public KeyDerivationFunction getKDF(){
 		return kdf;
 	}
-	
-	
-
 }

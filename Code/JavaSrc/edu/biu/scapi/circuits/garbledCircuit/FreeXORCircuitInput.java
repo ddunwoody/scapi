@@ -26,7 +26,10 @@ package edu.biu.scapi.circuits.garbledCircuit;
 
 import edu.biu.scapi.circuits.circuit.BooleanCircuit;
 import edu.biu.scapi.circuits.encryption.MultiKeyEncryptionScheme;
+import edu.biu.scapi.exceptions.FactoriesException;
+import edu.biu.scapi.primitives.kdf.HKDF;
 import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
+import edu.biu.scapi.primitives.prf.bc.BcHMAC;
 
 /**
  * This is the input class for a Free XOR circuit.<p>
@@ -43,30 +46,33 @@ public class FreeXORCircuitInput implements CircuitInput{
 	private BooleanCircuit ungarbledCircuit;
 	private MultiKeyEncryptionScheme mes;
 	private KeyDerivationFunction kdf;
+	private boolean isRowReduction;
 	
 	/**
 	 * This constructor creates an input object for a regular representation of FreeXORGarbledBooleanCircuit.
 	 * @param ungarbledCircuit The boolean circuit that needs to be garbled. 
 	 * @param mes A MultiKeyEncryptionScheme to use.
+	 * @param isRowReduction Indicates if the circuit should use the row reduction algorithm or not.
 	 */
-	public FreeXORCircuitInput(BooleanCircuit ungarbledCircuit, MultiKeyEncryptionScheme mes){
+	public FreeXORCircuitInput(BooleanCircuit ungarbledCircuit, MultiKeyEncryptionScheme mes, boolean isRowReduction){
 		this.ungarbledCircuit = ungarbledCircuit;
 		this.mes = mes;
-		this.kdf = null;
+		this.isRowReduction = isRowReduction;
+		
+		if (isRowReduction){
+			try {
+				kdf = new HKDF(new BcHMAC("SHA-256"));
+			} catch (FactoriesException e) {
+				// Should not occur since the given parameters are implemented.
+			}
+		}
 	}
 	
-	/**
-	 * This constructor creates an input object for a row reduction representation of FreeXORGarbledBooleanCircuit.
-	 * @param ungarbledCircuit The boolean circuit needs to be garbled. 
-	 * @param mes A MultiKeyEncryptionScheme to use.
-	 * @param kdf To use in the row reduction algorithm.
-	 * @param isRowReductionWithFixedOutputKeys Indicates if the user is going to sample the wires' keys from given output keys.
-	 * In this case, the circuit representation should be a little different. 
-	 * See {@link BooleanCircuit#BooleanCircuit(File f)} for more information.
-	 */
-	public FreeXORCircuitInput(BooleanCircuit ungarbledCircuit, MultiKeyEncryptionScheme mes, KeyDerivationFunction kdf){
-		this.ungarbledCircuit = ungarbledCircuit;
-		this.mes = mes;
+	@Override
+	public void setKDF(KeyDerivationFunction kdf){
+		if(!isRowReduction){
+			throw new IllegalStateException("the setKDF function should be called in case of row reduction only");
+		}
 		this.kdf = kdf;
 	}
 
@@ -82,13 +88,14 @@ public class FreeXORCircuitInput implements CircuitInput{
 	 */
 	@Override
 	public CircuitTypeUtil createCircuitUtil() {
-		if (kdf == null){ //There is no kdf, return the regular Free XOR utility.
+		if (!isRowReduction){ //There is no kdf, return the regular Free XOR utility.
 			return new FreeXORGarbledBooleanCircuitUtil(mes);
 		} else { //There is a kdf, return the Row Reduction Free XOR utility.
 			return new FreeXORRowReductionGarbledBooleanCircuitUtil(mes, kdf);
 		}
 	}
 	
+	@Override
 	public KeyDerivationFunction getKDF(){
 		return kdf;
 	}
