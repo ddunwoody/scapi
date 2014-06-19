@@ -26,38 +26,47 @@ import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
 import edu.biu.scapi.primitives.prf.bc.BcHMAC;
 import edu.biu.scapi.tools.Factories.DlogGroupFactory;
 
-
+/**
+ * This application runs party two of Yao protocol.
+ * 
+ * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
+ *
+ */
 public class App2 {
+	
 	/**
 	 * @param args no arguments should be passed
 	 */
 	public static void main(String[] args) {
+		//Create the necessary objects that are used in the protocol.
 		DlogGroup dlog = null;
 		KeyDerivationFunction kdf = null;
+		SecureRandom random = new SecureRandom();
 		try {
-			//use the koblitz curve
-			dlog = DlogGroupFactory.getInstance().getObject("DlogECF2m(K-233)", "Miracl");
+			//use the koblitz curve.
+			dlog = DlogGroupFactory.getInstance().getObject("DlogECF2m(K-233)", "OpenSSL");
 			kdf = new HKDF(new BcHMAC());
 		} catch (FactoriesException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		
-		SecureRandom random = new SecureRandom();
-		
-		//set up the communication with the other side and get the created channel
+	
+		//Set up the communication with the other side and get the created channel/
 		Channel channel = setCommunication();	
 		
-		//run the protocol multiple times
 		try {
-			
+			//Create the Boolean circuit of AES.
 			BooleanCircuit bc = new BooleanCircuit(new File("AES_Final-2.txt"));
+			//Create the OT sender.
 			OTBatchReceiver otReceiver = new OTSemiHonestDDHBatchOnByteArrayReceiver(dlog, kdf, random);
+			//Create the encryption scheme.
 			MultiKeyEncryptionScheme mes = new AESFixedKeyMultiKeyEncryption();
 			Date start = new Date();
+			//Run the protocol multiple times.
 			for(int i=0; i<100;i++){
 				
 				Date before = new Date();
+				//Create Party two with the previous created objects.
 				ArrayList<Byte> ungarbledInput = readInputs();
 				Date after = new Date();
 				long time = (after.getTime() - before.getTime());
@@ -66,7 +75,7 @@ public class App2 {
 				//init the P1 yao protocol
 				PartyTwo p2 = new PartyTwo(channel, bc, mes, otReceiver);
 			
-				//run the yao's protocol as party 1
+				//Run party two of Yao protocol.
 				p2.run(ungarbledInput);
 			}
 			Date end = new Date();
@@ -76,12 +85,13 @@ public class App2 {
 			
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
-	
-			
+		}		
 	}
 	
-	
+	/**
+	 * Create the inputs of party two from an input file.
+	 * @return an Array contains the inputs for party two.
+	 */
 	private static ArrayList<Byte> readInputs() {
 		File file = new File("AESpartyTwoInputs.txt");
 		
@@ -94,7 +104,9 @@ public class App2 {
 		}
 		
 		ArrayList<Byte> inputs = new ArrayList<Byte>();
+		//First, read the number of inputs.
 		int inputsNumber = scanner.nextInt();
+		//Read each input and set it in the inputs array.
 		for (int i=0; i<inputsNumber; i++){
 			inputs.add((byte) scanner.nextInt());
 		}
@@ -115,10 +127,10 @@ public class App2 {
 		
 		LoadParties loadParties = new LoadParties("Parties0.properties");
 	
-		//prepare the parties list
+		//Prepare the parties list.
 		listOfParties = loadParties.getPartiesList();
 	
-		//create the communication setup
+		//Create the communication setup.
 		CommunicationSetup commSetup = new CommunicationSetup();
 	
 		ConnectivitySuccessVerifier naive = new NaiveSuccess();
@@ -127,7 +139,7 @@ public class App2 {
 		
 		Map<InetSocketAddress, Channel> connections = commSetup.prepareForCommunication(listOfParties, naive, 200000);
 			
-		//return the channel with the other party. There was only one channel created
+		//Return the channel with the other party. There was only one channel created.
 		return (Channel)((connections.values()).toArray())[0];
 	}
 }
