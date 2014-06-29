@@ -165,8 +165,6 @@ BOOL OTExtensionReceiver::OTReceiverRoutine(int id, int myNumOTs)
 	cout << "\t Receiving Values:\t" << totalRcvTime << " ms" << endl;
 #endif
 
-	cout << "Receiver finished" << endl;
-
 	return TRUE;
 }
 
@@ -296,8 +294,7 @@ BOOL OTExtensionReceiver::verifyOT(int NumOTs)
 		resp = 0x01;
 		sock.Send(&resp, 1);
 	}
-	cout << "OT Verification successful" << endl;
-
+	
 	delete [] tempXc;
 	delete [] tempRet;
 	return true;
@@ -462,7 +459,6 @@ BOOL OTExtensionSender::OTSenderRoutine(int id, int myNumOTs)
 #endif
 
 
-	cout << "Sender finished" << endl;
 	return TRUE;
 }
 
@@ -588,7 +584,6 @@ BOOL OTExtensionSender::verifyOT(int NumOTs)
 			return false;
 		}
 	}
-	cout << "OT Verification successful" << endl;
 	return true;
 }
 
