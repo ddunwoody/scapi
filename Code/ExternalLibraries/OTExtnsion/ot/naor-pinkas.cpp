@@ -194,7 +194,8 @@ BOOL NaorPinkas::ReceiverECC(int nSndVals, int nOTs, CBitVector& choices,
 	EC2 *pDec = new EC2[nOTs];
 	EC2 *pC = new EC2[nOTs];
 
-
+	
+	irand(time(NULL)-100);
 	ebrick2 bg, bc;
 #endif
 	Big /*pK[nOTs],*/ bigtmp, x, y, xtmp, ytmp; 
@@ -215,7 +216,6 @@ BOOL NaorPinkas::ReceiverECC(int nSndVals, int nOTs, CBitVector& choices,
 	for (int k = 0; k < nOTs; k++) {
 
 		pK[k] = rand(m_SecParam, 2);
-		
 		Miracl_mulbrick(&bg, pK[k].getbig(), xtmp.getbig(), ytmp.getbig());
 		Miracl_InitPoint(PK_sigma+k, xtmp, ytmp);//PK_sigma[k] = EC2(xtmp, ytmp);
 		
@@ -239,10 +239,11 @@ BOOL NaorPinkas::ReceiverECC(int nSndVals, int nOTs, CBitVector& choices,
 	// N-P receiver: send pk0 
 	pBufIdx = pBuf;
 	int choice;
+	
 	for (int k = 0; k < nOTs; k++) 
 	{
 		choice = choices.GetBit(k);
-
+		
 		if (choice != 0) {
 			PK0 = pC[choice];
 			PK0 -= PK_sigma[k];
@@ -251,9 +252,10 @@ BOOL NaorPinkas::ReceiverECC(int nSndVals, int nOTs, CBitVector& choices,
 		}
 		//cout << "PK0: " << PK0 << ", PK_sigma: " << PK_sigma[k] << ", choice: " << choice << ", pC[choice: " << pC[choice] << endl;
 		PointToByteArray(pBufIdx, coordSize, PK0);
+		
 		pBufIdx += (coordSize + 1);
 	}
-
+	
 	socket.Send(pBuf, nOTs * (coordSize + 1)); 
 
 	delete [] pBuf;
@@ -288,6 +290,8 @@ BOOL NaorPinkas::ReceiverECC(int nSndVals, int nOTs, CBitVector& choices,
 
 BOOL NaorPinkas::SenderECC(int nSndVals, int nOTs, CSocket& socket, BYTE* ret) 
 {
+	irand(time(NULL)+100);
+
 	Big alpha, PKr, bigtmp, x, y, xtmp, ytmp;
 #ifdef USE_PRIME_FIELD
 	ECn pCr[nSndVals], pC[nSndVals], ecctmp, PK0r, invtmp, g;
@@ -306,10 +310,11 @@ BOOL NaorPinkas::SenderECC(int nSndVals, int nOTs, CSocket& socket, BYTE* ret)
 	alpha = rand(m_SecParam, 2);
 	pC[0] = g;
 	pC[0] *= alpha;
-
+	
 	//random C(i+1)
 	for (int u = 1; u < nSndVals; u++) {
 		bigtmp = rand(m_SecParam, 2);
+		
 		pC[u] = g;
 		pC[u] *= bigtmp;
 	}
@@ -323,7 +328,6 @@ BOOL NaorPinkas::SenderECC(int nSndVals, int nOTs, CSocket& socket, BYTE* ret)
 		pBufIdx += coordSize + 1;
 	}
 	socket.Send(pBuf, nBufSize);
-
 	//====================================================
 	// compute C^R
 	for (int u = 1; u < nSndVals; u++) {
@@ -331,6 +335,7 @@ BOOL NaorPinkas::SenderECC(int nSndVals, int nOTs, CSocket& socket, BYTE* ret)
 		ecurve_mult(alpha.getbig(), pC[u].get_point(), pCr[u].get_point());//mpz_powm(pCr[u], pC[u], alpha, state.p);
 #else
 		ecurve2_mult(alpha.getbig(), pC[u].get_point(), pCr[u].get_point());//mpz_powm(pCr[u], pC[u], alpha, state.p);
+	
 #endif
 	}
 	//====================================================
@@ -348,6 +353,7 @@ BOOL NaorPinkas::SenderECC(int nSndVals, int nOTs, CSocket& socket, BYTE* ret)
 
 #endif
 	for (int k = 0; k < nOTs; k++) {
+		
 		ByteArrayToPoint(&(pPK0[k]), coordSize, pBufIdx);
 		//cout << "pk0[" << k << "]: " << pPK0[k] << endl;
 		pBufIdx += (coordSize + 1);
@@ -369,6 +375,7 @@ BOOL NaorPinkas::SenderECC(int nSndVals, int nOTs, CSocket& socket, BYTE* ret)
 				ecurve_mult(alpha.getbig(), pPK0[k].get_point(),PK0r.get_point());
 #else
 				ecurve2_mult(alpha.getbig(), pPK0[k].get_point(),PK0r.get_point()); 
+				
 #endif
 				PointToByteArray(pBufIdx, coordSize, PK0r);
 				//epoint2_norm(PK0r.get_point());
