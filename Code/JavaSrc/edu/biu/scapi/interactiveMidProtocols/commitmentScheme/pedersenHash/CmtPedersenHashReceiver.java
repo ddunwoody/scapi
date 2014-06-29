@@ -46,11 +46,12 @@ import edu.biu.scapi.securityLevel.PerfectlyHidingCmt;
 
 /**
  * Concrete implementation of receiver that executes the Pedersen hash commitment 
- * scheme in the receiver's point of view.
+ * scheme in the receiver's point of view.<p>
  * 
- * This is a perfectly-hiding commitment that can be used to commit to a value of any length. 
+ * This is a perfectly-hiding commitment that can be used to commit to a value of any length. <p>
  * 
- * For more information see Protocol 6.5.3, page 164 of <i>Efficient Secure Two-Party Protocols</i> by Hazay-Lindell.
+ * For more information see Protocol 6.5.3, page 164 of <i>Efficient Secure Two-Party Protocols</i> by Hazay-Lindell.<p>
+ * The pseudo code of this protocol can be found in Protocol 3.2 of pseudo codes document at {@link http://crypto.biu.ac.il/scapi/SDK_Pseudocode_SCAPI_V2.0.0.pdf}.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *

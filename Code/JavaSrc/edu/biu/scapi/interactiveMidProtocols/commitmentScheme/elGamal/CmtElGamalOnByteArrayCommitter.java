@@ -46,9 +46,12 @@ import edu.biu.scapi.securityLevel.PerfectlyBindingCmt;
 import edu.biu.scapi.tools.Factories.DlogGroupFactory;
 
 /**
- * This class implements the committer side of the ElGamal commitment. 
+ * This class implements the committer side of the ElGamal commitment. <p>
+ * 
  * It uses El Gamal encryption for byte arrays, that is, the encryption class used is 
- * ScElGamalOnbyteArray. This default cannot be changed.
+ * ScElGamalOnbyteArray. This default cannot be changed.<p>
+ * 
+ * The pseudo code of this protocol can be found in Protocol 3.4 of pseudo codes document at {@link http://crypto.biu.ac.il/scapi/SDK_Pseudocode_SCAPI_V2.0.0.pdf}.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *

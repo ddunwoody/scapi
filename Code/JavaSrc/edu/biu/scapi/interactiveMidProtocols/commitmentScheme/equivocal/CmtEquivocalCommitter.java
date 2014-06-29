@@ -17,10 +17,10 @@ import edu.biu.scapi.securityLevel.EquivocalCmt;
 
 /**
  * Concrete implementation of Equivocal commitment scheme in the committer's point of view.<p>
- * This is a protocol to obtain an equivocal commitment from any commitment with a ZK-protocol 
- * of the commitment value.<p>
- * The equivocality property means that a simulator can decommit to any value it needs 
- * (needed for proofs of security).
+ * This is a protocol to obtain an equivocal commitment from any commitment with a ZK-protocol of the commitment value.<p>
+ * The equivocality property means that a simulator can decommit to any value it needs (needed for proofs of security).<p>
+ * 
+ * The pseudo code of this protocol can be found in Protocol 3.7 of pseudo codes document at {@link http://crypto.biu.ac.il/scapi/SDK_Pseudocode_SCAPI_V2.0.0.pdf}.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *

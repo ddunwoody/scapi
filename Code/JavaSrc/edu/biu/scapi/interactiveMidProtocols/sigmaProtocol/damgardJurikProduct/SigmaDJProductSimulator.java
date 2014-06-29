@@ -38,7 +38,9 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaSimulato
 /**
  * Concrete implementation of Sigma Simulator.<p>
  * This implementation simulates the case that the prover convince a verifier that 3 ciphertexts c1,c2,c3 
- * are encryptions of values x1,x2,x3 s.t. x1*x2=x3 mod N.
+ * are encryptions of values x1,x2,x3 s.t. x1*x2=x3 mod N.<p>
+ * 
+ * The pseudo code of this protocol can be found in Protocol 1.13 of pseudo codes document at {@link http://crypto.biu.ac.il/scapi/SDK_Pseudocode_SCAPI_V2.0.0.pdf}.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *

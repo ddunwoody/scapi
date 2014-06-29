@@ -41,9 +41,11 @@ import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersenTrapdoor.C
  * Concrete implementation of Zero Knowledge verifier.<p>
  * 
  * This is a transformation that takes any Sigma protocol and any perfectly hiding trapdoor (equivocal) 
- * commitment scheme and yields a zero-knowledge proof of knowledge.
+ * commitment scheme and yields a zero-knowledge proof of knowledge.<p>
  * 
- * For more information see Protocol 6.5.4, page 165 of Hazay-Lindell.
+ * For more information see Protocol 6.5.4, page 165 of Hazay-Lindell.<p>
+ * 
+ * The pseudo code of this protocol can be found in Protocol 2.2 of pseudo codes document at {@link http://crypto.biu.ac.il/scapi/SDK_Pseudocode_SCAPI_V2.0.0.pdf}.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *

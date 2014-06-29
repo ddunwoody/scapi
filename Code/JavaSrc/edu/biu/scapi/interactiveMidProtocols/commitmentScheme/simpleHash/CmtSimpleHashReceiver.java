@@ -41,12 +41,13 @@ import edu.biu.scapi.primitives.hash.bc.BcSHA256;
 import edu.biu.scapi.securityLevel.SecureCommit;
 
 /**
- * This class implements the receiver side of Simple Hash commitment.
+ * This class implements the receiver side of Simple Hash commitment.<p>
  * 
- * This is a commitment scheme based on hash functions. 
- * It can be viewed as a random-oracle scheme, but its security can also be viewed as a 
- * standard assumption on modern hash functions. Note that computational binding follows 
- * from the standard collision resistance assumption. 
+ * This is a commitment scheme based on hash functions. <p>
+ * It can be viewed as a random-oracle scheme, but its security can also be viewed as a standard assumption on modern hash functions. 
+ * Note that computational binding follows from the standard collision resistance assumption. <p>
+ * 
+ * The pseudo code of this protocol can be found in Protocol 3.6 of pseudo codes document at {@link http://crypto.biu.ac.il/scapi/SDK_Pseudocode_SCAPI_V2.0.0.pdf}.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *

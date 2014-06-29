@@ -39,10 +39,10 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
 /**
  * Concrete implementation of Sigma Protocol verifier computation. <p>
  * This protocol is used for a prover to convince a verifier that the input tuple (g,h,u,v) 
- * is a Diffie-Hellman tuple.
+ * is a Diffie-Hellman tuple.<p>
  * 
- * For more information see Protocol 6.2.4, page 152 of Hazay-Lindell.
- * 
+ * For more information see Protocol 6.2.4, page 152 of Hazay-Lindell.<p>
+ * The pseudo code of this protocol can be found in Protocol 1.2 of pseudo codes document at {@link http://crypto.biu.ac.il/scapi/SDK_Pseudocode_SCAPI_V2.0.0.pdf}.<p>
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */

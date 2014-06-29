@@ -48,10 +48,13 @@ import edu.biu.scapi.securityLevel.PerfectlyHidingCmt;
  * This commitment is also a trapdoor commitment in the sense that the receiver after 
  * the commitment phase has a trapdoor value, that if known by the committer would enable
  * it to decommit to any value. <p>
- * This trapdoor is output by the receiver and can be used by a higher-level application 
- * (e.g., by the ZK transformation of a sigma protocol to a zero-knowledge proof of knowledge).
  * 
- * For more information see Protocol 6.5.3, page 164 of <i>Efficient Secure Two-Party Protocols</i> by Hazay-Lindell.
+ * This trapdoor is output by the receiver and can be used by a higher-level application 
+ * (e.g., by the ZK transformation of a sigma protocol to a zero-knowledge proof of knowledge).<p>
+ * 
+ * For more information see Protocol 6.5.3, page 164 of <i>Efficient Secure Two-Party Protocols</i> by Hazay-Lindell.<p>
+ * 
+ * The pseudo code of this protocol can be found in Protocol 3.3 of pseudo codes document at {@link http://crypto.biu.ac.il/scapi/SDK_Pseudocode_SCAPI_V2.0.0.pdf}.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
