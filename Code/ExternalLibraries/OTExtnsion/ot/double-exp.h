@@ -1,5 +1,6 @@
-#ifndef __DOUBLE_EXP_H_
-#define __DOUBLE_EXP_H_
+#pragma once
+#ifndef DOUBLE_EXP_H
+#define DOUBLE_EXP_H
 #include "../util/typedefs.h"
 	#ifdef OTEXT_USE_GMP
 

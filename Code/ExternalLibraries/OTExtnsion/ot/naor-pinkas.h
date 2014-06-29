@@ -1,9 +1,9 @@
 /*
  * Compute the Naor-Pinkas Base OTs
  */
-
-#ifndef __Naor_Pinkas_H_
-#define __Naor_Pinkas_H_
+#pragma once
+#ifndef NAOR_PINKAS_H
+#define NAOR_PINKAS_H
 
 #include "baseOT.h"
 

@@ -1,9 +1,9 @@
 /*
  * The Naor-Pinkas OT protocols that does not require a random oracle
  */
-
-#ifndef __Naor_Pinkas_NORO_H_
-#define __Naor_Pinkas_NORO_H_
+#pragma once
+#ifndef NAOR_PINKAS_NORO_H
+#define NAOR_PINKAS_NORO_H
 
 #include "baseOT.h"
 #include "double-exp.h"

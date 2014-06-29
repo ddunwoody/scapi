@@ -1,5 +1,6 @@
-#ifndef __brick_h__
-#define __brick_h__
+#pragma once
+#ifndef BRICK_H_
+#define BRICK_H_
 
 #include "../util/typedefs.h"
 

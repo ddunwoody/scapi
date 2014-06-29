@@ -1,9 +1,9 @@
 /*
  * Methods for the OT Extension routine
  */
-
-#ifndef __OT_EXTENSION_H_
-#define __OT_EXTENSION_H_
+#pragma once
+#ifndef OT_EXTENSION_H
+#define OT_EXTENSION_H
 
 #include "../util/typedefs.h"
 #include "../util/socket.h"

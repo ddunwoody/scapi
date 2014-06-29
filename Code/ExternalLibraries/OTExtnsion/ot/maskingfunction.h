@@ -4,9 +4,9 @@
  *  Created on: May 13, 2013
  *      Author: mzohner
  */
-
-#ifndef MASKINGFUNCTION_H_
-#define MASKINGFUNCTION_H_
+#pragma once
+#ifndef MASKINGFUNCTION_H
+#define MASKINGFUNCTION_H
 
 #include "../util/cbitvector.h"
 #include "../util/typedefs.h"

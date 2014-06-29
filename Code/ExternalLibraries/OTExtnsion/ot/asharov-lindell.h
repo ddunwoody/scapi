@@ -4,9 +4,9 @@
  *  Created on: Mar 20, 2013
  *      Author: mzohner
  */
-
-#ifndef ASHAROVLINDELL_H_
-#define ASHAROVLINDELL_H_
+#pragma once
+#ifndef ASHAROV_LINDELL_H
+#define ASHAROV_LINDELL_H
 
 #include "baseOT.h"
 
@@ -31,4 +31,4 @@ class AsharovLindell : public BaseOT
 
 };
 
-#endif /* ASHAROVLINDELL_H_ */
+#endif /* ASHAROV-LINDELL_H_ */

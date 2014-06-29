@@ -4,9 +4,9 @@
  *  Created on: Mar 20, 2013
  *      Author: mzohner
  */
-
-#ifndef BASEOT_H_
-#define BASEOT_H_
+#pragma once
+#ifndef BASEOT_H
+#define BASEOT_H
 
 #include "miracl.h"
 #include "../util/typedefs.h"

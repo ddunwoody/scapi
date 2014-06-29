@@ -4,9 +4,9 @@
  *  Created on: May 13, 2013
  *      Author: mzohner
  */
-
-#ifndef XORMASKING_H_
-#define XORMASKING_H_
+#pragma once
+#ifndef XORMASKING_H
+#define XORMASKING_H
 
 #include "maskingfunction.h"
 
