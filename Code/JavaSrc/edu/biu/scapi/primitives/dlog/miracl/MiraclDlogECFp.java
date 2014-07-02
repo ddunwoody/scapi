@@ -28,6 +28,8 @@ package edu.biu.scapi.primitives.dlog.miracl;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.Properties;
 
 import edu.biu.scapi.primitives.dlog.DlogECFp;
@@ -73,9 +75,17 @@ public class MiraclDlogECFp extends MiraclAdapterDlogEC implements DlogECFp, DDH
 	public MiraclDlogECFp(String fileName, String curveName) throws IOException {
 		super(fileName, curveName);
 	}
+	
+	public MiraclDlogECFp(String fileName, String curveName, String randNumGenAlg) throws IOException, NoSuchAlgorithmException {
+		super(fileName, curveName, SecureRandom.getInstance(randNumGenAlg));
+	}
 
 	public MiraclDlogECFp(String curveName) throws IllegalArgumentException, IOException{
 		this(NISTEC_PROPERTIES_FILE, curveName);
+	}
+	
+	public MiraclDlogECFp(String curveName, SecureRandom random) throws IllegalArgumentException, IOException{
+		super(NISTEC_PROPERTIES_FILE, curveName, random);
 	}
 
 	/**

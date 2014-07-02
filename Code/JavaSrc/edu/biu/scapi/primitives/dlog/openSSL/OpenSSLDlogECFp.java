@@ -26,6 +26,8 @@ package edu.biu.scapi.primitives.dlog.openSSL;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.Properties;
 
 import edu.biu.scapi.primitives.dlog.DlogECFp;
@@ -51,6 +53,14 @@ public class OpenSSLDlogECFp extends OpenSSLAdapterDlogEC implements DlogECFp, D
 	private native int initCurve(long curve, long generator, byte[] q);
 	
 	/**
+	 * Default constructor. Initializes this object with P-192 NIST curve.
+	 * @throws IOException 
+	 */
+	public OpenSSLDlogECFp() throws IOException {
+		this("P-192");
+	}
+	
+	/**
 	 * Initialize this DlogGroup with the curve in the given file.
 	 * @param fileName the file to take the curve's parameters from.
 	 * @param curveName name of curve to initialized.
@@ -61,12 +71,34 @@ public class OpenSSLDlogECFp extends OpenSSLAdapterDlogEC implements DlogECFp, D
 	}
 	
 	/**
+	 * Initialize this DlogGroup with the curve in the given file.
+	 * @param fileName the file to take the curve's parameters from.
+	 * @param curveName name of curve to initialized.
+	 * @param randNumGenAlg The random number generator to use.
+	 * @throws IOException if there is a problem with the given file name.
+	 * @throws NoSuchAlgorithmException 
+	 */
+	public OpenSSLDlogECFp(String fileName, String curveName, String randNumGenAlg) throws IOException, NoSuchAlgorithmException {
+		super(fileName, curveName, SecureRandom.getInstance(randNumGenAlg));	
+	}
+	
+	/**
 	 * Initialize this DlogGroup with one of NIST recommended elliptic curve.
 	 * @param curveName name of NIST curve to initialized
 	 * @throws IOException if there is a problem with NIST properties file.
 	 */
 	public OpenSSLDlogECFp(String curveName) throws IOException {
 		super(curveName);
+	}
+	
+	/**
+	 * Initialize this DlogGroup with one of NIST recommended elliptic curve.
+	 * @param curveName name of NIST curve to initialized
+	 * @param random The source of randomness to use.
+	 * @throws IOException if there is a problem with NIST properties file.
+	 */
+	public OpenSSLDlogECFp(String curveName, SecureRandom random) throws IOException {
+		super(curveName, random);
 	}
 	
 	@Override

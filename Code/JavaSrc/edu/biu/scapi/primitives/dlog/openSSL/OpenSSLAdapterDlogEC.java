@@ -26,6 +26,7 @@ package edu.biu.scapi.primitives.dlog.openSSL;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.SecureRandom;
 
 import edu.biu.scapi.primitives.dlog.DlogGroupEC;
 import edu.biu.scapi.primitives.dlog.ECElement;
@@ -54,21 +55,44 @@ public abstract class OpenSSLAdapterDlogEC extends DlogGroupEC{
 	/**
 	 * Initialize this DlogGroup with the curve in the given file.
 	 * @param fileName the file to take the curve's parameters from.
-	 * @param curveName name of curve to initialized,
+	 * @param curveName name of curve to initialized.
 	 * @throws IOException
 	 */
 	public OpenSSLAdapterDlogEC(String fileName, String curveName) throws IOException {
-		super(fileName, curveName);
+		this(fileName, curveName, new SecureRandom());
+		
+	}
+	
+	/**
+	 * Initialize this DlogGroup with the curve in the given file.
+	 * @param fileName the file to take the curve's parameters from.
+	 * @param curveName name of curve to initialized.
+	 * @param random The source of randomness to use.
+	 * @throws IOException
+	 */
+	public OpenSSLAdapterDlogEC(String fileName, String curveName, SecureRandom random) throws IOException {
+		super(fileName, curveName, random);
 		
 	}
 	
 	/**
 	 * Initialize this DlogGroup with one of NIST recommended elliptic curve.
-	 * @param curveName name of NIST curve to initialized
+	 * @param curveName name of NIST curve to initialized.
+	 * @param random The source of randomness to use.
 	 * @throws IOException
 	 */
 	public OpenSSLAdapterDlogEC(String curveName) throws IOException {
-		this(NISTEC_PROPERTIES_FILE, curveName);
+		this(curveName, new SecureRandom());
+	}
+	
+	/**
+	 * Initialize this DlogGroup with one of NIST recommended elliptic curve.
+	 * @param curveName name of NIST curve to initialized.
+	 * @param random The source of randomness to use.
+	 * @throws IOException
+	 */
+	public OpenSSLAdapterDlogEC(String curveName, SecureRandom random) throws IOException {
+		this(NISTEC_PROPERTIES_FILE, curveName, random);
 	}
 	
 	/**

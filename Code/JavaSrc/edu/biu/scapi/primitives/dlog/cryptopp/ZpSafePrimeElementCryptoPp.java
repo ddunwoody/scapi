@@ -82,9 +82,24 @@ public class ZpSafePrimeElementCryptoPp implements ZpSafePrimeElement {
 	 * @throws IllegalArgumentException
 	 */
 	ZpSafePrimeElementCryptoPp(BigInteger p){
+		this(p, new SecureRandom());
+					
+	}
+	
+	/**
+	 * Constructor that gets DlogGroup and chooses random element with order q.
+	 * The algorithm is: 
+	 * input: modulus p 
+	 * choose a random element between 1 to p-1
+	 * calculate element^2 mod p
+     *  
+	 * @param p - group modulus
+	 * @throws IllegalArgumentException
+	 */
+	ZpSafePrimeElementCryptoPp(BigInteger p, SecureRandom random){
 		BigInteger element = null;
 		// find a number in the range [1, ..., p-1]
-		element = BigIntegers.createRandomInRange(BigInteger.ONE, p.subtract(BigInteger.ONE), new SecureRandom());
+		element = BigIntegers.createRandomInRange(BigInteger.ONE, p.subtract(BigInteger.ONE), random);
 			
 		//calculate its power to get a number in the subgroup and set the power as the element. 
 		element = element.pow(2).mod(p);

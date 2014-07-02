@@ -26,6 +26,8 @@ package edu.biu.scapi.primitives.dlog.openSSL;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.Properties;
 
 import edu.biu.scapi.primitives.dlog.DlogECF2m;
@@ -55,6 +57,12 @@ public class OpenSSLDlogECF2m extends OpenSSLAdapterDlogEC implements DlogECF2m,
 	//Initializes the native curve with the generator and order.
 	private native int initCurve(long curve, long generator, byte[] q, byte[] cofactor);
 	
+	/**
+	 * Default constructor. Initializes this object with K-163 NIST curve.
+	 */
+	public OpenSSLDlogECF2m() throws IOException {
+		this("K-163");
+	}
 	
 	/**
 	 * Initializes this DlogGroup with the curve in the given file.
@@ -67,12 +75,34 @@ public class OpenSSLDlogECF2m extends OpenSSLAdapterDlogEC implements DlogECF2m,
 	}
 	
 	/**
+	 * Initializes this DlogGroup with the curve in the given file.
+	 * @param fileName the file to take the curve's parameters from.
+	 * @param curveName name of curve to initialized.
+	 * @param randNumGenAlg The random number generator to use.
+	 * @throws IOException if there is a problem with the given file name.
+	 * @throws NoSuchAlgorithmException 
+	 */
+	public OpenSSLDlogECF2m(String fileName, String curveName, String randNumGenAlg) throws IOException, NoSuchAlgorithmException {
+		super(fileName, curveName, SecureRandom.getInstance(randNumGenAlg));	
+	}
+	
+	/**
 	 * Initialize this DlogGroup with one of NIST recommended elliptic curve.
 	 * @param curveName name of NIST curve to initialized
 	 * @throws IOException if there is a problem with NIST properties file.
 	 */
 	public OpenSSLDlogECF2m(String curveName) throws IOException {
 		super(curveName);
+	}
+	
+	/**
+	 * Initialize this DlogGroup with one of NIST recommended elliptic curve.
+	 * @param curveName name of NIST curve to initialized
+	 * @param random The source of randomness to use.
+	 * @throws IOException if there is a problem with NIST properties file.
+	 */
+	public OpenSSLDlogECF2m(String curveName, SecureRandom random) throws IOException {
+		super(curveName, random);
 	}
 	
 	@Override

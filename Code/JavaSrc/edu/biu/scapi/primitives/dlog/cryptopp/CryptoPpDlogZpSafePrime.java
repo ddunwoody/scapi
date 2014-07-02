@@ -27,6 +27,8 @@
 package edu.biu.scapi.primitives.dlog.cryptopp;
 
 import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 
 import edu.biu.scapi.primitives.dlog.DlogGroupAbs;
 import edu.biu.scapi.primitives.dlog.DlogZpSafePrime;
@@ -70,6 +72,16 @@ public class CryptoPpDlogZpSafePrime extends DlogGroupAbs implements DlogZpSafeP
 	 */
 	public CryptoPpDlogZpSafePrime(ZpGroupParams groupParams) {
 
+		this(groupParams, new SecureRandom());
+	}
+	
+	/**
+	 * Initializes the CryptoPP implementation of Dlog over Zp* with the given groupParams
+	 * @param groupParams - contains the group parameters
+	 */
+	public CryptoPpDlogZpSafePrime(ZpGroupParams groupParams, SecureRandom random) {
+
+		this.random = random;
 		BigInteger p = groupParams.getP();
 		BigInteger q = groupParams.getQ();
 		BigInteger g = groupParams.getXg();
@@ -115,6 +127,18 @@ public class CryptoPpDlogZpSafePrime extends DlogGroupAbs implements DlogZpSafeP
 		//creates ZpGroupParams from the given arguments and call the appropriate constructor
 		this(new ZpGroupParams(new BigInteger(q), new BigInteger(g), new BigInteger(p)));
 	}
+	
+	/**
+	 * Initializes the CryptoPP implementation of Dlog over Zp* with the given groupParams
+	 * @param q the order of the group
+	 * @param g the generator of the group
+	 * @param p the prime of the group
+	 * @throws NoSuchAlgorithmException 
+	 */
+	public CryptoPpDlogZpSafePrime(String q, String g, String p, String randNumGenAlg) throws NoSuchAlgorithmException {
+		//creates ZpGroupParams from the given arguments and call the appropriate constructor
+		this(new ZpGroupParams(new BigInteger(q), new BigInteger(g), new BigInteger(p)), SecureRandom.getInstance(randNumGenAlg));
+	}
 
 	/**
 	 * Default constructor. Initializes this object with 1024 bit size.
@@ -129,6 +153,17 @@ public class CryptoPpDlogZpSafePrime extends DlogGroupAbs implements DlogZpSafeP
 	 */
 	public CryptoPpDlogZpSafePrime(int numBits) {
 
+		this(numBits, new SecureRandom());
+	}
+	
+	/**
+	 * Initializes the CryptoPP implementation of Dlog over Zp* with random elements
+	 * @param numBits - number of the prime p bits to generate
+	 */
+	public CryptoPpDlogZpSafePrime(int numBits, SecureRandom random){
+		
+		this.random = random;
+		
 		// create random Zp dlog group
 		pointerToGroup = createRandomDlogZp(numBits);
 
@@ -145,12 +180,16 @@ public class CryptoPpDlogZpSafePrime extends DlogGroupAbs implements DlogZpSafeP
 
 		//Now that we have p, we can calculate k which is the maximum length in bytes of a string to be converted to a Group Element of this group. 
 		k = calcK(p);
-
 	}
 
 	public CryptoPpDlogZpSafePrime(String numBits) {
 		//creates an int from the given string and calls the appropriate constructor
 		this(new Integer(numBits));
+	}
+	
+	public CryptoPpDlogZpSafePrime(String numBits, String randNumGenAlg) throws NoSuchAlgorithmException {
+		//creates an int from the given string and calls the appropriate constructor
+		this(new Integer(numBits), SecureRandom.getInstance(randNumGenAlg));
 	}
 	
 	private int calcK(BigInteger p){
@@ -192,7 +231,7 @@ public class CryptoPpDlogZpSafePrime extends DlogGroupAbs implements DlogZpSafeP
 	public GroupElement createRandomElement() {
 		//This function overrides the basic implementation of DlogGroupAbs. For the case of Zp Safe Prime this is a more efficient implementation.
 		//It calls the package private constructor of ZpSafePrimeElementCryptoPp, which randomly creates an element in Zp.
-		return new ZpSafePrimeElementCryptoPp(((ZpGroupParams) groupParams).getP());
+		return new ZpSafePrimeElementCryptoPp(((ZpGroupParams) groupParams).getP(), random);
 
 	}
 

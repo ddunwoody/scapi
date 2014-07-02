@@ -29,6 +29,7 @@ package edu.biu.scapi.primitives.dlog.miracl;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.HashMap;
 
 import edu.biu.scapi.primitives.dlog.DlogEllipticCurve;
@@ -63,7 +64,11 @@ public abstract class MiraclAdapterDlogEC extends DlogGroupEC
 	protected MiraclAdapterDlogEC(){}
 	
 	public MiraclAdapterDlogEC(String fileName, String curveName) throws IOException {
-		super(fileName, curveName);
+		this(fileName, curveName, new SecureRandom());
+	}
+	
+	public MiraclAdapterDlogEC(String fileName, String curveName, SecureRandom random) throws IOException {
+		super(fileName, curveName, random);
 		exponentiationsMap = new HashMap <GroupElement, Long>();
 	}
 
