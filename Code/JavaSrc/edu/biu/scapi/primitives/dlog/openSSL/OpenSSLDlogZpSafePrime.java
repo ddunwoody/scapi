@@ -440,8 +440,7 @@ public class OpenSSLDlogZpSafePrime extends DlogGroupAbs implements DlogZpSafePr
 		BigInteger s = new BigInteger(newString);
 		BigInteger y = (s.add(BigInteger.ONE)).pow(2).mod(((ZpGroupParams) groupParams).getP());
 		//There is no need to check membership since the "element" was generated so that it is always an element.
-		Boolean bCheckMembership = true;
-		OpenSSLZpSafePrimeElement element = new OpenSSLZpSafePrimeElement(y, ((ZpGroupParams) groupParams).getP(), bCheckMembership);
+		OpenSSLZpSafePrimeElement element = new OpenSSLZpSafePrimeElement(y, ((ZpGroupParams) groupParams).getP(), false);
 		return element;
 	}
 	

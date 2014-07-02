@@ -442,8 +442,7 @@ public class CryptoPpDlogZpSafePrime extends DlogGroupAbs implements DlogZpSafeP
 		BigInteger s = new BigInteger(newString);
 		BigInteger y = (s.add(BigInteger.ONE)).pow(2).mod(((ZpGroupParams) groupParams).getP());
 		//There is no need to check membership since the "element" was generated so that it is always an element.
-		Boolean bCheckMembership = true;
-		ZpSafePrimeElementCryptoPp element = new ZpSafePrimeElementCryptoPp(y, ((ZpGroupParams) groupParams).getP(), bCheckMembership);
+		ZpSafePrimeElementCryptoPp element = new ZpSafePrimeElementCryptoPp(y, ((ZpGroupParams) groupParams).getP(), false);
 		return element;
 	}
 	
