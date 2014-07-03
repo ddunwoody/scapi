@@ -1,2 +1,5 @@
 *.o
 *.class
+.classpath
+.project
+*.jar
