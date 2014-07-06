@@ -22,12 +22,23 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-#include "jni.h" 
+// windows includes
+#ifdef _WIN32
 #include "stdafx.h"
+#endif
+
+// stdlib includes
 #include <string>
-#include "CollisionResistantHash.h"
+
+// java jni includes
+#include "jni.h"
+
+// cryptopp includes
 #include "sha.h"
 #include "cryptlib.h"
+
+// local includes
+#include "CollisionResistantHash.h"
 
 using namespace std;
 using namespace CryptoPP;

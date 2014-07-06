@@ -22,18 +22,30 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
+
+// windows includes
+#ifdef _WIN32
 #include "stdafx.h"
+#endif
+
+// stdlib includes
+#include <string>
+#include <time.h>
+
+// java jni includes
 #include "jni.h"
-#include "filter.h"
+
+// cryptopp includes
+#include "filters.h"
 #include "rabin.h"
 #include "rsa.h"
-#include <string>
-#include "Examples.h"
 #include "osrng.h"
 #include "ecp.h"
 #include "asn.h"
 #include "oids.h"
-#include <time.h>
+
+// local includes
+#include "Examples.h"
 
 using namespace std;
 using namespace CryptoPP;

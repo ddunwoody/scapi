@@ -22,14 +22,24 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
+
+// windows includes
+#ifdef _WIN32
 #include "stdafx.h"
-#include "RabinPermutation.h"
+#endif
+
+// stdlib includes
+#include <iostream>
+
+// cryptopp includes
 #include "rabin.h"
 #include "cryptlib.h"
-#include "Utils.h"
 #include "osrng.h"
-#include <iostream>
 #include "nbtheory.h"
+
+// local includes
+#include "RabinPermutation.h"
+#include "Utils.h"
 
 using namespace std;
 using namespace CryptoPP;

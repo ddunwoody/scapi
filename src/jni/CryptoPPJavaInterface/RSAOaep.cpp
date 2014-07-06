@@ -22,14 +22,24 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
+
+// windows includes
+#ifdef _WIN32
 #include "stdafx.h"
-#include "RSAOaep.h"
-#include "cryptlib.h"
-#include "Utils.h"
-#include <osrng.h>
-#include <rsa.h>
+#endif
+
+// stdlib includes
 #include <assert.h>
 #include <iostream>
+
+// cryptopp includes
+#include "cryptlib.h"
+#include <osrng.h>
+#include <rsa.h>
+
+// local includes
+#include "Utils.h"
+#include "RSAOaep.h"
 
 using namespace std;
 using namespace CryptoPP;
@@ -235,6 +245,6 @@ JNIEXPORT jint JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_encryption_C
 
 JNIEXPORT void JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_encryption_CryptoPPRSAOaep_deleteRSA
   (JNIEnv *, jobject, jlong encryptor, jlong decryptor){
-	  delete (RSAES_OAEP_SHA_Encryptor *) encryptor;
-	  delete (RSAES_OAEP_SHA_Decryptor *) decryptor;
+         delete (RSAES_OAEP_SHA_Encryptor *) encryptor;
+         delete (RSAES_OAEP_SHA_Decryptor *) decryptor;
 }

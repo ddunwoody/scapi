@@ -22,14 +22,27 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
+
+// windows includes
+#ifdef _WIN32
 #include "stdafx.h"
-#include "RSAPermutation.h"
+#endif
+
+// stdlib includes
+#include <iostream>
+
+// java jni includes
+#include "jni.h"
+
+// cryptopp includes
 #include "rsa.h"
 #include "cryptlib.h"
-#include "Utils.h"
 #include "osrng.h"
 #include "rabin.h"
-#include <iostream>
+
+// local includes
+#include "RSAPermutation.h"
+#include "Utils.h"
 
 using namespace std;
 using namespace CryptoPP;

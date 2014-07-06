@@ -22,12 +22,19 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
+// windows includes
+#ifdef _WIN32
 #include "stdafx.h"
-#include "DlogGroup.h"
-#include "Utils.h"
+#endif
+
+// cryptopp includes
 #include "cryptlib.h"
 #include "gfpcrypt.h"
 #include "osrng.h"
+
+// local includes
+#include "DlogGroup.h"
+#include "Utils.h"
 
 using namespace CryptoPP;
 
@@ -240,5 +247,5 @@ JNIEXPORT jboolean JNICALL Java_edu_biu_scapi_primitives_dlog_cryptopp_CryptoPpD
 JNIEXPORT void JNICALL Java_edu_biu_scapi_primitives_dlog_cryptopp_CryptoPpDlogZpSafePrime_deleteDlogZp
   (JNIEnv *, jobject, jlong groupPtr){
 	  //free the allocated memory
-	  delete((void*) groupPtr);
+	  delete((DL_GroupParameters_GFP_DefaultSafePrime*) groupPtr);
 }

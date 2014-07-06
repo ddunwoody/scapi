@@ -22,12 +22,23 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
+// windows includes
+#ifdef _WIN32
 #include "stdafx.h"
-#include "jni.h" 
-#include "AESPermutation.h"
+#endif
+
+// stdlib includes
+#include <iostream>
+
+// java jni includes
+#include "jni.h"
+
+// cryptopp includes
 #include "cryptlib.h"
 #include "aes.h"
-#include <iostream>
+
+// local includes
+#include "AESPermutation.h"
 
 using namespace std;
 using namespace CryptoPP;

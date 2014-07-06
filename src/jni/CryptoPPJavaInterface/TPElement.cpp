@@ -22,14 +22,24 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
+
+// windows includes
+#ifdef _WIN32
 #include "stdafx.h"
-#include "TPElement.h"
-#include "Utils.h"
+#endif
+
+// stdlib includes
 #include <iostream>
-#include "Integer.h"
+
+// cryptopp includes
+#include "integer.h"
 #include "osrng.h"
 #include "cryptlib.h"
 #include "modarith.h"
+
+// local includes
+#include "TPElement.h"
+#include "Utils.h"
 
 using namespace std;
 using namespace CryptoPP;
@@ -70,7 +80,7 @@ JNIEXPORT void JNICALL Java_edu_biu_scapi_primitives_trapdoorPermutation_cryptop
   (JNIEnv *env, jobject , jlong elPtr) {
 
 	  //free the allocated memory
-	  delete((void*) elPtr);
+	  delete((Integer*) elPtr);
 }
 
 /*

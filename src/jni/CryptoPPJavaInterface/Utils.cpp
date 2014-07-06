@@ -22,11 +22,21 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
+
+// windows includes
+#ifdef _WIN32
 #include "stdafx.h"
-#include "Utils.h"
-#include "Integer.h"
+#endif
+
+// stdlib includes
 #include <iostream>
 #include <queue.h>
+
+// cryptopp includes
+#include "integer.h"
+
+// local includes
+#include "Utils.h"
 
 using namespace std;
 
