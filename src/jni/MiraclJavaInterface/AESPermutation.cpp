@@ -23,11 +23,18 @@
 * 
 */
 
-#include "StdAfx.h"
+#ifdef _WIN32
+#include "stdafx.h"
+#endif
+
 #include <jni.h>
 #include <stdlib.h>
 #include <iostream>
-#include "miracl.h"
+#include <string.h>
+
+extern "C" {
+#include <miracl.h>
+}
 #include "AESPermutation.h"
 
 using namespace std;

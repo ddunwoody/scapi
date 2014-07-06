@@ -23,15 +23,20 @@
 * 
 */
 
-#include "StdAfx.h"
+#ifdef _WIN32
+#include "stdafx.h"
+#endif
+
 #include <jni.h>
 #include <stdlib.h>
 #include <iostream>
 #include <math.h>
 #include <map>
+extern "C" {
+#include <miracl.h>
+}
 #include "Dlog.h"
 #include "Utils.h"
-#include "miracl.h"
 
 
 JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_miracl_MiraclAdapterDlogEC_createMip
@@ -360,7 +365,7 @@ JNIEXPORT jboolean JNICALL Java_edu_biu_scapi_primitives_dlog_miracl_MiraclDlogE
 	  
 	 
 	  /* check if the values are as expected, return the result */
-	  if (compare(genX, x)==0 && compare(genY, y)==0)
+	  if (mr_compare(genX, x)==0 && mr_compare(genY, y)==0)
 		  result = 1;
 	  else result = 0;
 
@@ -395,7 +400,7 @@ JNIEXPORT jboolean JNICALL Java_edu_biu_scapi_primitives_dlog_miracl_MiraclAdapt
 	  epoint2_get(mip, (epoint*)generator, genX, genY);
 
 	  /* check if the values are as expected, return the result */
-	  if (compare(genX, x)==0 && compare(genY, y)==0)
+	  if (mr_compare(genX, x)==0 && mr_compare(genY, y)==0)
 		 result = 1;
 	  else result = 0;
 
@@ -522,7 +527,7 @@ epoint* computeLL(miracl* mip, epoint** elements, big* exponents, int n, int fie
 
 	//get the biggest exponent
 	for (i=0; i<n; i++)
-		if (compare(bigExp, exponents[i]) < 0)
+		if (mr_compare(bigExp, exponents[i]) < 0)
 			bigExp = exponents[i];
 	//num of bitf in the biggest exponent
 	t = logb2(mip, bigExp);
