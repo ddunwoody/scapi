@@ -49,7 +49,7 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_prf_openSSL_OpenSSLHMAC_cr
 
 	  //Create an Hmac object and initialize it with the created hash.
 	  HMAC_CTX_init(ctx);
-	  HMAC_Init_ex(ctx, NULL, NULL,  md, NULL);
+	  HMAC_Init_ex(ctx, NULL, 0,  md, NULL);
 
 	  //Release the allocated memory.
 	  env->ReleaseStringUTFChars(hashName, name);

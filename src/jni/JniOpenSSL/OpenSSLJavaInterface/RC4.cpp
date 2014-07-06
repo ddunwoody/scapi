@@ -28,6 +28,7 @@
 #include "RC4.h"
 #include <openssl/rc4.h>
 #include <iostream>
+#include <cstdlib>
 
 using namespace std;
 

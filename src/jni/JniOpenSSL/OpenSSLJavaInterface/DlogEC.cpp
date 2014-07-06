@@ -252,10 +252,10 @@ EC_POINT* DlogEC::inversePoint(EC_POINT* point){
 	//Create an inverse point and copy the given point to it.
 	EC_POINT *inverse;
 	if(NULL == (inverse = EC_POINT_new(curveP))) return 0;
-	if(NULL == (EC_POINT_copy(inverse, point))) return 0;
+	if(0 == (EC_POINT_copy(inverse, point))) return 0;
 
 	//Inverse the given value and set the inversed value instead.
-	if(NULL == (EC_POINT_invert(curveP,  inverse, ctx))) return 0;
+	if(0 == (EC_POINT_invert(curveP,  inverse, ctx))) return 0;
 	
 	return  inverse;
 }
@@ -272,7 +272,7 @@ EC_POINT* DlogEC::exponentiate(EC_POINT* base, BIGNUM* exponent){
 	if(NULL == (result = EC_POINT_new(curveP))) return 0;
 
 	//Compute the exponentiate.
-	if(NULL == (EC_POINT_mul(curveP, result, NULL, base, exponent, ctx))) return 0;
+	if(0 == (EC_POINT_mul(curveP, result, NULL, base, exponent, ctx))) return 0;
 
 	return result;
 }
@@ -319,7 +319,7 @@ EC_POINT* DlogEC::simultaneousMultiply(const EC_POINT** pointsArr, const BIGNUM*
 	if(NULL == (result = EC_POINT_new(curveP))) return 0;
 
 	//Computes the simultaneous multiply.
-	if(NULL == (EC_POINTs_mul(curveP, result, NULL, size, pointsArr, exponentsArr, ctx))) return 0;
+	if(0 == (EC_POINTs_mul(curveP, result, NULL, size, pointsArr, exponentsArr, ctx))) return 0;
 
 	return result;
 
@@ -345,11 +345,11 @@ EC_POINT* DlogEC::exponentiateWithPreComputedValues(BIGNUM* exponent){
 
 	//If there are no pre computes values, calculate them.
 	if (EC_GROUP_have_precompute_mult(curveP) == 0){
-		if(NULL == (EC_GROUP_precompute_mult(curveP, ctx))) return 0;
+		if(0 == (EC_GROUP_precompute_mult(curveP, ctx))) return 0;
 	}
 
 	//Calculate the exponentiate with the pre computed values.
-	if(NULL == (EC_POINT_mul(curveP, result, exponent, NULL, NULL, ctx))) return 0;
+	if(0 == (EC_POINT_mul(curveP, result, exponent, NULL, NULL, ctx))) return 0;
 
 	return result;
 

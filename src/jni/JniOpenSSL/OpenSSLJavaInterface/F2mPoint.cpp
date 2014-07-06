@@ -89,7 +89,7 @@ JNIEXPORT jbyteArray JNICALL Java_edu_biu_scapi_primitives_dlog_openSSL_ECF2mPoi
 	  //Convert x into a char array.
 	  int size = BN_num_bytes(x);
 	  unsigned char *xBytes = new unsigned char[size];
-	  if(NULL == (BN_bn2bin(x, xBytes))) return 0;
+	  if(0 == (BN_bn2bin(x, xBytes))) return 0;
 		  
 	  //Build jbyteArray from the char array.
 	  jbyteArray result = env-> NewByteArray(size);
@@ -121,7 +121,7 @@ JNIEXPORT jbyteArray JNICALL Java_edu_biu_scapi_primitives_dlog_openSSL_ECF2mPoi
 	  //Convert y into a char array.
 	  int size = BN_num_bytes(y);
 	  unsigned char *yBytes = new unsigned char[size];
-	  if(NULL == (BN_bn2bin(y, yBytes))) return 0;
+	  if(0 == (BN_bn2bin(y, yBytes))) return 0;
 		  
 	  //Build jbyteArray from the char array.
 	  jbyteArray result = env-> NewByteArray(size);

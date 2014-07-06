@@ -28,6 +28,7 @@
 #include "SymEncryption.h"
 #include <openssl/evp.h>
 #include <iostream>
+#include <cstring>
 
 using namespace std;
 
@@ -172,7 +173,7 @@ JNIEXPORT void JNICALL Java_edu_biu_scapi_midLayer_symmetricCrypto_encryption_Op
 
 	  //Create the requested block cipher according to the given prpName.
 	  const EVP_CIPHER* cipher;
-	  if(strcmp (str,"AES") == 0) {
+	  if(strncmp(str,"AES",3) == 0) {
 		 
 		  //In case the given prp name is AES, the actual object to use depends on the key size.
 		  int len = env->GetArrayLength(key)*8; //number of bits in key.
@@ -186,7 +187,7 @@ JNIEXPORT void JNICALL Java_edu_biu_scapi_midLayer_symmetricCrypto_encryption_Op
 								   break;
 				default: break;
 		  }
-	  } else if(strcmp (str,"TripleDES") == 0) {
+	  } else if(strncmp(str,"TripleDES",9) == 0) {
 		  
 		  cipher = EVP_des_ede3_cbc();
 	  }
@@ -219,7 +220,7 @@ JNIEXPORT void JNICALL Java_edu_biu_scapi_midLayer_symmetricCrypto_encryption_Op
 
 	  //Create the requested block cipher according to the given prpName.
 	  const EVP_CIPHER* cipher;
-	  if(strcmp (str,"AES") == 0) {
+	  if(strncmp(str,"AES",3) == 0) {
 		  
 		   //In case the given prp name is AES, the actual object to use depends on the key size.
 		  int len = env->GetArrayLength(key)*8; //number of bit in key.
