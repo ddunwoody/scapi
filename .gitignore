@@ -1,4 +1,7 @@
+*~
 *.o
+*.a
+*.so
 *.class
 .classpath
 .project
