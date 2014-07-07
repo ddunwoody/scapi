@@ -13,8 +13,11 @@ CXXFLAGS=-fPIC
 MIRACL_INCLUDES = -I/usr/local/include/miracl/
 MIRACL_LIB = -lmiracl
 
-SOURCES = AESPermutation.cpp Utils.cpp DLog.cpp ECF2mPoint.cpp ECFpPoint.cpp
-OBJ_FILES = $(SOURCES:.cpp=.o)
+SOURCES = Utils.c Dlog.c ECF2mPoint.c ECFpPoint.c
+CPP_SOURCES = AESPermutation.cpp
+
+OBJ_FILES = $(SOURCES:.c=.o)
+CPP_OBJ_FILES = $(CPP_SOURCES:.cpp=.opp)
 
 ## targets ##
 
@@ -24,8 +27,11 @@ libMiraclJavaInterface.so: $(OBJ_FILES)
 	$(INCLUDE_ARCHIVES_START) $(MIRACL_LIB) $(INCLUDE_ARCHIVES_END)
 
 # each source file is compiled seperately before linking
-%.o: %.cpp
+%.o: %.c
 	$(CXX) $(CXXFLAGS) -c $< $(MIRACL_INCLUDES) $(JAVA_INCLUDES)
+
+%.opp: %.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@ $(MIRACL_INCLUDES) $(JAVA_INCLUDES)
 
 clean:
 	rm -f *~
