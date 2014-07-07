@@ -1,5 +1,6 @@
 # detecting a unix os type: could be Linux, Darwin(Mac), FreeBSD, etc...
 uname_S := $(shell sh -c 'uname -s 2>/dev/null || echo not')
+ARCH := $(shell getconf LONG_BIT)
 
 ifeq ($(uname_S),Linux)
 	JAVA_HOME=$(shell dirname $$(dirname $$(readlink -f `which javac`)))
@@ -19,6 +20,8 @@ CXXFLAGS="-DNDEBUG -g -O2 -fPIC"
 # export all variables that are used by child makefiles
 export JAVA_HOME
 export JAVA_INCLUDES
+export uname_S
+export ARCH
 
 EXTERNAL_LIBS_TARGETS=compile-cryptopp compile-miracl compile-otextension compile-ntl compile-openssl
 JNI_TAGRETS=jni-cryptopp jni-miracl jni-otextension jni-ntl jni-openssl
@@ -36,6 +39,11 @@ compile-cryptopp:
 
 compile-miracl:
 	echo "Compiling the Miracl library..."
+	rm -rf build/miracl
+	mkdir -p build/miracl
+	find lib/Miracl/ -type f -exec cp '{}' build/miracl/ \;
+	cp -r lib/MiraclCompilation/* build/miracl/
+	$(MAKE) -C build/miracl MIRACL_TARGET_LANG=c
 
 compile-otextension:
 	echo "Compiling the OtExtension library..."
