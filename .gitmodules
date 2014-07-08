@@ -13,3 +13,6 @@
 [submodule "lib/NTL"]
 	path = lib/NTL
 	url = git@github.com:cryptobiu/NTL.git
+[submodule "lib/OTExtension"]
+	path = lib/OTExtension
+	url = git@github.com:cryptobiu/OTExtension.git
