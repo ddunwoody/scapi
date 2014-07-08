@@ -15,6 +15,7 @@ endif
 # compilation options
 CC=gcc
 CXX=g++
+CFLAGS=-fPIC
 CXXFLAGS="-DNDEBUG -g -O2 -fPIC"
 
 # export all variables that are used by child makefiles
@@ -59,6 +60,10 @@ compile-ntl:
 
 compile-openssl:
 	@echo "Compiling the OpenSSL library..."
+	@cd lib/OpenSSL && ./config shared -fPIC --openssldir=/usr/local/ssl
+	@$(MAKE) -C lib/OpenSSL depend
+	@$(MAKE) -C lib/OpenSSL all
+	@sudo $(MAKE) -C lib/OpenSSL install
 
 jni-cryptopp: compile-cryptopp
 	@echo "Compiling the Crypto++ jni interface..."
@@ -75,8 +80,13 @@ jni-otextension: prepare-miracl compile-miracl-cpp compile-otextension
 jni-ntl: compile-ntl
 	@echo "Compiling the NTL jni interface..."
 
-jni-openssl: compile-openssl
+jni-openssl:
 	@echo "Compiling the OpenSSL jni interface..."
+	@$(MAKE) -C src/jni/OpenSSLJavaInterface
+
+clean-jni-openssl:
+	@echo "Cleaning the OpenSSL jni dir..."
+	@$(MAKE) -C src/jni/OpenSSLJavaInterface clean
 
 clean-miracl:
 	@echo "Cleaning the miracl build dir..."

@@ -2,12 +2,13 @@
 # > cd [SCAPI_ROOT]
 # > make jni-miracl
 
-INCLUDE_ARCHIVES_START = -Wl,-whole-archive
-INCLUDE_ARCHIVES_END = -Wl,-no-whole-archive -Wl,--no-undefined
-
 # compilation options
 CXX=g++
 CXXFLAGS=-fPIC
+
+# linking options, we prefer our generated shared object will be self-contained.
+INCLUDE_ARCHIVES_START = -Wl,-whole-archive
+INCLUDE_ARCHIVES_END = -Wl,-no-whole-archive -Wl,--no-undefined
 
 # miracl dependency
 MIRACL_INCLUDES = -I/usr/local/include/miracl/
@@ -36,4 +37,5 @@ libMiraclJavaInterface.so: $(OBJ_FILES)
 clean:
 	rm -f *~
 	rm -f *.o
+	rm -f *.opp
 	rm -f *.so
