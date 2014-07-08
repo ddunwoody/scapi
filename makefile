@@ -67,6 +67,14 @@ compile-openssl:
 	@$(MAKE) -C lib/OpenSSL all
 	@sudo $(MAKE) -C lib/OpenSSL install
 
+compile-bouncycastle:
+	@echo "Compiling the BouncyCastle library..."
+	@cd lib/BouncyCastle && chmod a+x build15+ && ./build15+
+	@mkdir -p build/bouncycastle/
+	@cp lib/BouncyCastle/build/artifacts/jdk1.5/jars/bcprov-jdk* build/bouncycastle/
+
+#@sudo apt-get install junit
+
 jni-cryptopp: compile-cryptopp
 	@echo "Compiling the Crypto++ jni interface..."
 	@$(MAKE) -C src/jni/CryptoPPJavaInterface
