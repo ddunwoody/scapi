@@ -54,6 +54,8 @@ compile-miracl-cpp:
 
 compile-otextension:
 	@echo "Compiling the OtExtension library..."
+	@sudo $(MAKE) -C lib/OTExtension
+	@sudo $(MAKE) -C lib/OTExtension install
 
 compile-ntl:
 	@echo "Compiling the NTL library..."
@@ -76,6 +78,7 @@ jni-miracl:
 
 jni-otextension: prepare-miracl compile-miracl-cpp compile-otextension
 	@echo "Compiling the OtExtension jni interface..."
+	@$(MAKE) -C src/jni/OtExtensionJavaInterface
 
 jni-ntl: compile-ntl
 	@echo "Compiling the NTL jni interface..."
