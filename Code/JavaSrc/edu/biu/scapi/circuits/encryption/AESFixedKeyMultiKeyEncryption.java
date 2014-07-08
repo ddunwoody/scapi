@@ -32,7 +32,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import edu.biu.scapi.exceptions.KeyNotSetException;
 import edu.biu.scapi.exceptions.TweakNotSetException;
-import edu.biu.scapi.primitives.prf.PseudorandomFunction;
+import edu.biu.scapi.primitives.prf.AES;
 import edu.biu.scapi.primitives.prf.cryptopp.CryptoPpAES;
 
 /**
@@ -54,7 +54,7 @@ public class AESFixedKeyMultiKeyEncryption implements MultiKeyEncryptionScheme {
 	//A 128 bit key that we generated once and hardcoded in.
 	static final SecretKey FIXED_KEY = new SecretKeySpec (new byte[]{ -13, 29,-20, 98, -96, -51, -86, -82, 9, 49, -26, 92, -22, 50, -100, 36 }, "");
 	
-	private PseudorandomFunction aes;
+	private AES aes;
 	
 	/*
 	 * The key here is not the key to the AES, but rather the key to this encryption scheme. 
