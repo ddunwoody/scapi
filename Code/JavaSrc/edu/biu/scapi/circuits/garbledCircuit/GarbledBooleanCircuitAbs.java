@@ -149,12 +149,12 @@ abstract class GarbledBooleanCircuitAbs implements GarbledBooleanCircuit{
 	      
 	    	//Calculate the resulting value.
 	    	value = (byte) (signalBit ^ permutationBitOnWire);
-	    	//System.out.print(value);
+	    	
 	    	//Hold the result as a wire.
 	    	Wire translated = new Wire(value);
 	    	translatedOutput.put(w, translated);
 	    }
-	//System.out.println();
+	
 	    return translatedOutput;
 
 	}
