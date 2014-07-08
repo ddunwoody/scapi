@@ -10,9 +10,6 @@
 [submodule "lib/BouncyCastle"]
 	path = lib/BouncyCastle
 	url = git@github.com:bcgit/bc-java.git
-[submodule "lib/OTExtension"]
-	path = lib/OTExtension
-	url = git@github.com:MichaelZohner/OTExtension.git
 [submodule "lib/NTL"]
 	path = lib/NTL
 	url = git@github.com:cryptobiu/NTL.git
