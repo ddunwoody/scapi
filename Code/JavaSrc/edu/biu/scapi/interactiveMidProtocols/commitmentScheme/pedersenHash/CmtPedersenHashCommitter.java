@@ -39,6 +39,8 @@ import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.BigIntegerRandomValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtBigIntegerCommitValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtByteArrayCommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCCommitmentMsg;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCDecommitmentMessage;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitter;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtOnByteArray;
@@ -46,7 +48,7 @@ import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.CmtPeders
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.CmtPedersenCommitterCore;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.hash.CryptographicHash;
-import edu.biu.scapi.primitives.hash.bc.BcSHA224;
+import edu.biu.scapi.primitives.hash.openSSL.OpenSSLSHA224;
 import edu.biu.scapi.securityLevel.PerfectlyHidingCmt;
 
 /**
@@ -83,7 +85,7 @@ public class CmtPedersenHashCommitter extends CmtPedersenCommitterCore implement
 	 */
 	public CmtPedersenHashCommitter(Channel channel) throws ClassNotFoundException, IOException, CheatAttemptException{
 		super(channel);
-		this.hash = new BcSHA224(); 	//This default hash suits the default DlogGroup of the underlying Committer.
+		this.hash = new OpenSSLSHA224(); 	//This default hash suits the default DlogGroup of the underlying Committer.
 		hashCommitmentMap = new Hashtable<Long, byte[]>();
 	}
 	
@@ -119,10 +121,11 @@ public class CmtPedersenHashCommitter extends CmtPedersenCommitterCore implement
 	 */
 	
 	/**
-	 * Run COMMIT_PEDERSEN to commit to value H(x).
+	 * Runs COMMIT_ElGamal to commit to value H(x).
+	 * @return the created commitment.
 	 */
-	@Override
-	public void commit(CmtCommitValue input, long id) throws IOException, IllegalArgumentException {
+	public CmtCCommitmentMsg generateCommitmentMsg(CmtCommitValue input, long id){
+		
 		//Check that the input x is in the end a byte[]
 		if (!(input instanceof CmtByteArrayCommitValue))
 			throw new IllegalArgumentException("The input must be of type CmtByteArrayCommitValue");
@@ -135,22 +138,30 @@ public class CmtPedersenHashCommitter extends CmtPedersenCommitterCore implement
 		byte[] hashValArray = new byte[hash.getHashedMsgSize()];
 		hash.update(x, 0, x.length);
 		hash.hashFinal(hashValArray, 0);
-		//Use Pedersen commitment on the hashed value 
-		super.commit(new CmtBigIntegerCommitValue(new BigInteger(1, hashValArray)), id);
+		
+		//After the input has been manipulated with the Hash call the super's commit function. Since the super has been initialized with ScElGamalOnByteArray
+		//it will know how to take care of the byte array input.
+		return super.generateCommitmentMsg(new CmtBigIntegerCommitValue(new BigInteger(1, hashValArray)), id);
 	}
 
+	@Override
+	public CmtCDecommitmentMessage generateDecommitmentMsg(long id){
+		
+		//Fetch the commitment according to the requested ID
+		byte[] x = hashCommitmentMap.get(Long.valueOf(id));
+		//Get the relevant random value used in the commitment phase
+		BigIntegerRandomValue r = (commitmentMap.get(id)).getR();
+		
+		return new CmtPedersenDecommitmentMessage(new BigInteger(x),r);
+	}
+	
 	/**
 	 * Sends x to the receiver.
 	 */
 	@Override
 	public void decommit(long id) throws IOException {
 
-		//Fetch the commitment according to the requested ID
-		byte[] x = hashCommitmentMap.get(Long.valueOf(id));
-		//Get the relevant random value used in the commitment phase
-		BigIntegerRandomValue r = (commitmentMap.get(id)).getR();
-		
-		CmtPedersenDecommitmentMessage msg = new CmtPedersenDecommitmentMessage(new BigInteger(x),r);
+		CmtCDecommitmentMessage msg = generateDecommitmentMsg(id);
 		try{
 			channel.send(msg);
 		}

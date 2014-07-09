@@ -29,12 +29,15 @@ import java.security.SecureRandom;
 import java.util.Hashtable;
 import java.util.Map;
 
+
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CommitValueException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.BigIntegerRandomValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtByteArrayCommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCCommitmentMsg;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCDecommitmentMessage;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitter;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtOnByteArray;
@@ -75,14 +78,17 @@ public class CmtElGamalHashCommitter extends CmtElGamalCommitterCore implements 
 	 * Otherwise, it throws IllegalArgumentException.
 	 * An established channel has to be provided by the user of the class.
 	 * @param channel
-	 * @throws IllegalArgumentException
-	 * @throws SecurityLevelException
-	 * @throws InvalidDlogGroupException
-	 * @throws IOException
+	 * @throws IOException In case there is a problem in the pre-process phase.
 	 */
-	public CmtElGamalHashCommitter(Channel channel) throws IllegalArgumentException, SecurityLevelException, InvalidDlogGroupException, IOException{
+	public CmtElGamalHashCommitter(Channel channel) throws IOException {
 		//This default hash suits the default DlogGroup.
-		this(channel, new MiraclDlogECF2m("K-283"), new BcSHA256(), new SecureRandom());
+		try {
+			doConstruct(channel, new MiraclDlogECF2m("K-283"), new BcSHA256(), new SecureRandom());
+		} catch (SecurityLevelException e) {
+			// Should not occur since the default DlogGroup has the necessary security level.
+		} catch (InvalidDlogGroupException e) {
+			// Should not occur since the default DlogGroup is valid.
+		}
 	}
 	
 
@@ -102,20 +108,51 @@ public class CmtElGamalHashCommitter extends CmtElGamalCommitterCore implements 
 	 * @throws IOException
 	 */
 	public CmtElGamalHashCommitter(Channel channel, DlogGroup dlog, CryptographicHash hash, SecureRandom random) throws IllegalArgumentException, SecurityLevelException, InvalidDlogGroupException, IOException{
+		doConstruct(channel, dlog, hash, random);
+	}
+
+	private void doConstruct(Channel channel, DlogGroup dlog, CryptographicHash hash, SecureRandom random) throws SecurityLevelException, InvalidDlogGroupException, IOException{
 		//During the construction of this object, the Public Key with which we set the El Gamal object gets sent to the receiver.
-		super(channel, dlog, new ScElGamalOnByteArray(dlog, new HKDF(new BcHMAC())), random);
+		super.doConstruct(channel, dlog, new ScElGamalOnByteArray(dlog, new HKDF(new BcHMAC())), random);
 		if (hash.getHashedMsgSize()> (dlog.getOrder().bitLength()/8)){
 			throw new IllegalArgumentException("The size in bytes of the resulting hash is bigger than the size in bytes of the order of the DlogGroup.");
 		}
 		this.hash = hash;
 		hashCommitmentMap = new Hashtable<Long, byte[]>();
 	}
-
-
+	
 	/**
-	 * Run COMMIT_ElGamal to commit to value H(x).
+	 * Runs COMMIT_ElGamal to commit to value H(x).
+	 * @return the created commitment.
+	 */
+	public CmtCCommitmentMsg generateCommitmentMsg(CmtCommitValue input, long id){
+		
+		byte[] hashValArray = getHashOfX(input, id);
+		
+		//After the input has been manipulated with the Hash call the super's commit function. Since the super has been initialized with ScElGamalOnByteArray
+		//it will know how to take care of the byte array input.
+		return super.generateCommitmentMsg(new CmtByteArrayCommitValue(hashValArray), id);
+	}
+
+
+	
+	/**
+	 * Runs COMMIT_ElGamal to commit to value H(x).
 	 */
 	public void commit(CmtCommitValue input, long id) throws IOException {
+		byte[] hashValArray = getHashOfX(input, id);
+		//After the input has been manipulated with the Hash call the super's commit function. Since the super has been initialized with ScElGamalOnByteArray
+		//it will know how to take care of the byte array input.
+		super.commit(new CmtByteArrayCommitValue(hashValArray), id);
+	}
+	
+	/**
+	 * Returns H(x).
+	 * @param input should be an instance of CmtByteArrayCommitValue.
+	 * @param id
+	 * @return the result of the hash function of the given input.
+	 */
+	private byte[] getHashOfX(CmtCommitValue input, long id) {
 		//Check that the input x is in the end a byte[]
 		if (!(input instanceof CmtByteArrayCommitValue))
 			throw new IllegalArgumentException("The input must be of type CmtByteArrayCommitValue");
@@ -123,27 +160,31 @@ public class CmtElGamalHashCommitter extends CmtElGamalCommitterCore implements 
 		byte[] x  = ((CmtByteArrayCommitValue)input).getX();
 		//Keep the original commit value x and its id in the commitmentMap, needed for later (during the decommit phase).
 		hashCommitmentMap.put(Long.valueOf(id), x);
-
+		
 		//calculate H(x) = Hash(x)
 		byte[] hashValArray = new byte[hash.getHashedMsgSize()];
 		hash.update(x, 0, x.length);
 		hash.hashFinal(hashValArray, 0);
-		//After the input has been manipulated with the Hash call the super's commit function. Since the super has been initialized with ScElGamalOnByteArray
-		//it will know how to take care of the byte array input.
-		super.commit(new CmtByteArrayCommitValue(hashValArray), id);
+		return hashValArray;
 	}
 
-
-	/**
-	 * Sends x to the receiver.
-	 */
-	public void decommit(long id) throws IOException {
+	@Override
+	public CmtCDecommitmentMessage generateDecommitmentMsg(long id){
+		
 		//Fetch the commitment according to the requested ID
 		byte[] x = hashCommitmentMap.get(Long.valueOf(id));
 		//Get the relevant random value used in the commitment phase
 		BigIntegerRandomValue r = (commitmentMap.get(id)).getR();
+				
+		return new CmtElGamalDecommitmentMessage(x,r);
+	}
+	
+	/**
+	 * Sends x to the receiver.
+	 */
+	public void decommit(long id) throws IOException {
 		
-		CmtElGamalDecommitmentMessage msg = new CmtElGamalDecommitmentMessage(x,r);
+		CmtCDecommitmentMessage msg = generateDecommitmentMsg(id);
 		try{
 			channel.send(msg);
 		}

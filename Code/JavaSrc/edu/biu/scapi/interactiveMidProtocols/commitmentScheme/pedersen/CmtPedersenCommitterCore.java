@@ -41,6 +41,8 @@ import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.generals.ScapiDefaultConfiguration;
 import edu.biu.scapi.interactiveMidProtocols.BigIntegerRandomValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtBigIntegerCommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCCommitmentMsg;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCDecommitmentMessage;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitter;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitValue;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
@@ -159,18 +161,16 @@ public abstract class CmtPedersenCommitterCore implements CmtCommitter{
 	}
 
 	/**
-	 * Runs the commit phase of the commitment scheme. <P>
+	 * Runs the following lines of the commitment scheme: <P>
 	 * "SAMPLE a random value r <- Zq<P>
-	 * 	COMPUTE  c = g^r * h^x<P>
-	 * 	SEND c".
-	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitter#commit(edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitValue, long)
+	 * 	COMPUTE  c = g^r * h^x". <p>
 	 */
-	public void  commit(CmtCommitValue in, long id) throws IOException, IllegalArgumentException {
+	public CmtCCommitmentMsg generateCommitmentMsg(CmtCommitValue input, long id){
 		
-		if (!(in instanceof CmtBigIntegerCommitValue))
+		if (!(input instanceof CmtBigIntegerCommitValue))
 			throw new IllegalArgumentException("The input must be of type CmtBigIntegerCommitValue");
 		
-		BigInteger x = ((CmtBigIntegerCommitValue)in).getX();
+		BigInteger x = ((CmtBigIntegerCommitValue)input).getX();
 		//Check that the input is in Zq.
 		if ((x.compareTo(BigInteger.ZERO)<0) || (x.compareTo(dlog.getOrder())>0)){
 			throw new IllegalArgumentException("The input must be in Zq");
@@ -184,30 +184,53 @@ public abstract class CmtPedersenCommitterCore implements CmtCommitter{
 		GroupElement hToX = dlog.exponentiate(h, x);
 		GroupElement c = dlog.multiplyGroupElements(gToR, hToX);
 		
+		//Keep the committed value in the map together with its ID.
+		commitmentMap.put(Long.valueOf(id), new CmtPedersenCommitmentPhaseValues(new BigIntegerRandomValue(r), new CmtBigIntegerCommitValue(x), c));
+		
 		//Send c
-		CmtPedersenCommitmentMessage msg = new CmtPedersenCommitmentMessage(c.generateSendableData(), id);
+		return new CmtPedersenCommitmentMessage(c.generateSendableData(), id);
+		
+	}
+	
+	/**
+	 * Runs the commit phase of the commitment scheme. <P>
+	 * "SAMPLE a random value r <- Zq<P>
+	 * 	COMPUTE  c = g^r * h^x<P>
+	 * 	SEND c".
+	 * @see edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitter#commit(edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitValue, long)
+	 */
+	public void  commit(CmtCommitValue in, long id) throws IOException, IllegalArgumentException {
+		
+		CmtCCommitmentMsg msg = generateCommitmentMsg(in, id);
 		try {
 			//Send the message by the channel.
 			channel.send(msg);
 		} catch (IOException e) {
+			commitmentMap.remove(Long.valueOf(id));
 			throw new IOException("failed to send the message. The error is: " + e.getMessage());
 		}	
 		
-		//After succeeding in sending the commitment, keep the committed value in the map together with its ID.
-		commitmentMap.put(Long.valueOf(id), new CmtPedersenCommitmentPhaseValues(new BigIntegerRandomValue(r), new CmtBigIntegerCommitValue(x), c));
-		
 	}
 
+	@Override
+	public CmtCDecommitmentMessage generateDecommitmentMsg(long id){
+		
+		CmtPedersenCommitmentPhaseValues values = commitmentMap.get(Long.valueOf(id));
+		CmtBigIntegerCommitValue xCVal = (CmtBigIntegerCommitValue)values.getX();
+		return new CmtPedersenDecommitmentMessage(xCVal.getX(),values.getR());
+		
+	}
+	
 	/**
 	 * Runs the decommit phase of the commitment scheme.<P>
 	 * "SEND (r, x) to R<P>
 	 *	OUTPUT nothing."
 	 */
 	public void decommit(long id) throws IOException {
+		
 		//fetch the commitment according to the requested ID
-		CmtPedersenCommitmentPhaseValues values = commitmentMap.get(Long.valueOf(id));
-		CmtBigIntegerCommitValue xCVal = (CmtBigIntegerCommitValue)values.getX();
-		CmtPedersenDecommitmentMessage msg = new CmtPedersenDecommitmentMessage(xCVal.getX(),values.getR());
+		CmtCDecommitmentMessage msg = generateDecommitmentMsg(id);
+		
 		try{
 			channel.send(msg);
 		}

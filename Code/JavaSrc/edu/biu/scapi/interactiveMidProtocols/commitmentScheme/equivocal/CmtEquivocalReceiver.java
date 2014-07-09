@@ -8,6 +8,8 @@ import java.io.IOException;
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.exceptions.CommitValueException;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCCommitmentMsg;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCDecommitmentMessage;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtReceiver;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtWithProofsReceiver;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitValue;
@@ -82,6 +84,11 @@ public class CmtEquivocalReceiver implements CmtReceiver, EquivocalCmt {
 	public CmtCommitValue receiveDecommitment(long id) throws IOException, ClassNotFoundException, CheatAttemptException, CommitValueException {
 		//During the execution of verifyCommittedValue, the x is received by the receiver.
 		return receiver.verifyCommittedValue(id);
+	}
+	
+	@Override
+	public CmtCommitValue verifyDecommitment(CmtCCommitmentMsg commitmentMsg, CmtCDecommitmentMessage decommitmentMsg) {
+		throw new IllegalStateException("The Decommitment phase of this scheme is interactive. Thus, it can't generate a decommitment message. Call decommit function");
 	}
 
 	@Override

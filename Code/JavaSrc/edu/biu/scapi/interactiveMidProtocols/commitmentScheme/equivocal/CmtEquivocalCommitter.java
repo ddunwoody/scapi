@@ -8,6 +8,8 @@ import java.io.IOException;
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.exceptions.CommitValueException;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCCommitmentMsg;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCDecommitmentMessage;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitter;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtWithProofsCommitter;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitValue;
@@ -56,6 +58,13 @@ public class CmtEquivocalCommitter implements CmtCommitter, EquivocalCmt{
 	public CmtEquivocalCommitter(Channel channel) throws ClassNotFoundException, IOException, CheatAttemptException{
 		committer = new CmtPedersenWithProofsCommitter(channel);
 	}
+	
+	@Override
+	public CmtCCommitmentMsg generateCommitmentMsg(CmtCommitValue input, long id) {
+		// Delegate to the underlying committer.
+		return committer.generateCommitmentMsg(input, id);
+	}
+
 
 	/**
 	 * Runs the commit phase of the protocol.<p>
@@ -65,6 +74,11 @@ public class CmtEquivocalCommitter implements CmtCommitter, EquivocalCmt{
 	public void commit(CmtCommitValue input, long id) throws IOException {
 		//Delegate to the underlying committer.
 		committer.commit(input, id);
+	}
+	
+	@Override
+	public CmtCDecommitmentMessage generateDecommitmentMsg(long id) {
+		throw new IllegalStateException("The Decommitment phase of this scheme is interactive. Thus, it can't generate a decommitment message. Call decommit function");
 	}
 
 	/**
