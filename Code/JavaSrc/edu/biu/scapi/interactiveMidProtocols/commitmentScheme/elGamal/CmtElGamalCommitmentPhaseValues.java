@@ -53,7 +53,7 @@ public class CmtElGamalCommitmentPhaseValues implements CmtCommitmentPhaseValues
 	 * @param commitVal the committed value
 	 * @param computedCommitment the commitment 
 	 */
-	CmtElGamalCommitmentPhaseValues(BigIntegerRandomValue r, CmtCommitValue commitVal,/*PublicKey publicKey,*/ AsymmetricCiphertext computedCommitment) {
+	CmtElGamalCommitmentPhaseValues(BigIntegerRandomValue r, CmtCommitValue commitVal, AsymmetricCiphertext computedCommitment) {
 		this.r = r;
 		this.commitval = commitVal;
 		this.computedCommitment = computedCommitment;
