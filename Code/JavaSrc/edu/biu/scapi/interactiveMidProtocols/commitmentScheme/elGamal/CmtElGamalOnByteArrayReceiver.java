@@ -33,6 +33,8 @@ import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.generals.ScapiDefaultConfiguration;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtByteArrayCommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCCommitmentMsg;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCDecommitmentMessage;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtReceiver;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtOnByteArray;
@@ -119,13 +121,20 @@ public class CmtElGamalOnByteArrayReceiver extends CmtElGamalReceiverCore implem
 	 * @param msg the receiver message from the committer
 	 * @return the committed value if the decommit succeeded; null, otherwise.
 	 */
-	protected CmtCommitValue processDecommitment(long id, CmtElGamalDecommitmentMessage msg) {
+	public CmtCommitValue verifyDecommitment(CmtCCommitmentMsg commitmentMsg, CmtCDecommitmentMessage decommitmentMsg) {
+		if (!(decommitmentMsg instanceof CmtElGamalDecommitmentMessage)){
+			throw new IllegalArgumentException("decommitmentMsg should be an instance of CmtElGamalDecommitmentMessage");
+		}
+		if (!(commitmentMsg instanceof CmtElGamalCommitmentMessage)){
+			throw new IllegalArgumentException("commitmentMsg should be an instance of CmtElGamalCommitmentMessage");
+		}
+		
 		byte[] x = null;
-		if (!(msg.getX() instanceof byte[]))
+		if (!(decommitmentMsg.getX() instanceof byte[]))
 			throw new IllegalArgumentException("x value is not an instance of byte[]");
 		
 		try{
-			x = (byte[]) msg.getX();
+			x = (byte[]) decommitmentMsg.getX();
 		}catch (IllegalArgumentException e){
 			throw new IllegalArgumentException("Failed to receive decommitment. The error is: " + e.getMessage());
 		}
@@ -133,18 +142,17 @@ public class CmtElGamalOnByteArrayReceiver extends CmtElGamalReceiverCore implem
 		int len = x.length;
 		
 		//Fetch received commitment according to ID
-		CmtElGamalCommitmentMessage receivedCommitment = commitmentMap.get(Long.valueOf(id));
-		if (!(receivedCommitment.getCommitment() instanceof ElGamalOnByteArraySendableData))
+		if (!(commitmentMsg.getCommitment() instanceof ElGamalOnByteArraySendableData))
 			throw new IllegalArgumentException("commitment value is not an instance of ElGamalOnByteArraySendableData");
 
-		GroupElement u = dlog.reconstructElement(true,((ElGamalOnByteArraySendableData) receivedCommitment.getCommitment()).getCipher1());
-		byte[] v = ((ElGamalOnByteArraySendableData)receivedCommitment.getCommitment()).getCipher2();
+		GroupElement u = dlog.reconstructElement(true,((ElGamalOnByteArraySendableData) commitmentMsg.getCommitment()).getCipher1());
+		byte[] v = ((ElGamalOnByteArraySendableData)commitmentMsg.getCommitment()).getCipher2();
 		if (len != v.length){
 			return null;
 		}
 		
-		GroupElement gToR = dlog.exponentiate(dlog.getGenerator(), msg.getR().getR());	
-		GroupElement hToR = dlog.exponentiate(publicKey.getH(), msg.getR().getR());
+		GroupElement gToR = dlog.exponentiate(dlog.getGenerator(), ((CmtElGamalDecommitmentMessage) decommitmentMsg).getR().getR());	
+		GroupElement hToR = dlog.exponentiate(publicKey.getH(), ((CmtElGamalDecommitmentMessage) decommitmentMsg).getR().getR());
 		
 		byte[] hToRBytes = dlog.mapAnyGroupElementToByteArray(hToR);
 		byte[] c2 = kdf.deriveKey(hToRBytes, 0, hToRBytes.length, x.length).getEncoded();
