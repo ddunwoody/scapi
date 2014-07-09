@@ -35,7 +35,7 @@ import edu.biu.scapi.interactiveMidProtocols.RandomValue;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-public interface CmtCDecommitmentMessage {
+public interface CmtCDecommitmentMessage extends Serializable{
 	/**
 	 * Returns the committed value.
 	 * @return the serializable committed value.
