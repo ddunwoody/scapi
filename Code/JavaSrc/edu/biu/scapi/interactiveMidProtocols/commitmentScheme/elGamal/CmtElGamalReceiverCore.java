@@ -209,7 +209,9 @@ public abstract class CmtElGamalReceiverCore implements CmtReceiver{
 		if (!(message instanceof CmtElGamalDecommitmentMessage)){
 			throw new IllegalArgumentException("the received message is not an instance of CmtElGamalDecommitmentMessage");
 		}
-		return processDecommitment(id, (CmtElGamalDecommitmentMessage) message);
+		CmtElGamalCommitmentMessage receivedCommitment = commitmentMap.get(Long.valueOf(id));
+		
+		return verifyDecommitment(receivedCommitment, (CmtElGamalDecommitmentMessage) message);
 	}
 	
 	@Override
@@ -223,19 +225,4 @@ public abstract class CmtElGamalReceiverCore implements CmtReceiver{
 	public CmtElGamalCommitmentMessage getCommitmentPhaseValues(long id){
 		return commitmentMap.get(id);
 	}
-
-	/**
-	 * Proccesses the decommitment phase.
-	 * "IF NOT
-	 *	•	u=g^r 
-	 *	•	v = h^r * x
-	 *	•	x in G
-	 *		OUTPUT REJ
-	 *	ELSE
-	 *	    OUTPUT ACC and value x"
-	 * @param id the id of the commitment.
-	 * @param msg the receiver message from the committer
-	 * @return the committed value if the decommit succeeded; null, otherwise.
-	 */
-	protected abstract CmtCommitValue processDecommitment(long id, CmtElGamalDecommitmentMessage msg);
 }
