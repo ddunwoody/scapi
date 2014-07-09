@@ -33,6 +33,7 @@ import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.generals.ScapiDefaultConfiguration;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCCommitmentMsg;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitter;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtGroupElementCommitValue;
@@ -92,6 +93,12 @@ public class CmtElGamalOnGroupElementCommitter extends CmtElGamalCommitterCore i
 			e.printStackTrace();
 		}
 		
+	}
+	
+	public CmtCCommitmentMsg generateCommitmentMsg(CmtCommitValue input, long id){
+		if (!(input instanceof CmtGroupElementCommitValue))
+			throw new IllegalArgumentException("The input must be of type CmtGroupElementCommitValue");
+		return super.generateCommitmentMsg(input, id);
 	}
 
 	/**

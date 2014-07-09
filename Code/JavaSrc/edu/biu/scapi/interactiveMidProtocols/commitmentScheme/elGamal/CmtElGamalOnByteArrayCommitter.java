@@ -34,6 +34,7 @@ import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.generals.ScapiDefaultConfiguration;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtByteArrayCommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCCommitmentMsg;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitter;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtOnByteArray;
@@ -100,6 +101,12 @@ public class CmtElGamalOnByteArrayCommitter extends CmtElGamalCommitterCore impl
 			e.printStackTrace();
 		}
 		
+	}
+	
+	public CmtCCommitmentMsg generateCommitmentMsg(CmtCommitValue input, long id){
+		if (!(input instanceof CmtByteArrayCommitValue))
+			throw new IllegalArgumentException("The input must be of type CmtByteArrayCommitValue");
+		return super.generateCommitmentMsg(input, id);
 	}
 
 	/**
