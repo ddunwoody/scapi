@@ -33,11 +33,13 @@ import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CommitValueException;
 import edu.biu.scapi.interactiveMidProtocols.ByteArrayRandomValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtByteArrayCommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCCommitmentMsg;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCDecommitmentMessage;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitter;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitmentPhaseValues;
 import edu.biu.scapi.primitives.hash.CryptographicHash;
-import edu.biu.scapi.primitives.hash.bc.BcSHA256;
+import edu.biu.scapi.primitives.hash.openSSL.OpenSSLSHA256;
 import edu.biu.scapi.securityLevel.SecureCommit;
 
 /**
@@ -78,7 +80,7 @@ public class CmtSimpleHashCommitter implements CmtCommitter, SecureCommit {
 	 *  @param channel
 	 */
 	public CmtSimpleHashCommitter(Channel channel) {
-		this(channel, new BcSHA256(), new SecureRandom(), 32);	
+		this(channel, new OpenSSLSHA256(), new SecureRandom(), 32);	
 	}
 	
 	/**
@@ -100,6 +102,31 @@ public class CmtSimpleHashCommitter implements CmtCommitter, SecureCommit {
 		
 		//No pre-process in SimpleHash Commitment
 	}
+	
+	/**
+	 * Runs the following lines of the commitment scheme:
+	 * "SAMPLE a random value r <- {0, 1}^n
+	 *	COMPUTE c = H(r,x) (c concatenated with r)".
+	 * @return the generated commitment.
+	 *	
+	 */
+	public CmtCCommitmentMsg generateCommitmentMsg(CmtCommitValue input, long id){
+		
+		if(!(input instanceof CmtByteArrayCommitValue))
+			throw new IllegalArgumentException("The input has to be of type CmtByteArrayCommitValue");
+		byte[] x = ((CmtByteArrayCommitValue)input).getX();
+		//Sample random byte array r
+		byte[] r = new byte[n];
+		random.nextBytes(r);
+		
+		//Compute the hash function
+		byte[] hashValArray = computeCommitment(x, r);
+		
+		//After succeeding in sending the commitment, keep the committed value in the map together with its ID.
+		commitmentMap.put(Long.valueOf(id), new CmtSimpleHashCommitmentValues(new ByteArrayRandomValue(r), input, hashValArray));
+		
+		return new CmtSimpleHashCommitmentMessage(hashValArray, id);
+	}
 
 	/**
 	 * Runs the commit phase of the commitment scheme:
@@ -110,23 +137,14 @@ public class CmtSimpleHashCommitter implements CmtCommitter, SecureCommit {
 	 */
 	public void commit(CmtCommitValue input, long id) throws IOException {
 		
-		if(!(input instanceof CmtByteArrayCommitValue))
-			throw new IllegalArgumentException("The input has to be of type CmtByteArrayCommitValue");
-		byte[] x = ((CmtByteArrayCommitValue)input).getX();
-		//Sample random byte array r
-		byte[] r = new byte[n];
-		random.nextBytes(r);
-
-		//Compute the hash function
-		byte[] hashValArray = computeCommitment(x, r);
+		CmtCCommitmentMsg msg = generateCommitmentMsg(input, id);
 		try {
 			//Send the message by the channel.
-			channel.send(new CmtSimpleHashCommitmentMessage(hashValArray, id));
+			channel.send(msg);
 		} catch (IOException e) {
+			commitmentMap.remove(Long.valueOf(id));
 			throw new IOException("failed to send the message. The error is: " + e.getMessage());
 		}	
-		//After succeeding in sending the commitment, keep the committed value in the map together with its ID.
-		commitmentMap.put(Long.valueOf(id), new CmtSimpleHashCommitmentValues(new ByteArrayRandomValue(r), input, hashValArray));
 	}
 
 	/**
@@ -146,6 +164,16 @@ public class CmtSimpleHashCommitter implements CmtCommitter, SecureCommit {
 		hash.hashFinal(hashValArray, 0);
 		return hashValArray;
 	}
+	
+	@Override
+	public CmtCDecommitmentMessage generateDecommitmentMsg(long id){
+		
+		//fetch the commitment according to the requested ID
+		CmtSimpleHashCommitmentValues vals = commitmentMap.get(Long.valueOf(id));
+		byte[] x = ((CmtByteArrayCommitValue)vals.getX()).getX();
+		return new CmtSimpleHashDecommitmentMessage(vals.getR(), x);
+		
+	}
 
 	/**
 	 * Runs the decommit phase of the commitment scheme:
@@ -153,10 +181,8 @@ public class CmtSimpleHashCommitter implements CmtCommitter, SecureCommit {
 	 *	OUTPUT nothing."
 	 */
 	public void decommit(long id) throws IOException {
-		//fetch the commitment according to the requested ID
-		CmtSimpleHashCommitmentValues vals = commitmentMap.get(Long.valueOf(id));
-		byte[] x = ((CmtByteArrayCommitValue)vals.getX()).getX();
-		CmtSimpleHashDecommitmentMessage msg =  new CmtSimpleHashDecommitmentMessage(vals.getR(), x);
+		
+		CmtCDecommitmentMessage msg = generateDecommitmentMsg(id);
 		try{
 			channel.send(msg);
 		}
