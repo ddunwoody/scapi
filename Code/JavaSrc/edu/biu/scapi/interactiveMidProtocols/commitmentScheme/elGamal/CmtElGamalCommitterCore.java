@@ -39,6 +39,8 @@ import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.BigIntegerRandomValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCCommitmentMsg;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCDecommitmentMessage;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitter;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitValue;
 import edu.biu.scapi.midLayer.asymmetricCrypto.encryption.ElGamalEnc;
@@ -155,6 +157,29 @@ public abstract class CmtElGamalCommitterCore implements CmtCommitter {
 			throw new IOException("failed to send the public key in the pre-process phase. The error is: " + e.getLocalizedMessage());
 		}	
 	}
+	
+	
+	/**
+	 * Computes the commitment object of the commitment scheme. <p>
+	 * Pseudo code:<p>
+	 * "SAMPLE random values  r <- Zq <p>
+	 *	COMPUTE u = g^r and v = h^r * x". <p>
+	 * @return the created commitment.
+	 */
+	public CmtCCommitmentMsg generateCommitmentMsg(CmtCommitValue input, long id){
+		
+		//Sample random r <-Zq.
+		BigInteger r = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);	
+		
+		//Compute u = g^r and v = h^r * x.
+		//This is actually the encryption of x.
+		AsymmetricCiphertext c =  elGamal.encrypt(input.convertToPlaintext(), r);
+		
+		//keep the committed value in the map together with its ID.
+		commitmentMap.put(Long.valueOf(id), new CmtElGamalCommitmentPhaseValues(new BigIntegerRandomValue(r), input,c));
+		
+		return new CmtElGamalCommitmentMessage((ElGamalCiphertextSendableData)c.generateSendableData(), id);
+	}
 
 	/**
 	 * Runs the commit phase of the commitment scheme. <p>
@@ -165,21 +190,25 @@ public abstract class CmtElGamalCommitterCore implements CmtCommitter {
 	 */
 	public void commit(CmtCommitValue input, long id) throws IOException {
 		
-		//Sample random r <-Zq.
-		BigInteger r = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);	
-
-		//Compute u = g^r and v = h^r * x.
-		//This is actually the encryption of x.
-		AsymmetricCiphertext c =  elGamal.encryptWithGivenRandomValue(input.convertToPlaintext(), r);
-
+		//Generate the commitment object
+		CmtCCommitmentMsg c = generateCommitmentMsg(input, id);
+		
 		try {
 			//Send the message by the channel.
-			channel.send(new CmtElGamalCommitmentMessage((ElGamalCiphertextSendableData)c.generateSendableData(), id));
+			channel.send(c);
 		} catch (IOException e) {
+			commitmentMap.remove(Long.valueOf(id));
 			throw new IOException("failed to send the commitment. The error is: " + e.getMessage());
 		}	
-		//After succeeding in sending the commitment, keep the committed value in the map together with its ID.
-		commitmentMap.put(Long.valueOf(id), new CmtElGamalCommitmentPhaseValues(new BigIntegerRandomValue(r), input,c));
+		
+	}
+	
+	@Override
+	public CmtCDecommitmentMessage generateDecommitmentMsg(long id){
+		
+		//fetch the commitment according to the requested ID
+		CmtElGamalCommitmentPhaseValues values = commitmentMap.get(Long.valueOf(id));
+		return new CmtElGamalDecommitmentMessage(values.getX().generateSendableData(),values.getR());
 	}
 
 	/**
@@ -190,9 +219,7 @@ public abstract class CmtElGamalCommitterCore implements CmtCommitter {
 	 */
 	public void decommit(long id) throws IOException {
 
-		//fetch the commitment according to the requested ID
-		CmtElGamalCommitmentPhaseValues values = commitmentMap.get(Long.valueOf(id));
-		CmtElGamalDecommitmentMessage msg =  new CmtElGamalDecommitmentMessage(values.getX().generateSendableData(),values.getR());
+		CmtCDecommitmentMessage msg = generateDecommitmentMsg(id);
 		try{
 			channel.send(msg);
 		}
