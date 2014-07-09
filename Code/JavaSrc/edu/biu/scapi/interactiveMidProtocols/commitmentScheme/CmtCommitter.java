@@ -38,6 +38,41 @@ import edu.biu.scapi.exceptions.CommitValueException;
 public interface CmtCommitter {
 
 	/**
+	 * Generate a commitment message using the given input and ID.<p>
+	 * There are cases when the user wants to commit on the input but remain non-interactive, 
+	 * meaning not to send the generate message yet. 
+	 * The reasons for doing that are vary, for example the user wants to prepare a lot of commitments and send together.
+	 * In these cases the commit function is not useful since it sends the generates commit message to the other party. <p>
+	 * This function generates the message without sending it and this allows the user to save it and send it later if he wants.<p>
+	 * In case the commit phase is interactive, the commit message cannot be generated and an IllegalStateException will be thrown. 
+	 * In this case one should use the commit function instead.
+	 * 
+	 * Code example: giving a committer object and an input,
+	 * 
+	 * //Create three commitment messages.
+	 * CmtCCommitmentMsg msg1 = generateCommitmentMsg(input, 1);
+	 * CmtCCommitmentMsg msg2 = generateCommitmentMsg(input, 2);
+	 * CmtCCommitmentMsg msg3 = generateCommitmentMsg(input, 3);
+	 * ...
+	 * 
+	 * try {
+	 *		//Send the messages by the channel.
+	 *		channel.send(msg1);
+	 *		channel.send(msg2);
+	 *		channel.send(msg3);
+	 *	} catch (IOException e) {
+	 *		//Should remove the failed commitment from the commitmentMap!
+	 *		throw new IOException("failed to send the commitment. The error is: " + e.getMessage());
+	 *	}	
+	 * 
+	 * @param input The value that the committer commits about.
+	 * @param id Unique value attached to the input to keep track of the commitments in the case that many commitments are performed one after the other without decommiting them yet. 
+	 * @return the generated commitment object.
+	 * @throws IllegalStateException In case the commit phase is interactive.
+	 */
+	public CmtCCommitmentMsg generateCommitmentMsg(CmtCommitValue input, long id);
+
+	/**
 	 * This function is the heart of the commitment phase from the Committer's point of view.
 	 * @param input The value that the committer commits about.
 	 * @param id Unique value attached to the input to keep track of the commitments in the case that many commitments are performed one after the other without decommiting them yet. 
@@ -45,6 +80,39 @@ public interface CmtCommitter {
 	 */
 	public void commit(CmtCommitValue input, long id) throws IOException;
 
+	/**
+	 * Generate a decommitment message using the given id.<p>
+	 * 
+	 * There are cases when the user wants to decommit but remain non-interactive, meaning not to send the generate message yet. 
+	 * The reasons for doing that are vary, for example the user wants to prepare a lot of decommitments and send together.
+	 * In these cases the decommit function is not useful since it sends the generates decommit message to the other party. <p>
+	 * This function generates the message without sending it and this allows the user to save it and send it later if he wants.<p>
+	 * In case the decommit phase is interactive, the decommit message cannot be generated and an IllegalStateException will be thrown. 
+	 * In this case one should use the decommit function instead.
+	 * 
+	 * Code example: giving a committer object and an input,
+	 * 
+	 * //Create three commitment messages.
+	 * CmtCDecommitmentMessage msg1 = generateDecommitmentMsg(1);
+	 * CmtCDecommitmentMessage msg2 = generateDecommitmentMsg(2);
+	 * CmtCDecommitmentMessage msg3 = generateDecommitmentMsg(3);
+	 * ...
+	 * 
+	 * try {
+	 *		//Send the messages by the channel.
+	 *		channel.send(msg1);
+	 *		channel.send(msg2);
+	 *		channel.send(msg3);
+	 *	} catch (IOException e) {
+	 *		throw new IOException("failed to send the decommitment. The error is: " + e.getMessage());
+	 *	}	
+	 * 
+	 * @param id Unique value attached to the input to keep track of the commitments in the case that many commitments are performed one after the other without decommiting them yet. 
+	 * @return the generated decommitment object.
+	 * @throws IllegalStateException In case the decommit phase is interactive.
+	 */
+	public CmtCDecommitmentMessage generateDecommitmentMsg(long id);
+	
 	/**
 	 * This function is the heart of the decommitment phase from the Committer's point of view.
 	 * @param id Unique value used to identify which previously committed value needs to be decommitted now.
