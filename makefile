@@ -96,8 +96,7 @@ $(JAR_BOUNCYCASTLE):
 	@echo "Compiling the BouncyCastle library..."
 	@cp -r lib/BouncyCastle build/BouncyCastle
 	@cd build/BouncyCastle && chmod a+x build15+ && ./build15+
-	@mkdir -p build/BouncyCastle/jars/
-	@cp build/BouncyCastle/build/artifacts/jdk1.5/jars/bcprov-jdk* build/BouncyCastle/jars/
+	@cp build/BouncyCastle/build/artifacts/jdk1.5/jars/bcprov-jdk* assets/
 	@touch compile-bouncycastle
 #@sudo apt-get install junit
 
@@ -114,22 +113,31 @@ jni-openssl: $(JNI_OPENSSL)
 $(JNI_CRYPTOPP): compile-cryptopp
 	@echo "Compiling the Crypto++ jni interface..."
 	@$(MAKE) -C src/jni/CryptoPPJavaInterface
+	@cp $@ assets/
 
 $(JNI_MIRACL): compile-miracl
 	@echo "Compiling the Miracl jni interface..."
 	@$(MAKE) -C src/jni/MiraclJavaInterface
+	@cp $@ assets/
 
 $(JNI_OTEXTENSION): compile-miracl-cpp compile-otextension
 	@echo "Compiling the OtExtension jni interface..."
 	@$(MAKE) -C src/jni/OtExtensionJavaInterface
+	@cp $@ assets/
 
 $(JNI_NTL): compile-ntl
 	@echo "Compiling the NTL jni interface..."
 	@$(MAKE) -C src/jni/NTLJavaInterface
+	@cp $@ assets/
 
 $(JNI_OPENSSL): compile-openssl
 	@echo "Compiling the OpenSSL jni interface..."
 	@$(MAKE) -C src/jni/OpenSSLJavaInterface
+	@cp $@ assets/
+
+install:
+	@install -d /usr/local/lib
+	@install -m 0644 assets/*.so /usr/local/lib
 
 # clean targets
 clean-cryptopp:
