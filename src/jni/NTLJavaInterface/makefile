@@ -4,7 +4,7 @@
 
 # compilation options
 CXX=g++
-CXXFLAGS=-fPIC
+CXXFLAGS=-fPIC -fpermissive
 
 # linking options, we prefer our generated shared object will be self-contained.
 INCLUDE_ARCHIVES_START = -Wl,-whole-archive
