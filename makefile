@@ -28,17 +28,35 @@ export ARCH
 CLEAN_TARGETS:=clean-cryptopp clean-miracl clean-miracl-cpp clean-otextension clean-ntl clean-openssl clean-bouncycastle
 CLEAN_JNI_TARGETS:=clean-jni-cryptopp clean-jni-miracl clean-jni-otextension clean-jni-ntl clean-jni-openssl
 
+# target names of jni shared libraries
 JNI_CRYPTOPP:=src/jni/CryptoPPJavaInterface/libCryptoPPJavaInterface.so
 JNI_MIRACL:=src/jni/MiraclJavaInterface/libMiraclJavaInterface.so
 JNI_OTEXTENSION:=src/jni/OtExtensionJavaInterface/libOtExtensionJavaInterface.so
 JNI_NTL:=src/jni/NTLJavaInterface/libNTLJavaInterface.so
 JNI_OPENSSL:=src/jni/OpenSSLJavaInterface/libOpenSSLJavaInterface.so
-JAR_BOUNCYCASTLE:=build/BouncyCastle/jars/bcprov-jdk15on-151b18.jar
-
-EXTERNAL_LIBS_TARGETS:=compile-cryptopp compile-miracl compile-otextension compile-ntl compile-openssl
 JNI_TAGRETS=jni-cryptopp jni-miracl jni-otextension jni-ntl jni-openssl
 
-all: $(JNI_TAGRETS) $(JAR_BOUNCYCASTLE)
+# basenames of created jars (apache commons, bouncy castle, scapi)
+BASENAME_BOUNCYCASTLE:=bcprov-jdk15on-151b18.jar
+BASENAME_APACHE_COMMONS:=commons-exec-1.2.jar
+BASENAME_SCAPI:=Scapi-V2-3-0.jar
+
+# target names of created jars (apache commons, bouncy castle, scapi)
+JAR_BOUNCYCASTLE:=build/BouncyCastle/jars/$(BASENAME_BOUNCYCASTLE)
+JAR_APACHE_COMMONS:=assets/$(BASENAME_APACHE_COMMONS)
+JAR_SCAPI:=build/scapi/$(BASENAME_SCAPI)
+
+# scapi install dir
+INSTALL_DIR=/usr/local/lib/scapi
+
+# scripts
+SCRIPTS:=scripts/scapi.sh scripts/scapic.sh
+
+# external libs
+EXTERNAL_LIBS_TARGETS:=compile-cryptopp compile-miracl compile-otextension compile-ntl compile-openssl
+
+## targets
+all: $(JNI_TAGRETS) $(JAR_BOUNCYCASTLE) $(JAR_APACHE_COMMONS) compile-scapi $(SCRIPTS)
 
 # compile and install the crypto++ lib:
 # first compile the default target (test program + static lib)
@@ -92,15 +110,9 @@ compile-openssl:
 	@sudo $(MAKE) -C build/OpenSSL install
 	@touch compile-openssl
 
-$(JAR_BOUNCYCASTLE):
-	@echo "Compiling the BouncyCastle library..."
-	@cp -r lib/BouncyCastle build/BouncyCastle
-	@cd build/BouncyCastle && chmod a+x build15+ && ./build15+
-	@cp build/BouncyCastle/build/artifacts/jdk1.5/jars/bcprov-jdk* assets/
-	@touch compile-bouncycastle
-#@sudo apt-get install junit
-
 compile-bouncycastle: $(JAR_BOUNCYCASTLE)
+compile-scapi: $(JAR_SCAPI)
+compile-scripts: $(SCRIPTS)
 
 # jni targets
 jni-cryptopp: $(JNI_CRYPTOPP)
@@ -135,9 +147,36 @@ $(JNI_OPENSSL): compile-openssl
 	@$(MAKE) -C src/jni/OpenSSLJavaInterface
 	@cp $@ assets/
 
-install:
-	@install -d /usr/local/lib
-	@install -m 0644 assets/*.so /usr/local/lib
+$(JAR_BOUNCYCASTLE):
+	@echo "Compiling the BouncyCastle library..."
+	@cp -r lib/BouncyCastle build/BouncyCastle
+	@cd build/BouncyCastle && chmod a+x build15+ && ./build15+
+	@cp build/BouncyCastle/build/artifacts/jdk1.5/jars/bcprov-jdk* assets/
+	@touch compile-bouncycastle
+#@sudo apt-get install junit
+
+$(JAR_SCAPI): $(JAR_BOUNCYCASTLE) $(JAR_APACHE_COMMONS)
+	@echo "Compiling the SCAPI java code..."
+	@ant
+	@cp $@ assets/
+
+scripts/scapi.sh: scripts/scapi.sh.tmpl
+	sed -e "s;%SCAPIDIR%;$(INSTALL_DIR);g" -e "s;%APACHECOMMONS%;$(BASENAME_APACHE_COMMONS);g" \
+	-e "s;%SCAPI%;$(BASENAME_SCAPI);g" -e "s;%BOUNCYCASTLE%;$(BASENAME_BOUNCYCASTLE);g" $< > $@
+
+scripts/scapic.sh: scripts/scapic.sh.tmpl
+	sed -e "s;%SCAPIDIR%;$(INSTALL_DIR);g" -e "s;%APACHECOMMONS%;$(BASENAME_APACHE_COMMONS);g" \
+	-e "s;%SCAPI%;$(BASENAME_SCAPI);g" -e "s;%BOUNCYCASTLE%;$(BASENAME_BOUNCYCASTLE);g" $< > $@
+
+install: all
+	@echo "Installing SCAPI..."
+	install -d $(INSTALL_DIR)
+	install -m 0644 assets/*.so $(INSTALL_DIR)
+	install -m 0644 assets/*.jar $(INSTALL_DIR)
+	install -d /usr/bin
+	install -m 0755 scripts/scapi.sh /usr/bin/scapi
+	install -m 0755 scripts/scapic.sh /usr/bin/scapic
+	@echo "Done."
 
 # clean targets
 clean-cryptopp:
@@ -206,4 +245,8 @@ clean-jni-openssl:
 
 clean-libraries: $(CLEAN_TARGETS)
 clean-jnis: $(CLEAN_JNI_TARGETS)
-clean: clean-libraries clean-jnis
+clean-scripts:
+	@echo "cleaning the SCAPI shell scripts"
+	@rm -f scripts/*.sh
+
+clean: clean-libraries clean-jnis clean-scripts
