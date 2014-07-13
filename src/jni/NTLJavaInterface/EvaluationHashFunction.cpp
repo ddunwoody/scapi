@@ -22,7 +22,7 @@
 * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 * 
 */
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "EvaluationHashFunction.h"
 #include "NTL/GF2X.h"
 #include "NTL/GF2E.h"
