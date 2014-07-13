@@ -31,7 +31,6 @@ import java.security.spec.AlgorithmParameterSpec;
 import javax.crypto.SecretKey;
 
 import edu.biu.scapi.exceptions.FactoriesException;
-import edu.biu.scapi.exceptions.UnInitializedException;
 
 /** 
  * This class implements some common functionality of perfect universal hash.
@@ -61,9 +60,9 @@ public abstract class UniversalHashAbs implements UniversalHash {
 		return isInitialized;
 	}
 	
-	public AlgorithmParameterSpec getParams() throws UnInitializedException {
+	public AlgorithmParameterSpec getParams() throws IllegalStateException {
 		if (!isInitialized()){
-			throw new UnInitializedException();
+			throw new IllegalStateException("UnInitialized");
 		}
 		return params;
 	}
