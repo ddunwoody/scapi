@@ -47,7 +47,9 @@ import edu.biu.scapi.midLayer.asymmetricCrypto.keys.KeySendableData;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScCramerShoupPrivateKey;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScCramerShoupPublicKey;
 import edu.biu.scapi.midLayer.asymmetricCrypto.keys.ScCramerShoupPublicKey.ScCramerShoupPublicKeySendableData;
+import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertext;
 import edu.biu.scapi.midLayer.ciphertext.CramerShoupCiphertext;
+import edu.biu.scapi.midLayer.plaintext.Plaintext;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.GroupElement;
 import edu.biu.scapi.primitives.dlog.cryptopp.CryptoPpDlogZpSafePrime;
@@ -360,6 +362,36 @@ public abstract class CramerShoupAbs implements CramerShoupDDHEnc{
 	}
 	
 	/**
+	 * Encrypts the given plaintext using this Cramer Shoup encryption scheme.
+	 * @param plaintext message to encrypt. MUST be an instance of GroupElementPlaintext.
+	 * @return Ciphertext the encrypted plaintext.
+	 * @throws IllegalStateException if no public key was set.
+	 * @throws IllegalArgumentException if the given Plaintext is not instance of GroupElementPlaintext.
+	 */
+	@Override
+	public AsymmetricCiphertext encrypt(Plaintext plaintext){
+		// If there is no public key can not encrypt, throws exception.
+		if (!isKeySet()){
+			throw new IllegalStateException("in order to encrypt a message this object must be initialized with public key");
+		}
+		/*
+		 * 	Choose a random  r in Zq<p>
+		 *	Calculate 	u1 = g1^r<p>
+		 *         		u2 = g2^r<p>
+		 *         		e = (h^r)*msgEl<p>
+		 *	Convert u1, u2, e to byte[] using the dlogGroup<P>
+		 *	Compute alpha  - the result of computing the hash function on the concatenation u1+ u2+ e.<>
+		 *	Calculate v = c^r * d^(r*alpha)<p>
+		 *	Create and return an CramerShoupCiphertext object with u1, u2, e and v.
+		 */
+		
+		//Choose the random r.
+		BigInteger r = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
+		
+		return encrypt(plaintext, r);
+	}
+	
+	/**
 	 * Calculates h^r
 	 * @param r a random value.
 	 * @return the calculated value.
@@ -384,14 +416,6 @@ public abstract class CramerShoupAbs implements CramerShoupDDHEnc{
 	 */
 	protected GroupElement calcU1(BigInteger r) {
 		return dlogGroup.exponentiate(publicKey.getGenerator1(), r);
-	}
-
-	/**
-	 * Chooses a random value r in Zq.
-	 * @return the random r.
-	 */
-	protected BigInteger chooseRandomR() {
-		return BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
 	}
 	
 	/**
