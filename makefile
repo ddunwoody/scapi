@@ -16,6 +16,7 @@ ifeq ($(uname_S),Linux)
 	INCLUDE_ARCHIVES_END = -Wl,-no-whole-archive -Wl,--no-undefined
 	SHARED_LIB_OPT:=-shared
 	SHARED_LIB_EXT:=.so
+	OPENSSL_CONFIGURE=./config
 endif
 
 ifeq ($(uname_S),Darwin)
@@ -26,6 +27,7 @@ ifeq ($(uname_S),Darwin)
 	INCLUDE_ARCHIVES_END=
 	SHARED_LIB_OPT:=-dynamiclib
 	SHARED_LIB_EXT:=.dylib
+	OPENSSL_CONFIGURE=./Configure darwin64-x86_64-cc
 endif
 
 # export all variables that are used by child makefiles
@@ -99,11 +101,11 @@ compile-miracl-cpp:
 	@sudo $(MAKE) -C build/MiraclCPP MIRACL_TARGET_LANG=cpp install
 	@touch compile-miracl-cpp
 
-compile-otextension:
+compile-otextension: compile-openssl
 	@echo "Compiling the OtExtension library..."
 	@cp -r lib/OTExtension build/OTExtension
-	@sudo $(MAKE) -C build/OTExtension
-	@sudo $(MAKE) -C build/OTExtension install
+	@$(MAKE) -C build/OTExtension
+	@sudo $(MAKE) -C build/OTExtension SHARED_LIB_EXT=$(SHARED_LIB_EXT) install
 	@touch compile-otextension
 
 # TODO: add GMP and GF2X
@@ -118,7 +120,7 @@ compile-ntl:
 compile-openssl:
 	@echo "Compiling the OpenSSL library..."
 	@cp -r lib/OpenSSL build/OpenSSL
-	@cd build/OpenSSL && ./config shared -fPIC --openssldir=/usr/local/ssl
+	@cd build/OpenSSL && $(OPENSSL_CONFIGURE) shared -fPIC --openssldir=/usr/local/ssl
 	@$(MAKE) -C build/OpenSSL depend
 	@$(MAKE) -C build/OpenSSL all
 	@sudo $(MAKE) -C build/OpenSSL install

@@ -6,19 +6,25 @@
 CXX=g++
 CXXFLAGS=-fPIC
 
+# OTExtension dependency
 OT_INCLUDES = -I/usr/local/include/OTExtension/
 OT_LIB = -lOTExtension
 
+# OPENSSL dependency
 OPENSSL_INCLUDES = -I/usr/local/ssl/include/
 OPENSSL_LIB_DIR = -L/usr/local/ssl/lib/
-OPENSSL_LIB = -lssl
+OPENSSL_LIB = -lssl -lcrypto
 
-OtExtensionJavaInterface$(SHARED_LIB_EXT): OtExtension.o
-	$(CC) $(SHARED_LIB_OPT) -o libOtExtensionJavaInterface.so OtExtension.o \
-	$(OT_INCLUDES) $(JAVA_INCLUDES) $(OT_LIB) $(OPENSSL_INCLUDES) $(OPENSSL_LIB_DIR) $(OPENSSL_LIB)
+## targets ##
 
-OtExtension.o:
-	$(CC) -fpic -c OtExtension.cpp $(OT_INCLUDES) $(JAVA_INCLUDES) $(OPENSSL_INCLUDES)
+# main target - linking individual *.o files
+libOtExtensionJavaInterface$(SHARED_LIB_EXT): OtExtension.o
+	$(CXX) $(SHARED_LIB_OPT) -o $@ $< $(OT_INCLUDES) $(JAVA_INCLUDES) \
+	$(OPENSSL_INCLUDES) $(OPENSSL_LIB_DIR) \
+	$(INCLUDE_ARCHIVES_START) $(OPENSSL_LIB) $(OT_LIB) $(INCLUDE_ARCHIVES_END)
+
+OtExtension.o: OtExtension.cpp
+	$(CXX) -fpic -c $< $(OT_INCLUDES) $(JAVA_INCLUDES) $(OPENSSL_INCLUDES)
 
 clean:
 	rm -f *~
