@@ -17,17 +17,21 @@ ifeq ($(uname_S),Linux)
 	SHARED_LIB_OPT:=-shared
 	SHARED_LIB_EXT:=.so
 	OPENSSL_CONFIGURE=./config
+	LIBTOOL=libtool
+	JNI_PATH=LD_LIBRARY_PATH
 endif
 
 ifeq ($(uname_S),Darwin)
-	JAVA_HOME=$(shell dirname $$(dirname $$(readlink `which javac`)))
-	JAVA_INCLUDES=-I$(JAVA_HOME)/Headers/
+	JAVA_HOME=$(shell /usr/libexec/java_home)
+	JAVA_INCLUDES=-I$(shell dirname $$(dirname $$(readlink `which javac`)))/Headers/
 	CRYPTOPP_CXXFLAGS="-DNDEBUG -g -O2 -fPIC -DCRYPTOPP_DISABLE_ASM -pipe"
 	INCLUDE_ARCHIVES_START=-Wl,-all_load
 	INCLUDE_ARCHIVES_END=
 	SHARED_LIB_OPT:=-dynamiclib
 	SHARED_LIB_EXT:=.dylib
 	OPENSSL_CONFIGURE=./Configure darwin64-x86_64-cc
+	LIBTOOL=glibtool
+	JNI_PATH=DYLD_LIBRARY_PATH
 endif
 
 # export all variables that are used by child makefiles
@@ -53,14 +57,21 @@ JNI_OPENSSL:=src/jni/OpenSSLJavaInterface/libOpenSSLJavaInterface$(SHARED_LIB_EX
 JNI_TAGRETS=jni-cryptopp jni-miracl jni-otextension jni-ntl jni-openssl
 
 # basenames of created jars (apache commons, bouncy castle, scapi)
-BASENAME_BOUNCYCASTLE:=bcprov-jdk15on-151b18.jar
+#BASENAME_BOUNCYCASTLE:=bcprov-jdk15on-151b18.jar
+BASENAME_BOUNCYCASTLE:=bcprov-jdk15on-150.jar
 BASENAME_APACHE_COMMONS:=commons-exec-1.2.jar
+BASENAME_JUNIT:=junit-3.7.jar
 BASENAME_SCAPI:=Scapi-V2-3-0.jar
 
 # target names of created jars (apache commons, bouncy castle, scapi)
-JAR_BOUNCYCASTLE:=build/BouncyCastle/jars/$(BASENAME_BOUNCYCASTLE)
+#JAR_BOUNCYCASTLE:=build/BouncyCastle/jars/$(BASENAME_BOUNCYCASTLE)
+JAR_BOUNCYCASTLE:=assets/$(BASENAME_BOUNCYCASTLE)
 JAR_APACHE_COMMONS:=assets/$(BASENAME_APACHE_COMMONS)
+JAR_JUNIT:=$(shell pwd)/assets/$(BASENAME_JUNIT)
 JAR_SCAPI:=build/scapi/$(BASENAME_SCAPI)
+
+# ntl
+NTL_CFLAGS="-fPIC -O2"
 
 # scapi install dir
 INSTALL_DIR=/usr/local/lib/scapi
@@ -84,6 +95,14 @@ compile-cryptopp:
 	@$(MAKE) -C build/CryptoPP CXX=$(CXX) CXXFLAGS=$(CRYPTOPP_CXXFLAGS) dynamic
 	@sudo $(MAKE) -C build/CryptoPP CXX=$(CXX) CXXFLAGS=$(CRYPTOPP_CXXFLAGS) install
 	@touch compile-cryptopp
+
+prepare-miracl:
+	@echo "Copying the miracl source files into the miracl build dir..."
+	@mkdir -p build/$(MIRACL_DIR)
+	@find lib/Miracl/ -type f -exec cp '{}' build/$(MIRACL_DIR)/ \;
+	@rm -f build/$(MIRACL_DIR)/mirdef.h
+	@rm -f build/$(MIRACL_DIR)/mrmuldv.c
+	@cp -r lib/MiraclCompilation/* build/$(MIRACL_DIR)/
 
 compile-miracl:
 	@$(MAKE) prepare-miracl MIRACL_DIR=Miracl
@@ -112,7 +131,7 @@ compile-otextension: compile-openssl
 compile-ntl:
 	@echo "Compiling the NTL library..."
 	@cp -r lib/NTL/unix build/NTL
-	@cd build/NTL/src/ && ./configure SHARED=on
+	@cd build/NTL/src/ && ./configure CFLAGS=$(NTL_CFLAGS)
 	@$(MAKE) -C build/NTL/src/
 	@sudo $(MAKE) -C build/NTL/src/ install
 	@touch compile-ntl
@@ -163,13 +182,15 @@ $(JNI_OPENSSL): compile-openssl
 	@$(MAKE) -C src/jni/OpenSSLJavaInterface
 	@cp $@ assets/
 
+# TODO: for now we avoid re-compiling bouncy castle, since it is very unstable,
+# and it does not compile on MAC OS X correctly.
 $(JAR_BOUNCYCASTLE):
-	@echo "Compiling the BouncyCastle library..."
-	@cp -r lib/BouncyCastle build/BouncyCastle
-	@cd build/BouncyCastle && chmod a+x build15+ && ./build15+
-	@cp build/BouncyCastle/build/artifacts/jdk1.5/jars/bcprov-jdk* assets/
-	@touch compile-bouncycastle
-#@sudo apt-get install junit
+#@echo "Compiling the BouncyCastle library..."
+#@cp -r lib/BouncyCastle build/BouncyCastle
+#cd build/BouncyCastle && export JAVA_HOME=$(JAVA_HOME) && export ANT_HOME=$(ANT_HOME) && ant -f ant/jdk15+.xml build
+#cd build/BouncyCastle && export JAVA_HOME=$(JAVA_HOME) && export ANT_HOME=$(ANT_HOME) && ant -f ant/jdk15+.xml zip-src
+#@cp build/BouncyCastle/build/artifacts/jdk1.5/jars/bcprov-jdk* assets/
+#@touch compile-bouncycastle
 
 $(JAR_SCAPI): $(JAR_BOUNCYCASTLE) $(JAR_APACHE_COMMONS)
 	@echo "Compiling the SCAPI java code..."
@@ -178,7 +199,8 @@ $(JAR_SCAPI): $(JAR_BOUNCYCASTLE) $(JAR_APACHE_COMMONS)
 
 scripts/scapi.sh: scripts/scapi.sh.tmpl
 	sed -e "s;%SCAPIDIR%;$(INSTALL_DIR);g" -e "s;%APACHECOMMONS%;$(BASENAME_APACHE_COMMONS);g" \
-	-e "s;%SCAPI%;$(BASENAME_SCAPI);g" -e "s;%BOUNCYCASTLE%;$(BASENAME_BOUNCYCASTLE);g" $< > $@
+	-e "s;%SCAPI%;$(BASENAME_SCAPI);g" -e "s;%BOUNCYCASTLE%;$(BASENAME_BOUNCYCASTLE);g" \
+	-e "s;%JNIPATH%;$(JNI_PATH);g" $< > $@
 
 scripts/scapic.sh: scripts/scapic.sh.tmpl
 	sed -e "s;%SCAPIDIR%;$(INSTALL_DIR);g" -e "s;%APACHECOMMONS%;$(BASENAME_APACHE_COMMONS);g" \
@@ -187,7 +209,7 @@ scripts/scapic.sh: scripts/scapic.sh.tmpl
 install: all
 	@echo "Installing SCAPI..."
 	install -d $(INSTALL_DIR)
-	install -m 0644 assets/*.so $(INSTALL_DIR)
+	install -m 0644 assets/*$(SHARED_LIB_EXT) $(INSTALL_DIR)
 	install -m 0644 assets/*.jar $(INSTALL_DIR)
 	install -d /usr/bin
 	install -m 0755 scripts/scapi.sh /usr/bin/scapi
@@ -229,14 +251,6 @@ clean-bouncycastle:
 	@echo "Cleaning the bouncycastle build dir..."
 	@rm -rf build/BouncyCastle
 	@rm -f compile-bouncycastle
-
-prepare-miracl:
-	@echo "Copying the miracl source files into the miracl build dir..."
-	@mkdir -p build/$(MIRACL_DIR)
-	@find lib/Miracl/ -type f -exec cp '{}' build/$(MIRACL_DIR)/ \;
-	@rm -f build/$(MIRACL_DIR)/mirdef.h
-	@rm -f build/$(MIRACL_DIR)/mrmuldv.c
-	@cp -r lib/MiraclCompilation/* build/$(MIRACL_DIR)/
 
 # clean jni
 clean-jni-cryptopp:

@@ -8,7 +8,7 @@
   <property name="scapi.build.final.name" value="Scapi-V${scapi.build.version}"/>
 
   <!--external dependencies-->
-  <property name="scapi.depend.bouncycastle.filename" value="bcprov-jdk15on-151b18"/>
+  <property name="scapi.depend.bouncycastle.filename" value="bcprov-jdk15on-150"/>
   <property name="scapi.depend.apachecommons.filename" value="commons-exec-1.2"/>
   
   <!--paths-->
