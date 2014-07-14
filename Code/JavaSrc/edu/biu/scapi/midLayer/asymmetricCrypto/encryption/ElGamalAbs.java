@@ -276,6 +276,10 @@ public abstract class ElGamalAbs implements ElGamalEnc{
 	 * @throws IllegalArgumentException if the given Plaintext does not match this ElGamal type.
 	 */
 	public AsymmetricCiphertext encrypt(Plaintext plaintext) {
+		// If there is no public key can not encrypt, throws exception.
+		if (!isKeySet()){
+			throw new IllegalStateException("in order to encrypt a message this object must be initialized with public key");
+		}
 		/* 
 		 * Pseudo-code:
 		 * 	•	Choose a random  y <- Zq.
@@ -283,37 +287,32 @@ public abstract class ElGamalAbs implements ElGamalEnc{
 		 *	•	Calculate c2 = h^y * plaintext.getElement() mod p // For ElGamal on a GroupElement.
 		 *					OR KDF(h^y) XOR plaintext.getBytes()  // For ElGamal on a ByteArray.
 		 */
-		
-		// If there is no public key can not encrypt, throws exception.
-		if (!isKeySet()){
-			throw new IllegalStateException("in order to encrypt a message this object must be initialized with public key");
-		}
-		
 		//Chooses a random value y<-Zq.
 		BigInteger y = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
 		
-		//Calculates c1 = g^y and c2 = msg * h^y.
-		GroupElement generator = dlog.getGenerator();
-		GroupElement c1 = dlog.exponentiate(generator, y);
-		GroupElement hy = dlog.exponentiate(publicKey.getH(), y);
-		
-		return completeEncryption(c1, hy, plaintext);
+		return encrypt(plaintext, y);	
 	}
+	
 	/**
-	 * Encrypts the given message using ElGamal encryption scheme.
+	 * Encrypts the given plaintext using this asymmetric encryption scheme and using the given random value.<p>
+	 * There are cases when the random value is used after the encryption, for example, in sigma protocol. 
+	 * In these cases the random value should be known to the user. We decided not to have function that return it to the user 
+	 * since this can cause problems when more than one value is being encrypt. 
+	 * Instead, we decided to have an additional encrypt value that gets the random value from the user.
 	 * 
 	 * @param plaintext contains message to encrypt. The given plaintext must match this ElGamal type.
+	 * @param r The random value to use in the encryption. 
 	 * @return Ciphertext containing the encrypted message.
 	 * @throws IllegalStateException if no public key was set.
 	 * @throws IllegalArgumentException if the given Plaintext does not match this ElGamal type.
 	 */
-	public AsymmetricCiphertext encryptWithGivenRandomValue(Plaintext plaintext, BigInteger y) {
+	public AsymmetricCiphertext encrypt(Plaintext plaintext, BigInteger r) {
+		
 		/* 
 		 * Pseudo-code:
-		 * 	•	
-		 *	•	Calculate c1 = g^y mod p //Mod p operation are performed automatically by the group.
-		 *	•	Calculate c2 = h^y * plaintext.getElement() mod p // For ElGamal on a GroupElement.
-		 *					OR KDF(h^y) XOR plaintext.getBytes()  // For ElGamal on a ByteArray.
+		 *	•	Calculate c1 = g^r mod p //Mod p operation are performed automatically by the group.
+		 *	•	Calculate c2 = h^r * plaintext.getElement() mod p // For ElGamal on a GroupElement.
+		 *					OR KDF(h^r) XOR plaintext.getBytes()  // For ElGamal on a ByteArray.
 		 */
 		
 		// If there is no public key can not encrypt, throws exception.
@@ -321,19 +320,19 @@ public abstract class ElGamalAbs implements ElGamalEnc{
 			throw new IllegalStateException("in order to encrypt a message this object must be initialized with public key");
 		}
 		
-		//Check that the y random value passed to this function is in Zq.
-		if(!((y.compareTo(BigInteger.ZERO))>=0) && (y.compareTo(qMinusOne)<=0)) {
-			throw new IllegalArgumentException("y must be in Zq");
+		//Check that the r random value passed to this function is in Zq.
+		if(!((r.compareTo(BigInteger.ZERO))>=0) && (r.compareTo(qMinusOne)<=0)) {
+			throw new IllegalArgumentException("r must be in Zq");
 		}
-		
 		
 		//Calculates c1 = g^y and c2 = msg * h^y.
 		GroupElement generator = dlog.getGenerator();
-		GroupElement c1 = dlog.exponentiate(generator, y);
-		GroupElement hy = dlog.exponentiate(publicKey.getH(), y);
+		GroupElement c1 = dlog.exponentiate(generator, r);
+		GroupElement hy = dlog.exponentiate(publicKey.getH(), r);
 		
 		return completeEncryption(c1, hy, plaintext);
 	}
+	
 	protected abstract AsymmetricCiphertext completeEncryption(GroupElement c1, GroupElement hy, Plaintext plaintext);
 	
 	
