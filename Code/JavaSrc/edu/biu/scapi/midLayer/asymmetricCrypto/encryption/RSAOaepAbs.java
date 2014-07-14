@@ -26,6 +26,7 @@
 
 package edu.biu.scapi.midLayer.asymmetricCrypto.encryption;
 
+import java.math.BigInteger;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -156,6 +157,17 @@ public abstract class RSAOaepAbs implements RSAOaepEnc {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	/**
+	 * Encrypts the given plaintext using this asymmetric encryption scheme and using the given random value.<p>
+	 * All our implementations of RSA OAEP are done throw other libraries that do not provide a way to give the random 
+	 * value used to encrypt. For that reason, we throw an exception.
+	 * @throws UnsupportedOperationException.
+	 */
+	@Override
+	public AsymmetricCiphertext encrypt(Plaintext plainText, BigInteger r){
+		throw new UnsupportedOperationException("RSA OAEP implementations do not provide a way to give the random value to use in the encryption");
 	}
 	
 	/** (non-Javadoc)
