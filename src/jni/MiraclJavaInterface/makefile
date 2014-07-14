@@ -6,10 +6,6 @@
 CXX=g++
 CXXFLAGS=-fPIC
 
-# linking options, we prefer our generated shared object will be self-contained.
-INCLUDE_ARCHIVES_START = -Wl,-whole-archive
-INCLUDE_ARCHIVES_END = -Wl,-no-whole-archive -Wl,--no-undefined
-
 # miracl dependency
 MIRACL_INCLUDES = -I/usr/local/include/miracl/
 MIRACL_LIB = -lmiracl
@@ -23,8 +19,8 @@ CPP_OBJ_FILES = $(CPP_SOURCES:.cpp=.opp)
 ## targets ##
 
 # main target - linking individual *.o files
-libMiraclJavaInterface.so: $(OBJ_FILES)
-	$(CXX) -shared -o $@ $(OBJ_FILES) $(MIRACL_INCLUDES) $(JAVA_INCLUDES) \
+libMiraclJavaInterface$(SHARED_LIB_EXT): $(OBJ_FILES)
+	$(CXX) $(SHARED_LIB_OPT) -o $@ $(OBJ_FILES) $(MIRACL_INCLUDES) $(JAVA_INCLUDES) \
 	$(INCLUDE_ARCHIVES_START) $(MIRACL_LIB) $(INCLUDE_ARCHIVES_END)
 
 # each source file is compiled seperately before linking
@@ -38,4 +34,4 @@ clean:
 	rm -f *~
 	rm -f *.o
 	rm -f *.opp
-	rm -f *.so
+	rm -f *$(SHARED_LIB_EXT)

@@ -2,38 +2,52 @@
 uname_S := $(shell sh -c 'uname -s 2>/dev/null || echo not')
 ARCH := $(shell getconf LONG_BIT)
 
-ifeq ($(uname_S),Linux)
-	JAVA_HOME=$(shell dirname $$(dirname $$(readlink -f `which javac`)))
-	JAVA_INCLUDES=-I$(JAVA_HOME)/include/
-endif
-
-ifeq ($(uname_S),Darwin)
-	JAVA_HOME=$(shell dirname $$(dirname $$(readlink `which javac`)))
-	JAVA_INCLUDES=-I$(JAVA_HOME)/Headers/
-endif
-
 # compilation options
 CC=gcc
 CXX=g++
 CFLAGS=-fPIC
 CXXFLAGS="-DNDEBUG -g -O2 -fPIC"
 
+ifeq ($(uname_S),Linux)
+	JAVA_HOME=$(shell dirname $$(dirname $$(readlink -f `which javac`)))
+	JAVA_INCLUDES=-I$(JAVA_HOME)/include/
+	CRYPTOPP_CXXFLAGS=$(CXX_FLAGS)
+	INCLUDE_ARCHIVES_START = -Wl,-whole-archive # linking options, we prefer our generated shared object will be self-contained.
+	INCLUDE_ARCHIVES_END = -Wl,-no-whole-archive -Wl,--no-undefined
+	SHARED_LIB_OPT:=-shared
+	SHARED_LIB_EXT:=.so
+endif
+
+ifeq ($(uname_S),Darwin)
+	JAVA_HOME=$(shell dirname $$(dirname $$(readlink `which javac`)))
+	JAVA_INCLUDES=-I$(JAVA_HOME)/Headers/
+	CRYPTOPP_CXXFLAGS="-DNDEBUG -g -O2 -fPIC -DCRYPTOPP_DISABLE_ASM -pipe"
+	INCLUDE_ARCHIVES_START=-Wl,-all_load
+	INCLUDE_ARCHIVES_END=
+	SHARED_LIB_OPT:=-dynamiclib
+	SHARED_LIB_EXT:=.dylib
+endif
+
 # export all variables that are used by child makefiles
 export JAVA_HOME
 export JAVA_INCLUDES
 export uname_S
 export ARCH
+export INCLUDE_ARCHIVES_START
+export INCLUDE_ARCHIVES_END
+export SHARED_LIB_OPT
+export SHARED_LIB_EXT
 
 # target names
 CLEAN_TARGETS:=clean-cryptopp clean-miracl clean-miracl-cpp clean-otextension clean-ntl clean-openssl clean-bouncycastle
 CLEAN_JNI_TARGETS:=clean-jni-cryptopp clean-jni-miracl clean-jni-otextension clean-jni-ntl clean-jni-openssl
 
 # target names of jni shared libraries
-JNI_CRYPTOPP:=src/jni/CryptoPPJavaInterface/libCryptoPPJavaInterface.so
-JNI_MIRACL:=src/jni/MiraclJavaInterface/libMiraclJavaInterface.so
-JNI_OTEXTENSION:=src/jni/OtExtensionJavaInterface/libOtExtensionJavaInterface.so
-JNI_NTL:=src/jni/NTLJavaInterface/libNTLJavaInterface.so
-JNI_OPENSSL:=src/jni/OpenSSLJavaInterface/libOpenSSLJavaInterface.so
+JNI_CRYPTOPP:=src/jni/CryptoPPJavaInterface/libCryptoPPJavaInterface$(SHARED_LIB_EXT)
+JNI_MIRACL:=src/jni/MiraclJavaInterface/libMiraclJavaInterface$(SHARED_LIB_EXT)
+JNI_OTEXTENSION:=src/jni/OtExtensionJavaInterface/libOtExtensionJavaInterface$(SHARED_LIB_EXT)
+JNI_NTL:=src/jni/NTLJavaInterface/libNTLJavaInterface$(SHARED_LIB_EXT)
+JNI_OPENSSL:=src/jni/OpenSSLJavaInterface/libOpenSSLJavaInterface$(SHARED_LIB_EXT)
 JNI_TAGRETS=jni-cryptopp jni-miracl jni-otextension jni-ntl jni-openssl
 
 # basenames of created jars (apache commons, bouncy castle, scapi)
@@ -64,9 +78,9 @@ all: $(JNI_TAGRETS) $(JAR_BOUNCYCASTLE) $(JAR_APACHE_COMMONS) compile-scapi $(SC
 compile-cryptopp:
 	@echo "Compiling the Crypto++ library..."
 	@cp -r lib/CryptoPP build/CryptoPP
-	@$(MAKE) -C build/CryptoPP CXXFLAGS=$(CXXFLAGS)
-	@$(MAKE) -C build/CryptoPP CXXFLAGS=$(CXXFLAGS) dynamic
-	@sudo $(MAKE) -C build/CryptoPP CXXFLAGS=$(CXXFLAGS) install
+	@$(MAKE) -C build/CryptoPP CXX=$(CXX) CXXFLAGS=$(CRYPTOPP_CXXFLAGS)
+	@$(MAKE) -C build/CryptoPP CXX=$(CXX) CXXFLAGS=$(CRYPTOPP_CXXFLAGS) dynamic
+	@sudo $(MAKE) -C build/CryptoPP CXX=$(CXX) CXXFLAGS=$(CRYPTOPP_CXXFLAGS) install
 	@touch compile-cryptopp
 
 compile-miracl:

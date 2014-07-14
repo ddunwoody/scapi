@@ -6,10 +6,6 @@
 CXX=g++
 CXXFLAGS=-fPIC
 
-# linking options, we prefer our generated shared object will be self-contained.
-INCLUDE_ARCHIVES_START = -Wl,-whole-archive
-INCLUDE_ARCHIVES_END = -Wl,-no-whole-archive -Wl,--no-undefined
-
 OT_INCLUDES = -I/usr/local/include/OTExtension/
 OT_LIB = -lOTExtension
 
@@ -17,8 +13,8 @@ OPENSSL_INCLUDES = -I/usr/local/ssl/include/
 OPENSSL_LIB_DIR = -L/usr/local/ssl/lib/
 OPENSSL_LIB = -lssl
 
-OtExtensionJavaInterface.so: OtExtension.o
-	$(CC) -shared -o libOtExtensionJavaInterface.so OtExtension.o \
+OtExtensionJavaInterface$(SHARED_LIB_EXT): OtExtension.o
+	$(CC) $(SHARED_LIB_OPT) -o libOtExtensionJavaInterface.so OtExtension.o \
 	$(OT_INCLUDES) $(JAVA_INCLUDES) $(OT_LIB) $(OPENSSL_INCLUDES) $(OPENSSL_LIB_DIR) $(OPENSSL_LIB)
 
 OtExtension.o:
@@ -27,4 +23,4 @@ OtExtension.o:
 clean:
 	rm -f *~
 	rm -f *.o
-	rm -f *.so
+	rm -f *$(SHARED_LIB_EXT)

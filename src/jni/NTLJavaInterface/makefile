@@ -6,10 +6,6 @@
 CXX=g++
 CXXFLAGS=-fPIC -fpermissive
 
-# linking options, we prefer our generated shared object will be self-contained.
-INCLUDE_ARCHIVES_START = -Wl,-whole-archive
-INCLUDE_ARCHIVES_END = -Wl,-no-whole-archive -Wl,--no-undefined
-
 # ntl dependency
 NTL_INCLUDES = -I/usr/local/include/NTL/
 NTL_LIB = -lntl
@@ -22,8 +18,8 @@ OBJ_FILES = $(SOURCES:.cpp=.o)
 ## targets ##
 
 # main target - linking individual *.o files
-libNTLJavaInterface.so: $(OBJ_FILES)
-	$(CXX) -shared -o $@ $(OBJ_FILES) $(JAVA_INCLUDES) $(NTL_INCLUDES) \
+libNTLJavaInterface$(SHARED_LIB_EXT): $(OBJ_FILES)
+	$(CXX) $(SHARED_LIB_OPT) -o $@ $(OBJ_FILES) $(JAVA_INCLUDES) $(NTL_INCLUDES) \
 	$(NTL_LIB_DIR) $(INCLUDE_ARCHIVES_START) $(NTL_LIB) $(INCLUDE_ARCHIVES_END)
 
 # each source file is compiled seperately before linking
@@ -33,4 +29,4 @@ libNTLJavaInterface.so: $(OBJ_FILES)
 clean:
 	rm -f *~
 	rm -f *.o
-	rm -f *.so
+	rm -f *$(SHARED_LIB_EXT)
