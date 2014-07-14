@@ -235,10 +235,33 @@ public class ScElGamalOnGroupElement extends ElGamalAbs implements AsymMultiplic
 	 * 		2. If one or more of the GroupElements in the given ciphertexts is not a member of the underlying DlogGroup of this ElGamal encryption scheme.
 	 */
 	public AsymmetricCiphertext multiply(AsymmetricCiphertext cipher1, AsymmetricCiphertext cipher2) {
+		
+		//Choose a random value in Zq.
+		BigInteger w = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
+		
+		//Call the other function that computes the multiplication.
+		return multiply(cipher1, cipher2, w);
+	}
+
+	/**
+	 * Calculates the ciphertext resulting of multiplying two given ciphertexts.<P>
+	 * Both ciphertexts have to have been generated with the same public key and DlogGroup as the underlying objects of this ElGamal object.<p>
+	 * 
+	 * There are cases when the random value is used after the function, for example, in sigma protocol. 
+	 * In these cases the random value should be known to the user. We decided not to have function that return it to the user 
+	 * since this can cause problems when the multiply function is called more than one time. 
+	 * Instead, we decided to have an additional multiply function that gets the random value from the user.
+	 * 
+	 * @throws IllegalStateException if no public key was set.
+	 * @throws IllegalArgumentException in the following cases:
+	 * 		1. If one or more of the given ciphertexts is not instance of ElGamalOnGroupElementCiphertext.
+	 * 		2. If one or more of the GroupElements in the given ciphertexts is not a member of the underlying DlogGroup of this ElGamal encryption scheme.
+	 */
+	@Override
+	public AsymmetricCiphertext multiply(AsymmetricCiphertext cipher1, AsymmetricCiphertext cipher2, BigInteger w) {
 		/* 
 		 * Pseudo-Code:
 		 * 	c1 = (u1, v1); c2 = (u2, v2) 
-		 * 	SAMPLE a random value w in Zq
 		 * 	COMPUTE u = g^w*u1*u2
 		 * 	COMPUTE v = h^w*v1*v2
 		 * 	OUTPUT c = (u,v)
@@ -265,9 +288,12 @@ public class ScElGamalOnGroupElement extends ElGamalAbs implements AsymMultiplic
 		if (!(dlog.isMember(u1)) || !(dlog.isMember(v1)) || !(dlog.isMember(u2)) || !(dlog.isMember(v2))){
 			throw new IllegalArgumentException("GroupElements in the given ciphertexts must be a members in the DlogGroup of type " + dlog.getGroupType());
 		}
-		//Chooses a random value in Zq.
-		BigInteger w = BigIntegers.createRandomInRange(BigInteger.ZERO, qMinusOne, random);
 		
+		//Check that the r random value passed to this function is in Zq.
+		if(!((w.compareTo(BigInteger.ZERO))>=0) && (w.compareTo(qMinusOne)<=0)) {
+			throw new IllegalArgumentException("the given random value must be in Zq");
+		}
+				
 		//Calculates u = g^w*u1*u2.
 		GroupElement gExpW = dlog.exponentiate(dlog.getGenerator(), w);
 		GroupElement gExpWmultU1 = dlog.multiplyGroupElements(gExpW, c1.getC1());
@@ -280,7 +306,6 @@ public class ScElGamalOnGroupElement extends ElGamalAbs implements AsymMultiplic
 		
 		return new ElGamalOnGroupElementCiphertext(u,v);
 	}
-
 	
 	/** 
 	 * @see edu.biu.scapi.midLayer.asymmetricCrypto.encryption.AsymmetricEnc#generateCiphertext(edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertextSendableData)
@@ -308,5 +333,4 @@ public class ScElGamalOnGroupElement extends ElGamalAbs implements AsymMultiplic
 		GroupElement cipher2 = dlog.reconstructElement(true, data1.getCipher2());	
 		return new ElGamalOnGroupElementCiphertext(cipher1, cipher2);
 	}
-
 }
