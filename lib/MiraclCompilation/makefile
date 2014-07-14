@@ -1,13 +1,27 @@
 # settings
 MIRDEF=$(ARCH)bit/$(MIRACL_TARGET_LANG)/mirdef.h
-MRMULDV_EXT=gcc
 
+MRMULDV_SOURCE=mrmuldv.c.o
+#ifeq ($(uname_S),Linux)
+MRMULDV_EXT=gcc
 ifeq ($(ARCH),64)
 	MRMULDV_EXT=g64
 endif
+#endif
+
+#ifeq ($(uname_S),Darwin)
+#	MRMULDV_SOURCE=mrmuldv.asm.o
+#	MRMULDV_EXT=s32
+#	ifeq ($(ARCH),64)
+#		MRMULDV_EXT=s64
+#	endif
+#endif
 
 # compilation options
 CC=gcc
+ifeq ($(MIRACL_TARGET_LANG),cpp)
+	CC=g++
+endif
 CXX=g++
 AR=ar
 override CFLAGS=-fPIC -m64 -O2
@@ -25,16 +39,24 @@ ifeq ($(MIRACL_TARGET_LANG),cpp)
 	ALL_OBJ_FILES += $(CPP_OBJ_FILES)
 endif
 
-libmiracl.a: mirdef.h mrmuldv.c $(ALL_OBJ_FILES)
+libmiracl.a: mirdef.h $(ALL_OBJ_FILES)
 	$(AR) crv $@ $(ALL_OBJ_FILES)
 
 mirdef.h:
 	cp $(MIRDEF) mirdef.h
 
-mrmuldv.c:
-	cp mrmuldv.$(MRMULDV_EXT) mrmuldv.c
+mrmuldv.asm.o:
+	cp mrmuldv.$(MRMULDV_EXT) mrmuldv.s
+	as mrmuldv.s -o $@
 
-%.o: %.c mirdef.h mrmuldv.c
+mrmuldv.c.o:
+	cp mrmuldv.$(MRMULDV_EXT) mrmuldv.c
+	$(CC) $(CFLAGS) -c mrmuldv.c -o $@
+
+mrmuldv.o: $(MRMULDV_SOURCE)
+	cp $< $@
+
+%.o: %.c mirdef.h
 	$(CC) $(CFLAGS) -c $<
 
 # we use the *.opp extension for object files of the CPP modules
