@@ -26,6 +26,7 @@
 
 package edu.biu.scapi.midLayer.asymmetricCrypto.encryption;
 
+import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.KeyException;
 import java.security.KeyPair;
@@ -145,6 +146,20 @@ public interface AsymmetricEnc extends Cpa, Indistinguishable{
 	 * @throws IllegalStateException if no public key was set.
 	 */
 	public AsymmetricCiphertext encrypt(Plaintext plainText);
+	
+	/**
+	 * Encrypts the given plaintext using this asymmetric encryption scheme and using the given random value.<p>
+	 * There are cases when the random value is used after the encryption, for example, in sigma protocol. 
+	 * In these cases the random value should be known to the user. We decided not to have function that return it to the user 
+	 * since this can cause problems when more than one value is being encrypt. 
+	 * Instead, we decided to have an additional encrypt function that gets the random value from the user.
+	 * @param plainText message to encrypt
+	 * @param r The random value to use in the encryption. 
+	 * @return Ciphertext the encrypted plaintext
+	 * @throws IllegalArgumentException if the given Plaintext doesn't match this encryption type.
+	 * @throws IllegalStateException if no public key was set.
+	 */
+	public AsymmetricCiphertext encrypt(Plaintext plainText, BigInteger r);
 	
 	/**
 	 * Decrypts the given ciphertext using this asymmetric encryption scheme.
