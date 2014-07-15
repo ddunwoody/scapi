@@ -18,7 +18,7 @@ OBJ_FILES = $(SOURCES:.cpp=.o)
 ## targets ##
 
 # main target - linking individual *.o files
-libNTLJavaInterface$(SHARED_LIB_EXT): $(OBJ_FILES)
+libNTLJavaInterface$(JNI_LIB_EXT): $(OBJ_FILES)
 	$(CXX) $(SHARED_LIB_OPT) -o $@ $(OBJ_FILES) $(JAVA_INCLUDES) $(NTL_INCLUDES) \
 	$(NTL_LIB_DIR) $(INCLUDE_ARCHIVES_START) $(NTL_LIB) $(INCLUDE_ARCHIVES_END)
 
@@ -29,4 +29,4 @@ libNTLJavaInterface$(SHARED_LIB_EXT): $(OBJ_FILES)
 clean:
 	rm -f *~
 	rm -f *.o
-	rm -f *$(SHARED_LIB_EXT)
+	rm -f *$(JNI_LIB_EXT)

@@ -19,7 +19,7 @@ CPP_OBJ_FILES = $(CPP_SOURCES:.cpp=.opp)
 ## targets ##
 
 # main target - linking individual *.o files
-libMiraclJavaInterface$(SHARED_LIB_EXT): $(OBJ_FILES)
+libMiraclJavaInterface$(JNI_LIB_EXT): $(OBJ_FILES)
 	$(CXX) $(SHARED_LIB_OPT) -o $@ $(OBJ_FILES) $(MIRACL_INCLUDES) $(JAVA_INCLUDES) \
 	$(INCLUDE_ARCHIVES_START) $(MIRACL_LIB) $(INCLUDE_ARCHIVES_END)
 
@@ -34,4 +34,4 @@ clean:
 	rm -f *~
 	rm -f *.o
 	rm -f *.opp
-	rm -f *$(SHARED_LIB_EXT)
+	rm -f *$(JNI_LIB_EXT)

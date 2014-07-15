@@ -18,7 +18,7 @@ OPENSSL_LIB = -lssl -lcrypto
 ## targets ##
 
 # main target - linking individual *.o files
-libOtExtensionJavaInterface$(SHARED_LIB_EXT): OtExtension.o
+libOtExtensionJavaInterface$(JNI_LIB_EXT): OtExtension.o
 	$(CXX) $(SHARED_LIB_OPT) -o $@ $< $(OT_INCLUDES) $(JAVA_INCLUDES) \
 	$(OPENSSL_INCLUDES) $(OPENSSL_LIB_DIR) \
 	$(INCLUDE_ARCHIVES_START) $(OPENSSL_LIB) $(OT_LIB) $(INCLUDE_ARCHIVES_END)
@@ -29,4 +29,4 @@ OtExtension.o: OtExtension.cpp
 clean:
 	rm -f *~
 	rm -f *.o
-	rm -f *$(SHARED_LIB_EXT)
+	rm -f *$(JNI_LIB_EXT)

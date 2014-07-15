@@ -21,7 +21,7 @@ OBJ_FILES = $(SOURCES:.cpp=.o)
 ## targets ##
 
 # main target - linking individual *.o files
-libCryptoPPJavaInterface$(SHARED_LIB_EXT): $(OBJ_FILES)
+libCryptoPPJavaInterface$(JNI_LIB_EXT): $(OBJ_FILES)
 	$(CXX) $(SHARED_LIB_OPT) -o $@ $(OBJ_FILES) $(JAVA_INCLUDES) $(CRYPTOPP_INCLUDES) \
 	$(INCLUDE_ARCHIVES_START) $(CRYPTOPP_LIB) $(INCLUDE_ARCHIVES_END)
 
@@ -32,5 +32,5 @@ libCryptoPPJavaInterface$(SHARED_LIB_EXT): $(OBJ_FILES)
 clean:
 	rm -f *~
 	rm -f *.o
-	rm -f *$(SHARED_LIB_EXT)
+	rm -f *$(JNI_LIB_EXT)
 

@@ -16,6 +16,7 @@ ifeq ($(uname_S),Linux)
 	INCLUDE_ARCHIVES_END = -Wl,-no-whole-archive -Wl,--no-undefined
 	SHARED_LIB_OPT:=-shared
 	SHARED_LIB_EXT:=.so
+	JNI_LIB_EXT:=.so
 	OPENSSL_CONFIGURE=./config
 	LIBTOOL=libtool
 	JNI_PATH=LD_LIBRARY_PATH
@@ -29,6 +30,7 @@ ifeq ($(uname_S),Darwin)
 	INCLUDE_ARCHIVES_END=
 	SHARED_LIB_OPT:=-dynamiclib
 	SHARED_LIB_EXT:=.dylib
+	JNI_LIB_EXT:=.jnilib
 	OPENSSL_CONFIGURE=./Configure darwin64-x86_64-cc
 	LIBTOOL=glibtool
 	JNI_PATH=DYLD_LIBRARY_PATH
@@ -43,17 +45,18 @@ export INCLUDE_ARCHIVES_START
 export INCLUDE_ARCHIVES_END
 export SHARED_LIB_OPT
 export SHARED_LIB_EXT
+export JNI_LIB_EXT
 
 # target names
 CLEAN_TARGETS:=clean-cryptopp clean-miracl clean-miracl-cpp clean-otextension clean-ntl clean-openssl clean-bouncycastle
 CLEAN_JNI_TARGETS:=clean-jni-cryptopp clean-jni-miracl clean-jni-otextension clean-jni-ntl clean-jni-openssl
 
 # target names of jni shared libraries
-JNI_CRYPTOPP:=src/jni/CryptoPPJavaInterface/libCryptoPPJavaInterface$(SHARED_LIB_EXT)
-JNI_MIRACL:=src/jni/MiraclJavaInterface/libMiraclJavaInterface$(SHARED_LIB_EXT)
-JNI_OTEXTENSION:=src/jni/OtExtensionJavaInterface/libOtExtensionJavaInterface$(SHARED_LIB_EXT)
-JNI_NTL:=src/jni/NTLJavaInterface/libNTLJavaInterface$(SHARED_LIB_EXT)
-JNI_OPENSSL:=src/jni/OpenSSLJavaInterface/libOpenSSLJavaInterface$(SHARED_LIB_EXT)
+JNI_CRYPTOPP:=src/jni/CryptoPPJavaInterface/libCryptoPPJavaInterface$(JNI_LIB_EXT)
+JNI_MIRACL:=src/jni/MiraclJavaInterface/libMiraclJavaInterface$(JNI_LIB_EXT)
+JNI_OTEXTENSION:=src/jni/OtExtensionJavaInterface/libOtExtensionJavaInterface$(JNI_LIB_EXT)
+JNI_NTL:=src/jni/NTLJavaInterface/libNTLJavaInterface$(JNI_LIB_EXT)
+JNI_OPENSSL:=src/jni/OpenSSLJavaInterface/libOpenSSLJavaInterface$(JNI_LIB_EXT)
 JNI_TAGRETS=jni-cryptopp jni-miracl jni-otextension jni-ntl jni-openssl
 
 # basenames of created jars (apache commons, bouncy castle, scapi)
@@ -209,7 +212,7 @@ scripts/scapic.sh: scripts/scapic.sh.tmpl
 install: all
 	@echo "Installing SCAPI..."
 	install -d $(INSTALL_DIR)
-	install -m 0644 assets/*$(SHARED_LIB_EXT) $(INSTALL_DIR)
+	install -m 0644 assets/*$(JNI_LIB_EXT) $(INSTALL_DIR)
 	install -m 0644 assets/*.jar $(INSTALL_DIR)
 	install -d /usr/bin
 	install -m 0755 scripts/scapi.sh /usr/bin/scapi
