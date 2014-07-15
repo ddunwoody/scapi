@@ -1,13 +1,13 @@
 #ifndef _MPC_H_
 #define _MPC_H_
 
-#include <OtExtension/util/typedefs.h>
-#include <OtExtension/util/socket.h>
-#include <OtExtension/ot/naor-pinkas.h>
-#include <OtExtension/ot/asharov-lindell.h>
-#include <OtExtension/ot/ot-extension.h>
-#include <OtExtension/util/cbitvector.h>
-#include <OtExtension/ot/xormasking.h>
+#include <OTExtension/util/typedefs.h>
+#include <OTExtension/util/socket.h>
+#include <OTExtension/ot/naor-pinkas.h>
+#include <OTExtension/ot/asharov-lindell.h>
+#include <OTExtension/ot/ot-extension.h>
+#include <OTExtension/util/cbitvector.h>
+#include <OTExtension/ot/xormasking.h>
 
 #include <vector>
 #include <time.h>
