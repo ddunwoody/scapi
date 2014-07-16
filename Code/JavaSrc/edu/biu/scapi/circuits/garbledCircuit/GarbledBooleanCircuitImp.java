@@ -58,7 +58,7 @@ public class GarbledBooleanCircuitImp extends GarbledBooleanCircuitAbs implement
 	 * 
 	 */
 	public GarbledBooleanCircuitImp(BooleanCircuit bc){
-		this(new FreeXORCircuitInput(bc, new AESFixedKeyMultiKeyEncryption(), false));
+		this(new FreeXORGarblingParameters(bc, new AESFixedKeyMultiKeyEncryption(), false));
 		
 	}
 	
@@ -71,7 +71,7 @@ public class GarbledBooleanCircuitImp extends GarbledBooleanCircuitAbs implement
 	 * fill the garbled tables and translation table.
 	 * @param input Specifies which concrete type of circuit to implement.
 	 */
-	public GarbledBooleanCircuitImp(CircuitInput input){
+	public GarbledBooleanCircuitImp(GarblingParameters input){
 		//Create an empty garbled tables.
 		garbledTablesHolder = new BasicGarbledTablesHolder(new byte[input.getUngarbledCircuit().getGates().length][]);
 		//Call the function that creates the gates.
@@ -87,7 +87,7 @@ public class GarbledBooleanCircuitImp extends GarbledBooleanCircuitAbs implement
 	 * create the underlying gates.
 	 * @param input Specifies which concrete type of circuit to implement.
 	 */
-	public GarbledBooleanCircuitImp(CircuitInput input, PseudorandomGenerator prg){
+	public GarbledBooleanCircuitImp(GarblingParameters input, PseudorandomGenerator prg){
 		//Create an empty garbled tables.
 		garbledTablesHolder = new BasicGarbledTablesHolder(new byte[input.getUngarbledCircuit().getGates().length][]);
 		this.prg = prg;
@@ -100,7 +100,7 @@ public class GarbledBooleanCircuitImp extends GarbledBooleanCircuitAbs implement
 	 * Constructs a circuit from the given input.
 	 * @param input Specifies which concrete type of circuit to implement.
 	 */
-	private void doConstruct(CircuitInput input) {
+	private void doConstruct(GarblingParameters input) {
 		// The input object defines which concrete circuit to use. Thus, it can create the utility class that matches this type of circuit.
 		util = input.createCircuitUtil();
 		
