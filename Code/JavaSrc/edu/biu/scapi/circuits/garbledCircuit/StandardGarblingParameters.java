@@ -29,13 +29,12 @@ import java.security.SecureRandom;
 import edu.biu.scapi.circuits.circuit.BooleanCircuit;
 import edu.biu.scapi.circuits.encryption.MultiKeyEncryptionScheme;
 import edu.biu.scapi.exceptions.FactoriesException;
-import edu.biu.scapi.primitives.kdf.HKDF;
 import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
-import edu.biu.scapi.primitives.prf.bc.BcHMAC;
+import edu.biu.scapi.primitives.kdf.bc.BcKdfISO18033;
 
 /**
- * This is the input class for Standard circuit.<p>
- * Standard circuit's inputs are:
+ * This is the garbling parameters' class for Standard circuit.<p>
+ * Standard circuit's parameters are:
  * 1. The boolean circuit that needs to be garbled. 
  * 2. A MultiKeyEncryptionScheme.
  * 3. A SecureRandom object.
@@ -44,7 +43,7 @@ import edu.biu.scapi.primitives.prf.bc.BcHMAC;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class StandardCircuitInput implements CircuitInput{
+public class StandardGarblingParameters implements GarblingParameters{
 	
 	private BooleanCircuit ungarbledCircuit;
 	private MultiKeyEncryptionScheme mes;
@@ -53,20 +52,20 @@ public class StandardCircuitInput implements CircuitInput{
 	private boolean isRowReduction;
 	
 	/**
-	 * This constructor creates an input object for a regular representation of StandardGarbledBooleanCircuit.
+	 * This constructor creates a garbling parameters' object for a regular representation of StandardGarbledBooleanCircuit.
 	 * @param ungarbledCircuit The boolean circuit that needs to be garbled. 
 	 * @param mes A MultiKeyEncryptionScheme to use.
 	 * @param random
 	 * @param isRowReduction Indicates if the circuit should use the row reduction algorithm or not.
 	 */
-	public StandardCircuitInput(BooleanCircuit ungarbledCircuit, MultiKeyEncryptionScheme mes, SecureRandom random, boolean isRowReduction){
+	public StandardGarblingParameters(BooleanCircuit ungarbledCircuit, MultiKeyEncryptionScheme mes, SecureRandom random, boolean isRowReduction){
 		this.ungarbledCircuit = ungarbledCircuit;
 		this.mes = mes;
 		this.random = random;
 		
 		if (isRowReduction){
 			try {
-				kdf = new HKDF(new BcHMAC("SHA-256"));
+				kdf = new BcKdfISO18033("SHA-256");
 			} catch (FactoriesException e) {
 				// Should not occur since the given parameters are implemented.
 			}
