@@ -27,13 +27,12 @@ package edu.biu.scapi.circuits.garbledCircuit;
 import edu.biu.scapi.circuits.circuit.BooleanCircuit;
 import edu.biu.scapi.circuits.encryption.MultiKeyEncryptionScheme;
 import edu.biu.scapi.exceptions.FactoriesException;
-import edu.biu.scapi.primitives.kdf.HKDF;
 import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
-import edu.biu.scapi.primitives.prf.bc.BcHMAC;
+import edu.biu.scapi.primitives.kdf.bc.BcKdfISO18033;
 
 /**
- * This is the input class for a Free XOR circuit.<p>
- * A Free XOR circuit's inputs are:<p>
+ * This is the garbling parameters' class for a Free XOR circuit.<p>
+ * A Free XOR circuit's parameters are:<p>
  * 1. The boolean circuit that needs to be garbled. <p>
  * 2. A MultiKeyEncryptionScheme.<p>
  * 3. A KeyDerivationFunction, in case the user wants to use the Row Reduction algorithm.<p>
@@ -41,7 +40,7 @@ import edu.biu.scapi.primitives.prf.bc.BcHMAC;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class FreeXORCircuitInput implements CircuitInput{
+public class FreeXORGarblingParameters implements GarblingParameters{
 	
 	private BooleanCircuit ungarbledCircuit;
 	private MultiKeyEncryptionScheme mes;
@@ -49,19 +48,19 @@ public class FreeXORCircuitInput implements CircuitInput{
 	private boolean isRowReduction;
 	
 	/**
-	 * This constructor creates an input object for a regular representation of FreeXORGarbledBooleanCircuit.
+	 * This constructor creates a garbling parameters' object for a regular representation of FreeXORGarbledBooleanCircuit.
 	 * @param ungarbledCircuit The boolean circuit that needs to be garbled. 
 	 * @param mes A MultiKeyEncryptionScheme to use.
 	 * @param isRowReduction Indicates if the circuit should use the row reduction algorithm or not.
 	 */
-	public FreeXORCircuitInput(BooleanCircuit ungarbledCircuit, MultiKeyEncryptionScheme mes, boolean isRowReduction){
+	public FreeXORGarblingParameters(BooleanCircuit ungarbledCircuit, MultiKeyEncryptionScheme mes, boolean isRowReduction){
 		this.ungarbledCircuit = ungarbledCircuit;
 		this.mes = mes;
 		this.isRowReduction = isRowReduction;
 		
 		if (isRowReduction){
 			try {
-				kdf = new HKDF(new BcHMAC("SHA-256"));
+				kdf = new BcKdfISO18033("SHA-256");
 			} catch (FactoriesException e) {
 				// Should not occur since the given parameters are implemented.
 			}
