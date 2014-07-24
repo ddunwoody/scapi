@@ -30,7 +30,6 @@ import java.math.BigInteger;
 import org.bouncycastle.math.ec.ECPoint;
 
 import edu.biu.scapi.primitives.dlog.ECF2mPoint;
-import edu.biu.scapi.primitives.dlog.ECF2mUtility;
 import edu.biu.scapi.primitives.dlog.groupParams.ECF2mGroupParams;
 
 /**
@@ -39,7 +38,6 @@ import edu.biu.scapi.primitives.dlog.groupParams.ECF2mGroupParams;
  * 
  */
 public class ECF2mPointBc extends ECPointBc implements ECF2mPoint {
-	private ECF2mUtility util = new ECF2mUtility();
 	
 	/**
 	 * Constructor that accepts x,y possible values of a point on the requested curve.
@@ -54,10 +52,10 @@ public class ECF2mPointBc extends ECPointBc implements ECF2mPoint {
 	ECF2mPointBc(BigInteger x, BigInteger y, BcDlogECF2m curve, boolean bCheckMembership) throws IllegalArgumentException{
 
 		if(bCheckMembership) {
-				boolean valid = util.checkCurveMembership((ECF2mGroupParams) curve.getGroupParams(), x, y);
-				// checks validity
-				if (valid == false) // if not valid, throws exception
-					throw new IllegalArgumentException("x, y values are not a point on this curve");
+			boolean valid = curve.checkCurveMembership((ECF2mGroupParams) curve.getGroupParams(), x, y);
+			// checks validity
+			if (valid == false) // if not valid, throws exception
+				throw new IllegalArgumentException("x, y values are not a point on this curve");
 		}
 		/* create point with the given parameters */
 		point = curve.createPoint(x, y);

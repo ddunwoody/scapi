@@ -371,7 +371,7 @@ public class MiraclDlogECF2m extends MiraclAdapterDlogEC implements DlogECF2m, D
 		// 1.	Checking that the point is on the curve, performed by checkCurveMembership
 		// 2.	Checking that the point is in the Dlog group,performed by checkSubGroupMembership
 
-		boolean valid = util.checkCurveMembership((ECF2mGroupParams) groupParams, point.getX(), point.getY());
+		boolean valid = isF2mMember(mip, point.getPoint());
 		valid = valid && util.checkSubGroupMembership(this, point);
 
 		return valid;
