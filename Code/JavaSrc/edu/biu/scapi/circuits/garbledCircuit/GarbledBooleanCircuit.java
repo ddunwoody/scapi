@@ -41,10 +41,10 @@ import edu.biu.scapi.exceptions.NotAllInputsSetException;
 /**
  * {@code GarbledBooleanCircuit} is a general interface for all basic garbled circuits. It is implemented by all garbled circuits--optimized or not. <p>
  * All garbled circuits have four main operations: <p>
- * 1. The construct operation which is provided by the constructors of the implementing classes following by garble function. <p>
+ * 1. The {@link #garble()} function that generates the keys and creates the garbled tables. <p>
  * 2. The {@link #compute()} function computes a result on a garbled circuit whose input has been set. <p>
  * 3. The {@link #verify(BooleanCircuit, Map)} method is used in the case of a malicious adversary to verify that the garbled circuit 
- * created is an honest garbling of the agreed upon non garbled circuit. The constructing party constructs many garbled circuits and
+ * created is an honest garbling of the agreed upon non garbled circuit. For example, the constructing party constructs many garbled circuits and
  * the second party chooses all but one of them to verify and test the honesty of the constructing party.<p>
  * 4. The {@link #translate(Map)} that translates the garbled output from {@link #compute()} into meaningful output.<p>
  * 
