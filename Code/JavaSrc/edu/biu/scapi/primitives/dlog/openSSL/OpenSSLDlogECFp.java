@@ -51,6 +51,8 @@ public class OpenSSLDlogECFp extends OpenSSLAdapterDlogEC implements DlogECFp, D
 	private native long createCurve(byte[] p, byte[] a, byte[] b);
 	//Initializes the native curve with the generator and order.
 	private native int initCurve(long curve, long generator, byte[] q);
+	//Encodes the given byte array into a point. If the given byte array can not be encoded to a point, returns 0.
+	private native long encodeByteArrayToPoint(long curve, byte[] binaryString, int k);
 	
 	/**
 	 * Default constructor. Initializes this object with P-192 NIST curve.
@@ -271,14 +273,15 @@ public class OpenSSLDlogECFp extends OpenSSLAdapterDlogEC implements DlogECFp, D
 
 	@Override
 	public GroupElement encodeByteArrayToGroupElement(byte[] binaryString) {
-		//The actual work is implemented in ECFpUtility since it is independent of the underlying library (BC, Miracl, or other)
-		//If we ever decide to change the implementation there will only be one place to change it.
-		ECFpUtility.FpPoint fpPoint = util.findPointRepresentedByByteArray((ECFpGroupParams) groupParams, binaryString, k); 
-		if (fpPoint == null)
+		//Call a native function that encode the byte array to a point.
+		long point = encodeByteArrayToPoint(curve, binaryString, k);
+		
+		//If failed to create a point, return null.
+		if (point == 0)
 			return null;
-		//When generating an element for an encoding always check that the (x,y) coordinates represent a point on the curve.
-		ECElement element = (ECElement) generateElement(true, fpPoint.getX(), fpPoint.getY());
-		return element;
+		
+		 // Build a ECFpPointOpenSSL element from the result.
+		return new ECFpPointOpenSSL(curve, point);
 	}
 
 	@Override
