@@ -47,7 +47,7 @@ import edu.biu.scapi.midLayer.asymmetricCrypto.encryption.ScElGamalOnByteArray;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.miracl.MiraclDlogECF2m;
 import edu.biu.scapi.primitives.hash.CryptographicHash;
-import edu.biu.scapi.primitives.hash.bc.BcSHA256;
+import edu.biu.scapi.primitives.hash.openSSL.OpenSSLSHA256;
 import edu.biu.scapi.primitives.kdf.HKDF;
 import edu.biu.scapi.primitives.prf.bc.BcHMAC;
 import edu.biu.scapi.securityLevel.SecureCommit;
@@ -83,7 +83,7 @@ public class CmtElGamalHashCommitter extends CmtElGamalCommitterCore implements 
 	public CmtElGamalHashCommitter(Channel channel) throws IOException {
 		//This default hash suits the default DlogGroup.
 		try {
-			doConstruct(channel, new MiraclDlogECF2m("K-283"), new BcSHA256(), new SecureRandom());
+			doConstruct(channel, new MiraclDlogECF2m("K-283"), new OpenSSLSHA256(), new SecureRandom());
 		} catch (SecurityLevelException e) {
 			// Should not occur since the default DlogGroup has the necessary security level.
 		} catch (InvalidDlogGroupException e) {

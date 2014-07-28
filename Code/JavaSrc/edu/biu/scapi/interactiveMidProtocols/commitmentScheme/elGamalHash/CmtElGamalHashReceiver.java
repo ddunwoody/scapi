@@ -46,7 +46,7 @@ import edu.biu.scapi.midLayer.plaintext.ByteArrayPlaintext;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.miracl.MiraclDlogECF2m;
 import edu.biu.scapi.primitives.hash.CryptographicHash;
-import edu.biu.scapi.primitives.hash.bc.BcSHA256;
+import edu.biu.scapi.primitives.hash.openSSL.OpenSSLSHA256;
 import edu.biu.scapi.primitives.kdf.HKDF;
 import edu.biu.scapi.primitives.prf.bc.BcHMAC;
 import edu.biu.scapi.securityLevel.SecureCommit;
@@ -84,7 +84,7 @@ public class CmtElGamalHashReceiver extends CmtElGamalReceiverCore implements Cm
 	public CmtElGamalHashReceiver(Channel channel) throws IOException, ClassNotFoundException, CheatAttemptException{
 		//This default hash suits the default DlogGroup.
 		try {
-			doConstruct(channel, new MiraclDlogECF2m("K-283"), new BcSHA256());
+			doConstruct(channel, new MiraclDlogECF2m("K-283"), new OpenSSLSHA256());
 		} catch (SecurityLevelException e) {
 			// Should not occur since the default DlogGroup has the necessary security level.
 		} catch (InvalidDlogGroupException e) {
