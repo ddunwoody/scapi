@@ -247,6 +247,16 @@ public class CryptoPPRSAPss extends RSAPssAbs {
 		
 	}
 	
+	/**
+	 * Deletes the related RSA objects.
+	 */
+	protected void finalize() throws Throwable {
+
+		// Delete from the dll the dynamic allocation of the RSA objects.
+		deleteRSA(signer, verifier);
+
+	}
+	
 	//Loads the Crypto++ library.
 	static {
 	      System.loadLibrary("CryptoPPJavaInterface");
