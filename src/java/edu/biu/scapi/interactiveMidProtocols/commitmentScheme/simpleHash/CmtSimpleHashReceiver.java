@@ -31,22 +31,25 @@ import java.util.Hashtable;
 import java.util.Map;
 
 import edu.biu.scapi.comm.Channel;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCCommitmentMsg;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCDecommitmentMessage;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtRBasicCommitPhaseOutput;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtByteArrayCommitValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtReceiver;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtRCommitPhaseOutput;
 import edu.biu.scapi.primitives.hash.CryptographicHash;
-import edu.biu.scapi.primitives.hash.bc.BcSHA256;
+import edu.biu.scapi.primitives.hash.openSSL.OpenSSLSHA256;
 import edu.biu.scapi.securityLevel.SecureCommit;
 
 /**
- * This class implements the receiver side of Simple Hash commitment.
+ * This class implements the receiver side of Simple Hash commitment.<p>
  * 
- * This is a commitment scheme based on hash functions. 
- * It can be viewed as a random-oracle scheme, but its security can also be viewed as a 
- * standard assumption on modern hash functions. Note that computational binding follows 
- * from the standard collision resistance assumption. 
+ * This is a commitment scheme based on hash functions. <p>
+ * It can be viewed as a random-oracle scheme, but its security can also be viewed as a standard assumption on modern hash functions. 
+ * Note that computational binding follows from the standard collision resistance assumption. <p>
+ * 
+ * The pseudo code of this protocol can be found in Protocol 3.6 of pseudo codes document at {@link http://crypto.biu.ac.il/scapi/SDK_Pseudocode_SCAPI_V2.0.0.pdf}.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
@@ -68,7 +71,7 @@ public class CmtSimpleHashReceiver implements CmtReceiver, SecureCommit {
 	 *		      OUTPUT ACC and value x"	 
 	 */
 	
-	private Map<Long , byte[]> commitmentMap;
+	private Map<Long , CmtSimpleHashCommitmentMessage> commitmentMap;
 	private Channel channel;	
 	private CryptographicHash hash;
 	private int n; //security parameter.
@@ -79,7 +82,7 @@ public class CmtSimpleHashReceiver implements CmtReceiver, SecureCommit {
 	 *  @param channel
 	 */
 	public CmtSimpleHashReceiver(Channel channel) {
-		this(channel, new BcSHA256(), 32);	
+		this(channel, new OpenSSLSHA256(), 32);	
 	}
 	
 	
@@ -96,7 +99,7 @@ public class CmtSimpleHashReceiver implements CmtReceiver, SecureCommit {
 		this.channel = channel;
 		this.hash = hash;
 		this.n = n;
-		commitmentMap = new Hashtable<Long, byte[]>();
+		commitmentMap = new Hashtable<Long, CmtSimpleHashCommitmentMessage>();
 		
 		//No pre-process in SimpleHash Commitment
 	}
@@ -120,7 +123,7 @@ public class CmtSimpleHashReceiver implements CmtReceiver, SecureCommit {
 		}
 		
 		CmtSimpleHashCommitmentMessage msg = (CmtSimpleHashCommitmentMessage) message;
-		commitmentMap.put(Long.valueOf(msg.getId()), msg.getCommitment());
+		commitmentMap.put(Long.valueOf(msg.getId()), msg);
 		return new CmtRBasicCommitPhaseOutput(msg.getId());
 	}
 
@@ -146,10 +149,25 @@ public class CmtSimpleHashReceiver implements CmtReceiver, SecureCommit {
 			throw new IOException("Failed to receive decommitment. The error is: " + e.getMessage());
 		}
 		
-		if (!(message instanceof CmtSimpleHashDecommitmentMessage)){
+		if (!(message instanceof CmtCDecommitmentMessage)){
+			throw new IllegalArgumentException("the received message is not an instance of CmtCDecommitmentMessage");
+		}
+		
+		//Fetch received commitment according to ID
+		CmtSimpleHashCommitmentMessage receivedCommitment = commitmentMap.get(Long.valueOf(id));
+				
+		return verifyDecommitment(receivedCommitment, (CmtCDecommitmentMessage)message);
+		
+	}
+	
+	public CmtCommitValue verifyDecommitment(CmtCCommitmentMsg commitmentMsg, CmtCDecommitmentMessage decommitmentMsg){
+		if (!(decommitmentMsg instanceof CmtSimpleHashDecommitmentMessage)){
 			throw new IllegalArgumentException("the received message is not an instance of CmtSimpleHashDecommitmentMessage");
 		}
-		CmtSimpleHashDecommitmentMessage msg = (CmtSimpleHashDecommitmentMessage) message;
+		if (!(commitmentMsg instanceof CmtSimpleHashCommitmentMessage)){
+			throw new IllegalArgumentException("the received message is not an instance of CmtSimpleHashCommitmentMessage");
+		}
+		CmtSimpleHashDecommitmentMessage msg = (CmtSimpleHashDecommitmentMessage) decommitmentMsg;
 		
 		//Compute c = H(r,x)
 		byte[] x = msg.getX();
@@ -163,11 +181,8 @@ public class CmtSimpleHashReceiver implements CmtReceiver, SecureCommit {
 		hash.update(cTag, 0, cTag.length);
 		hash.hashFinal(hashValArrayTag, 0);
 		
-		//Fetch received commitment according to ID
-		byte[] receivedCommitment = commitmentMap.get(Long.valueOf(id));
-		
 		//Checks that c = H(r,x)
-		if (Arrays.equals(receivedCommitment, hashValArrayTag))
+		if (Arrays.equals(((CmtSimpleHashCommitmentMessage)commitmentMsg).getCommitment(), hashValArrayTag))
 			return new CmtByteArrayCommitValue(x);
 		//In the pseudocode it says to return X and ACCEPT if valid commitment else, REJECT.
 		//For now we return null as a mode of reject. If the returned value of this function is not null then it means ACCEPT

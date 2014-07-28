@@ -46,7 +46,7 @@ public abstract class DlogGroupAbs implements primeOrderSubGroup{
 	protected GroupElement generator;			//generator of the group
 	//map for multExponentiationsWithSameBase calculations
 	private HashMap<GroupElement, GroupElementsExponentiations> exponentiationsMap = new HashMap<GroupElement, GroupElementsExponentiations>();
-
+	protected SecureRandom random;				//Source of randomness to use.
 	//k is the maximum length of a string to be converted to a Group Element of this group. If a string exceeds the k length it cannot be converted.
  	protected int k;
 	
@@ -117,8 +117,7 @@ public abstract class DlogGroupAbs implements primeOrderSubGroup{
 		BigInteger qMinusOne = groupParams.getQ().subtract(one);
 
 		// choose a random number x in Zq*
-		BigInteger randNum = BigIntegers.createRandomInRange(one, qMinusOne,
-				new SecureRandom());
+		BigInteger randNum = BigIntegers.createRandomInRange(one, qMinusOne, random);
 
 		// compute g^x to get a new element
 		return exponentiate(generator, randNum);

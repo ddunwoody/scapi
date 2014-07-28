@@ -47,7 +47,9 @@ import edu.biu.scapi.primitives.hash.CryptographicHash;
  * 
  * This protocol is used to prove that the value encrypted under Cramer-Shoup in the ciphertext (u1,u2,e,v) 
  * with public-key g1,g2,c,d,h is x. <p>
- * The protocol is for the case that the prover knows the randomness used to encrypt.
+ * The protocol is for the case that the prover knows the randomness used to encrypt.<p>
+ * 
+ * The pseudo code of this protocol can be found in Protocol 1.10 of pseudo codes document at {@link http://crypto.biu.ac.il/scapi/SDK_Pseudocode_SCAPI_V2.0.0.pdf}.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *

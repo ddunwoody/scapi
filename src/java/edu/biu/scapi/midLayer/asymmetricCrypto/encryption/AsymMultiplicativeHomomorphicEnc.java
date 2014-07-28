@@ -26,6 +26,8 @@
 
 package edu.biu.scapi.midLayer.asymmetricCrypto.encryption;
 
+import java.math.BigInteger;
+
 import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertext;
 
 /**
@@ -46,4 +48,19 @@ public interface AsymMultiplicativeHomomorphicEnc extends AsymmetricEnc{
 	 * @throws IllegalArgumentException if the given ciphertexts do not match this asymmetric encryption.
 	 */
 	public AsymmetricCiphertext multiply(AsymmetricCiphertext cipher1, AsymmetricCiphertext cipher2);
+	
+	/**
+	 * Receives two ciphertexts and return their multiplication.<p>
+	 * There are cases when the random value is used after the function, for example, in sigma protocol. 
+	 * In these cases the random value should be known to the user. We decided not to have function that return it to the user 
+	 * since this can cause problems when the multiply function is called more than one time. 
+	 * Instead, we decided to have an additional multiply function that gets the random value from the user.
+	 * @param cipher1
+	 * @param cipher2
+	 * @param r The random value used in the function.
+	 * @return the multiplication result
+	 * @throws IllegalStateException if no public key was set.
+	 * @throws IllegalArgumentException if the given ciphertexts do not match this asymmetric encryption.
+	 */
+	public AsymmetricCiphertext multiply(AsymmetricCiphertext cipher1, AsymmetricCiphertext cipher2, BigInteger r);
 }

@@ -41,8 +41,6 @@ import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
 public class ECFpPointMiracl implements ECElement, ECFpPoint{
 
 	private native long createFpPoint(long mip, byte[] x, byte[] y);
-	private native long createFpPointFromX(long mip, byte[] x, boolean[] validity);
-	private native long createRandomFpPoint(long mip, byte[] p, int seed, boolean[] validity);
 	private native boolean checkInfinityFp(long point);
 	private native void deletePointFp(long p);
 	private native byte[] getXValueFpPoint(long mip, long point);

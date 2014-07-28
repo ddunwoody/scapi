@@ -43,10 +43,11 @@ import edu.biu.scapi.securityLevel.OneSidedSimulation;
  * privacy for the case that the sender is corrupted and simulation in the case that the receiver 
  * is corrupted.<p>
  * 
- * For more information see Protocol 7.3 page 185 of <i>Efficient Secure Two-Party Protocols</i> by Hazay-Lindell. <P>
- * 
  * This class derived from OTOneSidedSimDDHReceiverAbs and implements the functionality 
  * related to the GroupElement inputs.<p>
+ * 
+ * For more information see Protocol 7.3 page 185 of <i>Efficient Secure Two-Party Protocols</i> by Hazay-Lindell. <P>
+ * The pseudo code of this protocol can be found in Protocol 4.3 of pseudo codes document at {@link http://crypto.biu.ac.il/scapi/SDK_Pseudocode_SCAPI_V2.0.0.pdf}.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *

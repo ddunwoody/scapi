@@ -25,6 +25,8 @@
 package edu.biu.scapi.primitives.dlog.openSSL;
 
 import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 
 import edu.biu.scapi.primitives.dlog.DlogGroupAbs;
 import edu.biu.scapi.primitives.dlog.DlogZpSafePrime;
@@ -66,6 +68,15 @@ public class OpenSSLDlogZpSafePrime extends DlogGroupAbs implements DlogZpSafePr
 	 * @param groupParams - contains the group parameters.
 	 */
 	public OpenSSLDlogZpSafePrime(ZpGroupParams groupParams) {
+		this(groupParams, new SecureRandom());
+	}
+	
+	/**
+	 * Initializes the OpenSSL implementation of Dlog over Zp* with the given groupParams.
+	 * @param groupParams - contains the group parameters.
+	 * @param random The source of randomness to use.
+	 */
+	public OpenSSLDlogZpSafePrime(ZpGroupParams groupParams, SecureRandom random) {
 
 		BigInteger p = groupParams.getP();
 		BigInteger q = groupParams.getQ();
@@ -85,7 +96,8 @@ public class OpenSSLDlogZpSafePrime extends DlogGroupAbs implements DlogZpSafePr
 		}
 		// Set the inner parameters.
 		this.groupParams = groupParams;
-
+		this.random = random;
+		
 		//Create CryptoPP Dlog group with p, ,q , g.
 		//The validity of g will be checked after the creation of the group because the check need the pointer to the group.
 		dlog = createDlogZp(p.toByteArray(), q.toByteArray(), g.toByteArray());
@@ -108,9 +120,22 @@ public class OpenSSLDlogZpSafePrime extends DlogGroupAbs implements DlogZpSafePr
 	 * @param g the generator of the group.
 	 * @param p the prime of the group.
 	 */
-	public OpenSSLDlogZpSafePrime(String q, String g, String p) {
+	public OpenSSLDlogZpSafePrime(String q, String g, String p)  {
 		//Creates ZpGroupParams from the given arguments and call the appropriate constructor.
-		this(new ZpGroupParams(new BigInteger(q), new BigInteger(g), new BigInteger(p)));
+		this(new ZpGroupParams(new BigInteger(q), new BigInteger(g), new BigInteger(p)), new SecureRandom());
+	}
+	
+	/**
+	 * Initializes the OpenSSL implementation of Dlog over Zp* with the given parameters.
+	 * @param q the order of the group.
+	 * @param g the generator of the group.
+	 * @param p the prime of the group.
+	 * @param randNumGenAlg The random number generator to use.
+	 * @throws NoSuchAlgorithmException 
+	 */
+	public OpenSSLDlogZpSafePrime(String q, String g, String p, String randNumGenAlg) throws NoSuchAlgorithmException {
+		//Creates ZpGroupParams from the given arguments and call the appropriate constructor.
+		this(new ZpGroupParams(new BigInteger(q), new BigInteger(g), new BigInteger(p)), SecureRandom.getInstance(randNumGenAlg));
 	}
 
 	/**
@@ -125,7 +150,17 @@ public class OpenSSLDlogZpSafePrime extends DlogGroupAbs implements DlogZpSafePr
 	 * @param numBits - number of p's bits to generate.
 	 */
 	public OpenSSLDlogZpSafePrime(int numBits) {
-
+		this(numBits, new SecureRandom());
+	}
+	
+	/**
+	 * Initializes the OpenSSL implementation of Dlog over Zp* with random values.
+	 * @param numBits - number of p's bits to generate.
+	 * @param random The source of randomness to use.
+	 */
+	public OpenSSLDlogZpSafePrime(int numBits, SecureRandom random) {
+		this.random = random;
+		
 		// Create random Zp dlog group.
 		dlog = createRandomDlogZp(numBits);
 		// Get the generator value.
@@ -145,11 +180,23 @@ public class OpenSSLDlogZpSafePrime extends DlogGroupAbs implements DlogZpSafePr
 
 	/**
 	 * Initializes the OpenSSL implementation of Dlog over Zp* with random values.
-	 * @param numBits - number of p's bits to generate.
+	 * @param numBits - number of p's bits to generate. 
+	 * @throws NumberFormatException 
 	 */
-	public OpenSSLDlogZpSafePrime(String numBits) {
+	public OpenSSLDlogZpSafePrime(String numBits) throws NumberFormatException {
 		//Creates an int from the given string and calls the appropriate constructor.
-		this(new Integer(numBits));
+		this(new Integer(numBits), new SecureRandom());
+	}
+	/**
+	 * Initializes the OpenSSL implementation of Dlog over Zp* with random values.
+	 * @param numBits - number of p's bits to generate.
+	 * @param randNumGenAlg The random number generator to use.
+	 * @throws NoSuchAlgorithmException 
+	 * @throws NumberFormatException 
+	 */
+	public OpenSSLDlogZpSafePrime(String numBits, String randNumGenAlg) throws NumberFormatException, NoSuchAlgorithmException {
+		//Creates an int from the given string and calls the appropriate constructor.
+		this(new Integer(numBits), SecureRandom.getInstance(randNumGenAlg));
 	}
 	
 	private int calcK(BigInteger p){
@@ -191,7 +238,7 @@ public class OpenSSLDlogZpSafePrime extends DlogGroupAbs implements DlogZpSafePr
 	public GroupElement createRandomElement() {
 		//This function overrides the basic implementation of DlogGroupAbs. For the case of Zp Safe Prime this is a more efficient implementation.
 		//It calls the package private constructor of OpenSSLZpSafePrimeElement, which randomly creates an element in Zp.
-		return new OpenSSLZpSafePrimeElement(((ZpGroupParams) groupParams).getP());
+		return new OpenSSLZpSafePrimeElement(((ZpGroupParams) groupParams).getP(), random);
 
 	}
 
@@ -393,8 +440,7 @@ public class OpenSSLDlogZpSafePrime extends DlogGroupAbs implements DlogZpSafePr
 		BigInteger s = new BigInteger(newString);
 		BigInteger y = (s.add(BigInteger.ONE)).pow(2).mod(((ZpGroupParams) groupParams).getP());
 		//There is no need to check membership since the "element" was generated so that it is always an element.
-		Boolean bCheckMembership = true;
-		OpenSSLZpSafePrimeElement element = new OpenSSLZpSafePrimeElement(y, ((ZpGroupParams) groupParams).getP(), bCheckMembership);
+		OpenSSLZpSafePrimeElement element = new OpenSSLZpSafePrimeElement(y, ((ZpGroupParams) groupParams).getP(), false);
 		return element;
 	}
 	

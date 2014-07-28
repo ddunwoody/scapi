@@ -26,6 +26,8 @@ package edu.biu.scapi.primitives.dlog.openSSL;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.Properties;
 
 import edu.biu.scapi.primitives.dlog.DlogECFp;
@@ -49,6 +51,16 @@ public class OpenSSLDlogECFp extends OpenSSLAdapterDlogEC implements DlogECFp, D
 	private native long createCurve(byte[] p, byte[] a, byte[] b);
 	//Initializes the native curve with the generator and order.
 	private native int initCurve(long curve, long generator, byte[] q);
+	//Encodes the given byte array into a point. If the given byte array can not be encoded to a point, returns 0.
+	private native long encodeByteArrayToPoint(long curve, byte[] binaryString, int k);
+	
+	/**
+	 * Default constructor. Initializes this object with P-192 NIST curve.
+	 * @throws IOException 
+	 */
+	public OpenSSLDlogECFp() throws IOException {
+		this("P-192");
+	}
 	
 	/**
 	 * Initialize this DlogGroup with the curve in the given file.
@@ -61,12 +73,34 @@ public class OpenSSLDlogECFp extends OpenSSLAdapterDlogEC implements DlogECFp, D
 	}
 	
 	/**
+	 * Initialize this DlogGroup with the curve in the given file.
+	 * @param fileName the file to take the curve's parameters from.
+	 * @param curveName name of curve to initialized.
+	 * @param randNumGenAlg The random number generator to use.
+	 * @throws IOException if there is a problem with the given file name.
+	 * @throws NoSuchAlgorithmException 
+	 */
+	public OpenSSLDlogECFp(String fileName, String curveName, String randNumGenAlg) throws IOException, NoSuchAlgorithmException {
+		super(fileName, curveName, SecureRandom.getInstance(randNumGenAlg));	
+	}
+	
+	/**
 	 * Initialize this DlogGroup with one of NIST recommended elliptic curve.
 	 * @param curveName name of NIST curve to initialized
 	 * @throws IOException if there is a problem with NIST properties file.
 	 */
 	public OpenSSLDlogECFp(String curveName) throws IOException {
 		super(curveName);
+	}
+	
+	/**
+	 * Initialize this DlogGroup with one of NIST recommended elliptic curve.
+	 * @param curveName name of NIST curve to initialized
+	 * @param random The source of randomness to use.
+	 * @throws IOException if there is a problem with NIST properties file.
+	 */
+	public OpenSSLDlogECFp(String curveName, SecureRandom random) throws IOException {
+		super(curveName, random);
 	}
 	
 	@Override
@@ -239,14 +273,15 @@ public class OpenSSLDlogECFp extends OpenSSLAdapterDlogEC implements DlogECFp, D
 
 	@Override
 	public GroupElement encodeByteArrayToGroupElement(byte[] binaryString) {
-		//The actual work is implemented in ECFpUtility since it is independent of the underlying library (BC, Miracl, or other)
-		//If we ever decide to change the implementation there will only be one place to change it.
-		ECFpUtility.FpPoint fpPoint = util.findPointRepresentedByByteArray((ECFpGroupParams) groupParams, binaryString, k); 
-		if (fpPoint == null)
+		//Call a native function that encode the byte array to a point.
+		long point = encodeByteArrayToPoint(curve, binaryString, k);
+		
+		//If failed to create a point, return null.
+		if (point == 0)
 			return null;
-		//When generating an element for an encoding always check that the (x,y) coordinates represent a point on the curve.
-		ECElement element = (ECElement) generateElement(true, fpPoint.getX(), fpPoint.getY());
-		return element;
+		
+		 // Build a ECFpPointOpenSSL element from the result.
+		return new ECFpPointOpenSSL(curve, point);
 	}
 
 	@Override

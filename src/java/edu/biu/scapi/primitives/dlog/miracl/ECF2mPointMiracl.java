@@ -40,8 +40,6 @@ import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
 public class ECF2mPointMiracl implements ECElement, ECF2mPoint{
 
 	private native long createF2mPoint(long mip, byte[] x, byte[] y);
-	private native long createF2mPointFromX(long mip, byte[] x, boolean[] validity);
-	private native long createRandomF2mPoint(long mip, int m, int seed, boolean[] validity);
 	private native boolean checkInfinityF2m(long point);
 	private native byte[] getXValueF2mPoint(long mip, long point);
 	private native byte[] getYValueF2mPoint(long mip, long point);

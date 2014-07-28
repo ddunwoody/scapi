@@ -8,6 +8,8 @@ import java.io.IOException;
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.exceptions.CommitValueException;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCCommitmentMsg;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCDecommitmentMessage;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtReceiver;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtWithProofsReceiver;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitValue;
@@ -17,10 +19,11 @@ import edu.biu.scapi.securityLevel.EquivocalCmt;
 
 /**
  * Concrete implementation of Equivocal commitment scheme in the receiver's point of view.Pseudo code:<p>
- * This is a protocol to obtain an equivocal commitment from any commitment with a ZK-protocol 
- * of the commitment value.Pseudo code:<p>
- * The equivocality property means that a simulator can decommit to any value it needs 
- * (needed for proofs of security).
+ * This is a protocol to obtain an equivocal commitment from any commitment with a ZK-protocol of the commitment value.Pseudo code:<p>
+ * The equivocality property means that a simulator can decommit to any value it needs (needed for proofs of security).<p>
+ * 
+ * The pseudo code of this protocol can be found in Protocol 3.7 of pseudo codes document at {@link http://crypto.biu.ac.il/scapi/SDK_Pseudocode_SCAPI_V2.0.0.pdf}.<p>
+ * 
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
@@ -81,6 +84,11 @@ public class CmtEquivocalReceiver implements CmtReceiver, EquivocalCmt {
 	public CmtCommitValue receiveDecommitment(long id) throws IOException, ClassNotFoundException, CheatAttemptException, CommitValueException {
 		//During the execution of verifyCommittedValue, the x is received by the receiver.
 		return receiver.verifyCommittedValue(id);
+	}
+	
+	@Override
+	public CmtCommitValue verifyDecommitment(CmtCCommitmentMsg commitmentMsg, CmtCDecommitmentMessage decommitmentMsg) {
+		throw new IllegalStateException("The Decommitment phase of this scheme is interactive. Thus, it can't generate a decommitment message. Call decommit function");
 	}
 
 	@Override

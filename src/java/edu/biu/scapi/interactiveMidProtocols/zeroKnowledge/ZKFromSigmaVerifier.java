@@ -46,9 +46,11 @@ import edu.biu.scapi.securityLevel.PerfectlyHidingCmt;
  * Concrete implementation of Zero Knowledge verifier.<p>
  * 
  * This is a transformation that takes any Sigma protocol and any perfectly hiding commitment scheme and 
- * yields a zero-knowledge proof.
+ * yields a zero-knowledge proof.<p>
  * 
- * For more information see Protocol 6.5.1, page 161 of Hazay-Lindell.
+ * For more information see Protocol 6.5.1, page 161 of Hazay-Lindell.<p>
+ * 
+ * The pseudo code of this protocol can be found in Protocol 2.1 of pseudo codes document at {@link http://crypto.biu.ac.il/scapi/SDK_Pseudocode_SCAPI_V2.0.0.pdf}.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *

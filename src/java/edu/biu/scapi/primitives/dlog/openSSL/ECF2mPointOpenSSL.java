@@ -28,9 +28,7 @@ import java.math.BigInteger;
 
 import edu.biu.scapi.primitives.dlog.ECElementSendableData;
 import edu.biu.scapi.primitives.dlog.ECF2mPoint;
-import edu.biu.scapi.primitives.dlog.ECF2mUtility;
 import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
-import edu.biu.scapi.primitives.dlog.groupParams.ECF2mGroupParams;
 
 /**
  * This class is an adapter for F2m points of OpenSSL library.
@@ -71,13 +69,6 @@ public class ECF2mPointOpenSSL implements ECF2mPoint{
 	 * 
 	 */
 	ECF2mPointOpenSSL(BigInteger x, BigInteger y, OpenSSLDlogECF2m curve, boolean bCheckMembership) throws IllegalArgumentException{
-		if(bCheckMembership){
-			//check if the given parameters are valid point on the curve.
-			boolean valid = new ECF2mUtility().checkCurveMembership((ECF2mGroupParams) curve.getGroupParams(), x, y);
-			// checks validity
-			if (valid == false) // if not valid, throws exception
-				throw new IllegalArgumentException("x, y values are not a point on this curve");
-		}
 		//Create a point in the field with the given parameters, done by OpenSSL's native code.
 		point = createPoint(curve.getCurve(), x.toByteArray(), y.toByteArray());
 		//If the validity check done by OpenSSL did not succeed, then createF2mPoint returns 0,
@@ -87,6 +78,16 @@ public class ECF2mPointOpenSSL implements ECF2mPoint{
 		//Keep the coordinates for performance reasons. See long comment above next to declaration.
 		this.x = x;
 		this.y = y;
+		
+		if(bCheckMembership){
+			//check if the given parameters are valid point on the curve.
+			boolean valid = curve.isMember(this);
+			// checks validity
+			if (valid == false) {// if not valid, throws exception
+				deletePoint(point);
+				throw new IllegalArgumentException("x, y values are not a point on this curve");
+			}
+		}
 	}
 	
 	/**

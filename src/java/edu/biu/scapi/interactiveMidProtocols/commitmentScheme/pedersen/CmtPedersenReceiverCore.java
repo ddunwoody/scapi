@@ -38,6 +38,8 @@ import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.generals.ScapiDefaultConfiguration;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCCommitmentMsg;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCDecommitmentMessage;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtRBasicCommitPhaseOutput;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtBigIntegerCommitValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtReceiver;
@@ -86,7 +88,7 @@ public abstract class CmtPedersenReceiverCore implements CmtReceiver{
 	//The committer may commit many values one after the other without decommitting. And only at a later time decommit some or all those values. In order to keep track
 	//of the commitments and be able to relate them afterwards to the decommitments we keep them in the commitmentMap. The key is some unique id known to the application
 	//running the committer. The exact same id has to be use later on to decommit the corresponding values, otherwise the receiver will reject the decommitment.
-	private Hashtable<Long, GroupElement> commitmentMap; 
+	protected Hashtable<Long, CmtPedersenCommitmentMessage> commitmentMap; 
 	
 
 	/**
@@ -136,7 +138,7 @@ public abstract class CmtPedersenReceiverCore implements CmtReceiver{
 		this.dlog = dlog;
 		this.random = random;
 		qMinusOne =  dlog.getOrder().subtract(BigInteger.ONE);
-		commitmentMap = new Hashtable<Long, GroupElement>();
+		commitmentMap = new Hashtable<Long, CmtPedersenCommitmentMessage>();
 		
 		//The pre-process phase is actually performed at construction
 		preProcess();
@@ -188,8 +190,8 @@ public abstract class CmtPedersenReceiverCore implements CmtReceiver{
 			throw new IllegalArgumentException("The received message should be an instance of CmtPedersenCommitmentMessage");
 		}
 		CmtPedersenCommitmentMessage msg = (CmtPedersenCommitmentMessage) message;
-		GroupElement receivedCommitment = dlog.reconstructElement(true,msg.getCommitment());
-		commitmentMap.put(Long.valueOf(msg.getId()), receivedCommitment);
+		
+		commitmentMap.put(Long.valueOf(msg.getId()), msg);
 		return new CmtRBasicCommitPhaseOutput(msg.getId());
 	}
 
@@ -214,7 +216,8 @@ public abstract class CmtPedersenReceiverCore implements CmtReceiver{
 		}
 		CmtPedersenDecommitmentMessage msg = (CmtPedersenDecommitmentMessage) message;
 		
-		return processDecommitment(id, msg.getX(), msg.getR().getR());
+		CmtPedersenCommitmentMessage receivedCommitment = commitmentMap.get(Long.valueOf(id));
+		return verifyDecommitment(receivedCommitment, msg);
 	}
 	
 	/**
@@ -228,7 +231,10 @@ public abstract class CmtPedersenReceiverCore implements CmtReceiver{
 	 * @param r
 	 * @return the committed value
 	 */
-	protected CmtCommitValue processDecommitment(long id, BigInteger x, BigInteger r) {
+	public CmtCommitValue verifyDecommitment(CmtCCommitmentMsg commitmentMsg, CmtCDecommitmentMessage decommitmentMsg) {
+		BigInteger x = ((CmtPedersenDecommitmentMessage)decommitmentMsg).getX();
+		BigInteger r = ((CmtPedersenDecommitmentMessage)decommitmentMsg).getR().getR();
+		
 		//if x is not in Zq return null
 		if ((x.compareTo(BigInteger.ZERO)<0) || (x.compareTo(dlog.getOrder())>0)){
 			return null; 
@@ -237,9 +243,9 @@ public abstract class CmtPedersenReceiverCore implements CmtReceiver{
 		//Calculate c = g^r * h^x
 		GroupElement gTor = dlog.exponentiate(dlog.getGenerator(),r);
 		GroupElement hTox = dlog.exponentiate(h,x);
-		//Fetch received commitment according to ID
-		GroupElement receivedCommitment = commitmentMap.get(Long.valueOf(id));
-		if (receivedCommitment.equals(dlog.multiplyGroupElements(gTor, hTox)))
+		
+		GroupElement commitmentElement = dlog.reconstructElement(true, ((CmtPedersenCommitmentMessage)commitmentMsg).getCommitment());
+		if (commitmentElement.equals(dlog.multiplyGroupElements(gTor, hTox)))
 			return new CmtBigIntegerCommitValue(x);
 		//In the pseudocode it says to return X and ACCEPT if valid commitment else, REJECT.
 		//For now we return null as a mode of reject. If the returned value of this function is not null then it means ACCEPT
@@ -255,6 +261,6 @@ public abstract class CmtPedersenReceiverCore implements CmtReceiver{
 	
 	@Override
 	public GroupElement getCommitmentPhaseValues(long id){
-		return commitmentMap.get(id);
+		return dlog.reconstructElement(true, commitmentMap.get(id).getCommitment());
 	}
 }

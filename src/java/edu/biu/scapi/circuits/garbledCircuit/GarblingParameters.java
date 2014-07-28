@@ -28,20 +28,20 @@ import edu.biu.scapi.circuits.circuit.BooleanCircuit;
 import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
 
 /**
- * A general interface for a circuit's inputs.<p>
- * Each type of a circuit (standard, FreeXor, MinimizeAESSetKey, etc) has different inputs and should have an input class.<p>
- * All input classes should implement this interface.
+ * A general interface for a circuits' garbling parameters.<p>
+ * Each type of a circuit (standard, FreeXor, MinimizeAESSetKey, etc) has different parameters and should have a related garbling parameters' class.<p>
+ * All parameters classes should implement this interface.
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public interface CircuitInput {
+public interface GarblingParameters {
 	
 	/**
 	 * Creates and returns a unique utility class.<p>
 	 * There are some functionalities in the circuit that have different implementations in different kinds of circuit.
 	 * In case of such function, the circuit calls a utility class corresponding to the concrete circuit. 
 	 * The utility class is given to the circuit in the construct time by the input object, using this function.
-	 * The input class is specific for each circuit so it knows exactly which utility class to create.
+	 * The parameters class is specific for each circuit so it knows exactly which utility class to create.
 	 * @return the created utility object.
 	 */
 	public CircuitTypeUtil createCircuitUtil();

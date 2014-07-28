@@ -49,6 +49,21 @@ public interface AsymAdditiveHomomorphicEnc extends AsymmetricEnc {
 	public AsymmetricCiphertext add(AsymmetricCiphertext cipher1, AsymmetricCiphertext cipher2);
 	
 	/**
+	 * Receives two ciphertexts and return their addition.<p>
+	 * There are cases when the random value is used after the function, for example, in sigma protocol. 
+	 * In these cases the random value should be known to the user. We decided not to have function that return it to the user 
+	 * since this can cause problems when the add function is called more than one time. 
+	 * Instead, we decided to have an additional add function that gets the random value from the user.
+	 * @param cipher1
+	 * @param cipher2
+	 * @param r The random value to use in the function.
+	 * @return the addition result
+	 * @throws IllegalStateException if no public key was set.
+	 * @throws IllegalArgumentException if the given ciphertexts do not match this asymmetric encryption.
+	 */
+	public AsymmetricCiphertext add(AsymmetricCiphertext cipher1, AsymmetricCiphertext cipher2, BigInteger r);
+	
+	/**
 	 * Receives a cipher and a constant number and returns their multiplication.
 	 * @param cipher
 	 * @param constNumber
@@ -57,4 +72,19 @@ public interface AsymAdditiveHomomorphicEnc extends AsymmetricEnc {
 	 * @throws IllegalArgumentException if the given ciphertext does not match this asymmetric encryption.
 	 */
 	public AsymmetricCiphertext multByConst(AsymmetricCiphertext cipher, BigInteger constNumber);
+	
+	/**
+	 * Receives a cipher and a constant number and returns their multiplication.<p>
+	 * There are cases when the random value is used after the function, for example, in sigma protocol. 
+	 * In these cases the random value should be known to the user. We decided not to have function that return it to the user 
+	 * since this can cause problems when the multByConst function is called more than one time. 
+	 * Instead, we decided to have an additional multByConst function that gets the random value from the user.
+	 * @param cipher
+	 * @param constNumber
+	 * @param r The random value to use in the function.
+	 * @return the multiplication result.
+	 * @throws IllegalStateException if no public key was set.
+	 * @throws IllegalArgumentException if the given ciphertext does not match this asymmetric encryption.
+	 */
+	public AsymmetricCiphertext multByConst(AsymmetricCiphertext cipher, BigInteger constNumber, BigInteger r);
 }

@@ -66,8 +66,8 @@ abstract class GarbledBooleanCircuitAbs implements GarbledBooleanCircuit{
 	
 	/*
 	 * The translation table stores the signal bit for the output wires. Thus, it just tells you whether the wire coming out is a 
-	 * 0 or 1 but nothing about the plaintext of the wires is revealed. This is good since it is possible that a circuit output 
-	 * wire is also an input wire to a different gate, and thus if the translation table contained the plaintext of both possible
+	 * 0 or 1 but nothing about the key of the wires it revealed. This is good since it is possible that a circuit output 
+	 * wire is also an input wire to a different gate, and thus if the translation table contained the key of both possible
 	 * values of the output Wire, the constructing party could change the value of the wire when it is input into a gate, and 
 	 * privacy and/or correctness will not be preserved. Therefore, we only reveal the signal bit, and the other
 	 * possible value for the wire is not stored on the translation table.
@@ -149,12 +149,12 @@ abstract class GarbledBooleanCircuitAbs implements GarbledBooleanCircuit{
 	      
 	    	//Calculate the resulting value.
 	    	value = (byte) (signalBit ^ permutationBitOnWire);
-	    	//System.out.print(value);
+	    	
 	    	//Hold the result as a wire.
 	    	Wire translated = new Wire(value);
 	    	translatedOutput.put(w, translated);
 	    }
-	//System.out.println();
+	
 	    return translatedOutput;
 
 	}

@@ -28,6 +28,7 @@ package edu.biu.scapi.primitives.dlog;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.SecureRandom;
 import java.util.Properties;
 
 
@@ -54,6 +55,17 @@ public abstract class DlogGroupEC extends DlogGroupAbs implements DlogEllipticCu
 	 * @throws IOException 
 	 */
 	protected DlogGroupEC(String fileName, String curveName) throws IOException{
+		this(fileName, curveName, new SecureRandom());
+		
+	}
+	
+	/**
+	 * Constructor that initializes this DlogGroup with a curve that is not necessarily one of NIST recommended elliptic curves.
+	 * @param fileName - name of the elliptic curves file. This file has to comply with 
+	 * @param curveName - name of curve to initialized
+	 * @throws IOException 
+	 */
+	protected DlogGroupEC(String fileName, String curveName, SecureRandom random) throws IOException{
 		Properties ecProperties;
 		
 		ecProperties = getProperties(fileName); //get properties object containing the curve data
@@ -65,6 +77,8 @@ public abstract class DlogGroupEC extends DlogGroupAbs implements DlogEllipticCu
 		this.curveName = curveName;
 		this.fileName = fileName;
 			
+		this.random = random;
+		
 		doInit(ecProperties, curveName); // set the data and initialize the curve
 		
 	}

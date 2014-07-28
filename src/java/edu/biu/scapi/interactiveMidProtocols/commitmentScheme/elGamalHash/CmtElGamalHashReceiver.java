@@ -32,6 +32,8 @@ import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtByteArrayCommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCCommitmentMsg;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCDecommitmentMessage;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtReceiver;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtOnByteArray;
@@ -44,13 +46,16 @@ import edu.biu.scapi.midLayer.plaintext.ByteArrayPlaintext;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.dlog.miracl.MiraclDlogECF2m;
 import edu.biu.scapi.primitives.hash.CryptographicHash;
-import edu.biu.scapi.primitives.hash.bc.BcSHA256;
+import edu.biu.scapi.primitives.hash.openSSL.OpenSSLSHA256;
 import edu.biu.scapi.primitives.kdf.HKDF;
 import edu.biu.scapi.primitives.prf.bc.BcHMAC;
 import edu.biu.scapi.securityLevel.SecureCommit;
 
 /**
- * This class implements the committer side of the ElGamal hash commitment. 
+ * This class implements the committer side of the ElGamal hash commitment. <p>
+ * 
+ * The pseudo code of this protocol can be found in Protocol 3.5 of pseudo codes document at {@link http://crypto.biu.ac.il/scapi/SDK_Pseudocode_SCAPI_V2.0.0.pdf}.<p>
+ * 
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
@@ -72,16 +77,19 @@ public class CmtElGamalHashReceiver extends CmtElGamalReceiverCore implements Cm
 	 * Otherwise, it throws IllegalArgumentException.
 	 * An established channel has to be provided by the user of the class.
 	 * @param channel
-	 * @throws IllegalArgumentException
-	 * @throws SecurityLevelException
-	 * @throws InvalidDlogGroupException
 	 * @throws IOException
 	 * @throws CheatAttemptException 
 	 * @throws ClassNotFoundException 
 	 */
-	public CmtElGamalHashReceiver(Channel channel) throws IllegalArgumentException, SecurityLevelException, InvalidDlogGroupException, IOException, ClassNotFoundException, CheatAttemptException{
+	public CmtElGamalHashReceiver(Channel channel) throws IOException, ClassNotFoundException, CheatAttemptException{
 		//This default hash suits the default DlogGroup.
-		this(channel, new MiraclDlogECF2m("K-283"), new BcSHA256());
+		try {
+			doConstruct(channel, new MiraclDlogECF2m("K-283"), new OpenSSLSHA256());
+		} catch (SecurityLevelException e) {
+			// Should not occur since the default DlogGroup has the necessary security level.
+		} catch (InvalidDlogGroupException e) {
+			// Should not occur since the default DlogGroup is valid.
+		}
 	}
 	
 	/**
@@ -101,33 +109,42 @@ public class CmtElGamalHashReceiver extends CmtElGamalReceiverCore implements Cm
 	 * @throws ClassNotFoundException
 	 */
 	public CmtElGamalHashReceiver(Channel channel, DlogGroup dlog, CryptographicHash hash) throws IllegalArgumentException, SecurityLevelException, InvalidDlogGroupException, ClassNotFoundException, IOException, CheatAttemptException {
-		super(channel, dlog, new ScElGamalOnByteArray(dlog, new HKDF(new BcHMAC())));
+		doConstruct(channel, dlog, hash);
+
+	}
+
+	private void doConstruct(Channel channel, DlogGroup dlog, CryptographicHash hash) throws SecurityLevelException,
+			InvalidDlogGroupException, ClassNotFoundException, IOException,	CheatAttemptException {
+		super.doConstruct(channel, dlog, new ScElGamalOnByteArray(dlog, new HKDF(new BcHMAC())));
 		if (hash.getHashedMsgSize()> (dlog.getOrder().bitLength()/8)){
 			throw new IllegalArgumentException("The size in bytes of the resulting hash is bigger than the size in bytes of the order of the DlogGroup.");
 		}
 		this.hash = hash;
-
 	}
 	
 	/**
 	 * Verifies that the commitment was to H(x).
 	 */
 	@Override
-	protected CmtCommitValue processDecommitment(long id, CmtElGamalDecommitmentMessage msg) {
+	public CmtCommitValue verifyDecommitment(CmtCCommitmentMsg commitmentMsg, CmtCDecommitmentMessage decommitmentMsg) {
+		if (!(decommitmentMsg instanceof CmtElGamalDecommitmentMessage)){
+			throw new IllegalArgumentException("decommitmentMsg should be an instance of CmtElGamalDecommitmentMessage");
+		}
+		if (!(commitmentMsg instanceof CmtElGamalCommitmentMessage)){
+			throw new IllegalArgumentException("commitmentMsg should be an instance of CmtElGamalCommitmentMessage");
+		}
 		
 		//Hash the input x with the hash function
-		byte[] x  = (byte[]) msg.getX();
+		byte[] x  = (byte[]) decommitmentMsg.getX();
 		//calculate H(x) = Hash(x)
 		byte[] hashValArray = new byte[hash.getHashedMsgSize()];
 		hash.update(x, 0, x.length);
 		hash.hashFinal(hashValArray, 0);
 
 		//Fetch received commitment according to ID
-		CmtElGamalCommitmentMessage receivedCommitment = commitmentMap.get(Long.valueOf(id));
+		ElGamalOnByteArrayCiphertext c =(ElGamalOnByteArrayCiphertext) elGamal.encrypt(new ByteArrayPlaintext(hashValArray), ((CmtElGamalDecommitmentMessage) decommitmentMsg).getR().getR());
 		
-		ElGamalOnByteArrayCiphertext c =(ElGamalOnByteArrayCiphertext) elGamal.encryptWithGivenRandomValue(new ByteArrayPlaintext(hashValArray), msg.getR().getR());
-		
-		ElGamalOnByteArrayCiphertext receivedCommitmentCipher = (ElGamalOnByteArrayCiphertext) elGamal.reconstructCiphertext(receivedCommitment.getCommitment());
+		ElGamalOnByteArrayCiphertext receivedCommitmentCipher = (ElGamalOnByteArrayCiphertext) elGamal.reconstructCiphertext(((CmtElGamalCommitmentMessage) commitmentMsg).getCommitment());
 		
 		if (receivedCommitmentCipher.equals(c))
 			//The decommitment was accepted by El Gamal core. Now, El Gamal Hash has to return the original value before the hashing.

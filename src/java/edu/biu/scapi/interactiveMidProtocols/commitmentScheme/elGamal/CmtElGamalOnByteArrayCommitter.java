@@ -34,6 +34,7 @@ import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.generals.ScapiDefaultConfiguration;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtByteArrayCommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCCommitmentMsg;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitter;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtOnByteArray;
@@ -46,9 +47,12 @@ import edu.biu.scapi.securityLevel.PerfectlyBindingCmt;
 import edu.biu.scapi.tools.Factories.DlogGroupFactory;
 
 /**
- * This class implements the committer side of the ElGamal commitment. 
+ * This class implements the committer side of the ElGamal commitment. <p>
+ * 
  * It uses El Gamal encryption for byte arrays, that is, the encryption class used is 
- * ScElGamalOnbyteArray. This default cannot be changed.
+ * ScElGamalOnbyteArray. This default cannot be changed.<p>
+ * 
+ * The pseudo code of this protocol can be found in Protocol 3.4 of pseudo codes document at {@link http://crypto.biu.ac.il/scapi/SDK_Pseudocode_SCAPI_V2.0.0.pdf}.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
@@ -97,6 +101,12 @@ public class CmtElGamalOnByteArrayCommitter extends CmtElGamalCommitterCore impl
 			e.printStackTrace();
 		}
 		
+	}
+	
+	public CmtCCommitmentMsg generateCommitmentMsg(CmtCommitValue input, long id){
+		if (!(input instanceof CmtByteArrayCommitValue))
+			throw new IllegalArgumentException("The input must be of type CmtByteArrayCommitValue");
+		return super.generateCommitmentMsg(input, id);
 	}
 
 	/**

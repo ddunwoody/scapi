@@ -26,6 +26,8 @@
 
 package edu.biu.scapi.midLayer.asymmetricCrypto.encryption;
 
+import java.math.BigInteger;
+
 import edu.biu.scapi.midLayer.ciphertext.AsymmetricCiphertext;
 
 /**
@@ -45,4 +47,14 @@ public interface DamgardJurikEnc extends AsymAdditiveHomomorphicEnc {
 	 * @throws IllegalArgumentException if the given ciphertext does not match this asymmetric encryption.
 	 */
 	public AsymmetricCiphertext reRandomize(AsymmetricCiphertext cipher);
+	
+	/**
+	 * This function takes an encryption of some plaintext (let's call it originalPlaintext) and returns a cipher that "looks" different but
+	 * it is also an encryption of originalPlaintext.<p>
+	 * @param cipher
+	 * @param r The random source to use in the function.
+	 * @throws IllegalStateException if no public key was set.
+	 * @throws IllegalArgumentException if the given ciphertext does not match this asymmetric encryption.
+	 */
+	public AsymmetricCiphertext reRandomize(AsymmetricCiphertext cipher, BigInteger r);
 }

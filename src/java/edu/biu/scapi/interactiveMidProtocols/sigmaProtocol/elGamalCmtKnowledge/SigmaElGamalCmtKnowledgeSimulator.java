@@ -37,7 +37,9 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**
  * Concrete implementation of Sigma Simulator.<p>
- * This implementation simulates the case that the prover convince a verifier that it knows the value committed to in the commitment (h,c1, c2).
+ * This implementation simulates the case that the prover convince a verifier that it knows the value committed to in the commitment (h,c1, c2).<p>
+ * 
+ * The pseudo code of this protocol can be found in Protocol 1.6 of pseudo codes document at {@link http://crypto.biu.ac.il/scapi/SDK_Pseudocode_SCAPI_V2.0.0.pdf}.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *

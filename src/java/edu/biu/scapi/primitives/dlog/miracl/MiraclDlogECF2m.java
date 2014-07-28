@@ -28,6 +28,8 @@ package edu.biu.scapi.primitives.dlog.miracl;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.Properties;
 
 import edu.biu.scapi.primitives.dlog.DlogECF2m;
@@ -79,14 +81,28 @@ public class MiraclDlogECF2m extends MiraclAdapterDlogEC implements DlogECF2m, D
 	public MiraclDlogECF2m(String fileName, String curveName) throws IOException{
 		super(fileName, curveName);
 	}
+	
+	public MiraclDlogECF2m(String fileName, String curveName, String randNumGenAlg) throws IOException, NoSuchAlgorithmException{
+		super(fileName, curveName, SecureRandom.getInstance(randNumGenAlg));
+	}
+	
 	/**
 	 * Initialize this DlogGroup with one of NIST recommended elliptic curve
 	 * @param curveName - name of NIST curve to initialized
 	 * @throws IOException 
-	 * @throws IllegalAccessException
 	 */
 	public MiraclDlogECF2m(String curveName) throws IllegalArgumentException, IOException{
 		this(NISTEC_PROPERTIES_FILE, curveName);
+	}
+	
+	/**
+	 * Initialize this DlogGroup with one of NIST recommended elliptic curve
+	 * @param curveName - name of NIST curve to initialized
+	 * @param random The random number generator to use. 
+	 * @throws IOException 
+	 */
+	public MiraclDlogECF2m(String curveName, SecureRandom random) throws IOException{
+		super(NISTEC_PROPERTIES_FILE, curveName, random);
 	}
 
 	/**
@@ -355,7 +371,7 @@ public class MiraclDlogECF2m extends MiraclAdapterDlogEC implements DlogECF2m, D
 		// 1.	Checking that the point is on the curve, performed by checkCurveMembership
 		// 2.	Checking that the point is in the Dlog group,performed by checkSubGroupMembership
 
-		boolean valid = util.checkCurveMembership((ECF2mGroupParams) groupParams, point.getX(), point.getY());
+		boolean valid = isF2mMember(mip, point.getPoint());
 		valid = valid && util.checkSubGroupMembership(this, point);
 
 		return valid;

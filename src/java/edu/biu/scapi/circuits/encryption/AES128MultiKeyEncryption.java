@@ -34,7 +34,6 @@ import edu.biu.scapi.exceptions.KeyNotSetException;
 import edu.biu.scapi.exceptions.PlaintextTooLongException;
 import edu.biu.scapi.exceptions.TweakNotSetException;
 import edu.biu.scapi.primitives.prf.AES;
-import edu.biu.scapi.primitives.prf.PseudorandomFunction;
 import edu.biu.scapi.primitives.prf.cryptopp.CryptoPpAES;
 
 /**
@@ -67,7 +66,7 @@ public class AES128MultiKeyEncryption implements MultiKeyEncryptionScheme {
 	 */
 	private MultiSecretKey key;
 	private boolean isKeySet;
-	private PseudorandomFunction aes;
+	private AES aes;
 	private byte[] tweak;
 	private boolean isTweakSet;
 

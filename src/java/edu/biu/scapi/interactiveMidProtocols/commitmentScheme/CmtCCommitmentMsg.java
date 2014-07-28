@@ -24,6 +24,8 @@
 */
 package edu.biu.scapi.interactiveMidProtocols.commitmentScheme;
 
+import java.io.Serializable;
+
 /**
  * This interface represents the commitment message sent from the committer to the receiver during the commitment phase.
  * Every commitment has an id needed to identify the specific commitment in the case that many commitments are performed
@@ -31,7 +33,7 @@ package edu.biu.scapi.interactiveMidProtocols.commitmentScheme;
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
  */
-public interface CmtCCommitmentMsg {
+public interface CmtCCommitmentMsg extends Serializable{
 	/**
 	 * Returns the unique id of the commitment.
 	 * @return the commitment id

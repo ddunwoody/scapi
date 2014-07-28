@@ -40,10 +40,10 @@ import edu.biu.scapi.primitives.dlog.GroupElement;
 
 /**
  * Concrete implementation of Sigma Simulator.<p>
- * This implementation simulates the case that the prover convince a verifier that it knows the discrete log of the value h in G.
+ * This implementation simulates the case that the prover convince a verifier that it knows the discrete log of the value h in G.<P>
  *  
- * For more information see protocol 6.1.1, page 148 of Hazay-Lindell.
- * 
+ * For more information see protocol 6.1.1, page 148 of Hazay-Lindell.<p>
+ * The pseudo code of this protocol can be found in Protocol 1.1 of pseudo codes document at {@link http://crypto.biu.ac.il/scapi/SDK_Pseudocode_SCAPI_V2.0.0.pdf}.
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */

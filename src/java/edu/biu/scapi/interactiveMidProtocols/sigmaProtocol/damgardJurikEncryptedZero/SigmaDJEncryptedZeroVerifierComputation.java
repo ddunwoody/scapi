@@ -37,7 +37,9 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaProtocol
 /**
  * Concrete implementation of Sigma Protocol verifier computation. <p>
  * 
- * This protocol is used for a party to prove that a ciphertext is an encryption of 0 (or an Nth power).
+ * This protocol is used for a party to prove that a ciphertext is an encryption of 0 (or an Nth power).<p>
+ * 
+ * The pseudo code of this protocol can be found in Protocol 1.11 of pseudo codes document at {@link http://crypto.biu.ac.il/scapi/SDK_Pseudocode_SCAPI_V2.0.0.pdf}.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *

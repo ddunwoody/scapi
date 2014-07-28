@@ -36,7 +36,8 @@ import edu.biu.scapi.interactiveMidProtocols.sigmaProtocol.utility.SigmaSimulato
  * This implementation simulates the case that the prover convince a verifier that at least one of two statements is true, 
  * where each statement can be proven by an associated Sigma protocol.
  * 
- * For more information see Protocol 6.4.1, page 159 of Hazay-Lindell.
+ * For more information see Protocol 6.4.1, page 159 of Hazay-Lindell.<P>
+ * The pseudo code of this protocol can be found in Protocol 1.15 of pseudo codes document at {@link http://crypto.biu.ac.il/scapi/SDK_Pseudocode_SCAPI_V2.0.0.pdf}.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *

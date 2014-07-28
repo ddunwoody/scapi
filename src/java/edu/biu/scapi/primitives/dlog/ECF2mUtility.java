@@ -29,8 +29,6 @@ package edu.biu.scapi.primitives.dlog;
 import java.math.BigInteger;
 import java.util.Properties;
 
-import org.bouncycastle.math.ec.ECFieldElement;
-import org.bouncycastle.math.ec.ECFieldElement.F2m;
 import org.bouncycastle.util.encoders.Hex;
 
 import edu.biu.scapi.primitives.dlog.groupParams.ECF2mGroupParams;
@@ -50,75 +48,6 @@ public class ECF2mUtility {
 	//Default constructor.
 	public ECF2mUtility() {
 		super();
-	}
-
-	/**
-	 * Checks if the given x and y represent a valid point on the given curve, 
-	 * i.e. if the point (x, y) is a solution of the curve’s equation.
-	 * @param params elliptic curve over F2m parameters
-	 * @param x coefficient of the point
-	 * @param y coefficient of the point
-	 * @return true if the given x and y represented a valid point on the given curve
-	 */
-	public boolean checkCurveMembership(ECF2mGroupParams params, BigInteger x, BigInteger y){
-		
-		int m = params.getM(); // get the field size
-		
-		// get curve basis
-		int[] k = new int[3];
-		
-		if (params instanceof ECF2mKoblitz) {
-			getBasis(((ECF2mKoblitz) params).getCurve(), k);
-		} else
-			getBasis(params, k);
-		
-		// construct ECFieldElements from a,b,x,y. 
-		// Elements in the binary field are polynomials so we can't treat them as regular BigInteger. 
-		// We use BC library to create and deal with such field element.
-		ECFieldElement.F2m xElement = new ECFieldElement.F2m(m, k[0], k[1], k[2], x);
-		ECFieldElement.F2m yElement = new ECFieldElement.F2m(m, k[0], k[1], k[2], y);
-		ECFieldElement.F2m a = new ECFieldElement.F2m(m, k[0], k[1], k[2], params.getA());
-		ECFieldElement.F2m b = new ECFieldElement.F2m(m, k[0], k[1], k[2], params.getB());
-		
-		
-		// Calculates the curve equation with the given x,y.
-		
-		// compute x^3
-		ECFieldElement.F2m xPow2 = (F2m) xElement.square();
-		ECFieldElement.F2m xPow3 = (F2m) xPow2.multiply(xElement);
-		// compute ax^2
-		ECFieldElement.F2m axPow2 = (F2m) a.multiply(xPow2);
-		// compute x^3+ax^2+b
-		ECFieldElement.F2m addition = (F2m) xPow3.add(axPow2);
-		ECFieldElement.F2m rightSide = (F2m) addition.add(b);
-		
-		// compute xy
-		ECFieldElement.F2m xy = (F2m) yElement.multiply(xElement);
-		// compute y^2+xy
-		ECFieldElement.F2m yPow2 = (F2m) yElement.square();
-		ECFieldElement.F2m leftSide = (F2m) yPow2.add(xy);
-		
-		//if the the equation is solved - the point is in the elliptic curve and return true
-		if (leftSide.equals(rightSide))
-			return true;
-		else return false;
-	}
-	
-	/**
-	 * Returns the reduction polnomial F(z)
-	 * @param params curve parameters.
-	 * @param k array that holds the reduction polynomial.
-	 */
-	private void getBasis(GroupParams params, int[] k) {
-		
-		if (params instanceof ECF2mTrinomialBasis) {
-			k[0] = ((ECF2mTrinomialBasis) params).getK1();
-		}
-		if (params instanceof ECF2mPentanomialBasis) {
-			k[0] = ((ECF2mPentanomialBasis) params).getK1();
-			k[1] = ((ECF2mPentanomialBasis) params).getK2();
-			k[2] = ((ECF2mPentanomialBasis) params).getK3();
-		}
 	}
 	
 	/**

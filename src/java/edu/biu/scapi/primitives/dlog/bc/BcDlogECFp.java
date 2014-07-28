@@ -28,6 +28,8 @@ package edu.biu.scapi.primitives.dlog.bc;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.Properties;
 
 import org.bouncycastle.math.ec.ECCurve;
@@ -63,14 +65,27 @@ public class BcDlogECFp extends BcAdapterDlogEC implements DlogECFp, DDH {
 		super(fileName, curveName);
 	}
 	
+	public BcDlogECFp(String fileName, String curveName, String randNumGenAlg) throws IOException, NoSuchAlgorithmException {
+		super(fileName, curveName, SecureRandom.getInstance(randNumGenAlg));
+	}
+	
 	/**
 	 * Initialize this DlogGroup with one of NIST recommended elliptic curve
 	 * @param curveName - name of NIST curve to initialized
-	 * @throws IOException
-	 * @throws IllegalAccessException
+	 * @throws IOException 
 	 */
 	public BcDlogECFp(String curveName) throws IllegalArgumentException, IOException {
 		this(NISTEC_PROPERTIES_FILE, curveName);
+	}
+	
+	/**
+	 * Initialize this DlogGroup with one of NIST recommended elliptic curve
+	 * @param curveName - name of NIST curve to initialized
+	 * @param random The source of randomness to use.
+	 * @throws IOException 
+	 */
+	public BcDlogECFp(String curveName, SecureRandom random) throws IOException {
+		super(NISTEC_PROPERTIES_FILE, curveName, random);
 	}
 
 	/**

@@ -9,8 +9,8 @@ import javax.crypto.SecretKey;
 import edu.biu.scapi.circuits.circuit.BooleanCircuit;
 import edu.biu.scapi.circuits.encryption.MultiKeyEncryptionScheme;
 import edu.biu.scapi.circuits.garbledCircuit.CircuitCreationValues;
-import edu.biu.scapi.circuits.garbledCircuit.CircuitInput;
-import edu.biu.scapi.circuits.garbledCircuit.FreeXORCircuitInput;
+import edu.biu.scapi.circuits.garbledCircuit.GarblingParameters;
+import edu.biu.scapi.circuits.garbledCircuit.FreeXORGarblingParameters;
 import edu.biu.scapi.circuits.garbledCircuit.GarbledBooleanCircuit;
 import edu.biu.scapi.circuits.garbledCircuit.GarbledBooleanCircuitImp;
 import edu.biu.scapi.comm.Channel;
@@ -47,7 +47,7 @@ public class PartyOne {
 		
 		//Create the garbled circuit.
 		Date before = new Date();
-		CircuitInput input = new FreeXORCircuitInput(bc, mes, false);
+		GarblingParameters input = new FreeXORGarblingParameters(bc, mes, false);
 		circuit = new GarbledBooleanCircuitImp(input);
 		Date after = new Date();
 		long time = (after.getTime() - before.getTime());

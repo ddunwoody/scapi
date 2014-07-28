@@ -26,7 +26,6 @@ Copyright (c) 2012 - SCAPI (http://crypto.biu.ac.il/scapi)
 package edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersenHash;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
@@ -34,6 +33,8 @@ import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.InvalidDlogGroupException;
 import edu.biu.scapi.exceptions.SecurityLevelException;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtByteArrayCommitValue;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCCommitmentMsg;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCDecommitmentMessage;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtReceiver;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtOnByteArray;
@@ -41,16 +42,17 @@ import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.CmtPeders
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.pedersen.CmtPedersenReceiverCore;
 import edu.biu.scapi.primitives.dlog.DlogGroup;
 import edu.biu.scapi.primitives.hash.CryptographicHash;
-import edu.biu.scapi.primitives.hash.bc.BcSHA224;
+import edu.biu.scapi.primitives.hash.openSSL.OpenSSLSHA224;
 import edu.biu.scapi.securityLevel.PerfectlyHidingCmt;
 
 /**
  * Concrete implementation of receiver that executes the Pedersen hash commitment 
- * scheme in the receiver's point of view.
+ * scheme in the receiver's point of view.<p>
  * 
- * This is a perfectly-hiding commitment that can be used to commit to a value of any length. 
+ * This is a perfectly-hiding commitment that can be used to commit to a value of any length. <p>
  * 
- * For more information see Protocol 6.5.3, page 164 of <i>Efficient Secure Two-Party Protocols</i> by Hazay-Lindell.
+ * For more information see Protocol 6.5.3, page 164 of <i>Efficient Secure Two-Party Protocols</i> by Hazay-Lindell.<p>
+ * The pseudo code of this protocol can be found in Protocol 3.2 of pseudo codes document at {@link http://crypto.biu.ac.il/scapi/SDK_Pseudocode_SCAPI_V2.0.0.pdf}.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Yael Ejgenberg)
  *
@@ -74,7 +76,7 @@ public class CmtPedersenHashReceiver extends CmtPedersenReceiverCore implements 
 	 */
 	public CmtPedersenHashReceiver(Channel channel) throws IOException {
 		super(channel);
-		hash = new BcSHA224(); 		//This default hash suits the default DlogGroup of the underlying Committer.
+		hash = new OpenSSLSHA224(); 		//This default hash suits the default DlogGroup of the underlying Committer.
 	}
 	
 	/**
@@ -104,30 +106,15 @@ public class CmtPedersenHashReceiver extends CmtPedersenReceiverCore implements 
 	 * Verifies that the commitment was to H(x).
 	 */
 	@Override
-	public CmtCommitValue receiveDecommitment(long id) throws ClassNotFoundException, IOException {
-		Serializable message = null;
-		try {
-			message = channel.receive();
-
-		} catch (ClassNotFoundException e) {
-			throw new ClassNotFoundException("Failed to receive decommitment. The error is: " + e.getMessage());
-		} catch (IOException e) {
-			throw new IOException("Failed to receive decommitment. The error is: " + e.getMessage());
-		}
-
-		if (!(message instanceof CmtPedersenDecommitmentMessage)){
-			throw new IllegalArgumentException("the received message is not an instance of CmtPedersenDecommitmentMessage");
-		}
-		CmtPedersenDecommitmentMessage msg = (CmtPedersenDecommitmentMessage) message;
-		
+	public CmtCommitValue verifyDecommitment(CmtCCommitmentMsg commitmentMsg, CmtCDecommitmentMessage decommitmentMsg) {
 		//Hash the input x with the hash function
-		byte[] x  = msg.getX().toByteArray();
+		byte[] x  = ((CmtPedersenDecommitmentMessage)decommitmentMsg).getX().toByteArray();
 		//calculate H(x) = Hash(x)
 		byte[] hashValArray = new byte[hash.getHashedMsgSize()];
 		hash.update(x, 0, x.length);
 		hash.hashFinal(hashValArray, 0);
 		
-		CmtCommitValue val = processDecommitment(id, new BigInteger(1, hashValArray), msg.getR().getR());
+		CmtCommitValue val = super.verifyDecommitment(commitmentMsg, new CmtPedersenDecommitmentMessage(new BigInteger(1, hashValArray), ((CmtPedersenDecommitmentMessage)decommitmentMsg).getR()));
 		//If the inner Pedersen core algorithm returned null it means that it rejected the decommitment, so Pedersen Hash also rejects the answer and returns null
 		if (val == null)
 			return null;

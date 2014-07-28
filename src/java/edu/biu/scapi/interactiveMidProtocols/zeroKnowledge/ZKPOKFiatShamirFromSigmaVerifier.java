@@ -40,10 +40,12 @@ import edu.biu.scapi.primitives.randomOracle.RandomOracle;
  * Concrete implementation of Zero Knowledge verifier.<p>
  * 
  * This is a transformation that takes any Sigma protocol and a random oracle 
- * (instantiated with any hash function) H and yields a zero-knowledge proof of knowledge.
+ * (instantiated with any hash function) H and yields a zero-knowledge proof of knowledge.<p>
  * 
  * This protocol is explained in depth in <i>How to Prove Yourself: Practical Solutions to Identification and Signature Problems</i> 
- * by A. Fiat and A. Shamir in CRYPTO 1986, pages 186-194.
+ * by A. Fiat and A. Shamir in CRYPTO 1986, pages 186-194.<p>
+ * 
+ * The pseudo code of this protocol can be found in Protocol 2.3 of pseudo codes document at {@link http://crypto.biu.ac.il/scapi/SDK_Pseudocode_SCAPI_V2.0.0.pdf}.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *

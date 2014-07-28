@@ -8,6 +8,8 @@ import java.io.IOException;
 import edu.biu.scapi.comm.Channel;
 import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.exceptions.CommitValueException;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCCommitmentMsg;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCDecommitmentMessage;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitter;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtWithProofsCommitter;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitValue;
@@ -17,10 +19,10 @@ import edu.biu.scapi.securityLevel.EquivocalCmt;
 
 /**
  * Concrete implementation of Equivocal commitment scheme in the committer's point of view.<p>
- * This is a protocol to obtain an equivocal commitment from any commitment with a ZK-protocol 
- * of the commitment value.<p>
- * The equivocality property means that a simulator can decommit to any value it needs 
- * (needed for proofs of security).
+ * This is a protocol to obtain an equivocal commitment from any commitment with a ZK-protocol of the commitment value.<p>
+ * The equivocality property means that a simulator can decommit to any value it needs (needed for proofs of security).<p>
+ * 
+ * The pseudo code of this protocol can be found in Protocol 3.7 of pseudo codes document at {@link http://crypto.biu.ac.il/scapi/SDK_Pseudocode_SCAPI_V2.0.0.pdf}.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
@@ -56,6 +58,13 @@ public class CmtEquivocalCommitter implements CmtCommitter, EquivocalCmt{
 	public CmtEquivocalCommitter(Channel channel) throws ClassNotFoundException, IOException, CheatAttemptException{
 		committer = new CmtPedersenWithProofsCommitter(channel);
 	}
+	
+	@Override
+	public CmtCCommitmentMsg generateCommitmentMsg(CmtCommitValue input, long id) {
+		// Delegate to the underlying committer.
+		return committer.generateCommitmentMsg(input, id);
+	}
+
 
 	/**
 	 * Runs the commit phase of the protocol.<p>
@@ -65,6 +74,11 @@ public class CmtEquivocalCommitter implements CmtCommitter, EquivocalCmt{
 	public void commit(CmtCommitValue input, long id) throws IOException {
 		//Delegate to the underlying committer.
 		committer.commit(input, id);
+	}
+	
+	@Override
+	public CmtCDecommitmentMessage generateDecommitmentMsg(long id) {
+		throw new IllegalStateException("The Decommitment phase of this scheme is interactive. Thus, it can't generate a decommitment message. Call decommit function");
 	}
 
 	/**

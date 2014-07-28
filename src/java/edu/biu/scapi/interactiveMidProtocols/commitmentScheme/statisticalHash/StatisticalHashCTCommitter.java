@@ -28,6 +28,8 @@ import java.io.IOException;
 
 import edu.biu.scapi.exceptions.CheatAttemptException;
 import edu.biu.scapi.exceptions.CommitValueException;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCCommitmentMsg;
+import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCDecommitmentMessage;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitter;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitValue;
 import edu.biu.scapi.interactiveMidProtocols.commitmentScheme.CmtCommitmentPhaseValues;
@@ -94,6 +96,18 @@ public class StatisticalHashCTCommitter implements CmtCommitter {
 
 	@Override
 	public byte[] generateBytesFromCommitValue(CmtCommitValue value) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CmtCCommitmentMsg generateCommitmentMsg(CmtCommitValue input, long id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CmtCDecommitmentMessage generateDecommitmentMsg(long id) {
 		// TODO Auto-generated method stub
 		return null;
 	}

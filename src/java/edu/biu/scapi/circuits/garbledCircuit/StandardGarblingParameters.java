@@ -27,51 +27,49 @@ package edu.biu.scapi.circuits.garbledCircuit;
 import java.security.SecureRandom;
 
 import edu.biu.scapi.circuits.circuit.BooleanCircuit;
+import edu.biu.scapi.circuits.encryption.MultiKeyEncryptionScheme;
 import edu.biu.scapi.exceptions.FactoriesException;
-import edu.biu.scapi.primitives.kdf.HKDF;
 import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
-import edu.biu.scapi.primitives.prf.AES;
-import edu.biu.scapi.primitives.prf.bc.BcHMAC;
+import edu.biu.scapi.primitives.kdf.bc.BcKdfISO18033;
 
 /**
- * This is the input class for MinimizeAESSetKey circuit.<p>
- * MinimizeAESSetKey circuit's inputs are:<p>
- * 1. The boolean circuit needs to be garbled. <p>
- * 2. An AES object.<p>
- * 3. A SecureRandom object.<p>
- * 4. A KeyDerivationFunction, in case the user wants to use the Row Reduction algorithm.<p>
+ * This is the garbling parameters' class for Standard circuit.<p>
+ * Standard circuit's parameters are:
+ * 1. The boolean circuit that needs to be garbled. 
+ * 2. A MultiKeyEncryptionScheme.
+ * 3. A SecureRandom object.
+ * 4. A KeyDerivationFunction, in case the user wants to use the Row Reduction algorithm.
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */
-public class MinimizeAESSetKeyCircuitInput implements CircuitInput{
+public class StandardGarblingParameters implements GarblingParameters{
+	
 	private BooleanCircuit ungarbledCircuit;
+	private MultiKeyEncryptionScheme mes;
 	private SecureRandom random;
 	private KeyDerivationFunction kdf;
-	private AES aes;
 	private boolean isRowReduction;
 	
 	/**
-	 * This constructor creates an input object for a regular representation of MinimizeAESSetKeyGarbledBooleanCircuit.
+	 * This constructor creates a garbling parameters' object for a regular representation of StandardGarbledBooleanCircuit.
 	 * @param ungarbledCircuit The boolean circuit that needs to be garbled. 
-	 * @param aes An AES object to use.
+	 * @param mes A MultiKeyEncryptionScheme to use.
 	 * @param random
 	 * @param isRowReduction Indicates if the circuit should use the row reduction algorithm or not.
 	 */
-	public MinimizeAESSetKeyCircuitInput(BooleanCircuit ungarbledCircuit, AES aes, SecureRandom random, boolean isRowReduction){
+	public StandardGarblingParameters(BooleanCircuit ungarbledCircuit, MultiKeyEncryptionScheme mes, SecureRandom random, boolean isRowReduction){
 		this.ungarbledCircuit = ungarbledCircuit;
+		this.mes = mes;
 		this.random = random;
-		this.aes = aes;
-		this.isRowReduction = isRowReduction;
 		
 		if (isRowReduction){
 			try {
-				kdf = new HKDF(new BcHMAC("SHA-256"));
+				kdf = new BcKdfISO18033("SHA-256");
 			} catch (FactoriesException e) {
 				// Should not occur since the given parameters are implemented.
 			}
 		}
-		
 	}
 	
 	@Override
@@ -88,7 +86,6 @@ public class MinimizeAESSetKeyCircuitInput implements CircuitInput{
 		return ungarbledCircuit;
 	}
 	
-	
 	@Override
 	public CircuitTypeUtil createCircuitUtil() {
 		/*
@@ -96,10 +93,10 @@ public class MinimizeAESSetKeyCircuitInput implements CircuitInput{
 		 * If not, the returned utility class uses the regular garbled table.
 		 */
 		
-		if (!isRowReduction){ //There is no kdf, return the regular MinimizeAESSetKey utility.
-			return new MinimizeAESSetKeyGarbledBooleanCircuitUtil(aes, random);
-		} else{ //There is a kdf, return the Row Reduction MinimizeAESSetKey utility.
-			return new MinimizeAESSetKeyRowReductionGarbledBooleanCircuitUtil(aes, kdf, random);
+		if (!isRowReduction){ //There is no kdf, return the regular Standard circuit utility.
+			return new StandardGarbledBooleanCircuitUtil(mes, random);
+		} else { //There is a kdf, return the Row Reduction Standard circuit utility.
+			return new StandardRowReductionGarbledBooleanCircuitUtil(mes, kdf, random);
 		}
 	}
 	
@@ -107,5 +104,4 @@ public class MinimizeAESSetKeyCircuitInput implements CircuitInput{
 	public KeyDerivationFunction getKDF(){
 		return kdf;
 	}
-		
 }

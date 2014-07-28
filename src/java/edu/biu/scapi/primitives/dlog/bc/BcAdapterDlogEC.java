@@ -28,6 +28,7 @@ package edu.biu.scapi.primitives.dlog.bc;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.SecureRandom;
 
 import org.bouncycastle.math.ec.ECCurve;
 import org.bouncycastle.math.ec.ECPoint;
@@ -49,7 +50,11 @@ public abstract class BcAdapterDlogEC extends DlogGroupEC
 	protected BcAdapterDlogEC(){}
 	
 	public BcAdapterDlogEC(String fileName, String curveName) throws IOException {
-		super(fileName, curveName);
+		this(fileName, curveName, new SecureRandom());
+	}
+	
+	public BcAdapterDlogEC(String fileName, String curveName, SecureRandom random) throws IOException {
+		super(fileName, curveName, random);
 	}
 
 	/*

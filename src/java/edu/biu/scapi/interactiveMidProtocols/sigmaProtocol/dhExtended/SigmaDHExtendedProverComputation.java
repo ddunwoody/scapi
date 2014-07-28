@@ -43,9 +43,11 @@ import edu.biu.scapi.primitives.dlog.GroupElementSendableData;
 
 /**
  * Concrete implementation of Sigma Protocol prover computation. <p>
- * This protocol is used for a prover to convince a verifier that the input tuple (g1,…,gm,h1,…,hm) is an 
- * extended Diffie-Hellman tuple, meaning that there exists a single w in Zq such that hi=gi^w for all i.
  * 
+ * This protocol is used for a prover to convince a verifier that the input tuple (g1,…,gm,h1,…,hm) is an 
+ * extended Diffie-Hellman tuple, meaning that there exists a single w in Zq such that hi=gi^w for all i.<p>
+ * 
+ * The pseudo code of this protocol can be found in Protocol 1.3 of pseudo codes document at {@link http://crypto.biu.ac.il/scapi/SDK_Pseudocode_SCAPI_V2.0.0.pdf}.<p>
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
  */

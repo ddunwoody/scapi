@@ -43,7 +43,9 @@ import edu.biu.scapi.midLayer.plaintext.BigIntegerPlainText;
 /**
  * Concrete implementation of Sigma Protocol prover computation.<p>
  * 
- * This protocol is used for a party who encrypted a value x to prove that it indeed encrypted x.
+ * This protocol is used for a party who encrypted a value x to prove that it indeed encrypted x.<p>
+ * 
+ * The pseudo code of this protocol can be found in Protocol 1.12 of pseudo codes document at {@link http://crypto.biu.ac.il/scapi/SDK_Pseudocode_SCAPI_V2.0.0.pdf}.<p>
  * 
  * @author Cryptography and Computer Security Research Group Department of Computer Science Bar-Ilan University (Moriya Farbstein)
  *
