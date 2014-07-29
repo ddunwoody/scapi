@@ -1,10 +1,36 @@
 SCAPI - The Secure Computation API
 ==================================
 
-SCAPI is an open-source Java library for implementing secure two-party and multiparty computation protocols (SCAPI stands for the "Secure Computation API"). It provides a reliable, efficient, and highly flexible cryptographic infrastructure. SCAPI is comprised of three layers:
+What is SCAPI?
+--------------
 
-1. Low-level cryptographic functions: these are functions that are basic building blocks for cryptographic constructions (e.g., pseudorandom functions, pseudorandom generators, discrete logarithm groups, hash functions and more belong to this layer).
-2. Non-interactive mid-level cryptographic functions: these are non-interactive functions that can be applications within themselves in addition to being tools (e.g., encryption and signature schemes belong to this layer).
-3. Interactive cryptographic protocols: these are interactive protocols involving two or more parties; typically, the protocols in this layer are popular building blocks like commitment schemes, zero knowledge proofs and oblivious transfer.
+SCAPI is an open-source Java library for implementing secure two-party and multiparty computation protocols (SCAPI stands for the "Secure Computation API"). It provides a reliable, efficient, and highly flexible cryptographic infrastructure. 
 
-More information about SCAPI appears in this [paper](http://crypto.biu.ac.il/scapi/scapi.pdf), and on the [Documentation page](http://crypto.biu.ac.il/documentation-scapi.php).
+Where are the docs?
+-------------------
+
+Go to [http://scapi.readthedocs.org/](http://scapi.readthedocs.org/) 
+for a prebuilt version of the current documentation. 
+Otherwise build them yourself from the sphinx sources in the docs folder.
+
+More information about SCAPI and the motivation behind it appears in this [paper](http://crypto.biu.ac.il/scapi/scapi.pdf).
+
+What if I need help?
+--------------------
+
+The docs are great, and you can always email us at [scapi@biu.ac.il](mailto:scapi@biu.ac.il).
+
+Contributing to SCAPI
+---------------------
+
+We will be very happy to receive contributions of new code that extends SCAPI (under the condition that it is cleanly written, well documented, and fits into the SCAPI design paradigm). We do love to see fresh [pull-requests](https://github.com/cryptobiu/scapi/pulls) 
+in the morning! :)
+
+We also encourage you to open new [issues](https://github.com/cryptobiu/scapi/issues), but only if you really mean it!
+
+Licensing
+---------
+
+SCAPI is free and is licensed under an adaptation of the MIT license. SCAPI also
+uses the Crypto++, Miracl, NTL and Bouncy Castle libraries. Please see those projects for any
+further licensing issues. We kindly request an appropriate citation from any work that uses SCAPI. See the attached license file.
