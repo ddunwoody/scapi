@@ -18,15 +18,14 @@ More information about SCAPI and the motivation behind it appears in this [paper
 What if I need help?
 --------------------
 
-The docs are great, and you can always email us at [scapi@biu.ac.il](mailto:scapi@biu.ac.il).
+See the [documentation](http://scapi.readthedocs.org/) for explanations, but if you get stuck we are always happy to help. Email us at [scapi@biu.ac.il](mailto:scapi@biu.ac.il) with any questions you have.
 
 Contributing to SCAPI
 ---------------------
 
-We will be very happy to receive contributions of new code that extends SCAPI (under the condition that it is cleanly written, well documented, and fits into the SCAPI design paradigm). We do love to see fresh [pull-requests](https://github.com/cryptobiu/scapi/pulls) 
-in the morning! :)
+We will be very happy to receive contributions of [new code](https://github.com/cryptobiu/scapi/pulls) that extends SCAPI (under the condition that it is cleanly written, well documented, and fits into the SCAPI design paradigm). 
 
-We also encourage you to open new [issues](https://github.com/cryptobiu/scapi/issues), but only if you really mean it!
+We also encourage you to open new [issues](https://github.com/cryptobiu/scapi/issues) and let us know of any problems you find, or any new features you feel are necessary.
 
 Licensing
 ---------
