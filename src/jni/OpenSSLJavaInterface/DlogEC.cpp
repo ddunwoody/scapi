@@ -69,13 +69,20 @@ JNIEXPORT jlong JNICALL JNICALL Java_edu_biu_scapi_primitives_dlog_openSSL_OpenS
 	  //Convert the exponent to BIGNUM.
 	  BIGNUM *exponent;
 	  jbyte* exponent_bytes  = (jbyte*) env->GetByteArrayElements(exponentBytes, 0);
-	  if(NULL == (exponent = BN_bin2bn((unsigned char*)exponent_bytes, env->GetArrayLength(exponentBytes), NULL))) return 0;
+	  if(NULL == (exponent = BN_bin2bn((unsigned char*)exponent_bytes, env->GetArrayLength(exponentBytes), NULL))){
+		  env ->ReleaseByteArrayElements(exponentBytes, (jbyte*) exponent_bytes, 0);
+		  return 0;
+	  }
+	  env ->ReleaseByteArrayElements(exponentBytes, (jbyte*) exponent_bytes, 0);
 
+	  EC_POINT *result;
 	  //Call the function in the Dlog group that exponentiates the base to the exponent
-	  EC_POINT *result = ((DlogEC*)dlog)->exponentiate((EC_POINT*)base, exponent);
+	  if(0 == (result = ((DlogEC*)dlog)->exponentiate((EC_POINT*)base, exponent))){
+		  BN_free(exponent);
+		  return 0;
+	  }
 	  
 	  //Release the allocated memory.
-	  env ->ReleaseByteArrayElements(exponentBytes, (jbyte*) exponent_bytes, 0);
 	  BN_free(exponent);
 	  
 	  return (long) result; //return the result
@@ -129,7 +136,17 @@ JNIEXPORT jlong JNICALL JNICALL Java_edu_biu_scapi_primitives_dlog_openSSL_OpenS
 		  exponentBytes = (jbyteArray) env->GetObjectArrayElement(exponents, i);
 		  jbyte* exponent_bytes  = (jbyte*) env->GetByteArrayElements(exponentBytes, 0);
 		  //Convert to BIGNUM.
-		  if(NULL == (exponentsArr[i] = BN_bin2bn((unsigned char*)exponent_bytes, env->GetArrayLength(exponentBytes), NULL))) return 0;
+		  if(NULL == (exponentsArr[i] = BN_bin2bn((unsigned char*)exponent_bytes, env->GetArrayLength(exponentBytes), NULL))){
+			  //release the memory
+			  for(int j=0; j<i; j++){
+				   BN_free(exponentsArr[j]);
+			  }
+			  env ->ReleaseByteArrayElements(exponentBytes, exponent_bytes, 0);
+			  env ->ReleaseLongArrayElements(points, pointsArr, 0);
+			  delete(exponentsArr);
+			  return 0;
+
+		  }
 		  //Release the memory.
 		  env ->ReleaseByteArrayElements(exponentBytes, exponent_bytes, 0);
 	  }
@@ -169,7 +186,10 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_openSSL_OpenSSLAdapte
 	  //Create the exponent BIGNUM.
 	  BIGNUM *exponent;
 	  jbyte* exponent_bytes  = (jbyte*) env->GetByteArrayElements(exponentBytes, 0);
-	  if(NULL == (exponent = BN_bin2bn((unsigned char*)exponent_bytes, env->GetArrayLength(exponentBytes), NULL))) return 0;
+	  if(NULL == (exponent = BN_bin2bn((unsigned char*)exponent_bytes, env->GetArrayLength(exponentBytes), NULL))) {
+		  env ->ReleaseByteArrayElements(exponentBytes, (jbyte*) exponent_bytes, 0);
+		  return 0;
+	  }
 
 	  //Call the function in the Dlog group that computes the exponentiate with the pre computes values.
 	  EC_POINT *result = ((DlogEC*)dlog)->exponentiateWithPreComputedValues(exponent);
@@ -252,11 +272,17 @@ EC_POINT* DlogEC::inversePoint(EC_POINT* point){
 	//Create an inverse point and copy the given point to it.
 	EC_POINT *inverse;
 	if(NULL == (inverse = EC_POINT_new(curveP))) return 0;
-	if(0 == (EC_POINT_copy(inverse, point))) return 0;
+	if(0 == (EC_POINT_copy(inverse, point))) {
+		EC_POINT_free(inverse);
+		return 0;
+	}
 
 	//Inverse the given value and set the inversed value instead.
-	if(0 == (EC_POINT_invert(curveP,  inverse, ctx))) return 0;
-	
+	if(0 == (EC_POINT_invert(curveP,  inverse, ctx))){
+		EC_POINT_free(inverse);
+		return 0;
+	}
+		
 	return  inverse;
 }
 
@@ -272,7 +298,10 @@ EC_POINT* DlogEC::exponentiate(EC_POINT* base, BIGNUM* exponent){
 	if(NULL == (result = EC_POINT_new(curveP))) return 0;
 
 	//Compute the exponentiate.
-	if(0 == (EC_POINT_mul(curveP, result, NULL, base, exponent, ctx))) return 0;
+	if(0 == (EC_POINT_mul(curveP, result, NULL, base, exponent, ctx))) {
+		EC_POINT_free(result);
+		return 0;
+	}
 
 	return result;
 }
@@ -289,7 +318,10 @@ EC_POINT* DlogEC::multiply(EC_POINT* point1, EC_POINT* point2){
 	if(NULL == (result = EC_POINT_new(curveP))) return 0;
 
 	//Compute the multiplication.
-	EC_POINT_add(curveP, result, point1, point2, ctx);
+	if(0 == (EC_POINT_add(curveP, result, point1, point2, ctx))){
+		EC_POINT_free(result);
+		return 0;
+	}
 
 	return result; //return the result
 }
@@ -319,7 +351,10 @@ EC_POINT* DlogEC::simultaneousMultiply(const EC_POINT** pointsArr, const BIGNUM*
 	if(NULL == (result = EC_POINT_new(curveP))) return 0;
 
 	//Computes the simultaneous multiply.
-	if(0 == (EC_POINTs_mul(curveP, result, NULL, size, pointsArr, exponentsArr, ctx))) return 0;
+	if(0 == (EC_POINTs_mul(curveP, result, NULL, size, pointsArr, exponentsArr, ctx))){
+		EC_POINT_free(result);
+		return 0;
+	}
 
 	return result;
 
@@ -345,12 +380,18 @@ EC_POINT* DlogEC::exponentiateWithPreComputedValues(BIGNUM* exponent){
 
 	//If there are no pre computes values, calculate them.
 	if (EC_GROUP_have_precompute_mult(curveP) == 0){
-		if(0 == (EC_GROUP_precompute_mult(curveP, ctx))) return 0;
+		if(0 == (EC_GROUP_precompute_mult(curveP, ctx))) {
+			EC_POINT_free(result);
+			return 0;
+		}
 	}
 
 	//Calculate the exponentiate with the pre computed values.
-	if(0 == (EC_POINT_mul(curveP, result, exponent, NULL, NULL, ctx))) return 0;
-
+	if(0 == (EC_POINT_mul(curveP, result, exponent, NULL, NULL, ctx))){
+		EC_POINT_free(result);
+		return 0;
+	}
+	
 	return result;
 
 }
