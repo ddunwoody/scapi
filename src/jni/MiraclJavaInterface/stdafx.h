@@ -36,11 +36,4 @@
 // Windows Header Files:
 #include <windows.h>
 
-// MIRACL Library
-#ifdef _DEBUG
-#  pragma comment ( lib, "miraclLibrary" )
-#else
-#  pragma comment ( lib, "miraclLibrary" )
-#endif
-
 // TODO: reference additional headers your program requires here
