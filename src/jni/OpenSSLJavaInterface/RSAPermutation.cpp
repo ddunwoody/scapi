@@ -150,8 +150,7 @@ JNIEXPORT jbyteArray JNICALL Java_edu_biu_scapi_primitives_trapdoorPermutation_o
 	  ERR_load_crypto_strings();
 
 	  //Seed the random geneartor.
-	  char seed[] = "Seed the PRNG";
-	  RAND_seed(seed, sizeof seed);
+	  RAND_screen();
 
 	  //Allocate a new byte array to hold the output.
 	  int size = RSA_size((RSA *) rsa);

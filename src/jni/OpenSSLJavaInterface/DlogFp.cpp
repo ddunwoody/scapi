@@ -28,6 +28,7 @@
 #include "DlogFp.h"
 #include "DlogEC.h"
 #include <openssl/ec.h>
+#include <openssl/rand.h>
 #include <iostream>
 
 using namespace std;
@@ -83,7 +84,7 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_openSSL_OpenSSLDlogEC
  * param qBytes				: Bytes of the group's order.
  * return					: 1 if the initialization succedded; False, otherwise.
  */
-JNIEXPORT int JNICALL Java_edu_biu_scapi_primitives_dlog_openSSL_OpenSSLDlogECFp_initCurve
+JNIEXPORT jint JNICALL Java_edu_biu_scapi_primitives_dlog_openSSL_OpenSSLDlogECFp_initCurve
   (JNIEnv *env, jobject, jlong dlog, jlong generator, jbyteArray qBytes){
 	  
 	  //Convert the order into BIGNUM object.
@@ -102,3 +103,106 @@ JNIEXPORT int JNICALL Java_edu_biu_scapi_primitives_dlog_openSSL_OpenSSLDlogECFp
 
 	  return 1;
 }
+
+/* 
+ * function encodeByteArrayToPoint		: Encodes the given byte array into a point. 
+ *										  If the given byte array can not be encoded to a point, returns 0.
+ * param dlog							: Pointer to the native Dlog object.
+ * param binaryString					: The byte array to encode.
+ * param k								: k is the maximum length of a string to be converted to a Group Element of this group. 
+ *										  If a string exceeds the k length it cannot be converted.
+ * return								: The created point or 0 if the point cannot be created.
+ */
+JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_openSSL_OpenSSLDlogECFp_encodeByteArrayToPoint
+  (JNIEnv *env, jobject, jlong dlog, jbyteArray binaryString, jint k){
+	 //Pseudo-code:
+		/*If the length of binaryString exceeds k then throw IndexOutOfBoundsException.
+
+          Let L be the length in bytes of p
+
+          Choose a random byte array r of length L – k – 2 bytes 
+
+          Prepare a string newString of the following form: r || binaryString || binaryString.length (where || denotes concatenation) (i.e., the least significant byte of newString is the length of binaryString in bytes)
+
+          Convert the result to a BigInteger (bIString)
+
+          Compute the elliptic curve equation for this x and see if there exists a y such that (x,y) satisfies the equation.
+
+          If yes, return (x,y)
+
+          Else, go back to step 3 (choose a random r etc.) up to 80 times (This is an arbitrary hard-coded number).
+
+          If did not find y such that (x,y) satisfies the equation after 80 trials then return null.
+		 */
+
+	jbyte* string  = (jbyte*) env->GetByteArrayElements(binaryString, 0);
+	int len = env->GetArrayLength(binaryString);
+
+	EC_GROUP* curve = ((DlogEC*) dlog)->getCurve();
+
+	if (len > k){
+		env ->ReleaseByteArrayElements(binaryString, string, 0);
+		return 0;
+	}
+	
+	BIGNUM *x, *y, *p, *a, *b;
+	x = BN_new();
+	y = BN_new();
+	a = BN_new();
+	b = BN_new();
+	p = BN_new();
+	EC_GROUP_get_curve_GFp(curve, p, a, b, ((DlogEC*) dlog)->getCTX());
+	
+	int l = BN_num_bytes(p);
+
+	jbyte* randomArray = new jbyte[l-k-2];
+		
+	jbyte* newString = new jbyte[l - k - 1 + len];
+	memcpy(newString+l-k-2, string, len);
+	newString[l - k - 2 + len] = (char) len;
+
+	//Create an inverse point and copy the given point to it.
+	EC_POINT *point;
+	if(NULL == (point = EC_POINT_new(curve))) return 0;
+
+	int counter = 0;
+	bool success = 0;
+	do{
+			RAND_bytes((unsigned char*) randomArray, l-k-2);
+			memcpy(newString, randomArray, l-k-2);
+			
+			//Convert the result to a BigInteger (bIString)
+			if(NULL == (x = BN_bin2bn((unsigned char*)newString, l - k - 1 + len, NULL))) break;
+
+			int numBytes = BN_num_bytes(x);
+			//If the nmber is negative, make it positive.
+			if(BN_is_bit_set(x, numBytes*8)){	
+				cout<<"x is negative? "<<BN_is_negative(x)<<cout;
+				BN_set_bit(x, numBytes*8);
+				cout<<"x is negative? "<<BN_is_negative(x)<<cout;
+			}
+
+			//Try to create a point aith the generated x value.
+			//if failed, go back to choose a random r etc.
+			success = EC_POINT_set_compressed_coordinates_GFp(curve, point, x, 0, ((DlogEC*) dlog)->getCTX());
+			counter++;
+	} while((!success) && (counter <= 80)); //we limit the amount of times we try to 80 which is an arbitrary number.
+
+	//Delete the allocated memory.
+	env ->ReleaseByteArrayElements(binaryString, string, 0);
+	BN_free(x);
+	BN_free(y);
+	BN_free(p);
+	delete(randomArray);
+	delete(newString);
+
+	//If a point could not be created, return 0;
+	if (!success){
+		EC_POINT_free(point);
+		return 0;
+	}
+
+	//Return the created point.
+	return (long) point;
+}
+

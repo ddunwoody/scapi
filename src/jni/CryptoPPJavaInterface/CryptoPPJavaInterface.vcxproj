@@ -68,21 +68,21 @@
     <OutDir>$(SolutionDir)$(Configuration)\$(Platform)\</OutDir>
     <IntDir>$(SolutionDir)$(Configuration)\$(Platform)\intermmidiate</IntDir>
     <LinkIncremental>true</LinkIncremental>
-    <LibraryPath>C:\work\LAST_Project\SDK\Code\C++Src\Jni\cryptlib\Win32;$(LibraryPath)</LibraryPath>
-    <IncludePath>C:\work\LAST_Project\SDK\Code\C++Src\Jni;C:\Program Files\CryptoPP\cryptopp561;C:\Program Files %28x86%29\Java\jdk1.6.0_10\include\win32;C:\Program Files %28x86%29\Java\jdk1.6.0_10\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\development\SDK\Code\C++Src\Jni\cryptlib\v_5.6.1\Win32;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\GitHub\Development\scapi\lib\CryptoPP;C:\Program Files\CryptoPP\cryptopp561;C:\Program Files\Java\jdk1.6.0_45\include\win32;C:\Program Files\Java\jdk1.6.0_45\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)\$(Configuration)\$(Platform)\</OutDir>
     <IntDir>$(SolutionDir)\$(Configuration)\$(Platform)\intermmidiate</IntDir>
     <LinkIncremental>true</LinkIncremental>
-    <LibraryPath>C:\work\LAST_Project\SDK\Code\C++Src\Jni\cryptlib\x64;$(LibraryPath)</LibraryPath>
-    <IncludePath>C:\work\LAST_Project\SDK\Code\C++Src\Jni;C:\Program Files\CryptoPP\cryptopp561;C:\Program Files %28x86%29\Java\jdk1.6.0_10\include;C:\Program Files %28x86%29\Java\jdk1.6.0_10\include\win32;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\development\SDK\Code\C++Src\Jni\cryptlib\v_5.6.1\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Program Files\Java\jdk1.6.0_45\include;C:\Program Files\Java\jdk1.6.0_45\include\win32;C:\GitHub\Development\scapi\lib\CryptoPP;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>.\Debug\</OutDir>
     <IntDir>.\Debug\</IntDir>
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\work\LAST_Project\SDK\Code\ExternalLibraries\CryptoPP\cryptopp561;C:\Program Files %28x86%29\IBM\SDP\jdk\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\GitHub\Development\scapi\lib\CryptoPP;C:\Program Files %28x86%29\IBM\SDP\jdk\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\user\Downloads\cryptopp561\development_files;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -173,7 +173,7 @@
       <SubSystem>Console</SubSystem>
       <OutputFile>$(SolutionDir)$(Configuration)\$(Platform)\CryptoPPJavaInterface.dll</OutputFile>
       <ImportLibrary>$(SolutionDir)$(Configuration)\$(Platform)\CryptoPPJavaInterface.lib</ImportLibrary>
-      <AdditionalDependencies>C:\work\LAST_Project\SDK\Code\C++Src\Jni\cryptlib\x64\cryptlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <ShowProgress>LinkVerboseLib</ShowProgress>
       <IgnoreAllDefaultLibraries>
       </IgnoreAllDefaultLibraries>

@@ -24,9 +24,7 @@
 */
 
 // windows includes
-#ifdef _WIN32
-#include "stdafx.h"
-#endif
+#include "StdAfx.h"
 
 // stdlib includes
 #include <string>
