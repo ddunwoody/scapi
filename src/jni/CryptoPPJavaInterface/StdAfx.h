@@ -46,7 +46,9 @@
 #  pragma comment ( lib, "cryptlib" )
 #endif
 
+#ifdef _WIN32
 #include <windows.h>
+#endif
 
 // TODO: reference additional headers your program requires here
 
