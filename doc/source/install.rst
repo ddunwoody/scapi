@@ -54,12 +54,14 @@ In order to install SCAPI
 
 On Eclipse:
 
-1. Configure build path: go to Libraries tab, and add external JARS. Add the jar files we mentioned here_.
+1. Configure build path: go to Libraries tab, and add external JARS. 
 
-2. Configure build path: go to Source tab and locate the Native Library Location section. Add:
+   a. Add ScapiWin-{version}.jar.
+   b. Add bcprov-{version}.jar.
+   c. Add commons-exec-1.2.jar.
+2. Configure build path: go to Source tab and locate the Native Library Location section.
 
-   a. The lib folder where you have the Miracl, Crypto++, NTL and OpenSSL DLLs.
-
+   a. Add the lib folder where you have the Miracl, Crypto++, NTL and OpenSSL precompiled DLLs.
 3. Place the msvcp100.dll and msvcr100.dll in [C:]\Windows\System32 folder if they are missing there.
 
 .. _git: http://git-scm.org/
