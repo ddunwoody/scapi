@@ -13,6 +13,8 @@ Go to [http://scapi.readthedocs.org/](http://scapi.readthedocs.org/)
 for a prebuilt version of the current documentation. 
 Otherwise build them yourself from the sphinx sources in the docs folder.
 
+We also added the javadoc reference under docs/javadoc/ directory.
+
 More information about SCAPI and the motivation behind it appears in this [paper](http://crypto.biu.ac.il/scapi/scapi.pdf).
 
 What if I need help?
