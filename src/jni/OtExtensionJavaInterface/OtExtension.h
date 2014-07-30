@@ -1,6 +1,15 @@
 #ifndef _MPC_H_
 #define _MPC_H_
 
+#ifdef _WIN32
+#include "../util/typedefs.h"
+#include "../util/socket.h"
+#include "../ot/naor-pinkas.h"
+#include "../ot/asharov-lindell.h"
+#include "../ot/ot-extension.h"
+#include "../util/cbitvector.h"
+#include "../ot/xormasking.h"
+#else
 #include <OTExtension/util/typedefs.h>
 #include <OTExtension/util/socket.h>
 #include <OTExtension/ot/naor-pinkas.h>
@@ -8,6 +17,7 @@
 #include <OTExtension/ot/ot-extension.h>
 #include <OTExtension/util/cbitvector.h>
 #include <OTExtension/ot/xormasking.h>
+#endif
 
 #include <vector>
 #include <time.h>

@@ -45,7 +45,7 @@ BOOL Connect()
 	LONG lTO = CONNECT_TIMEO_MILISEC;
 
 #ifndef BATCH
-	cout << "Connecting to party "<< !m_nPID << ": " << m_nAddr << ", " << m_nPort << endl;
+	//cout << "Connecting to party "<< !m_nPID << ": " << m_nAddr << ", " << m_nPort << endl;
 #endif
 	for(int k = m_nNumOTThreads-1; k >= 0 ; k--)
 	{
@@ -62,7 +62,7 @@ BOOL Connect()
 				// send pid when connected
 				m_vSockets[k].Send( &k, sizeof(int) );
 		#ifndef BATCH
-				cout << " (" << !m_nPID << ") (" << k << ") connected" << endl;
+			//	cout << " (" << !m_nPID << ") (" << k << ") connected" << endl;
 		#endif
 				if(k == 0) 
 				{
@@ -93,7 +93,7 @@ connect_failure:
 BOOL Listen()
 {
 #ifndef BATCH
-	cout << "Listening: " << m_nAddr << ":" << m_nPort << ", with size: " << m_nNumOTThreads << endl;
+	//cout << "Listening: " << m_nAddr << ":" << m_nPort << ", with size: " << m_nNumOTThreads << endl;
 #endif
 	if( !m_vSockets[0].Socket() ) 
 	{
@@ -125,7 +125,7 @@ BOOL Listen()
 		}
 
 	#ifndef BATCH
-		cout <<  " (" << m_nPID <<") (" << threadID << ") connection accepted" << endl;
+		//cout <<  " (" << m_nPID <<") (" << threadID << ") connection accepted" << endl;
 	#endif
 		// locate the socket appropriately
 		m_vSockets[threadID].AttachFrom(sock);
@@ -133,7 +133,7 @@ BOOL Listen()
 	}
 
 #ifndef BATCH
-	cout << "Listening finished"  << endl;
+	//cout << "Listening finished"  << endl;
 #endif
 	return TRUE;
 
@@ -192,7 +192,7 @@ OTExtensionReceiver* InitOTReceiver(const char* address, int port, int numOfThre
 #ifdef OTTiming
 	gettimeofday(&np_begin, NULL);
 #endif
-
+	
 	PrecomputeNaorPinkasReceiver();
 	
 #ifdef OTTiming
@@ -232,7 +232,7 @@ BOOL PrecomputeNaorPinkasReceiver()
 	
 	// Execute NP receiver routine and obtain the key 
 	BYTE* pBuf = new BYTE[SHA1_BYTES * NUM_EXECS_NAOR_PINKAS * nSndVals];
-
+	
 	//=================================================	
 	// N-P sender: send: C0 (=g^r), C1, C2, C3 
 	bot->Sender(nSndVals, NUM_EXECS_NAOR_PINKAS, m_vSockets[0], pBuf);
@@ -438,7 +438,6 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_interactiveMidProtocols_ot_otBatch_ot
 JNIEXPORT void JNICALL Java_edu_biu_scapi_interactiveMidProtocols_ot_otBatch_otExtension_OTSemiHonestExtensionSender_runOtAsSender
   (JNIEnv *env, jobject, jlong sender, jbyteArray x1, jbyteArray x2, jbyteArray deltaFromJava, jint numOfOts, jint bitLength, jstring version){
 
-	  cout << "Playing as role:Sender " << endl;
 	//The masking function with which the values that are sent in the last communication step are processed
 	//Choose OT extension version: G_OT, C_OT or R_OT
 	BYTE ver;
@@ -507,7 +506,6 @@ JNIEXPORT void JNICALL Java_edu_biu_scapi_interactiveMidProtocols_ot_otBatch_otE
 	//else if(ver==R_OT){} no need to set any values. There is no input for x0 and x1 and no input for delta
 	
 	//run the ot extension as the sender
-	cout << "Sender performing " << numOfOts << " OT extensions on " << bitLength << " bit elements" << endl;
 	ObliviouslySend((OTExtensionSender*) sender, X1, X2, numOfOts, bitLength, ver, delta);
 
 	if(ver != G_OT){//we need to copy x0 and x1 
@@ -536,6 +534,14 @@ JNIEXPORT void JNICALL Java_edu_biu_scapi_interactiveMidProtocols_ot_otBatch_otE
 	X2.delCBitVector();
 	delta.delCBitVector();
 
+}
 
+JNIEXPORT void JNICALL Java_edu_biu_scapi_interactiveMidProtocols_ot_otBatch_otExtension_OTSemiHonestExtensionSender_deleteSender
+  (JNIEnv *, jobject, jlong sender){
+	  delete (OTExtensionSender*) sender;
+}
 
+JNIEXPORT void JNICALL Java_edu_biu_scapi_interactiveMidProtocols_ot_otBatch_otExtension_OTSemiHonestExtensionReceiver_deleteReceiver
+  (JNIEnv *, jobject, jlong receiver){
+	  delete (OTExtensionReceiver*) receiver;
 }
