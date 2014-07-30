@@ -23,9 +23,8 @@
 * 
 */
 
-#ifdef _WIN32
+// visual studio precompiled headers
 #include "stdafx.h"
-#endif
 
 #include <jni.h>
 #include <stdlib.h>
