@@ -275,13 +275,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AESPermutation.cpp" />
     <ClCompile Include="CollisionResistantHash.cpp" />
     <ClCompile Include="DlogElement.cpp" />
     <ClCompile Include="DlogGroup.cpp" />
     <ClCompile Include="Examples.cpp" />
     <ClCompile Include="CryptoPPJavaInterface.cpp" />
     <ClCompile Include="RabinPermutation.cpp" />
+    <ClCompile Include="RSAOaep.cpp" />
     <ClCompile Include="RSAPermutation.cpp" />
+    <ClCompile Include="RSAPss.cpp" />
     <ClCompile Include="StdAfx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
@@ -296,13 +299,16 @@
     <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AESPermutation.h" />
     <ClInclude Include="CollisionResistantHash.h" />
     <ClInclude Include="DlogElement.h" />
     <ClInclude Include="DlogGroup.h" />
     <ClInclude Include="Examples.h" />
     <ClInclude Include="JavaCryptopp.h" />
     <ClInclude Include="RabinPermutation.h" />
+    <ClInclude Include="RSAOaep.h" />
     <ClInclude Include="RSAPermutation.h" />
+    <ClInclude Include="RSAPss.h" />
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="TPElement.h" />
     <ClInclude Include="Utils.h" />
