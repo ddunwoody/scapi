@@ -83,8 +83,7 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_openSSL_OpenSSLDlogZp
 	  if(NULL == (ctx = BN_CTX_new())) return 0;
 
 	  //Seed the random geneartor.
-	  char seed[] = "Seed the PRNG";
-	  RAND_seed(seed, sizeof seed);
+	  RAND_screen();
 	  
 	  //Sample a random safe prime with the requested number of bits.
 	  dh->p = BN_new();
