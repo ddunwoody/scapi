@@ -48,6 +48,13 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_openSSL_OpenSSLDlogEC
 JNIEXPORT jint JNICALL Java_edu_biu_scapi_primitives_dlog_openSSL_OpenSSLDlogECFp_initCurve
   (JNIEnv *, jobject, jlong, jlong, jbyteArray);
 
+/*
+ * Class:     edu_biu_scapi_primitives_dlog_openSSL_OpenSSLDlogECFp
+ * Method:    encodeByteArrayToPoint
+ * Signature: (J[BI)J
+ */
+JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_openSSL_OpenSSLDlogECFp_encodeByteArrayToPoint
+  (JNIEnv *, jobject, jlong, jbyteArray, jint);
 
 #ifdef __cplusplus
 }
