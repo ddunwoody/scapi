@@ -45,6 +45,15 @@
     <ClCompile Include="CryptoPPJavaInterface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="AESPermutation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RSAPss.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RSAOaep.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="StdAfx.h">
@@ -75,6 +84,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DlogGroup.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AESPermutation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RSAOaep.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RSAPss.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
