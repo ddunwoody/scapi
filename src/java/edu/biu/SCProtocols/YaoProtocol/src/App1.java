@@ -30,25 +30,27 @@ import edu.biu.scapi.interactiveMidProtocols.ot.otBatch.otExtension.OTSemiHonest
 public class App1 {
 	
 	/**
+	 * Execute Yao protocol's party one.
+	 * 
 	 * @param args no arguments should be passed
 	 */
 	public static void main(String[] args) {
-		
+		//Create Party object to use in the OTExtension. 
+		//The communication in Ot Extension is done in the native code and thus, it does not receive a channel but a party.
 		Party party = null;
 		try {
 			party = new Party(InetAddress.getByName("127.0.0.1"), 7666);
 		} catch (UnknownHostException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			// Should not occur since this is the localhost.
 		}
 		//Set up the communication with the other side and get the created channel.
+		//This channel is used in protocol parts others than the OT.
 		Channel channel = setCommunication();	
 		
 		try {
 			//Create the Boolean circuit of AES.
 			BooleanCircuit bc = new BooleanCircuit(new File("AES_Final-2.txt"));
 			//Create the OT sender.
-			//OTBatchSender otSender = new OTSemiHonestDDHBatchOnByteArraySender(dlog, kdf, random);
 			OTBatchSender otSender = new OTSemiHonestExtensionSender(party,163,1);
 			//Create the encryption scheme.
 			MultiKeyEncryptionScheme mes = new AESFixedKeyMultiKeyEncryption();
