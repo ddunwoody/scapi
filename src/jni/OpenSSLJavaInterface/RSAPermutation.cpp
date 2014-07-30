@@ -150,7 +150,11 @@ JNIEXPORT jbyteArray JNICALL Java_edu_biu_scapi_primitives_trapdoorPermutation_o
 	  ERR_load_crypto_strings();
 
 	  //Seed the random geneartor.
-	  RAND_screen();
+#ifdef _WIN32
+	  RAND_screen(); // only defined for windows, reseeds from screen contents
+#else
+	  RAND_poll(); // reseeds using hardware state (clock, interrupts, etc).
+#endif
 
 	  //Allocate a new byte array to hold the output.
 	  int size = RSA_size((RSA *) rsa);

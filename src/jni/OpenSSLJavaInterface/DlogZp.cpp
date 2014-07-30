@@ -83,7 +83,11 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_openSSL_OpenSSLDlogZp
 	  if(NULL == (ctx = BN_CTX_new())) return 0;
 
 	  //Seed the random geneartor.
-	  RAND_screen();
+#ifdef _WIN32
+	  RAND_screen(); // only defined for windows, reseeds from screen contents
+#else
+	  RAND_poll(); // reseeds using hardware state (clock, interrupts, etc).
+#endif
 	  
 	  //Sample a random safe prime with the requested number of bits.
 	  dh->p = BN_new();
