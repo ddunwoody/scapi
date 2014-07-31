@@ -248,11 +248,10 @@ class StandardGarbledBooleanCircuitUtil implements CircuitTypeUtil{
 			throw new IllegalArgumentException("the given garbledTablesHolder should be an instance of BasicGarbledTablesHolder");
 		}
 		Map<Integer, SecretKey[]> allWireValues = new HashMap<Integer, SecretKey[]>();
-		Map<Integer, SecretKey[]> outputGarbledValues = new HashMap<Integer, SecretKey[]>();
 		Gate[] ungarbledGates = ungarbledCircuit.getGates();
 		
 		//Call the function that sample the keys.
-		CircuitCreationValues values = sampleSeedKeys(prg, seed, ungarbledCircuit, allWireValues, outputGarbledValues);
+		CircuitCreationValues values = sampleSeedKeys(prg, seed, ungarbledCircuit, allWireValues);
 				
 		try {
 			createGarbledTables(gates, (BasicGarbledTablesHolder) garbledTablesHolder, ungarbledGates, allWireValues);
@@ -276,8 +275,10 @@ class StandardGarbledBooleanCircuitUtil implements CircuitTypeUtil{
 	 * @throws InvalidKeyException
 	 */
 	private CircuitCreationValues sampleSeedKeys(PseudorandomGenerator prg, byte[] seed, BooleanCircuit ungarbledCircuit, 
-			Map<Integer, SecretKey[]> allWireValues, Map<Integer, SecretKey[]> outputGarbledValues) throws InvalidKeyException{
+			Map<Integer, SecretKey[]> allWireValues) throws InvalidKeyException{
 		Map<Integer, SecretKey[]> allInputWireValues = new HashMap<Integer, SecretKey[]>();
+		Map<Integer, SecretKey[]> outputGarbledValues = new HashMap<Integer, SecretKey[]>();
+		
 		HashMap<Integer, Byte> translationTable = new HashMap<Integer, Byte>();
 		
 		//Sets the given seed as the prg key.

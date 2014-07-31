@@ -424,11 +424,10 @@ class FreeXORGarbledBooleanCircuitUtil implements CircuitTypeUtil {
 		}
 		
 		Map<Integer, SecretKey[]> allWireValues = new HashMap<Integer, SecretKey[]>();
-		Map<Integer, SecretKey[]> outputGarbledValues = new HashMap<Integer, SecretKey[]>();
 		Gate[] ungarbledGates = ungarbledCircuit.getGates();
 		
 		//Call the function thast actually performs the keys generation.
-		CircuitCreationValues values = sampleSeedKeys(ungarbledCircuit, prg, seed, allWireValues, outputGarbledValues);
+		CircuitCreationValues values = sampleSeedKeys(ungarbledCircuit, prg, seed, allWireValues);
 		
 		//Now that all wires have garbled values, we create the garbled tables.
 		try {
@@ -452,8 +451,9 @@ class FreeXORGarbledBooleanCircuitUtil implements CircuitTypeUtil {
 	 * @return the created keys of each input and output wire and the translation table.
 	 * @throws InvalidKeyException
 	 */
-	private CircuitCreationValues sampleSeedKeys(BooleanCircuit ungarbledCircuit, PseudorandomGenerator prg, byte[] seed, Map<Integer, SecretKey[]> allWireValues, Map<Integer, SecretKey[]> outputGarbledValues) throws InvalidKeyException {
+	private CircuitCreationValues sampleSeedKeys(BooleanCircuit ungarbledCircuit, PseudorandomGenerator prg, byte[] seed, Map<Integer, SecretKey[]> allWireValues) throws InvalidKeyException {
 		Map<Integer, SecretKey[]> allInputWireValues = new HashMap<Integer, SecretKey[]>();
+		Map<Integer, SecretKey[]> outputGarbledValues = new HashMap<Integer, SecretKey[]>();
 		HashMap<Integer, Byte> translationTable = new HashMap<Integer, Byte>();
 		
 		//Sets the given seed as the prg key.
