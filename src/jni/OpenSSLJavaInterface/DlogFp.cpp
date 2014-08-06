@@ -29,6 +29,7 @@
 #include "DlogEC.h"
 #include <openssl/ec.h>
 #include <openssl/rand.h>
+#include <cstring>	// For memcpy
 #include <iostream>
 
 using namespace std;

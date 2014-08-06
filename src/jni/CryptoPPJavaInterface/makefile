@@ -7,8 +7,8 @@ CXX=g++
 CXXFLAGS=-fPIC
 
 # crypto++ dependency
-CRYPTOPP_INCLUDES = -I/usr/include/cryptopp/
-CRYPTOPP_LIB = -lcryptopp
+CRYPTOPP_INCLUDES = -I$(builddir)/CryptoPP
+CRYPTOPP_LIB = -L$(builddir)/CryptoPP -lcryptopp
 
 # java jvm dependency
 # JAVA_HOME and JAVA_INCLUDES must be exported on the parent makefile

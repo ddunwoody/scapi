@@ -7,8 +7,8 @@ CXX=g++
 CXXFLAGS=-fPIC
 
 # miracl dependency
-MIRACL_INCLUDES = -I/usr/local/include/miracl/
-MIRACL_LIB = -lmiracl
+MIRACL_INCLUDES = -I$(builddir)/Miracl
+MIRACL_LIB = -L$(builddir)/Miracl -lmiracl
 
 SOURCES = Utils.c Dlog.c ECF2mPoint.c ECFpPoint.c
 CPP_SOURCES = AESPermutation.cpp

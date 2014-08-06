@@ -7,12 +7,12 @@ CXX=g++
 CXXFLAGS=-fPIC
 
 # OTExtension dependency
-OT_INCLUDES = -I/usr/local/include/OTExtension/
-OT_LIB = -lOTExtension
+OT_INCLUDES = -I$(builddir) -I$(builddir)/OpenSSL -I$(builddir)/MiraclCPP
+OT_LIB = -L$(builddir)/OTExtension -lOTExtension
 
 # OPENSSL dependency
-OPENSSL_INCLUDES = -I/usr/local/ssl/include/
-OPENSSL_LIB_DIR = -L/usr/local/ssl/lib/
+OPENSSL_INCLUDES = -I$(builddir)/OpenSSL/include/
+OPENSSL_LIB_DIR = -L$(builddir)/OpenSSL
 OPENSSL_LIB = -lssl -lcrypto
 
 ## targets ##

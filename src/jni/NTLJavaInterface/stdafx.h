@@ -47,7 +47,8 @@
 #  pragma comment ( lib, "gf2x" )
 #endif
 
-#define NTL_NO_MIN_MAX
+// Causes errors on Ubuntu 14.04
+//#define NTL_NO_MIN_MAX
 
 
 
