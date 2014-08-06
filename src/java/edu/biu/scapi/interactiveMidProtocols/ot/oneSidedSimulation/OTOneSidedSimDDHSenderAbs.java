@@ -28,7 +28,9 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.util.logging.Level;
 
+import edu.biu.scapi.generals.Logging;
 import org.bouncycastle.util.BigIntegers;
 
 import edu.biu.scapi.comm.Channel;
@@ -75,17 +77,17 @@ abstract class OTOneSidedSimDDHSenderAbs implements OTSender{
 			Run the verifier in ZKPOK_FROM_SIGMA with Sigma protocol SIGMA_DLOG. Use common input x.
 			If output is REJ, REPORT ERROR (cheat attempt) and HALT
 			IF NOT
-			•	z0 = z1
-			•	x, y, z0, z1 in G
+			ï¿½	z0 = z1
+			ï¿½	x, y, z0, z1 in G
 			REPORT ERROR (cheat attempt)
 			SAMPLE random values u0,u1,v0,v1 <-  {0, . . . , q-1} 
 			COMPUTE:
-			•	w0 = x^u0 * g^v0
-			•	k0 = (z0)^u0 * y^v0
-			•	w1 = x^u1 * g^v1
-			•	k1 = (z1)^u1 * y^v1 
-			•	c0 = x0 XOR KDF(|x0|,k0)
-			•	c1 = x1 XOR KDF(|x1|,k1) 
+			ï¿½	w0 = x^u0 * g^v0
+			ï¿½	k0 = (z0)^u0 * y^v0
+			ï¿½	w1 = x^u1 * g^v1
+			ï¿½	k1 = (z1)^u1 * y^v1 
+			ï¿½	c0 = x0 XOR KDF(|x0|,k0)
+			ï¿½	c1 = x1 XOR KDF(|x1|,k1) 
 			SEND (w0, c0) and (w1, c1) to R
 			OUTPUT nothing
 
@@ -106,7 +108,7 @@ abstract class OTOneSidedSimDDHSenderAbs implements OTSender{
 		try {
 			//Create the default DlogGroup by the factory.
 			dlog = DlogGroupFactory.getInstance().getObject(dlogName);
-			System.out.println(dlog.getGroupType());
+            Logging.getLogger().log(Level.FINE, dlog.getGroupType());
 		} catch (FactoriesException e1) {
 			// Should not occur since the dlog name in the configuration file is valid.
 		}
@@ -167,17 +169,17 @@ abstract class OTOneSidedSimDDHSenderAbs implements OTSender{
 	 *	Run the verifier in ZKPOK_FROM_SIGMA with Sigma protocol SIGMA_DLOG. Use common input x.<p>
 	 *	If output is REJ, REPORT ERROR (cheat attempt) and HALT<p>
 	 *	IF NOT<p>
-	 *	•	z0 = z1<p>
-	 *	•	x, y, z0, z1 in G<p>
+	 *	ï¿½	z0 = z1<p>
+	 *	ï¿½	x, y, z0, z1 in G<p>
 	 *	REPORT ERROR (cheat attempt)<p>
 	 *	SAMPLE random values u0,u1,v0,v1 <-  {0, . . . , q-1} <p>
 	 *	COMPUTE:<p>
-	 *	•	w0 = x^u0 * g^v0<p>
-	 *	•	k0 = (z0)^u0 * y^v0<p>
-	 *	•	w1 = x^u1 * g^v1<p>
-	 *	•	k1 = (z1)^u1 * y^v1 <p>
-	 *	•	c0 = x0 XOR KDF(|x0|,k0)<p>
-	 *	•	c1 = x1 XOR KDF(|x1|,k1) <p>
+	 *	ï¿½	w0 = x^u0 * g^v0<p>
+	 *	ï¿½	k0 = (z0)^u0 * y^v0<p>
+	 *	ï¿½	w1 = x^u1 * g^v1<p>
+	 *	ï¿½	k1 = (z1)^u1 * y^v1 <p>
+	 *	ï¿½	c0 = x0 XOR KDF(|x0|,k0)<p>
+	 *	ï¿½	c1 = x1 XOR KDF(|x1|,k1) <p>
 	 *	SEND (w0, c0) and (w1, c1) to R<p>
 	 *	OUTPUT nothing"
 	 */
@@ -189,21 +191,21 @@ abstract class OTOneSidedSimDDHSenderAbs implements OTSender{
 			Run the verifier in ZKPOK_FROM_SIGMA with Sigma protocol SIGMA_DLOG. Use common input x.
 			If output is REJ, REPORT ERROR (cheat attempt) and HALT
 			IF NOT
-			•	z0 != z1
-			•	x, y, z0, z1 in G
+			ï¿½	z0 != z1
+			ï¿½	x, y, z0, z1 in G
 			REPORT ERROR (cheat attempt)
 			SAMPLE random values u0,u1,v0,v1 <-  {0, . . . , q-1} 
 			COMPUTE:
-			•	w0 = x^u0 * g^v0
-			•	k0 = (z0)^u0 * y^v0
-			•	w1 = x^u1 * g^v1
-			•	k1 = (z1)^u1 * y^v1 
+			ï¿½	w0 = x^u0 * g^v0
+			ï¿½	k0 = (z0)^u0 * y^v0
+			ï¿½	w1 = x^u1 * g^v1
+			ï¿½	k1 = (z1)^u1 * y^v1 
 			COMPUTE: in byteArray scenario:
-				•	c0 = x0 XOR KDF(|x0|,k0)
-				•	c1 = x1 XOR KDF(|x1|,k1) 
+				ï¿½	c0 = x0 XOR KDF(|x0|,k0)
+				ï¿½	c1 = x1 XOR KDF(|x1|,k1) 
 				OR in GroupElement scenario:
-				•	c0 = x0 * k0
-				•	c1 = x1 * k1
+				ï¿½	c0 = x0 * k0
+				ï¿½	c1 = x1 * k1
 			SEND (w0, c0) and (w1, c1) to R
 			OUTPUT nothing
 		 */
@@ -232,14 +234,14 @@ abstract class OTOneSidedSimDDHSenderAbs implements OTSender{
 		//Compute values w0, k0, w1, k1
 		GroupElement g = dlog.getGenerator(); //Get the group generator.
 		
-		//Calculates w0 = x^u0 • g^v0
+		//Calculates w0 = x^u0 ï¿½ g^v0
 		GroupElement w0 = dlog.multiplyGroupElements(dlog.exponentiate(x, u0), dlog.exponentiate(g, v0));
-		//Calculates k0 = (z0)^u0 • y^v0
+		//Calculates k0 = (z0)^u0 ï¿½ y^v0
 		GroupElement k0 = dlog.multiplyGroupElements(dlog.exponentiate(z0, u0), dlog.exponentiate(y, v0));
 		
-		//Calculates w1 = x^u1 • g^v1
+		//Calculates w1 = x^u1 ï¿½ g^v1
 		GroupElement w1 = dlog.multiplyGroupElements(dlog.exponentiate(x, u1), dlog.exponentiate(g, v1));
-		//Calculates k1 = (z1)^u1 • y^v1
+		//Calculates k1 = (z1)^u1 ï¿½ y^v1
 		GroupElement k1 = dlog.multiplyGroupElements(dlog.exponentiate(z1, u1), dlog.exponentiate(y, v1));
 		
 		//Compute c0, c1		
@@ -301,8 +303,8 @@ abstract class OTOneSidedSimDDHSenderAbs implements OTSender{
 	/**
 	 * Runs the following lines from the protocol:
 	 * "IF NOT
-	 *	•	z0 != z1
-	 *	•	x, y, z0, z1 in the DlogGroup
+	 *	ï¿½	z0 != z1
+	 *	ï¿½	x, y, z0, z1 in the DlogGroup
 	 *	REPORT ERROR (cheat attempt)"
 	 * @param z1 
 	 * @param z0 
@@ -335,11 +337,11 @@ abstract class OTOneSidedSimDDHSenderAbs implements OTSender{
 	/**
 	 * Runs the following lines from the protocol:
 	 * "COMPUTE: in byteArray scenario:
-	 *	•	c0 = x0 XOR KDF(|x0|,k0)
-	 *	•	c1 = x1 XOR KDF(|x1|,k1) 
+	 *	ï¿½	c0 = x0 XOR KDF(|x0|,k0)
+	 *	ï¿½	c1 = x1 XOR KDF(|x1|,k1) 
 	 *	OR in GroupElement scenario:
-	 *	•	c0 = x0 * k0
-	 *	•	c1 = x1 * k1"
+	 *	ï¿½	c0 = x0 * k0
+	 *	ï¿½	c1 = x1 * k1"
 	 * @param k1 
 	 * @param k0 
 	 * @param w1 

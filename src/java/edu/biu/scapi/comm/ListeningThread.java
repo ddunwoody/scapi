@@ -214,6 +214,5 @@ class ListeningThread extends Thread{
         		
         }	
         Logging.getLogger().log(Level.INFO, "End of listening thread run");
-        System.out.println("End of listening thread run");
 	}
 }
