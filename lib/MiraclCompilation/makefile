@@ -65,10 +65,10 @@ mrmuldv.o: $(MRMULDV_SOURCE)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 install:
-	install -d /usr/local/include/miracl
-	install -d /usr/local/lib
-	install -m 0644 libmiracl.a /usr/local/lib
-	install -m 0644 *.h /usr/local/include/miracl
+	install -d $(prefix)/include/miracl
+	install -d $(prefix)/lib
+	install -m 0644 libmiracl.a $(prefix)/lib
+	install -m 0644 *.h $(prefix)/include/miracl
 
 clean:
 	rm -f *.a

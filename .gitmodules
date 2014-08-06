@@ -15,4 +15,4 @@
 	url = git://github.com/cryptobiu/NTL.git
 [submodule "lib/OTExtension"]
 	path = lib/OTExtension
-	url = git://github.com/tal-m/OTExtension.git
+	url = git://github.com/cryptobiu/OTExtension.git

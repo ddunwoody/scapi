@@ -67,7 +67,7 @@ JNI_MIRACL:=src/jni/MiraclJavaInterface/libMiraclJavaInterface$(JNI_LIB_EXT)
 JNI_OTEXTENSION:=src/jni/OtExtensionJavaInterface/libOtExtensionJavaInterface$(JNI_LIB_EXT)
 JNI_NTL:=src/jni/NTLJavaInterface/libNTLJavaInterface$(JNI_LIB_EXT)
 JNI_OPENSSL:=src/jni/OpenSSLJavaInterface/libOpenSSLJavaInterface$(JNI_LIB_EXT)
-JNI_TAGRETS=jni-cryptopp jni-miracl jni-otextension jni-ntl jni-openssl
+JNI_TAGRETS=jni-cryptopp jni-miracl jni-openssl jni-otextension jni-ntl
 
 # basenames of created jars (apache commons, bouncy castle, scapi)
 #BASENAME_BOUNCYCASTLE:=bcprov-jdk15on-151b18.jar
@@ -93,10 +93,10 @@ INSTALL_DIR=$(prefix)/scapi
 SCRIPTS:=scripts/scapi.sh scripts/scapic.sh
 
 # external libs
-EXTERNAL_LIBS_TARGETS:=compile-cryptopp compile-miracl compile-otextension compile-ntl compile-openssl
+EXTERNAL_LIBS_TARGETS:=compile-cryptopp compile-miracl compile-openssl compile-otextension compile-ntl
 
 ## targets
-all: $(JNI_TAGRETS) $(JAR_BOUNCYCASTLE) $(JAR_APACHE_COMMONS) compile-scapi $(SCRIPTS)
+all: $(JNI_TAGRETS) $(JAR_BOUNCYCASTLE) $(JAR_APACHE_COMMONS) compile-scapi
 
 # compile and install the crypto++ lib:
 # first compile the default target (test program + static lib)
@@ -106,7 +106,7 @@ compile-cryptopp:
 	@cp -r lib/CryptoPP/ $(builddir)/CryptoPP/
 	@$(MAKE) -C $(builddir)/CryptoPP CXX=$(CXX) CXXFLAGS=$(CRYPTOPP_CXXFLAGS)
 	@$(MAKE) -C $(builddir)/CryptoPP CXX=$(CXX) CXXFLAGS=$(CRYPTOPP_CXXFLAGS) dynamic
-#	@sudo $(MAKE) -C $(builddir)/CryptoPP CXX=$(CXX) CXXFLAGS=$(CRYPTOPP_CXXFLAGS) install
+	@$(MAKE) -C $(builddir)/CryptoPP CXX=$(CXX) CXXFLAGS=$(CRYPTOPP_CXXFLAGS) PREFIX=$(prefix) install
 	@touch compile-cryptopp
 
 prepare-miracl:
@@ -116,14 +116,13 @@ prepare-miracl:
 	@rm -f $(builddir)/$(MIRACL_DIR)/mirdef.h
 	@rm -f $(builddir)/$(MIRACL_DIR)/mrmuldv.c
 	@cp -r lib/MiraclCompilation/* $(builddir)/$(MIRACL_DIR)/
-	@ln -s $(builddir)/$(MIRACL_DIR) $(builddir)/$(MIRACL_DIR)/miracl
 
 compile-miracl: 
 	@$(MAKE) prepare-miracl MIRACL_DIR=Miracl
 	@echo "Compiling the Miracl library (C)..."
 	@$(MAKE) -C $(builddir)/Miracl MIRACL_TARGET_LANG=c
 	@echo "Installing the Miracl library..."
-#	@sudo $(MAKE) -C $(builddir)/Miracl MIRACL_TARGET_LANG=c install
+	@$(MAKE) -C $(builddir)/Miracl MIRACL_TARGET_LANG=c install
 	@touch compile-miracl
 
 compile-miracl-cpp:
@@ -131,14 +130,14 @@ compile-miracl-cpp:
 	@echo "Compiling the Miracl library (C++)..."
 	@$(MAKE) -C $(builddir)/MiraclCPP MIRACL_TARGET_LANG=cpp
 	@echo "Installing the Miracl library..."
-#	@sudo $(MAKE) -C $(builddir)/MiraclCPP MIRACL_TARGET_LANG=cpp install
+	@$(MAKE) -C $(builddir)/MiraclCPP MIRACL_TARGET_LANG=cpp install
 	@touch compile-miracl-cpp
 
-compile-otextension: compile-openssl compile-miracl
+compile-otextension: compile-openssl compile-miracl-cpp
 	@echo "Compiling the OtExtension library..."
 	@cp -r lib/OTExtension $(builddir)/OTExtension
 	@$(MAKE) -C $(builddir)/OTExtension
-#	@sudo $(MAKE) -C $(builddir)/OTExtension SHARED_LIB_EXT=$(SHARED_LIB_EXT) install
+	@$(MAKE) -C $(builddir)/OTExtension SHARED_LIB_EXT=$(SHARED_LIB_EXT) install
 	@touch compile-otextension
 
 # TODO: add GMP and GF2X
@@ -147,8 +146,7 @@ compile-ntl:
 	@cp -r lib/NTL/unix $(builddir)/NTL
 	@cd $(builddir)/NTL/src/ && ./configure CFLAGS=$(NTL_CFLAGS)
 	@$(MAKE) -C $(builddir)/NTL/src/
-#	@sudo $(MAKE) -C $(builddir)/NTL/src/ install
-	@ln -s $(builddir)/NTL/src/ntl.a $(builddir)/NTL/src/libntl.a
+	@$(MAKE) -C $(builddir)/NTL/src/ PREFIX=$(prefix) install
 	@touch compile-ntl
 
 compile-openssl:
@@ -157,7 +155,7 @@ compile-openssl:
 	@cd $(builddir)/OpenSSL && $(OPENSSL_CONFIGURE) shared -fPIC --openssldir=$(prefix)/ssl
 	@$(MAKE) -C $(builddir)/OpenSSL depend
 	@$(MAKE) -C $(builddir)/OpenSSL all
-#	@sudo $(MAKE) -C $(builddir)/OpenSSL install
+	@$(MAKE) -C $(builddir)/OpenSSL install
 	@touch compile-openssl
 
 compile-bouncycastle: $(JAR_BOUNCYCASTLE)
@@ -182,7 +180,7 @@ $(JNI_MIRACL): compile-miracl
 	@$(MAKE) -C src/jni/MiraclJavaInterface
 	@cp $@ assets/
 
-$(JNI_OTEXTENSION): compile-miracl-cpp compile-otextension
+$(JNI_OTEXTENSION): compile-otextension
 	@echo "Compiling the OtExtension jni interface..."
 	@$(MAKE) -C src/jni/OtExtensionJavaInterface
 	@cp $@ assets/
@@ -200,12 +198,12 @@ $(JNI_OPENSSL): compile-openssl
 # TODO: for now we avoid re-compiling bouncy castle, since it is very unstable,
 # and it does not compile on MAC OS X correctly.
 $(JAR_BOUNCYCASTLE):
-#@echo "Compiling the BouncyCastle library..."
-#@cp -r lib/BouncyCastle $(builddir)/BouncyCastle
-#cd $(builddir)/BouncyCastle && export JAVA_HOME=$(JAVA_HOME) && export ANT_HOME=$(ANT_HOME) && ant -f ant/jdk15+.xml build
-#cd $(builddir)/BouncyCastle && export JAVA_HOME=$(JAVA_HOME) && export ANT_HOME=$(ANT_HOME) && ant -f ant/jdk15+.xml zip-src
-#@cp $(builddir)/BouncyCastle/build/artifacts/jdk1.5/jars/bcprov-jdk* assets/
-#@touch compile-bouncycastle
+	@echo "Compiling the BouncyCastle library..."
+#	@cp -r lib/BouncyCastle $(builddir)/BouncyCastle
+#	@cd $(builddir)/BouncyCastle && export JAVA_HOME=$(JAVA_HOME) && export ANT_HOME=$(ANT_HOME) && ant -f ant/jdk15+.xml build
+#	@cd $(builddir)/BouncyCastle && export JAVA_HOME=$(JAVA_HOME) && export ANT_HOME=$(ANT_HOME) && ant -f ant/jdk15+.xml zip-src
+#	@cp $(builddir)/BouncyCastle/build/artifacts/jdk1.5/jars/bcprov-jdk* assets/
+#	@touch compile-bouncycastle
 
 $(JAR_SCAPI): $(JAR_BOUNCYCASTLE) $(JAR_APACHE_COMMONS)
 	@echo "Compiling the SCAPI java code..."
@@ -221,14 +219,14 @@ scripts/scapic.sh: scripts/scapic.sh.tmpl
 	sed -e "s;%SCAPIDIR%;$(INSTALL_DIR);g" -e "s;%APACHECOMMONS%;$(BASENAME_APACHE_COMMONS);g" \
 	-e "s;%SCAPI%;$(BASENAME_SCAPI);g" -e "s;%BOUNCYCASTLE%;$(BASENAME_BOUNCYCASTLE);g" $< > $@
 
-install: all
+install: all clean-scripts compile-scripts
 	@echo "Installing SCAPI..."
 	install -d $(INSTALL_DIR)
 	install -m 0644 assets/*$(JNI_LIB_EXT) $(INSTALL_DIR)
 	install -m 0644 assets/*.jar $(INSTALL_DIR)
-	install -d ./install/usr/bin
-	install -m 0755 scripts/scapi.sh ./install/usr/bin/scapi
-	install -m 0755 scripts/scapic.sh ./install/usr/bin/scapic
+	install -d /usr/bin
+	install -m 0755 scripts/scapi.sh /usr/bin/scapi
+	install -m 0755 scripts/scapic.sh /usr/bin/scapic
 	@echo "Done."
 
 # clean targets

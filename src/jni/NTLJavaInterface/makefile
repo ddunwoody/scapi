@@ -7,9 +7,9 @@ CXX=g++
 CXXFLAGS=-fPIC -fpermissive
 
 # ntl dependency
-NTL_INCLUDES = -I$(builddir)/NTL/include
+NTL_INCLUDES = -I$(includedir)
 NTL_LIB = -lntl
-NTL_LIB_DIR = -L$(builddir)/NTL/src
+NTL_LIB_DIR = -L$(libdir)
 
 # sources
 SOURCES = EvaluationHashFunction.cpp JniEvaluationHashFunction.cpp SigmaProtocolOR.cpp
