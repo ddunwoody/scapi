@@ -70,7 +70,8 @@ class SecuringConnectionThread extends Thread{
 	 */
 	SecuringConnectionThread(PlainChannel channel, InetAddress IP, int port,
 			boolean doConnect, KeyExchangeProtocol keyExchangeProtocol, KeyExchangeOutput keyExchangeOutput) {
-		
+
+		setName("SecuringConnection-" + getName());
 		this.doConnect = doConnect;
 		this.channel = channel;
 		this.ipAddres = IP;

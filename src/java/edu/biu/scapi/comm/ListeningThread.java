@@ -65,6 +65,7 @@ class ListeningThread extends Thread{
 	 */
 	public ListeningThread( Map<InetAddress ,Vector<SecuringConnectionThread>> securingThreadsMap, Party party, int numOfIncomingConnections) {
 
+		setName("Listening-" + getName());
 		connectingThreadsMap = securingThreadsMap;
 		this.numOfIncomingConnections = numOfIncomingConnections;
 		
