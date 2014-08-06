@@ -12,3 +12,6 @@ build/*
 install/*
 compile-*
 scripts/*.sh
+install/*
+.idea/
+*.iml
