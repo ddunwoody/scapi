@@ -20,7 +20,7 @@ CXXFLAGS="-DNDEBUG -g -O2 -fPIC"
 
 ifeq ($(uname_S),Linux)
 	JAVA_HOME=$(shell dirname $$(dirname $$(readlink -f `which javac`)))
-	JAVA_INCLUDES=-I$(JAVA_HOME)/include/
+	JAVA_INCLUDES=-I$(JAVA_HOME)/include/ -I$(JAVA_HOME)/include/linux/
 	CRYPTOPP_CXXFLAGS=$(CXXFLAGS)
 	INCLUDE_ARCHIVES_START = -Wl,-whole-archive # linking options, we prefer our generated shared object will be self-contained.
 	INCLUDE_ARCHIVES_END = -Wl,-no-whole-archive -Wl,--no-undefined
