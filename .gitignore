@@ -12,3 +12,4 @@ build/*
 install/*
 compile-*
 scripts/*.sh
+target/*
