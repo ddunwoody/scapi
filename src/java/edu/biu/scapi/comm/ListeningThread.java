@@ -174,6 +174,7 @@ class ListeningThread extends Thread{
 					
 					//close the socket
 					try {
+						Logging.getLogger().log(Level.WARNING, "Unauthorized IP " + inetAddr + " tried to connect");
 						socketChannel.close();
 					} catch (IOException e) {
 						
