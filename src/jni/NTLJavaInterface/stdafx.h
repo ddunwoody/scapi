@@ -29,12 +29,13 @@
 //
 
 #ifdef _WIN32
+
 #pragma once
 #include "targetver.h"
+#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
+#include <windows.h> // Windows Header Files
+#define NTL_NO_MIN_MAX // Known to cause errors on Ubuntu 14.04, for now defined only for windows
 
-#define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
-// Windows Header Files:
-#include <windows.h>
 #endif
 
 // NTLLibrary
@@ -46,9 +47,5 @@
 #  pragma comment ( lib, "ntl" )
 #  pragma comment ( lib, "gf2x" )
 #endif
-
-#define NTL_NO_MIN_MAX
-
-
 
 // TODO: reference additional headers your program requires here

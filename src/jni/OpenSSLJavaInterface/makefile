@@ -7,8 +7,8 @@ CXX=g++
 CXXFLAGS=-fPIC
 
 # openssl dependency
-OPENSSL_INCLUDES = -I/usr/local/ssl/include/
-OPENSSL_LIB_DIR = -L/usr/local/ssl/lib/
+OPENSSL_INCLUDES = -I$(prefix)/ssl/include
+OPENSSL_LIB_DIR = -L$(prefix)/ssl/lib
 OPENSSL_LIB = -lssl -lcrypto
 
 SOURCES = AES.cpp DlogEC.cpp DlogF2m.cpp DlogFp.cpp DlogZp.cpp DSA.cpp F2mPoint.cpp \
