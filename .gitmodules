@@ -1,18 +1,18 @@
 [submodule "lib/OpenSSL"]
 	path = lib/OpenSSL
-	url = git://github.com/openssl/openssl.git
+	url = https://github.com/openssl/openssl.git
 [submodule "lib/CryptoPP"]
 	path = lib/CryptoPP
-	url = git://github.com/cryptobiu/cryptopp.git
+	url = https://github.com/cryptobiu/cryptopp.git
 [submodule "lib/Miracl"]
 	path = lib/Miracl
-	url = git://github.com/CertiVox/MIRACL.git
+	url = https://github.com/CertiVox/MIRACL.git
 [submodule "lib/BouncyCastle"]
 	path = lib/BouncyCastle
-	url = git://github.com/bcgit/bc-java.git
+	url = https://github.com/bcgit/bc-java.git
 [submodule "lib/NTL"]
 	path = lib/NTL
-	url = git://github.com/cryptobiu/NTL.git
+	url = https://github.com/cryptobiu/NTL.git
 [submodule "lib/OTExtension"]
 	path = lib/OTExtension
-	url = git://github.com/cryptobiu/OTExtension.git
+	url = https://github.com/cryptobiu/OTExtension.git
