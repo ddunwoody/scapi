@@ -103,117 +103,126 @@ class ListeningThread extends Thread{
 	 */
 	public void run() {
 
-		//first set the channels in the map to connecting
-		Collection<Vector<SecuringConnectionThread>> collection = connectingThreadsMap.values();
-		Iterator<Vector<SecuringConnectionThread>> itr = collection.iterator();
-		
-		while(itr.hasNext()){ 
-			
-			//get the vector of threads.
-			Vector<SecuringConnectionThread> threadsVector = itr.next();
-			int vectorSize = threadsVector.size();
-			
-			//go over the vector to set the state to connecting.
-			for(int i=0; i<vectorSize ; i++){
-				
-				//get the plain channel in order to change the state
-				PlainChannel channel = threadsVector.get(i).getChannel(); 
-			
-				//set the channel state to connecting
-				channel.setState(PlainChannel.State.CONNECTING);
-			}
-		       
-		}
-		
-			
-		int i=0;
-		//loop for incoming connections and make sure that this thread should not stopped.
-        while (i < numOfIncomingConnections && !bStopped) {
-        	
-            SocketChannel socketChannel = null;
-			try {
-				
-				//use the server socket to listen on incoming connections.
-				// accept connections from all the smaller processes
-				Logging.getLogger().log(Level.INFO, "Trying to listen "+ listener.socket().getLocalPort());
-				
-				socketChannel = listener.accept();
-			
-				
-			}	catch (ClosedChannelException e) {
-				// TODO: handle exception
-			} 	catch (IOException e) {
-				
-				Logging.getLogger().log(Level.WARNING, e.toString());
-			}
-			
-			//there was no connection request
-			if(socketChannel==null){
-				try {
-					Thread.sleep (1000);
-				} catch (InterruptedException e) {
-					
-					Logging.getLogger().log(Level.INFO, e.toString());
-				}
-			}
-			else{
-				
-				
-				//get the ip of the client socket
-				InetAddress inetAddr = socketChannel.socket().getInetAddress();
-				
-				
-				//use the address from the socket and find it the map. We get a vector of all the SecuringConnectionThreads that have this ip address.
-				Vector<SecuringConnectionThread> scThreadsVector = connectingThreadsMap.get(inetAddr);
-				
-				//check if the ip address is a valid address. I.e. exists in the map. If the returned vector is null it means that there is no
-				//SecuringConnectionThreads for this address.
-				if(scThreadsVector==null){//an unauthorized ip tried to connect
-					
-					//close the socket
-					try {
-						Logging.getLogger().log(Level.WARNING, "Unauthorized IP " + inetAddr + " tried to connect");
-						socketChannel.close();
-					} catch (IOException e) {
-						
-						Logging.getLogger().log(Level.WARNING, e.toString());
-					}
-				}
-	        	else{ //we have a thread that corresponds to this ip address. Thus, this address is valid
-	        		
-	        		//increment the index
-	        		i++;
-	        		
-	        		//remove the first index and get the securing thread. Get the first thread in the vector. It may be that this is not
-	        		//the thread that has the appropriate port. However this is for the key exchange algorithm to check if it is important
-	        		//to the application that use the com layer.
-	        		SecuringConnectionThread scThread = scThreadsVector.remove(0);
-	        		
-	        		//If there is nothing left in the vector remove it from the map too.
-	        		if(scThreadsVector.isEmpty()){
-	        			
-	        			connectingThreadsMap.remove(inetAddr);
-	        		}
-	        			
-	        		
-	        		//check that the channel is concrete channel and not some decoration
-	        		if(scThread.getChannel() instanceof PlainTCPChannel){
-	        			//get the channel from the thread and set the obtained socket.
-	        			((PlainTCPChannel)scThread.getChannel()).setSocket(socketChannel.socket());
-	        			
-	        			//start the connecting thread
-	        			scThread.start();
-	        		} else
-						
-						//all the channels must be plain.
-						throw new InvalidChannelException("All channels must be plain");
-						
-	        		
-	        	}
-			}
-        		
-        }	
-        Logging.getLogger().log(Level.INFO, "End of listening thread run");
-        
+        try {
+            //first set the channels in the map to connecting
+            Collection<Vector<SecuringConnectionThread>> collection = connectingThreadsMap.values();
+            Iterator<Vector<SecuringConnectionThread>> itr = collection.iterator();
+
+            while (itr.hasNext()) {
+
+                //get the vector of threads.
+                Vector<SecuringConnectionThread> threadsVector = itr.next();
+                int vectorSize = threadsVector.size();
+
+                //go over the vector to set the state to connecting.
+                for (int i = 0; i < vectorSize; i++) {
+
+                    //get the plain channel in order to change the state
+                    PlainChannel channel = threadsVector.get(i).getChannel();
+
+                    //set the channel state to connecting
+                    channel.setState(PlainChannel.State.CONNECTING);
+                }
+
+            }
+
+
+            int i = 0;
+            //loop for incoming connections and make sure that this thread should not stopped.
+            while (i < numOfIncomingConnections && !bStopped) {
+
+                SocketChannel socketChannel = null;
+                try {
+
+                    //use the server socket to listen on incoming connections.
+                    // accept connections from all the smaller processes
+                    Logging.getLogger().log(Level.INFO, "Trying to listen " + listener.socket().getLocalPort());
+
+                    socketChannel = listener.accept();
+
+
+                } catch (ClosedChannelException e) {
+                    // TODO: handle exception
+                } catch (IOException e) {
+
+                    Logging.getLogger().log(Level.WARNING, e.toString());
+                }
+
+                //there was no connection request
+                if (socketChannel == null) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+
+                        Logging.getLogger().log(Level.INFO, e.toString());
+                    }
+                } else {
+
+
+                    //get the ip of the client socket
+                    InetAddress inetAddr = socketChannel.socket().getInetAddress();
+
+
+                    //use the address from the socket and find it the map. We get a vector of all the SecuringConnectionThreads that have this ip address.
+                    Vector<SecuringConnectionThread> scThreadsVector = connectingThreadsMap.get(inetAddr);
+
+                    //check if the ip address is a valid address. I.e. exists in the map. If the returned vector is null it means that there is no
+                    //SecuringConnectionThreads for this address.
+                    if (scThreadsVector == null) {//an unauthorized ip tried to connect
+
+                        //close the socket
+                        try {
+                            Logging.getLogger().log(Level.WARNING, "Unauthorized IP " + inetAddr + " tried to connect");
+                            socketChannel.close();
+                        } catch (IOException e) {
+
+                            Logging.getLogger().log(Level.WARNING, e.toString());
+                        }
+                    } else { //we have a thread that corresponds to this ip address. Thus, this address is valid
+
+                        //increment the index
+                        i++;
+
+                        //remove the first index and get the securing thread. Get the first thread in the vector. It may be that this is not
+                        //the thread that has the appropriate port. However this is for the key exchange algorithm to check if it is important
+                        //to the application that use the com layer.
+                        SecuringConnectionThread scThread = scThreadsVector.remove(0);
+
+                        //If there is nothing left in the vector remove it from the map too.
+                        if (scThreadsVector.isEmpty()) {
+
+                            connectingThreadsMap.remove(inetAddr);
+                        }
+
+
+                        //check that the channel is concrete channel and not some decoration
+                        if (scThread.getChannel() instanceof PlainTCPChannel) {
+                            //get the channel from the thread and set the obtained socket.
+                            ((PlainTCPChannel) scThread.getChannel()).setSocket(socketChannel.socket());
+
+                            //start the connecting thread
+                            scThread.start();
+                        } else
+
+                            //all the channels must be plain.
+                            throw new InvalidChannelException("All channels must be plain");
+
+
+                    }
+                }
+
+            }
+            Logging.getLogger().log(Level.INFO, "End of listening thread run");
+        } finally {
+            releaseListeningSocket();
+        }
 	}
+
+    private void releaseListeningSocket() {
+        try {
+                listener.close();
+            } catch (IOException e) {
+                Logging.getLogger().log(Level.WARNING, "Failed while closing listening socket", e);
+            }
+    }
 }

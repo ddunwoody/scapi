@@ -405,12 +405,15 @@ public class CommunicationSetup implements TimeoutObserver{
 			
 			//sets the flag of the thread to stopped. This will make the run function of the thread to terminate if it has not finished yet.
 			thread.stopConnecting();
+            thread.interrupt();
 			
 		}	
 		
 		//further stop the listening thread if it still runs. Similarly, it sets the flag of the listening thread to stopped.
-		if(listeningThread!=null)
-			listeningThread.stopConnecting();
+		if(listeningThread!=null) {
+            listeningThread.stopConnecting();
+            listeningThread.interrupt();
+        }
 	}
 	
 }
