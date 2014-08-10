@@ -59,7 +59,7 @@ export JNI_LIB_EXT
 
 # target names
 CLEAN_TARGETS:=clean-cryptopp clean-miracl clean-miracl-cpp clean-otextension clean-ntl clean-openssl clean-bouncycastle
-CLEAN_JNI_TARGETS:=clean-jni-cryptopp clean-jni-miracl clean-jni-otextension clean-jni-ntl clean-jni-openssl
+CLEAN_JNI_TARGETS:=clean-jni-cryptopp clean-jni-miracl clean-jni-otextension clean-jni-ntl clean-jni-openssl clean-jni-assets
 
 # target names of jni shared libraries
 JNI_CRYPTOPP:=src/jni/CryptoPPJavaInterface/libCryptoPPJavaInterface$(JNI_LIB_EXT)
@@ -286,10 +286,21 @@ clean-jni-openssl:
 	@echo "Cleaning the OpenSSL jni build dir..."
 	@$(MAKE) -C src/jni/OpenSSLJavaInterface clean
 
+clean-jni-assets:
+	@echo "Cleaning the JNI assets..."
+	@rm -f assets/*$(JNI_LIB_EXT)
+
 clean-libraries: $(CLEAN_TARGETS)
 clean-jnis: $(CLEAN_JNI_TARGETS)
 clean-scripts:
 	@echo "cleaning the SCAPI shell scripts"
 	@rm -f scripts/*.sh
 
-clean: clean-libraries clean-jnis clean-scripts
+clean-scapi:
+	@ant clean
+	@rm -f assets/$(BASENAME_SCAPI)
+
+clean-install:
+	@rm -rf install/*
+
+clean: clean-libraries clean-jnis clean-scripts clean-scapi clean-install
