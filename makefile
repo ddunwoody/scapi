@@ -288,7 +288,7 @@ clean-jni-openssl:
 
 clean-jni-assets:
 	@echo "Cleaning the JNI assets..."
-	@rm -f assets/*.so
+	@rm -f assets/*$(JNI_LIB_EXT)
 
 clean-libraries: $(CLEAN_TARGETS)
 clean-jnis: $(CLEAN_JNI_TARGETS)
