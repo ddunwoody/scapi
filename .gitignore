@@ -9,7 +9,6 @@
 .project
 *.jar
 build/*
-install/*
 compile-*
 scripts/*.sh
 install/*
