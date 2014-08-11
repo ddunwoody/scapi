@@ -31,6 +31,7 @@
 #include <iostream>
 #include <math.h>
 #include <map>
+#include <time.h> 
 extern "C" {
 #include <miracl.h>
 }
@@ -513,7 +514,110 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_miracl_MiraclDlogECF2
 
 }
 
+/* 
+ * function encodeByteArrayToPoint		: Encodes the given byte array into a point. 
+ *										  If the given byte array can not be encoded to a point, returns 0.
+ * param dlog							: Pointer to the native Dlog object.
+ * param binaryString					: The byte array to encode.
+ * param k								: k is the maximum length of a string to be converted to a Group Element of this group. 
+ *										  If a string exceeds the k length it cannot be converted.
+ * return								: The created point or 0 if the point cannot be created.
+ */
+JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_miracl_MiraclDlogECFp_encodeByteArrayToPoint
+  (JNIEnv * env, jobject, jlong m, jbyteArray binaryString, jint k){
+	   //Pseudo-code:
+		/*If the length of binaryString exceeds k then throw IndexOutOfBoundsException.
 
+          Let L be the length in bytes of p
+
+          Choose a random byte array r of length L – k – 2 bytes 
+
+          Prepare a string newString of the following form: r || binaryString || binaryString.length (where || denotes concatenation) (i.e., the least significant byte of newString is the length of binaryString in bytes)
+
+          Convert the result to a BigInteger (bIString)
+
+          Compute the elliptic curve equation for this x and see if there exists a y such that (x,y) satisfies the equation.
+
+          If yes, return (x,y)
+
+          Else, go back to step 3 (choose a random r etc.) up to 80 times (This is an arbitrary hard-coded number).
+
+          If did not find y such that (x,y) satisfies the equation after 80 trials then return null.
+		 */
+
+	   /* convert the accepted parameters to MIRACL parameters*/
+	   miracl* mip = (miracl*)m;
+	 
+	  jbyte* string  = (jbyte*) env->GetByteArrayElements(binaryString, 0);
+	  int len = env->GetArrayLength(binaryString);
+ 
+	  if (len > k){
+		  env ->ReleaseByteArrayElements(binaryString, string, 0);
+		  return 0;
+	  }
+	
+	  big x, p;
+	  x = mirvar(mip, 0);
+	  p = mip->modulus;
+	  
+	  int l = logb2(mip, p)/8;
+	  
+	  char* randomArray = new char[l-k-2];
+	  char* newString = new char[l - k - 1 + len];
+	  memcpy(newString+l-k-2, string, len);
+
+	  newString[l - k - 2 + len] = (char) len;
+
+	  
+	  int counter = 0;
+	  bool success = 0;
+
+	  csprng rng;  
+      srand(time(0));
+	  long seed;  
+	  char raw = rand();
+	  time((time_t*)&seed);  
+	  strong_init(&rng,1,&raw,seed);                 
+	  do{
+		  
+			for (int i=0; i<l-k-2; i++){
+				  randomArray[i] = strong_rng(&rng);
+			}
+			
+			memcpy(newString, randomArray, l-k-2);
+			
+			bytes_to_big(mip, l - k - 1 + len, newString, x);
+			
+			//If the number is negative, make it positive.
+			if(exsign(x)== -1){
+				absol(x, x);
+			}
+			//epoint_x returns true if the given x value leads to a valid point on the curve.
+			//if failed, go back to choose a random r etc.
+			success = epoint_x(mip, x);
+			counter++;
+	  } while((!success) && (counter <= 80)); //we limit the amount of times we try to 80 which is an arbitrary number.
+	  
+	  epoint* point = 0;
+	  if (success){
+		point = epoint_init(mip);
+		epoint_set(mip, x, x, 0, point);
+	  }
+
+	  char* temp = new char[l - k - 1 + len];
+	  big_to_bytes(mip,l - k - 1 + len , x, temp, 1);
+	  
+	  //Delete the allocated memory.
+	  env ->ReleaseByteArrayElements(binaryString, string, 0);
+	  
+	  mirkill(x);
+	 
+	  delete(randomArray);
+	  delete(newString);
+	  
+	  //Return the created point.
+	  return (long) point;
+}
 
 epoint* computeLL(miracl* mip, epoint** elements, big* exponents, int n, int field){
 		

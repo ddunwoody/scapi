@@ -62,6 +62,8 @@ public class MiraclDlogECFp extends MiraclAdapterDlogEC implements DlogECFp, DDH
 	private native long initFpExponentiateWithPrecomputedValues(long mip,byte[]p, byte[]a, byte[]b, long base, byte[] exponent, int window, int maxBits);
 	private native long computeFpExponentiateWithPrecomputedValues(long mip, long ebrickPointer, byte[] exponent);
 	private native void endFpExponentiateWithPreComputedValues(long ebrickPointer);	
+	//Encodes the given byte array into a point. If the given byte array can not be encoded to a point, returns 0.
+	private native long encodeByteArrayToPoint(long mip, byte[] binaryString, int k);
 	
 	private ECFpUtility util;
 	
@@ -346,14 +348,14 @@ public class MiraclDlogECFp extends MiraclAdapterDlogEC implements DlogECFp, DDH
 	 * @return the created group Element or null if could not find the encoding in reasonable time
 	 */
 	public GroupElement encodeByteArrayToGroupElement(byte[] binaryString) {
-		//The actual work is implemented in ECFpUtility since it is independent of the underlying library (BC, Miracl, or other)
-		//If we ever decide to change the implementation there will only be one place to change it.
-		ECFpUtility.FpPoint fpPoint = util.findPointRepresentedByByteArray((ECFpGroupParams) groupParams, binaryString, k); 
-		if (fpPoint == null)
+		
+		long point = encodeByteArrayToPoint(mip, binaryString, k);
+		
+		if (point == 0)
 			return null;
-		//When generating an element for an encoding always check that the (x,y) coordinates represent a point on the curve.
-		ECElement element = (ECElement) generateElement(true, fpPoint.getX(), fpPoint.getY());
-		return element;
+		
+		 // Build a ECFpPointOpenSSL element from the result.
+		return new ECFpPointMiracl(point, this);
 	}
 	
 	/**

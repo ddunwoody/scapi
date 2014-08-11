@@ -250,7 +250,14 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_miracl_MiraclDlogECF2
 JNIEXPORT void JNICALL Java_edu_biu_scapi_primitives_dlog_miracl_MiraclDlogECF2m_endF2mExponentiateWithPreComputedValues
   (JNIEnv *, jobject, jlong);
 
-  
+/*
+ * Class:     edu_biu_scapi_primitives_dlog_miracl_MiraclDlogECFp
+ * Method:    encodeByteArrayToPoint
+ * Signature: (J[BI)J
+ */
+JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_miracl_MiraclDlogECFp_encodeByteArrayToPoint
+  (JNIEnv *, jobject, jlong, jbyteArray, jint);
+
 #ifdef __cplusplus
 }
 #endif
