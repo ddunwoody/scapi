@@ -80,8 +80,7 @@ public class BooleanCircuit {
 	 * An arrayList containing the indices of the input {@code Wire}s of this {@code BooleanCircuit} indexed by the party number.
 	 */
 	private ArrayList<ArrayList<Integer>> eachPartysInputWires = new ArrayList<ArrayList<Integer>>();
-	
-	// Integer.parseInt(s.next()) is significantly faster than s.nextInt() so we use the former.
+
 	/**
 	 * Constructs a BooleanCircuit from a File. <p>
 	 * The File first lists the number of {@code Gate}s, then the number of parties. <p>
@@ -95,7 +94,22 @@ public class BooleanCircuit {
 	 * @throws CircuitFileFormatException if there is a problem with the format of the file.
 	 */
 	public BooleanCircuit(File f) throws FileNotFoundException, CircuitFileFormatException {
-	    Scanner s = new Scanner(f);
+		this(new Scanner(f));
+	}
+
+	// Integer.parseInt(s.next()) is significantly faster than s.nextInt() so we use the former.
+	/**
+	 * Constructs a BooleanCircuit from a Scanner. <p>
+	 * The Scanner's underyling contents contains a lists the number of {@code Gate}s, then the number of parties. <p>
+	 * Then for each party: party number, the number of inputs for that party, and following there is a list of indices of each of these input {@code Wire}s.<p>
+	 * Next it lists the number of output {@code Wire}s followed by the index of each of these {@code Wires}. <p>
+	 * Then for each gate, we have the following: number of inputWires, number of OutputWires inputWireIndices OutputWireIndices and the gate's truth Table (as a 0-1 string).<P>
+	 * example file: 1 2 1 1 1 2 1 2 1 3 2 1 1 2 3 0001<p>
+	 *
+	 * @param s The {@link Scanner} from which the circuit is read.
+	 * @throws CircuitFileFormatException if there is a problem with the format of the circuit.
+	 */
+	public BooleanCircuit(Scanner s) throws CircuitFileFormatException {
 	    //Read the number of gates.
 	    int numberOfGates = Integer.parseInt(read(s));
 	    gates = new Gate[numberOfGates];
