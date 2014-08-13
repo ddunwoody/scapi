@@ -40,19 +40,20 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_prf_openSSL_OpenSSLHMAC_cr
   (JNIEnv *env, jobject, jstring hashName){
 	  HMAC_CTX *ctx = new  HMAC_CTX;
 
-	   OpenSSL_add_all_digests();
+	  OpenSSL_add_all_digests();
 	  
 	  //get the hash name from java.
 	  const char* name = env->GetStringUTFChars(hashName, NULL);
 	  //Get the underlying hash function.
 	  const EVP_MD *md = EVP_get_digestbyname(name);
 
-	  //Create an Hmac object and initialize it with the created hash.
-	  HMAC_CTX_init(ctx);
-	  HMAC_Init_ex(ctx, NULL, 0,  md, NULL);
-
 	  //Release the allocated memory.
 	  env->ReleaseStringUTFChars(hashName, name);
+
+	  //Create an Hmac object and initialize it with the created hash.
+	  HMAC_CTX_init(ctx);
+	  if (0 == (HMAC_Init_ex(ctx, NULL, 0,  md, NULL))) return 0;
+	  
 	  return (long) ctx;
 }
 
@@ -67,7 +68,7 @@ JNIEXPORT void JNICALL Java_edu_biu_scapi_primitives_prf_openSSL_OpenSSLHMAC_set
 	  jbyte* keyBytes  = (jbyte*) env->GetByteArrayElements(key, 0);
 	  
 	  //Initialize the Hmac object with the given key.
-	  int suc = HMAC_Init_ex((HMAC_CTX *)hmac, keyBytes, env->GetArrayLength(key),  NULL, NULL);
+	  HMAC_Init_ex((HMAC_CTX *)hmac, keyBytes, env->GetArrayLength(key),  NULL, NULL);
 	
 	  //Make sure to release the memory created in c++. The JVM will not release it automatically.
 	  env->ReleaseByteArrayElements(key, keyBytes, 0);
@@ -128,14 +129,19 @@ JNIEXPORT void JNICALL Java_edu_biu_scapi_primitives_prf_openSSL_OpenSSLHMAC_upd
 	  unsigned char* output = new unsigned char[size];//Create a char array to hold the result.
 	  
 	  //Compute the final function and copy the output the the given output array
-	  HMAC_Final((HMAC_CTX *)hmac, output, NULL);
+	  if (0 == (HMAC_Final((HMAC_CTX *)hmac, output, NULL))){
+		  delete output;
+	  }
+
 	  env->SetByteArrayRegion(out, outOffset, size, (jbyte*)output); 
 
 	  //initialize the Hmac again in order to enable repeated calls.
 	  const EVP_MD *md = ((HMAC_CTX *)hmac)->md;
 	  unsigned char* key = ((HMAC_CTX *)hmac)->key;
 	  int keyLen =  ((HMAC_CTX *)hmac)->key_length;
-	  HMAC_Init_ex((HMAC_CTX *)hmac, key, keyLen,  md, NULL);
+	  if (0 == (HMAC_Init_ex((HMAC_CTX *)hmac, key, keyLen,  md, NULL))){
+		  delete(output);
+	  }
 
 	  //Release the allocated memory.
 	  delete output;

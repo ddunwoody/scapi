@@ -55,6 +55,7 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_openSSL_OpenSSLDlogEC
 	  jbyte* a_bytes  = (jbyte*) env->GetByteArrayElements(aBytes, 0); 	  
 	  if(NULL == (a = BN_bin2bn((unsigned char*) a_bytes, env->GetArrayLength(aBytes), NULL))) {
 			env ->ReleaseByteArrayElements(aBytes, (jbyte*) a_bytes, 0);
+			BN_CTX_free(ctx);
 			return 0;
 	  }
 	  env ->ReleaseByteArrayElements(aBytes, (jbyte*) a_bytes, 0);
@@ -62,7 +63,8 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_openSSL_OpenSSLDlogEC
 	  //Create BN b.
 	  jbyte* b_bytes  = (jbyte*) env->GetByteArrayElements(bBytes, 0);
 	  if(NULL == (b = BN_bin2bn((unsigned char*)b_bytes, env->GetArrayLength(bBytes), NULL))) {
-			BN_free(a);
+			BN_CTX_free(ctx);
+		    BN_free(a);
 			env ->ReleaseByteArrayElements(bBytes, (jbyte*) b_bytes, 0);
 			return 0;
 	  }
@@ -71,7 +73,8 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_openSSL_OpenSSLDlogEC
 	  //Create BN p.
 	  jbyte* p_bytes  = (jbyte*) env->GetByteArrayElements(pBytes, 0);
 	  if(NULL == (p = BN_bin2bn((unsigned char*)p_bytes, env->GetArrayLength(pBytes), NULL))) {
-			BN_free(a);
+			BN_CTX_free(ctx);
+		    BN_free(a);
 			BN_free(b);
 			env ->ReleaseByteArrayElements(bBytes, (jbyte*) b_bytes, 0);
 			return 0;
@@ -80,7 +83,8 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_openSSL_OpenSSLDlogEC
 
 	  // Create the curve using a, b, p.
 	  if(NULL == (curve = EC_GROUP_new_curve_GF2m(p, a, b, ctx))) {
-			BN_free(a);
+			BN_CTX_free(ctx);
+		    BN_free(a);
 			BN_free(b);
 			BN_free(p);
 			return 0;
@@ -134,8 +138,6 @@ JNIEXPORT jint JNICALL Java_edu_biu_scapi_primitives_dlog_openSSL_OpenSSLDlogECF
 	  //Release the allocated memory.
 	  BN_free(order);
 	  BN_free(cofactor);
-	  
-	  
 
 	  return 1;
 }

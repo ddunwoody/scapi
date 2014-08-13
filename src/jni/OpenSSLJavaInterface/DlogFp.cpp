@@ -50,28 +50,50 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_openSSL_OpenSSLDlogEC
 	 
 	  //Convert the jbyteArrays to c++ notation.
 	  jbyte* p_bytes  = (jbyte*) env->GetByteArrayElements(pBytes, 0);
+	  if(NULL == (p = BN_bin2bn((unsigned char*)p_bytes, env->GetArrayLength(pBytes), NULL))){
+		  env ->ReleaseByteArrayElements(pBytes, (jbyte*) p_bytes, 0);
+		  return 0;
+	  }
+	  env ->ReleaseByteArrayElements(pBytes, (jbyte*) p_bytes, 0);
+
 	  jbyte* a_bytes  = (jbyte*) env->GetByteArrayElements(aBytes, 0);
+	  if(NULL == (a = BN_bin2bn((unsigned char*) a_bytes, env->GetArrayLength(aBytes), NULL))){
+		  BN_free(p);
+		  env ->ReleaseByteArrayElements(aBytes, (jbyte*) a_bytes, 0);
+		  return 0;
+	  }
+	  env ->ReleaseByteArrayElements(aBytes, (jbyte*) a_bytes, 0);
+
 	  jbyte* b_bytes  = (jbyte*) env->GetByteArrayElements(bBytes, 0);
-	
+	  if(NULL == (b = BN_bin2bn((unsigned char*)b_bytes, env->GetArrayLength(bBytes), NULL))){
+		  BN_free(p);
+		  BN_free(a);
+		  env ->ReleaseByteArrayElements(bBytes, (jbyte*) b_bytes, 0);
+		  return 0;
+	  }
+	  env ->ReleaseByteArrayElements(bBytes, (jbyte*) b_bytes, 0);
 
 	  // Set up the BN_CTX.
-	  if(NULL == (ctx = BN_CTX_new())) return 0;
+	  if(NULL == (ctx = BN_CTX_new())){
+		  BN_free(p);
+		  BN_free(b);
+		  BN_free(a);
+		  return 0;
+	  }
 
-	  // Set the values of the curve parameters.
-	  if(NULL == (a = BN_bin2bn((unsigned char*) a_bytes, env->GetArrayLength(aBytes), NULL))) return 0;
-	  if(NULL == (b = BN_bin2bn((unsigned char*)b_bytes, env->GetArrayLength(bBytes), NULL))) return 0;
-	  if(NULL == (p = BN_bin2bn((unsigned char*)p_bytes, env->GetArrayLength(pBytes), NULL))) return 0;
-	
 	  // Create the curve.
-	  if(NULL == (curve = EC_GROUP_new_curve_GFp(p, a, b, ctx))) return 0;
+	  if(NULL == (curve = EC_GROUP_new_curve_GFp(p, a, b, ctx))){
+		  BN_free(p);
+		  BN_free(b);
+		  BN_free(a);
+		  BN_CTX_free(ctx);
+		  return 0;
 
+	  }
 	  //Release the allocated memory.
 	  BN_free(p);
 	  BN_free(b);
 	  BN_free(a);
-	  env ->ReleaseByteArrayElements(pBytes, (jbyte*) p_bytes, 0);
-	  env ->ReleaseByteArrayElements(aBytes, (jbyte*) a_bytes, 0);
-	  env ->ReleaseByteArrayElements(bBytes, (jbyte*) b_bytes, 0);
 	  
 	  //Create Dlog group with the curve and ctx.
 	  DlogEC* dlog = new DlogEC(curve, ctx);
@@ -92,16 +114,21 @@ JNIEXPORT jint JNICALL Java_edu_biu_scapi_primitives_dlog_openSSL_OpenSSLDlogECF
 	  BIGNUM *order;
 	  jbyte* q_bytes  = (jbyte*) env->GetByteArrayElements(qBytes, 0);
 
-	  if(NULL == (order = BN_bin2bn((unsigned char*)q_bytes, env->GetArrayLength(qBytes), NULL))) return 0;
+	  if(NULL == (order = BN_bin2bn((unsigned char*)q_bytes, env->GetArrayLength(qBytes), NULL))){
+		  env ->ReleaseByteArrayElements(qBytes, (jbyte*) q_bytes, 0);
+		  return 0;
+	  }
+	  env ->ReleaseByteArrayElements(qBytes, (jbyte*) q_bytes, 0);
 
 	  // Set the generator and the order.
-	  if(1 != EC_GROUP_set_generator(((DlogEC*) dlog)->getCurve(), (EC_POINT*) generator, order, NULL))
+	  if(1 != EC_GROUP_set_generator(((DlogEC*) dlog)->getCurve(), (EC_POINT*) generator, order, NULL)){
+		  BN_free(order); 
 		  return 0;
+	  }
 	
 	  //Release the allocated memory.
 	  BN_free(order);
-	  env ->ReleaseByteArrayElements(qBytes, (jbyte*) q_bytes, 0);
-
+	  
 	  return 1;
 }
 
@@ -152,8 +179,17 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_openSSL_OpenSSLDlogEC
 	a = BN_new();
 	b = BN_new();
 	p = BN_new();
-	EC_GROUP_get_curve_GFp(curve, p, a, b, ((DlogEC*) dlog)->getCTX());
-	
+	if (0 == (EC_GROUP_get_curve_GFp(curve, p, a, b, ((DlogEC*) dlog)->getCTX()))){
+		env ->ReleaseByteArrayElements(binaryString, string, 0);
+		BN_free(a);
+		BN_free(b);
+		BN_free(p);
+		BN_free(x);
+		BN_free(y);
+	}
+
+	BN_free(a);
+	BN_free(b);
 	int l = BN_num_bytes(p);
 
 	jbyte* randomArray = new jbyte[l-k-2];
@@ -164,7 +200,15 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_openSSL_OpenSSLDlogEC
 
 	//Create an inverse point and copy the given point to it.
 	EC_POINT *point;
-	if(NULL == (point = EC_POINT_new(curve))) return 0;
+	if(NULL == (point = EC_POINT_new(curve))){
+		env ->ReleaseByteArrayElements(binaryString, string, 0);
+		BN_free(p);
+		BN_free(x);
+		BN_free(y);
+		delete(randomArray);
+		delete(newString);
+		return 0;
+	}
 
 	int counter = 0;
 	bool success = 0;
@@ -178,9 +222,7 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_openSSL_OpenSSLDlogEC
 			int numBytes = BN_num_bytes(x);
 			//If the nmber is negative, make it positive.
 			if(BN_is_bit_set(x, numBytes*8)){	
-				cout<<"x is negative? "<<BN_is_negative(x)<<cout;
 				BN_set_bit(x, numBytes*8);
-				cout<<"x is negative? "<<BN_is_negative(x)<<cout;
 			}
 
 			//Try to create a point aith the generated x value.
