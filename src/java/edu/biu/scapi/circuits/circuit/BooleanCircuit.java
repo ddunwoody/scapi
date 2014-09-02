@@ -198,7 +198,7 @@ public class BooleanCircuit {
      * @param presetInputWires The circuit's input wires whose values have been previously set.
      * @throws NoSuchPartyException if the party number is negative or bigger then the given number of parties.
      */
-	void setInputs(Map<Integer, Wire> presetInputWires,int partyNumber) throws NoSuchPartyException {
+	public void setInputs(Map<Integer, Wire> presetInputWires,int partyNumber) throws NoSuchPartyException {
 		if(partyNumber < 1 || partyNumber > numberOfParties){
 			throw new NoSuchPartyException();
 		}
