@@ -103,7 +103,7 @@ all: $(JNI_TAGRETS) $(JAR_BOUNCYCASTLE) $(JAR_APACHE_COMMONS) compile-scapi
 # then also compile the dynamic lib, and finally install.
 compile-cryptopp:
 	@echo "Compiling the Crypto++ library..."
-	@cp -r lib/CryptoPP/ $(builddir)/CryptoPP/
+	cp -r lib/CryptoPP $(builddir)
 	@$(MAKE) -C $(builddir)/CryptoPP CXX=$(CXX) CXXFLAGS=$(CRYPTOPP_CXXFLAGS)
 	@$(MAKE) -C $(builddir)/CryptoPP CXX=$(CXX) CXXFLAGS=$(CRYPTOPP_CXXFLAGS) dynamic
 	@$(MAKE) -C $(builddir)/CryptoPP CXX=$(CXX) CXXFLAGS=$(CRYPTOPP_CXXFLAGS) PREFIX=$(prefix) install
