@@ -31,6 +31,7 @@
 #include <iostream>
 #include <math.h>
 #include <map>
+#include <string.h> // For memcpy
 #include <time.h> 
 extern "C" {
 #include <miracl.h>
