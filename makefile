@@ -44,6 +44,15 @@ ifeq ($(uname_S),Darwin)
 	OPENSSL_CONFIGURE=./Configure darwin64-x86_64-cc
 	LIBTOOL=glibtool
 	JNI_PATH=DYLD_LIBRARY_PATH
+	OSX_VERSION=$(shell sw_vers -productVersion)
+	ifneq (,$(findstring 10.9,$(OSX_VERSION)))
+		CC=gcc-4.9
+		CXX=g++-4.9
+		AR=gcc-ar-4.9
+		RANLIB=gcc-ranlib-4.9
+		CRYPTOPP_CXXFLAGS="-DNDEBUG -g -O2 -fPIC -DCRYPTOPP_DISABLE_ASM -pipe -Wa,-q"
+		JAVA_INCLUDES=-I$(JAVA_HOME)/include/ -I$(JAVA_HOME)/include/darwin/
+	endif
 endif
 
 # export all variables that are used by child makefiles
@@ -126,25 +135,25 @@ compile-miracl:
 	@touch compile-miracl
 
 compile-miracl-cpp:
-	@$(MAKE) prepare-miracl MIRACL_DIR=MiraclCPP
+	@$(MAKE) prepare-miracl MIRACL_DIR=MiraclCPP CXX=$(CXX)
 	@echo "Compiling the Miracl library (C++)..."
-	@$(MAKE) -C $(builddir)/MiraclCPP MIRACL_TARGET_LANG=cpp
+	@$(MAKE) -C $(builddir)/MiraclCPP MIRACL_TARGET_LANG=cpp CXX=$(CXX)
 	@echo "Installing the Miracl library..."
-	@$(MAKE) -C $(builddir)/MiraclCPP MIRACL_TARGET_LANG=cpp install
+	@$(MAKE) -C $(builddir)/MiraclCPP MIRACL_TARGET_LANG=cpp CXX=$(CXX) install
 	@touch compile-miracl-cpp
 
 compile-otextension: compile-openssl compile-miracl-cpp
 	@echo "Compiling the OtExtension library..."
 	@cp -r lib/OTExtension $(builddir)/OTExtension
-	@$(MAKE) -C $(builddir)/OTExtension
-	@$(MAKE) -C $(builddir)/OTExtension SHARED_LIB_EXT=$(SHARED_LIB_EXT) install
+	@$(MAKE) -C $(builddir)/OTExtension CXX=$(CXX)
+	@$(MAKE) -C $(builddir)/OTExtension CXX=$(CXX) SHARED_LIB_EXT=$(SHARED_LIB_EXT) install
 	@touch compile-otextension
 
 # TODO: add GMP and GF2X
 compile-ntl:
 	@echo "Compiling the NTL library..."
 	@cp -r lib/NTL/unix $(builddir)/NTL
-	@cd $(builddir)/NTL/src/ && ./configure CFLAGS=$(NTL_CFLAGS)
+	@cd $(builddir)/NTL/src/ && ./configure CFLAGS=$(NTL_CFLAGS) CC=$(CC) CXX=$(CXX)
 	@$(MAKE) -C $(builddir)/NTL/src/
 	@$(MAKE) -C $(builddir)/NTL/src/ PREFIX=$(prefix) install
 	@touch compile-ntl
@@ -172,7 +181,7 @@ jni-openssl: $(JNI_OPENSSL)
 # jni real targets
 $(JNI_CRYPTOPP): compile-cryptopp
 	@echo "Compiling the Crypto++ jni interface..."
-	@$(MAKE) -C src/jni/CryptoPPJavaInterface
+	@$(MAKE) -C src/jni/CryptoPPJavaInterface CXX=$(CXX)
 	@cp $@ assets/
 
 $(JNI_MIRACL): compile-miracl
@@ -182,12 +191,12 @@ $(JNI_MIRACL): compile-miracl
 
 $(JNI_OTEXTENSION): compile-otextension
 	@echo "Compiling the OtExtension jni interface..."
-	@$(MAKE) -C src/jni/OtExtensionJavaInterface
+	@$(MAKE) -C src/jni/OtExtensionJavaInterface CXX=$(CXX)
 	@cp $@ assets/
 
 $(JNI_NTL): compile-ntl
 	@echo "Compiling the NTL jni interface..."
-	@$(MAKE) -C src/jni/NTLJavaInterface
+	@$(MAKE) -C src/jni/NTLJavaInterface CXX=$(CXX)
 	@cp $@ assets/
 
 $(JNI_OPENSSL): compile-openssl

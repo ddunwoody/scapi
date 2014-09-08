@@ -18,11 +18,11 @@ endif
 #endif
 
 # compilation options
+CXX=g++
 CC=gcc
 ifeq ($(MIRACL_TARGET_LANG),cpp)
-	CC=g++
+	CC=$(CXX)
 endif
-CXX=g++
 AR=ar
 override CFLAGS=-fPIC -m64 -O2
 override CXXFLAGS=-fPIC -m64 -O2
