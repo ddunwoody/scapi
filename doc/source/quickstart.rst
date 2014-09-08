@@ -10,8 +10,9 @@ Your First Scapi Application
 We begin with a minimal application and go through some basic examples.
 
 .. sourcecode:: java
-    :emphasize-lines: 15
+    :emphasize-lines: 16
     
+    import java.io.IOException;
     import java.math.BigInteger;
     import java.security.SecureRandom;
 
@@ -23,7 +24,7 @@ We begin with a minimal application and go through some basic examples.
 
     public class DlogExample {
 
-        public static void main(String[] args) {
+        public static void main(String[] args) throws IOException {
             // initiate a discrete log group
 	    // (in this case the OpenSSL implementation of the elliptic curve group K-233)
 	    DlogGroup dlog = new OpenSSLDlogECF2m("K-233");
@@ -80,7 +81,7 @@ Our main class defines a discrete log group, and then extract the group properti
 
     public class DlogExample {
 
-        public static void main(String[] args) {
+        public static void main(String[] args) throws IOException {
             // initiate a discrete log group
 	    // (in this case the OpenSSL implementation of the elliptic curve group K-233)
 	    DlogGroup dlog = new OpenSSLDlogECF2m("K-233");
