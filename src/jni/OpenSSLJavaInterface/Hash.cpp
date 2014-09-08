@@ -50,12 +50,15 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_hash_openSSL_OpenSSLHash_c
 	  //Get the OpenSSL digest.
 	  md = EVP_get_digestbyname(name);
 	  if(md == 0) {
+		  env->ReleaseStringUTFChars(hashName, name);
           return 0;
 	  }
+	  env->ReleaseStringUTFChars(hashName, name);
 	
 	  //Create an OpenSSL EVP_MD_CTX struct and initialize it with the created hash.
 	  mdctx = EVP_MD_CTX_create();
-	  EVP_DigestInit(mdctx, md);
+	  if (0 == (EVP_DigestInit(mdctx, md))) return 0;
+	  
 
 	  return (long) mdctx;
 }
@@ -88,6 +91,8 @@ JNIEXPORT void JNICALL Java_edu_biu_scapi_primitives_hash_openSSL_OpenSSLHash_up
 
 	  //Update the hash with the message.
 	  EVP_DigestUpdate((EVP_MD_CTX *) hash, msg, len);
+
+	  env->ReleaseByteArrayElements(message, msg, 0);
 }
 
 /* 

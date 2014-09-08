@@ -14,3 +14,4 @@ scripts/*.sh
 install/*
 .idea/
 *.iml
+*.log

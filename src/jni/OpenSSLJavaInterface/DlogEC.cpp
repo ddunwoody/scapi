@@ -190,12 +190,12 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_openSSL_OpenSSLAdapte
 		  env ->ReleaseByteArrayElements(exponentBytes, (jbyte*) exponent_bytes, 0);
 		  return 0;
 	  }
+	  //Release the allocated memory.
+	  env ->ReleaseByteArrayElements(exponentBytes, (jbyte*) exponent_bytes, 0);
 
 	  //Call the function in the Dlog group that computes the exponentiate with the pre computes values.
 	  EC_POINT *result = ((DlogEC*)dlog)->exponentiateWithPreComputedValues(exponent);
 	  
-	  //Release the allocated memory.
-	  env ->ReleaseByteArrayElements(exponentBytes, (jbyte*) exponent_bytes, 0);
 	  BN_free(exponent);
 	  
 	  return (long) result; //return the result
@@ -257,7 +257,10 @@ EC_POINT* DlogEC::createInfinityPoint(){
 	if(NULL == (point = EC_POINT_new(curveP))) return 0;
 
 	//Set the point to be the infinity.
-	EC_POINT_set_to_infinity(curveP, point);
+	if(0 == (EC_POINT_set_to_infinity(curveP, point))){
+		EC_POINT_free(point);
+		return 0;
+	}
 	
 	return point;
 }

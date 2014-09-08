@@ -42,13 +42,14 @@ using namespace std;
  */
 JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_trapdoorPermutation_openSSL_OpenSSLRSAPermutation_initRSAPublicPrivate
   (JNIEnv *env, jobject, jbyteArray modulus, jbyteArray pubExponent, jbyteArray privExponent){
+	  //Create a RSA object.
+	  RSA* rsa = RSA_new();
+
 	  //Convert the given data into c++ notation.
 	  jbyte* mod  = (jbyte*) env->GetByteArrayElements(modulus, 0);
 	  jbyte* pubExp  = (jbyte*) env->GetByteArrayElements(pubExponent, 0);
 	  jbyte* privExp  = (jbyte*) env->GetByteArrayElements(privExponent, 0);
 
-	  //Create a RSA object.
-	  RSA* rsa = RSA_new();
 	  //Set the given parameters.
 	  rsa->n = BN_bin2bn((unsigned char*)mod, env->GetArrayLength(modulus), NULL);
 	  rsa->e = BN_bin2bn((unsigned char*)pubExp, env->GetArrayLength(pubExponent), NULL);
@@ -58,6 +59,11 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_trapdoorPermutation_openSS
 	  env->ReleaseByteArrayElements(modulus, mod, 0);
 	  env->ReleaseByteArrayElements(pubExponent, pubExp, 0);
 	  env->ReleaseByteArrayElements(privExponent, privExp, 0);
+
+	  if ((rsa->n == NULL) || (rsa->e == NULL) || (rsa->d == NULL)){
+		  RSA_free((RSA *)rsa);
+		  return 0;
+	  }
 
 	  return (long) rsa;
 }
@@ -109,6 +115,11 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_trapdoorPermutation_openSS
 	  env->ReleaseByteArrayElements(primeExponent2, dq, 0);
 	  env->ReleaseByteArrayElements(crt, u, 0);
 
+	  if ((rsa->n == NULL) || (rsa->e == NULL) || (rsa->d == NULL) || (rsa->p == NULL) || (rsa->q == NULL) || (rsa->dmp1 == NULL) || (rsa->dmq1 == NULL) || (rsa->iqmp == NULL)){
+		  RSA_free((RSA *)rsa);
+		  return 0;
+	  }
+
 	  return (long) rsa;
 }
 
@@ -134,6 +145,10 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_trapdoorPermutation_openSS
 	  env->ReleaseByteArrayElements(modulus, mod, 0);
 	  env->ReleaseByteArrayElements(pubExponent, pubExp, 0);
 
+	  if ((rsa->n == NULL) || (rsa->e == NULL)){
+		  RSA_free((RSA *)rsa);
+		  return 0;
+	  }
 	  return (long) rsa;
 }
 

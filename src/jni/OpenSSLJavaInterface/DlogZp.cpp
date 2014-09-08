@@ -47,20 +47,26 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_openSSL_OpenSSLDlogZp
 	  jbyte* pBytes  = (jbyte*) env->GetByteArrayElements(p, 0);
 	  jbyte* qBytes  = (jbyte*) env->GetByteArrayElements(q, 0);
 	  jbyte* generator  = (jbyte*) env->GetByteArrayElements(g, 0);
-	  
-	  //Set the parameters of the group.
+
 	  dh->p = BN_bin2bn((unsigned char*)pBytes, env->GetArrayLength(p), NULL);
 	  dh->q = BN_bin2bn((unsigned char*)qBytes, env->GetArrayLength(q), NULL);
 	  dh->g = BN_bin2bn((unsigned char*)generator, env->GetArrayLength(g), NULL);
 
-	  //Release the allocated memory
 	  env->ReleaseByteArrayElements(p, pBytes, 0);
 	  env->ReleaseByteArrayElements(q, qBytes, 0);
-	  env->ReleaseByteArrayElements(g, generator, 0);
+	  env->ReleaseByteArrayElements(g, generator, 0); 
+
+	  if ((dh->p == NULL) || (dh->q == NULL) ||(dh->g == NULL) ){
+		  DH_free(dh);
+		  return 0;
+	  }
 	  
 	  // Set up the BN_CTX.
 	  BN_CTX *ctx;
-	  if(NULL == (ctx = BN_CTX_new())) return 0;
+	  if(NULL == (ctx = BN_CTX_new())){
+		  DH_free(dh);
+		  return 0;
+	  }
 
 	  //Create a native Dlog object with dh and ctx.
 	  DlogZp* dlog = new DlogZp(dh,  ctx);
@@ -80,7 +86,10 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_openSSL_OpenSSLDlogZp
 
 	  //Set up the BN_CTX.
 	  BN_CTX *ctx;
-	  if(NULL == (ctx = BN_CTX_new())) return 0;
+	  if(NULL == (ctx = BN_CTX_new())){
+		  DH_free(dh);
+		  return 0;
+	  }
 
 	  //Seed the random geneartor.
 #ifdef _WIN32
@@ -91,11 +100,19 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_openSSL_OpenSSLDlogZp
 	  
 	  //Sample a random safe prime with the requested number of bits.
 	  dh->p = BN_new();
-	  int suc = BN_generate_prime_ex(dh->p, numBits, 1, NULL, NULL, NULL);
+	  if(0 == (BN_generate_prime_ex(dh->p, numBits, 1, NULL, NULL, NULL))){
+		  BN_CTX_free(ctx);
+		  DH_free(dh);
+		  return 0;
+	  }
 	  
 	  //Calculates q from p, such that p = 2q + 1.
 	  dh->q = BN_new();
-	  BN_rshift1(dh->q,dh->p);
+	  if(0 == (BN_rshift1(dh->q,dh->p))){
+		  BN_CTX_free(ctx);
+		  DH_free(dh);
+		  return 0;
+	  }
 	  
 	  //Sample a generator to the group. 
 	  //Each element in the group, except the identity, is a generator. 
@@ -206,16 +223,23 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_openSSL_OpenSSLDlogZp
 	  
 	  //Convert the exponent into a BIGNUM object.
 	  BIGNUM* expBN;
-	  if(NULL == (expBN = BN_bin2bn((unsigned char*)exponent_bytes, env->GetArrayLength(exponent), NULL))) return 0;
-	  
+	  if(NULL == (expBN = BN_bin2bn((unsigned char*)exponent_bytes, env->GetArrayLength(exponent), NULL))){
+		  env ->ReleaseByteArrayElements(exponent, (jbyte*) exponent_bytes, 0);
+		  return 0;
+	  }
+	  env ->ReleaseByteArrayElements(exponent, (jbyte*) exponent_bytes, 0);
+
 	  //Prepare a result element.
 	  BIGNUM* result = BN_new();
 	  //Raise the given element and put the result in result.
-	  BN_mod_exp(result, (BIGNUM *) base, expBN, dh->p, ((DlogZp*) dlog) -> getCTX());
+	  if(0 == (BN_mod_exp(result, (BIGNUM *) base, expBN, dh->p, ((DlogZp*) dlog) -> getCTX()))){
+		  BN_free(expBN);
+		  return 0;
+	  }
 
 	  //Release the allocated memory.
 	  BN_free(expBN);
-	  env ->ReleaseByteArrayElements(exponent, (jbyte*) exponent_bytes, 0);
+	  
 
 	  return (long) result;
 }
@@ -234,7 +258,8 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_openSSL_OpenSSLDlogZp
 	  //Prepare a result element.
 	  BIGNUM* result = BN_new();
 	  //Multiply the elements.
-	  BN_mod_mul(result, (BIGNUM*) element1, (BIGNUM*) element2, dh->p, ((DlogZp*) dlog) -> getCTX());
+	  if(0 == (BN_mod_mul(result, (BIGNUM*) element1, (BIGNUM*) element2, dh->p, ((DlogZp*) dlog) -> getCTX()))) return 0;
+	  
 
 	  return (long) result;
 }

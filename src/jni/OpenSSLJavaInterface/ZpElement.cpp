@@ -43,7 +43,10 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_primitives_dlog_openSSL_OpenSSLZpSafe
 
 	  //Create a new BIGNUM with the given bytes.
 	  BIGNUM *elBN;
-	  if(NULL == (elBN = BN_bin2bn((unsigned char*) el, env->GetArrayLength(element), NULL))) return 0;
+	  if(NULL == (elBN = BN_bin2bn((unsigned char*) el, env->GetArrayLength(element), NULL))) {
+		  env ->ReleaseByteArrayElements(element, el, 0);
+		  return 0;
+	  }
 
 	  //Release the allocated memory.
 	  env ->ReleaseByteArrayElements(element, el, 0);

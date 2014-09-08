@@ -56,6 +56,11 @@ JNIEXPORT jlong JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_digitalSign
 	  env->ReleaseByteArrayElements(qBytes, q, 0);
 	  env->ReleaseByteArrayElements(gBytes, g, 0);
 
+	   if (dsa->p == NULL ||  dsa->q == NULL ||  dsa->g == NULL){
+		  DSA_free((DSA*) dsa);
+		  return 0;
+	  }
+
 	  return (long) dsa;
 }
 
@@ -170,7 +175,9 @@ JNIEXPORT jboolean JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_digitalS
 JNIEXPORT jobjectArray JNICALL Java_edu_biu_scapi_midLayer_asymmetricCrypto_digitalSignature_OpenSSLDSA_generateKey
   (JNIEnv *env, jobject, jlong dsa){
 	 //Generate DSA keys. The keys are stored in the DSA structure.
-	 DSA_generate_key((DSA*) dsa);
+	 if (0 == (DSA_generate_key((DSA*) dsa))){
+		 return 0;
+	 }
 	  
 	 //Build a jObjectArray to hold the keys data.
 	 jclass byteClass = env->FindClass("[B");

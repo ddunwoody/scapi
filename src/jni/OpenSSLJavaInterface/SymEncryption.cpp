@@ -80,7 +80,11 @@ JNIEXPORT jbyteArray JNICALL Java_edu_biu_scapi_midLayer_symmetricCrypto_encrypt
 	  jbyte* iv  = (jbyte*) env->GetByteArrayElements(ivBytes, 0);
 	  
 	  //Initialize the encryption objects with the key.
-	  EVP_EncryptInit ((EVP_CIPHER_CTX *)enc, NULL, NULL, (unsigned char*) iv);
+	  if (0 == (EVP_EncryptInit ((EVP_CIPHER_CTX *)enc, NULL, NULL, (unsigned char*) iv))){
+		  env->ReleaseByteArrayElements(plaintextBytes, plaintext, 0);
+		  env->ReleaseByteArrayElements(ivBytes, iv, 0);
+		  return 0;
+	  }
 	  
 	  int blockSize = EVP_CIPHER_CTX_block_size((EVP_CIPHER_CTX *)enc);
 	  int plaintextSize = env->GetArrayLength(plaintextBytes);  
@@ -93,8 +97,18 @@ JNIEXPORT jbyteArray JNICALL Java_edu_biu_scapi_midLayer_symmetricCrypto_encrypt
 	  int size, rem;
 	  
 	  //Encrypt the plaintext.
-	  EVP_EncryptUpdate ((EVP_CIPHER_CTX*)enc, out, &size, (unsigned char*)plaintext, plaintextSize);
-	  EVP_EncryptFinal_ex((EVP_CIPHER_CTX*)enc, out+size, &rem);
+	  if (0 == (EVP_EncryptUpdate ((EVP_CIPHER_CTX*)enc, out, &size, (unsigned char*)plaintext, plaintextSize))){
+		  env->ReleaseByteArrayElements(plaintextBytes, plaintext, 0);
+		  env->ReleaseByteArrayElements(ivBytes, iv, 0);
+		  delete (out);
+		  return 0;
+	  }
+	  if(0 == EVP_EncryptFinal_ex((EVP_CIPHER_CTX*)enc, out+size, &rem)){
+		  env->ReleaseByteArrayElements(plaintextBytes, plaintext, 0);
+		  env->ReleaseByteArrayElements(ivBytes, iv, 0);
+		  delete (out);
+		  return 0;
+	  }
 		 
 	  //Create a jbyteArray that contains the encrypted data.
 	  jbyteArray result = env ->NewByteArray(size+rem);
@@ -121,7 +135,11 @@ JNIEXPORT jbyteArray JNICALL Java_edu_biu_scapi_midLayer_symmetricCrypto_encrypt
 	  jbyte* iv  = (jbyte*) env->GetByteArrayElements(ivBytes, 0);
 	  
 	   //Initialize the encryption object with the key.
-	  EVP_DecryptInit ((EVP_CIPHER_CTX *)dec, NULL, NULL, (unsigned char*) iv);
+	  if (0 == EVP_DecryptInit ((EVP_CIPHER_CTX *)dec, NULL, NULL, (unsigned char*) iv)){
+		  env->ReleaseByteArrayElements(cipherBytes, cipher, 0);
+		  env->ReleaseByteArrayElements(ivBytes, iv, 0);
+		  return 0;
+	  }
 	  
 	  int cipherSize = env->GetArrayLength(cipherBytes);  
 	  //Allocate a new byte array of size cipherSize.
@@ -130,8 +148,18 @@ JNIEXPORT jbyteArray JNICALL Java_edu_biu_scapi_midLayer_symmetricCrypto_encrypt
 	  int size, rem;
 	  
 	  //Decrypt the ciphertext.
-	  EVP_DecryptUpdate ((EVP_CIPHER_CTX*)dec, out, &size, (unsigned char*)cipher, cipherSize);
-	  EVP_DecryptFinal_ex((EVP_CIPHER_CTX*)dec, out+size, &rem);
+	  if (0 == (EVP_DecryptUpdate ((EVP_CIPHER_CTX*)dec, out, &size, (unsigned char*)cipher, cipherSize))){
+		  env->ReleaseByteArrayElements(cipherBytes, cipher, 0);
+		  env->ReleaseByteArrayElements(ivBytes, iv, 0);
+		  delete(out);
+		  return 0;
+	  }
+	  if (0 == (EVP_DecryptFinal_ex((EVP_CIPHER_CTX*)dec, out+size, &rem))){
+		  env->ReleaseByteArrayElements(cipherBytes, cipher, 0);
+		  env->ReleaseByteArrayElements(ivBytes, iv, 0);
+		  delete(out);
+		  return 0;
+	  }
 		 
 	  //Create a jbyteArray that contains the decrypted data.
 	  jbyteArray result = env ->NewByteArray(size+rem);
