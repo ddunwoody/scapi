@@ -91,3 +91,5 @@ On Eclipse:
 .. _java: http://java.com/
 .. _ant: http://ant.apache.org/
 .. _gcc: http://gcc.gnu.org/
+.. _clang: http://clang.llvm.org/
+.. _homebrew: http://brew.sh/
