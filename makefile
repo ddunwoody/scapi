@@ -213,7 +213,9 @@ $(JAR_SCAPI): $(JAR_BOUNCYCASTLE) $(JAR_APACHE_COMMONS)
 scripts/scapi.sh: scripts/scapi.sh.tmpl
 	sed -e "s;%SCAPIDIR%;$(INSTALL_DIR);g" -e "s;%APACHECOMMONS%;$(BASENAME_APACHE_COMMONS);g" \
 	-e "s;%SCAPI%;$(BASENAME_SCAPI);g" -e "s;%BOUNCYCASTLE%;$(BASENAME_BOUNCYCASTLE);g" \
-	-e "s;%JNIPATH%;$(JNI_PATH);g" $< > $@
+	-e "s;%JNIPATH%;$(JNI_PATH);g" \
+	-e "s;%PREFIX%;$(prefix);g" \
+	$< > $@
 
 scripts/scapic.sh: scripts/scapic.sh.tmpl
 	sed -e "s;%SCAPIDIR%;$(INSTALL_DIR);g" -e "s;%APACHECOMMONS%;$(BASENAME_APACHE_COMMONS);g" \

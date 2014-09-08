@@ -1,3 +1,3 @@
 #!/bin/sh
-export %JNIPATH%=%SCAPIDIR%
+export %JNIPATH%=%SCAPIDIR%:%PREFIX%/ssl/lib
 java -classpath %SCAPIDIR%/%APACHECOMMONS%:%SCAPIDIR%/%SCAPI%:%SCAPIDIR%/%BOUNCYCASTLE%:. $1
