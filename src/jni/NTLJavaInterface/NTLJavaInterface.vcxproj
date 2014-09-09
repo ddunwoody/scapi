@@ -64,8 +64,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <LibraryPath>C:\development\SDK\Code\C++Src\JniNtl\NTLJavaInterface;C:\Documents and Settings\LabTest\My Documents\Visual Studio 2010\Projects\gf2x\Debug;C:\Documents and Settings\LabTest\My Documents\Visual Studio 2010\Projects\ntl\Debug;$(LibraryPath)</LibraryPath>
-    <IncludePath>C:\Program Files %28x86%29\IBM\SDP\jdk\include;C:\Users\user\Downloads\WinNTL-5_5_2\WinNTL-5_5_2\include;C:\Documents and Settings\LabTest\My Documents\Visual Studio 2010\Projects\WinNTL-5_5_2\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\development\SDK\Code\C++Src\JniNtl\NTLLib\win32;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Program Files %28x86%29\IBM\SDP\jdk\include;C:\development\SDK\Code\ExternalLibraries\Ntl\WinNTL-5_5_2\include;C:\development\SDK\Code\ExternalLibraries\Ntl\gf2x-1.0\gf2x;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -74,15 +74,15 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <LibraryPath>C:\work\LAST_Project\SDK\Code\C++Src\JniNtl;$(LibraryPath)</LibraryPath>
-    <IncludePath>C:\work\LAST_Project\SDK\Code\ExternalLibraries\WinNTL-5_5_2\include;C:\Program Files\IBM\SDP\jdk\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\development\SDK\Code\C++Src\JniNtl\NTLLib\win32;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\development\SDK\Code\ExternalLibraries\Ntl\WinNTL-5_5_2\include;C:\development\SDK\Code\ExternalLibraries\Ntl\gf2x-1.0\gf2x;C:\Program Files\Java\jdk1.6.0_45\include;C:\Program Files\Java\jdk1.6.0_45\include\win32;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)$(Configuration)$(Platform)\</OutDir>
     <IntDir>$(Configuration)$(Platform)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <LibraryPath>C:\work\LAST_Project\SDK\Code\C++Src\JniNtl;$(LibraryPath)</LibraryPath>
-    <IncludePath>C:\work\LAST_Project\SDK\Code\ExternalLibraries\WinNTL-5_5_2\include;C:\Program Files\IBM\SDP\jdk\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\development\SDK\Code\C++Src\JniNtl\NTLLib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Program Files\Java\jdk1.6.0_45\include;C:\Program Files\Java\jdk1.6.0_45\include\win32;C:\development\SDK\Code\ExternalLibraries\Ntl\gf2x-1.0\gf2x;C:\development\SDK\Code\ExternalLibraries\Ntl\WinNTL-5_5_2\include;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)$(Configuration)$(Platform)\</OutDir>
     <IntDir>$(Configuration)$(Platform)\</IntDir>
   </PropertyGroup>
@@ -96,6 +96,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>ntl.lib;gf2x.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -118,6 +119,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;NTLJAVAINTERFACE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -140,6 +142,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>ntl.lib;gf2x.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -148,6 +151,7 @@
   <ItemGroup>
     <ClInclude Include="EvaluationHashFunction.h" />
     <ClInclude Include="JniEvaluationHashFunction.h" />
+    <ClInclude Include="SigmaProtocolOR.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
@@ -169,6 +173,7 @@
     <ClCompile Include="EvaluationHashFunction.cpp" />
     <ClCompile Include="JniEvaluationHashFunction.cpp" />
     <ClCompile Include="NTLJavaInterface.cpp" />
+    <ClCompile Include="SigmaProtocolOR.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
