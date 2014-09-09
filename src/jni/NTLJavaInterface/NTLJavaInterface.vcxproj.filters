@@ -30,6 +30,9 @@
     <ClInclude Include="JniEvaluationHashFunction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SigmaProtocolOR.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -45,6 +48,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="JniEvaluationHashFunction.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SigmaProtocolOR.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -390,6 +390,19 @@ JNIEXPORT jbyteArray JNICALL Java_edu_biu_scapi_interactiveMidProtocols_sigmaPro
 	return elArr;
 }
 
+JNIEXPORT void JNICALL Java_edu_biu_scapi_interactiveMidProtocols_sigmaProtocol_orMultiple_SigmaORMultipleVerifierComputation_setChallenge
+  (JNIEnv *env, jobject, jlongArray pointerToChallenge, jbyteArray challenge){
+	  //sample random field element.	
+	GF2E* element = new GF2E;
+	*element = convertBytesToGF2E(env, challenge); 
+	
+	//set the pointer in the argument.
+	jlong* pointer = env->GetLongArrayElements(pointerToChallenge, 0);
+	pointer[0] = (jlong)element;
+	// release the array
+	env->ReleaseLongArrayElements(pointerToChallenge, pointer, 0);
+}
+
 /* function checkPolynomialValidity : Check if the degree pf the polynom is n-k, if Q(i)=ei for all i=1,…,n and if Q(0)=e.
  * param polynomial					: array of the polynom coefficients
  * param k							: number of true statments. the degree of the polynom should be n-k
