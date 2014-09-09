@@ -72,7 +72,9 @@ public class SigmaORMultipleVerifierComputation implements SigmaVerifierComputat
 	
 	//Checks if Q is of degree n-k AND Q(i)=ei for all i=1,…,n AND Q(0)=e. This function also deletes the allocated memory.
 	private native boolean checkPolynomialValidity(byte[][] polynomial, int k, long challengePointer, byte[][] challenges);
-
+	
+	//Sets the given challenge in the field.
+	private native void setChallenge(long [] pointer, byte[] challenge);
 	
 	/**
 	 * Constructor that gets the underlying verifiers.
@@ -175,7 +177,12 @@ public class SigmaORMultipleVerifierComputation implements SigmaVerifierComputat
 	 * @param challenge
 	 */
 	public void setChallenge(byte[] challenge){
-		e = challenge;
+		e = alignToT(challenge);
+		//Call the native function to sample a field element.
+		long[] pointer = new long[2];
+		//The pointer to the sampled challenge will be in the first cell of the array. We send array from technical reasons.
+		setChallenge(pointer, challenge);
+		challengePointer = pointer[0];
 	}
 	
 	/**
