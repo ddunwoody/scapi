@@ -71,6 +71,15 @@ JNIEXPORT void JNICALL Java_edu_biu_scapi_interactiveMidProtocols_sigmaProtocol_
 JNIEXPORT jbyteArray JNICALL Java_edu_biu_scapi_interactiveMidProtocols_sigmaProtocol_orMultiple_SigmaORMultipleVerifierComputation_sampleChallenge
   (JNIEnv *, jobject, jlongArray);
 
+
+/*
+ * Class:     edu_biu_scapi_interactiveMidProtocols_sigmaProtocol_orMultiple_SigmaORMultipleVerifierComputation
+ * Method:    setChallenge
+ * Signature: ([J[B)V
+ */
+JNIEXPORT void JNICALL Java_edu_biu_scapi_interactiveMidProtocols_sigmaProtocol_orMultiple_SigmaORMultipleVerifierComputation_setChallenge
+  (JNIEnv *, jobject, jlongArray, jbyteArray);
+
 /*
  * Class:     edu_biu_scapi_interactiveMidProtocols_SigmaProtocol_orMultiple_SigmaORMultipleVerifier
  * Method:    checkPolynomialValidity
