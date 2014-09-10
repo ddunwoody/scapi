@@ -36,7 +36,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import edu.biu.scapi.circuits.circuit.BooleanCircuit;
 import edu.biu.scapi.circuits.circuit.Gate;
-import edu.biu.scapi.circuits.encryption.HashingMultiKeyEncryption;
+import edu.biu.scapi.circuits.encryption.AESFixedKeyMultiKeyEncryption;
 import edu.biu.scapi.circuits.encryption.MultiKeyEncryptionScheme;
 import edu.biu.scapi.exceptions.NoSuchPartyException;
 import edu.biu.scapi.exceptions.PlaintextTooLongException;
@@ -73,13 +73,16 @@ class FreeXORGarbledBooleanCircuitUtil implements CircuitTypeUtil {
 	 */
 	FreeXORGarbledBooleanCircuitUtil(MultiKeyEncryptionScheme mes){
 		this.mes = mes;
+		if (mes instanceof AESFixedKeyMultiKeyEncryption){
+			((AESFixedKeyMultiKeyEncryption) mes).setFreeXor(true);
+		}
 	}
 	
 	/**
-	 * Default constructor. Uses HashingMultiKeyEncryption object.
+	 * Default constructor. Uses AESFixedKeyMultiKeyEncryption object.
 	 */
 	FreeXORGarbledBooleanCircuitUtil(){
-		this(new HashingMultiKeyEncryption());
+		this(new AESFixedKeyMultiKeyEncryption());
 	}
 	
 	@Override
