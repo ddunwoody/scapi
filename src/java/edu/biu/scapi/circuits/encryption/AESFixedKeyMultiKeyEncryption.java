@@ -73,8 +73,10 @@ public class AESFixedKeyMultiKeyEncryption implements MultiKeyEncryptionScheme {
 	
 	//{@code boolean} flag that is {@code true} of the tweak has been set, {@code false} otherwise
 	private boolean isTweakSet = false;
-	
-	//In case of free xor the encryption and decryption is a bit different. This flag indicates which algorithm to use.
+
+	//The regular implementation of encrypt and decrypt are insecure in case of free xor circuit since the delta is revealed.
+	//To avoid that, the input to the aes function should be different. 
+	//This flag indicates which algorithm to use.
 	private boolean isFreeXor = false; 
 
 	public AESFixedKeyMultiKeyEncryption() {
@@ -118,14 +120,16 @@ public class AESFixedKeyMultiKeyEncryption implements MultiKeyEncryptionScheme {
 		SecretKey[] keys = key.getKeys();
 		byte[] inBytes;
 		if (isFreeXor){
-			inBytes = shiftRight(keys[0].getEncoded());
+			//In case of free xor circuit, we multiply k0 by two. This is done by shifting k0 bits to the left.
+			inBytes = shiftLeft(keys[0].getEncoded());
 		} else {
 			inBytes = keys[0].getEncoded();
 		}
 		for (int i = 1; i < keys.length; i++) {
 			byte[] currKeyBytes;
 			if (isFreeXor){	
-				currKeyBytes = shiftLeft(keys[i].getEncoded());
+				//In case of free xor circuit, we divide k1 by two. This is done by shifting k0 bits to the right.
+				currKeyBytes = shiftRight(keys[i].getEncoded());
 			} else {
 				currKeyBytes = keys[i].getEncoded();
 			}
@@ -168,14 +172,14 @@ public class AESFixedKeyMultiKeyEncryption implements MultiKeyEncryptionScheme {
 		SecretKey[] keys = key.getKeys();
 		byte[] inBytes;
 		if (isFreeXor){
-			inBytes = shiftRight(keys[0].getEncoded());
+			inBytes = shiftLeft(keys[0].getEncoded());
 		} else {
 			inBytes = keys[0].getEncoded();
 		}
 		for (int i = 1; i < keys.length; i++) {
 			byte[] currKeyBytes;
 			if (isFreeXor){	
-				currKeyBytes = shiftLeft(keys[i].getEncoded());
+				currKeyBytes = shiftRight(keys[i].getEncoded());
 			} else {
 				currKeyBytes = keys[i].getEncoded();
 			}
@@ -202,6 +206,11 @@ public class AESFixedKeyMultiKeyEncryption implements MultiKeyEncryptionScheme {
 		return outBytes;
 	}
 
+	/**
+	 * Shifts the bits of the given array to the right.
+	 * @param bytes to shift right.
+	 * @return an array containing the given bytes shifted right.
+	 */
 	private byte[] shiftRight(byte[] bytes){
 		
 		ByteBuffer temp = ByteBuffer.wrap(bytes);
@@ -214,6 +223,11 @@ public class AESFixedKeyMultiKeyEncryption implements MultiKeyEncryptionScheme {
 		return temp.array();
 	}
 	
+	/**
+	 * Shifts the bits of the given array to the left.
+	 * @param bytes to shift left.
+	 * @return an array containing the given bytes shifted left.
+	 */
 	private byte[] shiftLeft(byte[] bytes){
 		ByteBuffer temp = ByteBuffer.wrap(bytes);
 		LongBuffer longBuf = temp.asLongBuffer();
