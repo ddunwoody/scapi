@@ -24,6 +24,8 @@
 */
 package edu.biu.scapi.circuits.encryption;
 
+import java.nio.ByteBuffer;
+import java.nio.LongBuffer;
 import java.security.InvalidKeyException;
 
 import javax.crypto.IllegalBlockSizeException;
@@ -72,6 +74,11 @@ public class AESFixedKeyMultiKeyEncryption implements MultiKeyEncryptionScheme {
 	//{@code boolean} flag that is {@code true} of the tweak has been set, {@code false} otherwise
 	private boolean isTweakSet = false;
 
+	//The regular implementation of encrypt and decrypt are insecure in case of free xor circuit since the delta is revealed.
+	//To avoid that, the input to the aes function should be different. 
+	//This flag indicates which algorithm to use.
+	private boolean isFreeXor = false; 
+
 	public AESFixedKeyMultiKeyEncryption() {
 		aes = new CryptoPpAES();
 		try {
@@ -97,6 +104,10 @@ public class AESFixedKeyMultiKeyEncryption implements MultiKeyEncryptionScheme {
 		isKeySet = true;
 	}
 
+	public void setFreeXor(boolean isFreeXor){
+		this.isFreeXor = isFreeXor;
+	}
+	
 	@Override
 	public byte[] encrypt(byte[] plaintext) throws KeyNotSetException, TweakNotSetException, IllegalBlockSizeException {
 		if (!isKeySet) {
@@ -107,9 +118,22 @@ public class AESFixedKeyMultiKeyEncryption implements MultiKeyEncryptionScheme {
 		}
 		// XOR all of the keys to each other.
 		SecretKey[] keys = key.getKeys();
-		byte[] inBytes = keys[0].getEncoded();
+		byte[] inBytes;
+		if (isFreeXor){
+			//In case of free xor circuit, we multiply k0 by two. This is done by shifting k0 bits to the left.
+			inBytes = shiftLeft(keys[0].getEncoded());
+		} else {
+			inBytes = keys[0].getEncoded();
+		}
 		for (int i = 1; i < keys.length; i++) {
-			byte[] currKeyBytes = keys[i].getEncoded();
+			byte[] currKeyBytes;
+			if (isFreeXor){	
+				//In case of free xor circuit, we divide k1 by two. This is done by shifting k0 bits to the right.
+				currKeyBytes = shiftRight(keys[i].getEncoded());
+			} else {
+				currKeyBytes = keys[i].getEncoded();
+			}
+			
 			for (int byteNumber = 0; byteNumber < inBytes.length; byteNumber++) {
 				inBytes[byteNumber] ^= currKeyBytes[byteNumber];
 			}
@@ -146,9 +170,19 @@ public class AESFixedKeyMultiKeyEncryption implements MultiKeyEncryptionScheme {
 			throw new TweakNotSetException();
 		}
 		SecretKey[] keys = key.getKeys();
-		byte[] inBytes = keys[0].getEncoded();
+		byte[] inBytes;
+		if (isFreeXor){
+			inBytes = shiftLeft(keys[0].getEncoded());
+		} else {
+			inBytes = keys[0].getEncoded();
+		}
 		for (int i = 1; i < keys.length; i++) {
-			byte[] currKeyBytes = keys[i].getEncoded();
+			byte[] currKeyBytes;
+			if (isFreeXor){	
+				currKeyBytes = shiftRight(keys[i].getEncoded());
+			} else {
+				currKeyBytes = keys[i].getEncoded();
+			}
 			for (int byteNumber = 0; byteNumber < inBytes.length; byteNumber++) {
 				inBytes[byteNumber] ^= currKeyBytes[byteNumber];
 			}
@@ -172,6 +206,39 @@ public class AESFixedKeyMultiKeyEncryption implements MultiKeyEncryptionScheme {
 		return outBytes;
 	}
 
+	/**
+	 * Shifts the bits of the given array to the right.
+	 * @param bytes to shift right.
+	 * @return an array containing the given bytes shifted right.
+	 */
+	private byte[] shiftRight(byte[] bytes){
+		
+		ByteBuffer temp = ByteBuffer.wrap(bytes);
+		LongBuffer longBuf = temp.asLongBuffer();
+		int size = longBuf.capacity();
+		for (int i=0; i<size; i++){
+			longBuf.put(i, longBuf.get(i) >> 1);
+		}
+		temp.asLongBuffer().put(longBuf);
+		return temp.array();
+	}
+	
+	/**
+	 * Shifts the bits of the given array to the left.
+	 * @param bytes to shift left.
+	 * @return an array containing the given bytes shifted left.
+	 */
+	private byte[] shiftLeft(byte[] bytes){
+		ByteBuffer temp = ByteBuffer.wrap(bytes);
+		LongBuffer longBuf = temp.asLongBuffer();
+		int size = longBuf.capacity();
+		for (int i=0; i<size; i++){
+			longBuf.put(i, longBuf.get(i) << 1);
+		}
+		temp.asLongBuffer().put(longBuf);
+		return temp.array();
+	}
+	
 	@Override
 	public boolean isKeySet() {
 		return isKeySet;

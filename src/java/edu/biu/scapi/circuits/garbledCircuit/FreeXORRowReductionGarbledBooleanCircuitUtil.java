@@ -32,7 +32,9 @@ import javax.crypto.spec.SecretKeySpec;
 
 import edu.biu.scapi.circuits.circuit.Gate;
 import edu.biu.scapi.circuits.encryption.MultiKeyEncryptionScheme;
+import edu.biu.scapi.exceptions.FactoriesException;
 import edu.biu.scapi.primitives.kdf.KeyDerivationFunction;
+import edu.biu.scapi.primitives.kdf.bc.BcKdfISO18033;
 
 /**
  * The {FreeXORRowReductionGarbledBooleanCircuit} class is a utility class that computes the functionalities regarding Free XOR Garbled Boolean Circuit 
@@ -53,6 +55,18 @@ class FreeXORRowReductionGarbledBooleanCircuitUtil extends FreeXORGarbledBoolean
 	FreeXORRowReductionGarbledBooleanCircuitUtil(MultiKeyEncryptionScheme mes, KeyDerivationFunction kdf) {
 		super(mes);
 		this.kdf = kdf;
+	}
+	
+	/**
+	 * Default constructor. Uses AESFixedKeyMultiKeyEncryption object and .
+	 */
+	FreeXORRowReductionGarbledBooleanCircuitUtil() {
+		super();
+		try {
+			this.kdf = new BcKdfISO18033("SHA-224");
+		} catch (FactoriesException e) {
+			// Should not occur since the hash name is valid.
+		}
 	}
 	
 	@Override
