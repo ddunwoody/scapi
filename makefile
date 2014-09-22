@@ -96,7 +96,7 @@ JAR_SCAPI:=$(builddir)/scapi/$(BASENAME_SCAPI)
 NTL_CFLAGS="-fPIC -O2"
 
 # scapi install dir
-INSTALL_DIR=$(prefix)/scapi
+INSTALL_DIR=$(libdir)/scapi
 
 # scripts
 SCRIPTS:=scripts/scapi.sh scripts/scapic.sh
@@ -233,9 +233,9 @@ install: all clean-scripts compile-scripts
 	install -d $(INSTALL_DIR)
 	install -m 0644 assets/*$(JNI_LIB_EXT) $(INSTALL_DIR)
 	install -m 0644 assets/*.jar $(INSTALL_DIR)
-	install -d $(prefix)/bin
-	install -m 0755 scripts/scapi.sh $(prefix)/bin/scapi
-	install -m 0755 scripts/scapic.sh $(prefix)/bin/scapic
+	install -d $(bindir)
+	install -m 0755 scripts/scapi.sh $(bindir)/scapi
+	install -m 0755 scripts/scapic.sh $(bindir)/scapic
 	@echo "Done."
 
 # clean targets

@@ -50,7 +50,7 @@ In order to install scapi: ::
   $ git submodule init
   $ git submodule update
   $ make
-  $ sudo make install prefix=/usr/lib
+  $ sudo make install prefix=/usr
 
 .. _Windows:
 
