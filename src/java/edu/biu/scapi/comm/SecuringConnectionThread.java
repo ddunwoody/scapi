@@ -35,8 +35,8 @@
  * In order for two parties to be able to connect to each other, one needs to be listening for connections and the other needs to connect to it. 
  * In our case it is not relevant which party connects to which, since all parties are equal (this is not a server-client setup). 
  * We devised a simple algorithm to decide the order of the connections:
- * 	• Each party connects to other parties with higher ID number and *
- *  • Listens to parties with lower ID number than its own. *
+ * 	ï¿½ Each party connects to other parties with higher ID number and *
+ *  ï¿½ Listens to parties with lower ID number than its own. *
  * The comparison will be performed based on the string representation of the InetSocketAddress object obtained from the IP and port of the party.
  * If a party needs to listen for connections, we call it a DOWN connection. 
  * If it needs to connect to a higher up party, we call it an UP connection. 
@@ -70,7 +70,8 @@ class SecuringConnectionThread extends Thread{
 	 */
 	SecuringConnectionThread(PlainChannel channel, InetAddress IP, int port,
 			boolean doConnect, KeyExchangeProtocol keyExchangeProtocol, KeyExchangeOutput keyExchangeOutput) {
-		
+
+		setName("SecuringConnection-" + getName());
 		this.doConnect = doConnect;
 		this.channel = channel;
 		this.ipAddres = IP;
@@ -106,8 +107,7 @@ class SecuringConnectionThread extends Thread{
 				channel.setState(PlainChannel.State.CONNECTING);
 				
 				Logging.getLogger().log(Level.INFO, "state: connecting " + channel.toString());
-				System.out.println("state: connecting");
-				
+
 				try {
 					//try to connect
 					channel.connect();

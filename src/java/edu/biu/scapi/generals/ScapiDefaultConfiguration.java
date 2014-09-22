@@ -27,6 +27,7 @@ package edu.biu.scapi.generals;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import java.util.logging.Level;
 
 /**
  * This class manage SCAPI's default values. The default values are read from a configuration file. 
@@ -49,7 +50,7 @@ public class ScapiDefaultConfiguration {
 		try {
 			ecProperties.load(in);
 		} catch (IOException e) {
-			System.err.println("A problem was found when trying to open SCAPIDefaultConfig.properties file: " + e.getMessage());
+			Logging.getLogger().log(Level.SEVERE, "A problem was found when trying to open SCAPIDefaultConfig.properties file: " + e.getMessage());
 		}	
 	}
 

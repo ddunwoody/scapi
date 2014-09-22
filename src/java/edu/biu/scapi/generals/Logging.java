@@ -47,38 +47,16 @@ import java.util.logging.SimpleFormatter;
  *
  */
 public class Logging {
-	
-	static Logger logger = Logger.getLogger("Log");
-    static FileHandler fh;
-	
-	static{
-		 try {
-				fh = new FileHandler("LogFile.log", true);
-			} catch (SecurityException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			//we use the simple format
-			SimpleFormatter formatter = new SimpleFormatter();
-		    fh.setFormatter(formatter);
-			logger.addHandler(fh);
-			
-			//by default we write all the logging levels
-			logger.setLevel(Level.ALL);
-		    
-	}
-	
+
+    private static final Logger LOGGER = Logger.getLogger("SCAPI");
+
 	/**
 	 * Sets the logging level.
 	 * @param level the required level of logging
 	 */
 	public static void setLoggingLevel(Level level){
-		
-		logger.setLevel(level);
+
+        LOGGER.setLevel(level);
 	}
 	
 	/**
@@ -87,7 +65,7 @@ public class Logging {
 	 */
 	public static Logger getLogger(){
 		
-		return logger;
+		return LOGGER;
 	}
 	
 

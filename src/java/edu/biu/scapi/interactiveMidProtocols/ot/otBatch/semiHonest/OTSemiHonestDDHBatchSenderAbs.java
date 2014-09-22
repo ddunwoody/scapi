@@ -29,7 +29,9 @@ import java.io.Serializable;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.logging.Level;
 
+import edu.biu.scapi.generals.Logging;
 import org.bouncycastle.util.BigIntegers;
 
 import edu.biu.scapi.comm.Channel;
@@ -64,14 +66,14 @@ abstract class OTSemiHonestDDHBatchSenderAbs implements OTBatchSender{
 		 	WAIT for message (h0i,h1i) from R
 			SAMPLE a single random value r <-  {0, . . . , q-1} and COMPUTE u=g^r
 			For every i=1,...,m, COMPUTE:
-			•	ki0 = (hi0)^r
-			•	ki1 = (hi1)^r
+			ï¿½	ki0 = (hi0)^r
+			ï¿½	ki1 = (hi1)^r
 			In the byte array scenario:
-			•	vi0 = xi0 XOR KDF(|xi0|,ki0)
-			•	vi1 = xi1 XOR KDF(|xi1|,ki1)
+			ï¿½	vi0 = xi0 XOR KDF(|xi0|,ki0)
+			ï¿½	vi1 = xi1 XOR KDF(|xi1|,ki1)
 			In the group element scenario:
-			•   vi0 = xi0 * ki0
-			•	vi1 = xi1 * ki1
+			ï¿½   vi0 = xi0 * ki0
+			ï¿½	vi1 = xi1 * ki1
 			For every i=1,...,m, SEND (u,vi0,vi1) to R
 			OUTPUT nothing
 
@@ -91,7 +93,7 @@ abstract class OTSemiHonestDDHBatchSenderAbs implements OTBatchSender{
 		try {
 			//Create the default DlogGroup by the factory.
 			dlog = DlogGroupFactory.getInstance().getObject(dlogName);
-			System.out.println(dlog.getGroupType());
+            Logging.getLogger().log(Level.FINE, dlog.getGroupType());
 		} catch (FactoriesException e1) {
 			// Should not occur since the dlog name in the configuration file is valid.
 		}
@@ -138,14 +140,14 @@ abstract class OTSemiHonestDDHBatchSenderAbs implements OTBatchSender{
 	 *	"WAIT for message (h0i,h1i) from R<p>
 	 *	SAMPLE a single random value r <-  {0, . . . , q-1} and COMPUTE u=g^r<p>
 	 *	For every i=1,...,m, COMPUTE:<p>
-	 *		•	ki0 = (hi0)^r<p>
-	 *		•	ki1 = (hi1)^r<p>
+	 *		ï¿½	ki0 = (hi0)^r<p>
+	 *		ï¿½	ki1 = (hi1)^r<p>
 	 *		In the byte array scenario:<p>
-	 *		•	vi0 = xi0 XOR KDF(|xi0|,ki0)<p>
-	 *		•	vi1 = xi1 XOR KDF(|xi1|,ki1)<p>
+	 *		ï¿½	vi0 = xi0 XOR KDF(|xi0|,ki0)<p>
+	 *		ï¿½	vi1 = xi1 XOR KDF(|xi1|,ki1)<p>
 	 *		In the group element scenario:<p>
-	 *		•   vi0 = xi0 * ki0<p>
-	 *		•	vi1 = xi1 * ki1<p>
+	 *		ï¿½   vi0 = xi0 * ki0<p>
+	 *		ï¿½	vi1 = xi1 * ki1<p>
 	 *	For every i=1,...,m, SEND (u,vi0,vi1) to R<p>
 	 *	OUTPUT nothing"<p>
 	 * @return null, this protocol has no output.
@@ -212,11 +214,11 @@ abstract class OTSemiHonestDDHBatchSenderAbs implements OTBatchSender{
 	/**
 	 * Runs the following lines from the protocol:
 	 * "In the byte array scenario:
-	 *	•	vi0 = xi0 XOR KDF(|xi0|,ki0)
-	 *	•	vi1 = xi1 XOR KDF(|xi1|,ki1)
+	 *	ï¿½	vi0 = xi0 XOR KDF(|xi0|,ki0)
+	 *	ï¿½	vi1 = xi1 XOR KDF(|xi1|,ki1)
 	 *	In the group element scenario:
-	 *	•   vi0 = xi0 * ki0
-	 *	•	vi1 = xi1 * ki1"
+	 *	ï¿½   vi0 = xi0 * ki0
+	 *	ï¿½	vi1 = xi1 * ki1"
 	 * @param input
 	 * @param k1Array
 	 * @param k0Array
