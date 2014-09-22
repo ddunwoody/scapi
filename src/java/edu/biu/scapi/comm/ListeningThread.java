@@ -65,6 +65,7 @@ class ListeningThread extends Thread{
 	 */
 	public ListeningThread( Map<InetAddress ,Vector<SecuringConnectionThread>> securingThreadsMap, Party party, int numOfIncomingConnections) {
 
+		setName("Listening-" + getName());
 		connectingThreadsMap = securingThreadsMap;
 		this.numOfIncomingConnections = numOfIncomingConnections;
 		
@@ -173,6 +174,7 @@ class ListeningThread extends Thread{
 					
 					//close the socket
 					try {
+						Logging.getLogger().log(Level.WARNING, "Unauthorized IP " + inetAddr + " tried to connect");
 						socketChannel.close();
 					} catch (IOException e) {
 						
@@ -214,6 +216,5 @@ class ListeningThread extends Thread{
         		
         }	
         Logging.getLogger().log(Level.INFO, "End of listening thread run");
-        System.out.println("End of listening thread run");
 	}
 }

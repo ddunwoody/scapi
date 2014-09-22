@@ -28,7 +28,9 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.util.logging.Level;
 
+import edu.biu.scapi.generals.Logging;
 import org.bouncycastle.util.BigIntegers;
 
 import edu.biu.scapi.comm.Channel;
@@ -102,7 +104,7 @@ abstract class OTPrivacyOnlyDDHReceiverAbs implements OTReceiver{
 		try {
 			//Create the default DlogGroup by the factory.
 			dlog = DlogGroupFactory.getInstance().getObject(dlogName);
-			System.out.println(dlog.getGroupType());
+            Logging.getLogger().log(Level.FINE, dlog.getGroupType());
 		} catch (FactoriesException e1) {
 			// Should not occur since the dlog name in the configuration file is valid.
 		}
