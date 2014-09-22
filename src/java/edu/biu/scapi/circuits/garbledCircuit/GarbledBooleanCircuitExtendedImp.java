@@ -224,19 +224,7 @@ public class GarbledBooleanCircuitExtendedImp implements GarbledBooleanCircuitEx
 			int size = inputIndices.size();
 			//Set an empty garbled tables array in the right size.
 			garbledTablesHolder.getInputGarbledTables().setGarbledTables(new byte[size][]);
-			//Create an identity gates array in the right size.
-			inputIdentityGates = new IdentityGate[size];
-			int index;
-			//Create each input identity gate with input wire -(i+1) and the output wire i. 
-			for (int i=0; i<size; i++){
-				index = inputIndices.get(i);
-				if (prg == null){	
-					inputIdentityGates[i] = new IdentityGate(i, -1*(index+1), index, mes, garbledTablesHolder.getInputGarbledTables());
-				} else {
-					inputIdentityGates[i] = new IdentityGate(i, -1*(index+1), index, mes, garbledTablesHolder.getInputGarbledTables(), prg);
-				}
-			}
-		// In case the user did not set input keys, the keys are the input keys of the inner circuit.
+			createInputIdentityGates(size);
 		} else{
 			inputGarbledValues = values.getAllInputWireValues();
 		}
@@ -249,19 +237,7 @@ public class GarbledBooleanCircuitExtendedImp implements GarbledBooleanCircuitEx
 			int size = outputIndices.length;
 			//Set an empty garbled tables array in the right size.
 			garbledTablesHolder.getOutputGarbledTables().setGarbledTables(new byte[size][]);
-			//Create an identity gates array in the right size.
-			outputIdentityGates = new IdentityGate[size];
-			int index;
-			//Create each output identity gate with input wire i and the output wire -(i+1). 
-			for (int i=0; i<size; i++){
-				index = outputIndices[i];
-				if (prg == null){	
-					outputIdentityGates[i] = new IdentityGate(i, index, -1*(index+1), mes, garbledTablesHolder.getOutputGarbledTables());
-				} else{
-					outputIdentityGates[i] = new IdentityGate(i, index, -1*(index+1), mes, garbledTablesHolder.getOutputGarbledTables(), prg);
-				}
-			}
-		// In case the user did not set output keys, the keys are the output keys of the inner circuit.
+			createOutputIdentityGates(size);
 		} else{
 			outputGarbledValues = values.getAllOutputWireValues();
 		}
@@ -799,7 +775,64 @@ public class GarbledBooleanCircuitExtendedImp implements GarbledBooleanCircuitEx
 		ExtendedGarbledTablesHolder holder = (ExtendedGarbledTablesHolder) garbledTables;
 		
 		this.garbledTablesHolder.setGarbledTables(holder.getInternalGarbledTables(), holder.getInputGarbledTables(), holder.getOutputGarbledTables());
+		generateInputOutputGates();
 		gbc.setGarbledTables(holder.getInternalGarbledTables());
+	}
+	
+	/**
+	 * In case the user set input and/or output keys, create the corresponding gates.<P>
+	 * The algorithm to add the gates:<P>
+	 *	1. For each input wire i, add a gate with input wire -(i+1) and the output wire i. <P>
+	 *	2. For each output wire i, add a gate with input wire i and the output wire -(i+1). <P>
+	 *	
+	 * @param values The values returned from the inner circuit's garble function.
+	 * @return The input and output keys of this circuit, along with the translation table of the inner circuit. 
+	 */
+	private void generateInputOutputGates() {
+		
+		//In case the user set the input keys, create the input identity gates.
+		if (garbledTablesHolder.getInputGarbledTables().toDoubleByteArray() != null){
+			
+			int size = inputIndices.size();
+			createInputIdentityGates(size);
+		}
+		
+		//In case the user set the output keys, create the output identity gates.
+		if (garbledTablesHolder.getOutputGarbledTables().toDoubleByteArray() != null){
+			
+			int size = outputIndices.length;
+			createOutputIdentityGates(size);
+		}
+	}
+
+	private void createOutputIdentityGates(int size) {
+		//Create an identity gates array in the right size.
+		outputIdentityGates = new IdentityGate[size];
+		int index;
+		//Create each output identity gate with input wire i and the output wire -(i+1). 
+		for (int i=0; i<size; i++){
+			index = outputIndices[i];
+			if (prg == null){	
+				outputIdentityGates[i] = new IdentityGate(i, index, -1*(index+1), mes, garbledTablesHolder.getOutputGarbledTables());
+			} else{
+				outputIdentityGates[i] = new IdentityGate(i, index, -1*(index+1), mes, garbledTablesHolder.getOutputGarbledTables(), prg);
+			}
+		}
+	}
+
+	private void createInputIdentityGates(int size) {
+		//Create an identity gates array in the right size.
+		inputIdentityGates = new IdentityGate[size];
+		int index;
+		//Create each input identity gate with input wire -(i+1) and the output wire i. 
+		for (int i=0; i<size; i++){
+			index = inputIndices.get(i);
+			if (prg == null){	
+				inputIdentityGates[i] = new IdentityGate(i, -1*(index+1), index, mes, garbledTablesHolder.getInputGarbledTables());
+			} else {
+				inputIdentityGates[i] = new IdentityGate(i, -1*(index+1), index, mes, garbledTablesHolder.getInputGarbledTables(), prg);
+			}
+		}
 	}
 
 	@Override
