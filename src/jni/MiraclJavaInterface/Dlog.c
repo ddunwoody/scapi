@@ -28,6 +28,7 @@
 
 #include <jni.h>
 #include <stdlib.h>
+#include <string.h>
 #include <iostream>
 #include <math.h>
 #include <map>

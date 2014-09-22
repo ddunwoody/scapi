@@ -43,7 +43,7 @@ public class DJKeyGenParameterSpec implements AlgorithmParameterSpec {
 	 * Default constructor. The values of the RSA modulus length and the certainty are chosen by SCAPI
 	 */
 	public DJKeyGenParameterSpec(){
-		this.modulusLength = 128;
+		this.modulusLength = 1024;
 		this.certainty = 40;
 	}
 	
