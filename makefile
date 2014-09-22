@@ -233,9 +233,9 @@ install: all clean-scripts compile-scripts
 	install -d $(INSTALL_DIR)
 	install -m 0644 assets/*$(JNI_LIB_EXT) $(INSTALL_DIR)
 	install -m 0644 assets/*.jar $(INSTALL_DIR)
-	install -d /usr/bin
-	install -m 0755 scripts/scapi.sh /usr/bin/scapi
-	install -m 0755 scripts/scapic.sh /usr/bin/scapic
+	install -d $(prefix)/bin
+	install -m 0755 scripts/scapi.sh $(prefix)/bin/scapi
+	install -m 0755 scripts/scapic.sh $(prefix)/bin/scapic
 	@echo "Done."
 
 # clean targets
