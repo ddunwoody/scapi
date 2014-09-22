@@ -76,7 +76,7 @@ JNI_MIRACL:=src/jni/MiraclJavaInterface/libMiraclJavaInterface$(JNI_LIB_EXT)
 JNI_OTEXTENSION:=src/jni/OtExtensionJavaInterface/libOtExtensionJavaInterface$(JNI_LIB_EXT)
 JNI_NTL:=src/jni/NTLJavaInterface/libNTLJavaInterface$(JNI_LIB_EXT)
 JNI_OPENSSL:=src/jni/OpenSSLJavaInterface/libOpenSSLJavaInterface$(JNI_LIB_EXT)
-JNI_TAGRETS=jni-cryptopp jni-miracl jni-openssl jni-otextension jni-ntl
+JNI_TARGETS=jni-cryptopp jni-miracl jni-openssl jni-otextension jni-ntl
 
 # basenames of created jars (apache commons, bouncy castle, scapi)
 #BASENAME_BOUNCYCASTLE:=bcprov-jdk15on-151b18.jar
@@ -105,14 +105,14 @@ SCRIPTS:=scripts/scapi.sh scripts/scapic.sh
 EXTERNAL_LIBS_TARGETS:=compile-cryptopp compile-miracl compile-openssl compile-otextension compile-ntl
 
 ## targets
-all: $(JNI_TAGRETS) $(JAR_BOUNCYCASTLE) $(JAR_APACHE_COMMONS) compile-scapi
+all: $(JNI_TARGETS) $(JAR_BOUNCYCASTLE) $(JAR_APACHE_COMMONS) compile-scapi
 
 # compile and install the crypto++ lib:
 # first compile the default target (test program + static lib)
 # then also compile the dynamic lib, and finally install.
 compile-cryptopp:
 	@echo "Compiling the Crypto++ library..."
-	@cp -r lib/CryptoPP/ $(builddir)/CryptoPP/
+	cp -r lib/CryptoPP $(builddir)
 	@$(MAKE) -C $(builddir)/CryptoPP CXX=$(CXX) CXXFLAGS=$(CRYPTOPP_CXXFLAGS)
 	@$(MAKE) -C $(builddir)/CryptoPP CXX=$(CXX) CXXFLAGS=$(CRYPTOPP_CXXFLAGS) dynamic
 	@$(MAKE) -C $(builddir)/CryptoPP CXX=$(CXX) CXXFLAGS=$(CRYPTOPP_CXXFLAGS) PREFIX=$(prefix) install
