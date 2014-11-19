@@ -34,7 +34,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Level;
 
-import edu.biu.scapi.exceptions.InvalidChannel;
 import edu.biu.scapi.exceptions.InvalidChannelException;
 import edu.biu.scapi.generals.Logging;
 
