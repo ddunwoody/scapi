@@ -125,8 +125,6 @@ public class CommunicationSetup implements TimeoutObserver{
 		
 		watchdog.start();
 		
-		Logging.getLogger().log(Level.WARNING,"Testing log");
-		
 		//establish connections.
 		try {
 			establishAndSecureConnections();
