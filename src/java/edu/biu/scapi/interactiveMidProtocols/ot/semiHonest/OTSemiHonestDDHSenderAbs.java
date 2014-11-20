@@ -64,12 +64,12 @@ abstract class OTSemiHonestDDHSenderAbs implements OTSender{
 		 	WAIT for message (h0,h1) from R
 			SAMPLE a random value r in  [0, . . . , q-1] 
 			COMPUTE:
-				�	u = g^r
-				�	k0 = h0^r
-				�	v0 = x0 XOR KDF(|x0|,k0) - in byteArray scenario.
+				*	u = g^r
+				*	k0 = h0^r
+				*	v0 = x0 XOR KDF(|x0|,k0) - in byteArray scenario.
 						OR x0*k0			 - in GroupElement scenario.
-				�	k1 = h1^r
-				�	v1 = x1 XOR KDF(|x1|,k1) - in byteArray scenario.
+				*	k1 = h1^r
+				*	v1 = x1 XOR KDF(|x1|,k1) - in byteArray scenario.
 						OR x1*k1 			 - in GroupElement scenario.
 			SEND (u,v0,v1) to R
 			OUTPUT nothing
@@ -137,16 +137,16 @@ abstract class OTSemiHonestDDHSenderAbs implements OTSender{
 	 *	"WAIT for message (h0,h1) from R<p>
 	 *	SAMPLE a random value r in  [0, . . . , q-1] <p>
 	 *	COMPUTE:<p>
-	 *		�	u = g^r<p>
-	 *		�	k0 = h0^r<p>
-	 *		�	k1 = h1^r<p>
+	 *		*	u = g^r<p>
+	 *		*	k0 = h0^r<p>
+	 *		*	k1 = h1^r<p>
 	 *	COMPUTE:<p>
 	 *			in the byte array scenario<p>
-	 *				�	v0 = x0 XOR KDF(|x0|,k0)<p> 
-	 *				�	v1 = x1 XOR KDF(|x1|,k1)<p> 
+	 *				*	v0 = x0 XOR KDF(|x0|,k0)<p> 
+	 *				*	v1 = x1 XOR KDF(|x1|,k1)<p> 
 	 *			OR in the GroupElement scenario:<p>
-	 *				�	v0 = x0 * k0<p>
-	 *				�	v1 = x1 * k1"<p>
+	 *				*	v0 = x0 * k0<p>
+	 *				*	v1 = x1 * k1"<p>
 	 *		SEND (u,v0,v1) to R<p>
 	 *		OUTPUT nothing"<p>
 	 */
@@ -236,11 +236,11 @@ abstract class OTSemiHonestDDHSenderAbs implements OTSender{
 	/**
 	 * Runs the following lines from the protocol:
 	 * "COMPUTE: in the byte array scenario:
-	 *		�	v0 = x0 XOR KDF(|x0|,k0) 
-	 *		�	v1 = x1 XOR KDF(|x1|,k1)
+	 *		*	v0 = x0 XOR KDF(|x0|,k0) 
+	 *		*	v1 = x1 XOR KDF(|x1|,k1)
 	 * OR in the GroupElement scenario:
-	 * 		�	v0 = x0 * k0
-	 *		�	v1 = x1 * k1"
+	 * 		*	v0 = x0 * k0
+	 *		*	v1 = x1 * k1"
 	 * @param input
 	 * @param k1 
 	 * @param k0 
