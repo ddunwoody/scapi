@@ -66,14 +66,14 @@ abstract class OTSemiHonestDDHBatchSenderAbs implements OTBatchSender{
 		 	WAIT for message (h0i,h1i) from R
 			SAMPLE a single random value r <-  {0, . . . , q-1} and COMPUTE u=g^r
 			For every i=1,...,m, COMPUTE:
-			�	ki0 = (hi0)^r
-			�	ki1 = (hi1)^r
+			*	ki0 = (hi0)^r
+			*	ki1 = (hi1)^r
 			In the byte array scenario:
-			�	vi0 = xi0 XOR KDF(|xi0|,ki0)
-			�	vi1 = xi1 XOR KDF(|xi1|,ki1)
+			*	vi0 = xi0 XOR KDF(|xi0|,ki0)
+			*	vi1 = xi1 XOR KDF(|xi1|,ki1)
 			In the group element scenario:
-			�   vi0 = xi0 * ki0
-			�	vi1 = xi1 * ki1
+			*   vi0 = xi0 * ki0
+			*	vi1 = xi1 * ki1
 			For every i=1,...,m, SEND (u,vi0,vi1) to R
 			OUTPUT nothing
 
@@ -140,14 +140,14 @@ abstract class OTSemiHonestDDHBatchSenderAbs implements OTBatchSender{
 	 *	"WAIT for message (h0i,h1i) from R<p>
 	 *	SAMPLE a single random value r <-  {0, . . . , q-1} and COMPUTE u=g^r<p>
 	 *	For every i=1,...,m, COMPUTE:<p>
-	 *		�	ki0 = (hi0)^r<p>
-	 *		�	ki1 = (hi1)^r<p>
+	 *		*	ki0 = (hi0)^r<p>
+	 *		*	ki1 = (hi1)^r<p>
 	 *		In the byte array scenario:<p>
-	 *		�	vi0 = xi0 XOR KDF(|xi0|,ki0)<p>
-	 *		�	vi1 = xi1 XOR KDF(|xi1|,ki1)<p>
+	 *		*	vi0 = xi0 XOR KDF(|xi0|,ki0)<p>
+	 *		*	vi1 = xi1 XOR KDF(|xi1|,ki1)<p>
 	 *		In the group element scenario:<p>
-	 *		�   vi0 = xi0 * ki0<p>
-	 *		�	vi1 = xi1 * ki1<p>
+	 *		*   vi0 = xi0 * ki0<p>
+	 *		*	vi1 = xi1 * ki1<p>
 	 *	For every i=1,...,m, SEND (u,vi0,vi1) to R<p>
 	 *	OUTPUT nothing"<p>
 	 * @return null, this protocol has no output.
@@ -214,11 +214,11 @@ abstract class OTSemiHonestDDHBatchSenderAbs implements OTBatchSender{
 	/**
 	 * Runs the following lines from the protocol:
 	 * "In the byte array scenario:
-	 *	�	vi0 = xi0 XOR KDF(|xi0|,ki0)
-	 *	�	vi1 = xi1 XOR KDF(|xi1|,ki1)
+	 *	*	vi0 = xi0 XOR KDF(|xi0|,ki0)
+	 *	*	vi1 = xi1 XOR KDF(|xi1|,ki1)
 	 *	In the group element scenario:
-	 *	�   vi0 = xi0 * ki0
-	 *	�	vi1 = xi1 * ki1"
+	 *	*   vi0 = xi0 * ki0
+	 *	*	vi1 = xi1 * ki1"
 	 * @param input
 	 * @param k1Array
 	 * @param k0Array

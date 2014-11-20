@@ -69,21 +69,21 @@ abstract class OTPrivacyOnlyDDHSenderAbs implements OTSender{
 	    	WAIT for message a from R
 			DENOTE the tuple a received by S by (x, y, z0, z1)
 			IF NOT
-			�	z0 != z1
-			�	x, y, z0, z1 in the DlogGroup
+			*	z0 != z1
+			*	x, y, z0, z1 in the DlogGroup
 			REPORT ERROR (cheat attempt)
 			SAMPLE random values u0,u1,v0,v1 in  {0, . . . , q-1} 
 			COMPUTE:
-			�	w0 = x^u0 � g^v0
-			�	k0 = (z0)^u0 � y^v0
-			�	w1 = x^u1 � g^v1
-			�	k1 = (z1)^u1 � y^v1 
+			*	w0 = x^u0 � g^v0
+			*	k0 = (z0)^u0 � y^v0
+			*	w1 = x^u1 � g^v1
+			*	k1 = (z1)^u1 � y^v1 
 			in byteArray scenario:
-				�	c0 = x0 XOR KDF(|x0|,k0)
-				�	c1 = x1 XOR KDF(|x1|,k1) 
+				*	c0 = x0 XOR KDF(|x0|,k0)
+				*	c1 = x1 XOR KDF(|x1|,k1) 
 			OR in GroupElement scenario:
-				�	c0 = x0 * k0
-				�	c1 = x1 * k1
+				*	c0 = x0 * k0
+				*	c1 = x1 * k1
 			SEND (w0, c0) and (w1, c1) to R
 			OUTPUT nothing
 	*/	 
@@ -161,21 +161,21 @@ abstract class OTPrivacyOnlyDDHSenderAbs implements OTSender{
 	 * "WAIT for message a from R<p>
 	 *		DENOTE the tuple a received by S by (x, y, z0, z1)<p>
 	 *		IF NOT<p>
-	 *		�	z0 != z1<p>
-	 *		�	x, y, z0, z1 in the DlogGroup<p>
+	 *		*	z0 != z1<p>
+	 *		*	x, y, z0, z1 in the DlogGroup<p>
 	 *		REPORT ERROR (cheat attempt)<p>
 	 *		SAMPLE random values u0,u1,v0,v1 in  {0, . . . , q-1} <p>
 	 *		COMPUTE:<p>
-	 *		�	w0 = x^u0 � g^v0<p>
-	 *		�	k0 = (z0)^u0 � y^v0<p>
-	 *		�	w1 = x^u1 � g^v1<p>
-	 *		�	k1 = (z1)^u1 � y^v1 <p>
+	 *		*	w0 = x^u0 � g^v0<p>
+	 *		*	k0 = (z0)^u0 � y^v0<p>
+	 *		*	w1 = x^u1 � g^v1<p>
+	 *		*	k1 = (z1)^u1 � y^v1 <p>
 	 *		in byteArray scenario:<p>
-	 *			�	c0 = x0 XOR KDF(|x0|,k0)<p>
-	 *			�	c1 = x1 XOR KDF(|x1|,k1) <p>
+	 *			*	c0 = x0 XOR KDF(|x0|,k0)<p>
+	 *			*	c1 = x1 XOR KDF(|x1|,k1) <p>
 	 *		OR in GroupElement scenario:<p>
-	 *			�	c0 = x0 * k0<p>
-	 *			�	c1 = x1 * k1<p>
+	 *			*	c0 = x0 * k0<p>
+	 *			*	c1 = x1 * k1<p>
 	 *		SEND (w0, c0) and (w1, c1) to R<p>
 	 *		OUTPUT nothing"
 	 */
@@ -201,14 +201,14 @@ abstract class OTPrivacyOnlyDDHSenderAbs implements OTSender{
 		
 		GroupElement g = dlog.getGenerator(); //Get the group generator.
 		
-		//Calculates w0 = x^u0 � g^v0
+		//Calculates w0 = (x^u0)*(g^v0)
 		GroupElement w0 = dlog.multiplyGroupElements(dlog.exponentiate(x, u0), dlog.exponentiate(g, v0));
-		//Calculates k0 = (z0)^u0 � y^v0
+		//Calculates k0 = (z0)^u0 * y^v0
 		GroupElement k0 = dlog.multiplyGroupElements(dlog.exponentiate(z0, u0), dlog.exponentiate(y, v0));
 		
-		//Calculates w1 = x^u1 � g^v1
+		//Calculates w1 = x^u1 * g^v1
 		GroupElement w1 = dlog.multiplyGroupElements(dlog.exponentiate(x, u1), dlog.exponentiate(g, v1));
-		//Calculates k1 = (z1)^u1 � y^v1
+		//Calculates k1 = (z1)^u1 * y^v1
 		GroupElement k1 = dlog.multiplyGroupElements(dlog.exponentiate(z1, u1), dlog.exponentiate(y, v1));
 
 		//compute c0,c1
@@ -242,8 +242,8 @@ abstract class OTPrivacyOnlyDDHSenderAbs implements OTSender{
 	/**
 	 * Runs the following lines from the protocol:
 	 * "IF NOT
-	 *	�	z0 != z1
-	 *	�	x, y, z0, z1 in the DlogGroup
+	 *	*	z0 != z1
+	 *	*	x, y, z0, z1 in the DlogGroup
 	 *	REPORT ERROR (cheat attempt)"
 	 * @param z1 
 	 * @param z0 
@@ -276,11 +276,11 @@ abstract class OTPrivacyOnlyDDHSenderAbs implements OTSender{
 	/**
 	 * Runs the following lines from the protocol:
 	 * "COMPUTE: in byteArray scenario:
-	 *	�	c0 = x0 XOR KDF(|x0|,k0)
-	 *	�	c1 = x1 XOR KDF(|x1|,k1) 
+	 *	*	c0 = x0 XOR KDF(|x0|,k0)
+	 *	*	c1 = x1 XOR KDF(|x1|,k1) 
 	 *	OR in GroupElement scenario:
-	 *	�	c0 = x0 * k0
-	 *	�	c1 = x1 * k1"
+	 *	*	c0 = x0 * k0
+	 *	*	c1 = x1 * k1"
 	 * @param input 
 	 * @param k1 
 	 * @param k0 
