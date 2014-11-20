@@ -39,7 +39,6 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Level;
 
-import edu.biu.scapi.exceptions.InvalidChannel;
 import edu.biu.scapi.exceptions.InvalidChannelException;
 import edu.biu.scapi.generals.Logging;
 
@@ -51,7 +50,6 @@ class ListeningThread extends Thread{
 																				  //Since we may have multiple channels from the same IP address we use a vector
 																				  //for each IP address. We can not differentiate using the port since when a client connects
 																				  //its port is unknown.
-	private int port;//the port to listen on
 	private boolean bStopped = false;//a flag that indicates if to keep on listening or stop
 	private ServerSocketChannel listener;
 	private int numOfIncomingConnections;
@@ -216,5 +214,6 @@ class ListeningThread extends Thread{
         		
         }	
         Logging.getLogger().log(Level.INFO, "End of listening thread run");
+        
 	}
 }

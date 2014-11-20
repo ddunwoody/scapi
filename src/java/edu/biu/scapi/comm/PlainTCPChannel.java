@@ -36,7 +36,6 @@ import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.util.Arrays;
 import java.util.logging.Level;
 
 import edu.biu.scapi.generals.Logging;
@@ -44,7 +43,7 @@ import edu.biu.scapi.generals.Logging;
 /** 
  * This class represents a concrete channel in the Decorator Pattern used to create Channels. This channel ensures TCP type of communication.
  * In order to enforce the right usage of the Channel class we will restrict the ability to instantiate one, 
- * only to classes within the Communication Layer’s package. This means that the constructor of the channel will be unreachable from 
+ * only to classes within the Communication Layerï¿½s package. This means that the constructor of the channel will be unreachable from 
  * another package. However, the send, receive and close functions will be declared public, therefore allowing anyone holding a channel 
  * to be able to use them.
  *  
